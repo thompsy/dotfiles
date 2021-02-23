@@ -734,7 +734,7 @@ This is based on https://github.com/abo-abo/hydra/wiki/Window-Management
 
   (defhydra hydra-window-delux ()
          "
-      Movement^^        ^Split^          ^Switch^	        ^Resize^    ^Eyebrowse^
+      ^Movement^        ^Split^          ^Switch^	        ^Resize^    ^Eyebrowse^
       -----------------------------------------------------------------------------
       _n_ ←             _v_ertical       _b_uffer	        _q_ X←       _c_lose config
       _e_ ↓             _x_ horizontal   _f_ind files         _w_ X↓       _r_ename config
