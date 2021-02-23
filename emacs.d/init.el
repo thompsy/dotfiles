@@ -191,6 +191,11 @@
   (setq org-agenda-files (list "~/workspace/scratch/" "~/Dropbox/Andrew/org")))
 
 (use-package org-mode
+  :config
+  (if *is-windows*
+      (setq org-directory "C:\\Dropbox\\Andrew\\org\\")
+    (setq org-directory "~/Dropbox/Andrew/org/"))
+  (setq org-default-notes-file (concat org-directory "inbox.org"))
   :hook (add-hook 'org-mode-hook #'visual-line-mode))
 
 (use-package org-bullets
