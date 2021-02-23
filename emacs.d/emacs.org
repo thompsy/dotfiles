@@ -392,6 +392,7 @@ Add find and replace info to the modeline.
 *** avy
 #+BEGIN_SRC emacs-lisp
   (use-package avy
+    :config (setq avy-background t)
     :bind ("C-'" . avy-goto-char-timer))
 #+END_SRC
 *** Text Editing
