@@ -923,8 +923,8 @@ Press ~C-(~ to get git info
 #+BEGIN_SRC emacs-lisp
   (use-package dired-git-info
       :straight t
-      :bind (:map dired-mode-map
-                  ("C-(" . dired-git-info-mode)))
+      :general ('dired-mode-map
+                "C-(" 'dired-git-info-mode))
 #+END_SRC
 *** projectile
 Projectile allows some nice things for projects, such as searching for files, managing buffers, etc.
