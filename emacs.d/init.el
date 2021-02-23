@@ -688,6 +688,25 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
+;; Json
+;;
+(use-package json-mode)
+(use-package json-reformat)
+(use-package jsonrpc)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; Yaml
+;;
+(use-package yaml-mode
+  :init
+  (setq indent-tabs-mode nil)
+  :mode "\\.yml\\'"
+  :bind (:map yaml-mode-map
+              ("C-m" . newline-and-indent)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
 ;; Expand region!
 ;;
 (use-package expand-region
