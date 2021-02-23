@@ -1115,6 +1115,26 @@ Company provides code completion.
                 ("C-p" . (lambda () (interactive) (company-complete-common-or-cycle -1)))))
 
 #+END_SRC
+
+*** Smart Scan
+#+BEGIN_SRC emacs-lisp
+  (use-package smartscan
+    :hook ((prog-mode . smartscan-mode))
+    :config
+    (global-set-key (kbd "M-n") 'smartscan-symbol-go-forward)
+    (global-set-key (kbd "M-p") 'smartscan-symbol-go-backward)
+    (global-set-key (kbd "M-'") 'my/symbol-replace))
+
+  (defun my/symbol-replace (replacement)
+    "Replace all standalone symbols in the buffer matching the one at point."
+    (interactive  (list (read-from-minibuffer "Replacement for thing at point: " nil)))
+    (save-excursion
+      (let ((symbol (or (thing-at-point 'symbol) (error "No symbol at point!"))))
+        (beginning-of-buffer)
+        ;; (query-replace-regexp symbol replacement)
+        (replace-regexp (format "\\b%s\\b" (regexp-quote symbol)) replacement))))
+
+#+END_SRC
 *** language server protocol
 Setup for Microsoft's (GASP!) Language Server Protocol. Any language that uses this calls =lsp= in the language mode's =:hook= / =:ghook=
 
