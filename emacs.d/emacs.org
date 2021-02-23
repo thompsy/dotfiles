@@ -41,10 +41,10 @@ What OS am I running?
 
 Setup the home directory
 #+BEGIN_SRC emacs-lisp
-  (defconst HOME_DIR
+  (defconst ORG_DIR
     (if *is-windows*
-        "C:/Dropbox/Andrew/"
-      "~/Dropbox/Andrew/")
+        "C:/Dropbox/Andrew/org/"
+      "~/Dropbox/Andrew/org/")
     "Home directory. Most of this lives on Dropbox to it can sync across machines.")
 #+END_SRC
 ** Package Setup
@@ -812,12 +812,12 @@ As of Emacs 27.1, =org-tempo= is required to use these.
     (setq org-capture-templates
           '(
             ("c" "Note on current task" plain (clock) "%T from: %a \n %i \n %?")
-            ("s" "Standup" entry (file+olp+datetree (concat HOME_DIR "/org/todo.org") "Standup") "* Planned\n- %?\n %i\n %a")
-            ("r" "To-Read" item (file+headline (lamdba () (concat HOME_DIR "/org/personal.org")) "To Read") "")
+            ("s" "Standup" entry (file+olp+datetree (concat ORG_DIR "todo.org") "Standup") "* Planned\n- %?\n %i\n %a")
+            ("r" "To-Read" item (file+headline (lamdba () (concat ORG_DIR "personal.org")) "To Read") "")
             ("t" "Tasks")
-            ("tw" "Work Task" entry (file+headline (lambda () (concat HOME_DIR "/org/swrx.org")) "Tasks") "** TODO %?\n %i")
-            ("tp" "Pesonal Task" entry (file+headline (lambda () (concat HOME_DIR "/org/personal.org")) "Tasks") "* TODO %?\n %i\n %a")
-            ("th" "Household Task" entry (file+headline (lambda () (concat HOME_DIR "/org/clermiston-road.org")) "Tasks") "* TODO %?\n %i\n %a")
+            ("tw" "Work Task" entry (file+headline (lambda () (concat ORG_DIR "swrx.org")) "Tasks") "** TODO %?\n %i")
+            ("tp" "Pesonal Task" entry (file+headline (lambda () (concat ORG_DIR "personal.org")) "Tasks") "* TODO %?\n %i\n %a")
+            ("th" "Household Task" entry (file+headline (lambda () (concat ORG_DIR "clermiston-road.org")) "Tasks") "* TODO %?\n %i\n %a")
 
             ))
 
@@ -873,11 +873,11 @@ I dont need documentation for elisp in this config, so =my-disable-flycheck-for-
         (defun my-disable-flycheck-for-elisp ()
           (setq flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
         :custom
-        (setq org-agenda-files (list (concat HOME_DIR "/org") (concat HOME_DIR "/org/journal")))
+        (setq org-agenda-files (list ORG_DIR (concat ORG_DIR "journal")))
 
         :config
         (setq
-         org-directory (concat HOME_DIR "/org")
+         org-directory ORG_DIR
          org-startup-folded t)
         (define-key org-mode-map (kbd "C-'") nil) ;; This conflicts with avy
         (my-org-prettify-settings)
@@ -894,7 +894,7 @@ I dont need documentation for elisp in this config, so =my-disable-flycheck-for-
     :straight nil
     :defer t
     :config
-    (setq org-journal-dir (concat HOME_DIR "/org/journal"))
+    (setq org-journal-dir (concat ORG_DIR "journal"))
     (setq org-journal-date-format "%A %d %B %Y")
     (setq org-journal-time-format "%H:%M")
     (setq org-journal-enable-agenda-integration t)
@@ -921,7 +921,7 @@ I dont need documentation for elisp in this config, so =my-disable-flycheck-for-
 
   (use-package org-roam
     :config
-    (setq org-roam-directory (concat HOME_DIR "/org/roam"))
+    (setq org-roam-directory (concat ORG_DIR "roam"))
     :hook (add-hook 'after-init-hook 'org-roam-mode))
 
   (defhydra hydra-org-roam (:exit t :idle 0.8)
@@ -1058,7 +1058,7 @@ Enable the minor modes I use for writing
   (use-package elfeed-dashboard
     :ensure t
     :config
-    (setq elfeed-dashboard-file (concat HOME_DIR "/org/elfeed-dashboard.org"))
+    (setq elfeed-dashboard-file (concat ORG_DIR "elfeed-dashboard.org"))
     ;; update feed counts on elfeed-quit
     (advice-add 'elfeed-search-quit-window :after #'elfeed-dashboard-update-links))
 
@@ -1066,13 +1066,13 @@ Enable the minor modes I use for writing
     :custom
     (elfeed-org)
     :config
-    (setq rmh-elfeed-org-files (list (concat HOME_DIR "/org/elfeed.org"))))
+    (setq rmh-elfeed-org-files (list (concat ORG_DIR "elfeed.org"))))
 
   (use-package elfeed-goodies)
   ;;TODO add this to dropbox
   (use-package elfeed
     :config
-    (setq elfeed-db-directory (concat HOME_DIR "/org/.elfeed")))
+    (setq elfeed-db-directory (concat ORG_DIR ".elfeed")))
 #+END_SRC
 
 ** Code
