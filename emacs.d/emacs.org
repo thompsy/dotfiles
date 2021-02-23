@@ -1273,13 +1273,12 @@ I dont need documentation for elisp in this config, so =my-disable-flycheck-for-
         :preface
         (defun my-disable-flycheck-for-elisp ()
           (setq flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
-        :custom
-        (setq org-agenda-files (list ORG_DIR (concat ORG_DIR "work") (concat ORG_DIR "journal")))
-
         :general
         (org-mode-map "C-'" nil)
         :config
         (setq
+         org-agenda-files (list ORG_DIR (concat ORG_DIR "work") (concat ORG_DIR "journal"))
+         org-tags-column 80
          org-ellipsis " [+]"
          org-directory ORG_DIR
          org-startup-folded t
