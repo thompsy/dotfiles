@@ -285,49 +285,138 @@ It also adds a =:general= use-package keyword, so this needs to be setup before 
 #+END_SRC
 **** hydra
 #+BEGIN_SRC emacs-lisp
-  (use-package hydra
-    :straight t
-    :defer t
-    :general
-    (my-leader-def
-     "s" '(hydra-straight-helper/body :wk "pkgs"))
-    :config
-    (defhydra hydra-zoom (global-map "<f5>")
-      "zoom"
-      ("g" text-scale-increase "in")
-      ("l" text-scale-decrease "out")
-      ("r" (text-scale-set 0) "reset")
-      ("0" (text-scale-set 0) :bind nil :exit t))
-    (defhydra hydra-straight-helper (:hint nil :color green)
-
-      "
-  _c_heck all       |_f_etch all     |_m_erge all      |_n_ormalize all   |p_u_sh all
-  _C_heck package   |_F_etch package |_M_erge package  |_N_ormlize package|p_U_sh package
-  ----------------^^+--------------^^+---------------^^+----------------^^+------------||_q_uit||
-  _r_ebuild all     |_p_ull all      |_v_ersions freeze|_w_atcher start   |_g_et recipe
-  _R_ebuild package |_P_ull package  |_V_ersions thaw  |_W_atcher quit    |prun_e_ build"
-      ("c" straight-check-all)
-      ("C" straight-check-package)
-      ("r" straight-rebuild-all)
-      ("R" straight-rebuild-package)
-      ("f" straight-fetch-all)
-      ("F" straight-fetch-package)
-      ("p" straight-pull-all)
-      ("P" straight-pull-package)
-      ("m" straight-merge-all)
-      ("M" straight-merge-package)
-      ("n" straight-normalize-all)
-      ("N" straight-normalize-package)
-      ("u" straight-push-all)
-      ("U" straight-push-package)
-      ("v" straight-freeze-versions)
-      ("V" straight-thaw-versions)
-      ("w" straight-watcher-start)
-      ("W" straight-watcher-quit)
-      ("g" straight-get-recipe)
-      ("e" straight-prune-build)
-      ("q" nil)))
+    (use-package hydra
+      :straight t
+      :defer t)
 #+END_SRC
+Now for some specific hydras.
+
+First a handy hydra for adjust text size:
+#+begin_src emacs-lisp
+  (my-leader-def "z" '(hydra-zoom/body :wk "zoom"))
+  (defhydra hydra-zoom (:column 2)
+      ("n" text-scale-increase "Zoom in")
+      ("t" text-scale-decrease "Zoom out")
+      ("r" (text-scale-set 0) "Reset zoom")
+      ("0" (text-scale-set 0) :bind nil :exit t))
+#+end_src
+
+Now one for easier navigation.
+#+begin_src emacs-lisp
+  (general-define-key "C-n" 'hydra-move/body)
+  (defhydra hydra-move
+    (:body-pre (next-line))
+    "navigation"
+    ("n" next-line)
+    ("p" previous-line)
+    ("f" forward-char)
+    ("b" backward-char)
+    ("a" beginning-of-line)
+    ("e" move-end-of-line)
+    ("v" scroll-up-command)
+    ;; Converting M-v to V here by analogy.
+    ("V" scroll-down-command)
+    ("l" recenter-top-bottom)
+    ("<" beginning-of-buffer)
+    (">" end-of-buffer))
+#+end_src
+
+One for editing rectangles.
+#+begin_src emacs-lisp
+  (my-leader-def "R" '(hydra-rectangle/body :wk "rectangle"))
+  (defhydra hydra-rectangle (:body-pre (rectangle-mark-mode 1)
+                                       :color pink
+                                       :hint nil
+                                       :post (deactivate-mark))
+         "
+      ^_i_^       _w_ copy      _O_pen       _N_umber-lines            |\\     -,,,--,,_
+    _n_   _o_     _y_ank        _t_ype       _E_xchange-point          /,`.-'`'   ..  \-;;,_
+      ^_e_^       _d_ kill      _c_lear      _r_eset-region-mark      |,4-  ) )_   .;.(  `'-'
+    ^^^^          _u_ndo        _g_ quit     ^ ^                     '---''(./..)-'(_\_)
+    "
+         ("i" rectangle-previous-line)
+         ("e" rectangle-next-line)
+         ("n" rectangle-backward-char)
+         ("o" rectangle-forward-char)
+         ("d" kill-rectangle)                    ;; C-x r k
+         ("y" yank-rectangle)                    ;; C-x r y
+         ("w" copy-rectangle-as-kill)            ;; C-x r M-w
+         ("O" open-rectangle)                    ;; C-x r o
+         ("t" string-rectangle)                  ;; C-x r t
+         ("c" clear-rectangle)                   ;; C-x r c
+         ("E" rectangle-exchange-point-and-mark) ;; C-x C-x
+         ("N" rectangle-number-lines)            ;; C-x r N
+         ("r" (if (region-active-p)
+                  (deactivate-mark)
+                (rectangle-mark-mode 1)))
+         ("u" undo nil)
+         ("g" nil))
+#+end_src
+
+Now one for package management.
+#+begin_src emacs-lisp
+  (my-leader-def "s" '(hydra-straight-helper/body :wk "pkgs"))
+  (defhydra hydra-straight-helper (:hint nil :color green)
+         "
+        _c_heck all       |_f_etch all     |_m_erge all      |_n_ormalize all   |p_u_sh all
+        _C_heck package   |_F_etch package |_M_erge package  |_N_ormlize package|p_U_sh package
+        ----------------^^+--------------^^+---------------^^+----------------^^+------------||_q_uit||
+        _r_ebuild all     |_p_ull all      |_v_ersions freeze|_w_atcher start   |_g_et recipe
+        _R_ebuild package |_P_ull package  |_V_ersions thaw  |_W_atcher quit    |prun_e_ build"
+         ("c" straight-check-all)
+         ("C" straight-check-package)
+         ("r" straight-rebuild-all)
+         ("R" straight-rebuild-package)
+         ("f" straight-fetch-all)
+         ("F" straight-fetch-package)
+         ("p" straight-pull-all)
+         ("P" straight-pull-package)
+         ("m" straight-merge-all)
+         ("M" straight-merge-package)
+         ("n" straight-normalize-all)
+         ("N" straight-normalize-package)
+         ("u" straight-push-all)
+         ("U" straight-push-package)
+         ("v" straight-freeze-versions)
+         ("V" straight-thaw-versions)
+         ("w" straight-watcher-start)
+         ("W" straight-watcher-quit)
+         ("g" straight-get-recipe)
+         ("e" straight-prune-build)
+         ("q" nil))
+#+end_src
+
+Easy unicode input for regularly used characters.
+#+begin_src emacs-lisp
+  (defun my/insert-unicode (unicode-name)
+    "Same as C-x 8 enter UNICODE-NAME."
+    (insert-char (gethash unicode-name (ucs-names))))
+
+  (my-leader-def "u" '(hydra-unicode/body :wk "unicode"))
+  (defhydra hydra-unicode (:hint nil)
+    "
+          Unicode  _e_ €  _g_ £
+                   _f_ ♀  _r_ ♂
+                   _o_ °  _m_ µ  _z_ ë  _Z_ Ë
+                   _n_ ←  _e_ ↓  _i_ ↑  _o_ →
+          "
+    ("e" (my/insert-unicode "EURO SIGN"))
+    ("g" (my/insert-unicode "POUND SIGN"))
+
+    ("r" (my/insert-unicode "MALE SIGN"))
+    ("f" (my/insert-unicode "FEMALE SIGN"))
+
+    ("o" (my/insert-unicode "DEGREE SIGN"))
+    ("m" (my/insert-unicode "MICRO SIGN"))
+
+    ("z" (my/insert-unicode "LATIN SMALL LETTER E DIAERESIS"))
+    ("Z" (my/insert-unicode "LATIN CAPITAL LETTER E DIAERESIS"))
+
+    ("n" (my/insert-unicode "LEFTWARDS ARROW"))
+    ("e" (my/insert-unicode "DOWNWARDS ARROW"))
+    ("i" (my/insert-unicode "UPWARDS ARROW"))
+    ("o" (my/insert-unicode "RIGHTWARDS ARROW")))
+#+end_src
 **** keyfreq
 #+BEGIN_SRC emacs-lisp
   (use-package keyfreq
