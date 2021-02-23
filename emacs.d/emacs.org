@@ -986,6 +986,7 @@ Some new agenda additions:
   (setq org-habit-graph-column 65)
   (setq org-duration-format 'h:mm) ;; show hours at max, not days
   (setq org-agenda-compact-blocks t)
+  (setq org-cycle-separator-lines 0)
   ;; default show today
   (setq org-agenda-span 'day)
   (setq org-agenda-start-day "-0d")
