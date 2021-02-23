@@ -392,8 +392,9 @@
 				    helm-source-buffer-not-found))
 
 ;; Taken from: https://github.com/alhassy/emacs.d#being-at-the-helm----completion--narrowing-framework
-; but not working at the moment...
 (use-package helm-swoop
+  :config (setq helm-swoop-pre-input-function
+		(lambda () ""))
   :bind  (("C-s"     . 'helm-swoop)
           ("C-M-s"   . 'helm-multi-swoop-all)
           ("C-S-s" . 'helm-swoop-back-to-last-point))
