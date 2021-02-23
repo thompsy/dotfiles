@@ -858,27 +858,31 @@ I dont need documentation for elisp in this config, so =my-disable-flycheck-for-
 - The =org-level-*= stuff makes headings bigger.
 - Several things should be in =fixed-pitch=, such as tables so  they are indented correctly
 #+BEGIN_SRC emacs-lisp
-  (use-package org
-    :straight nil
-    :gfhook
-    #'my-org-prettify-hook
-    ('org-src-mode-hook #'my-disable-flycheck-for-elisp)
-    :preface
-    (defun my-disable-flycheck-for-elisp ()
-      (setq flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
-    :custom
-    (if *is-windows*
-        (setq org-agenda-files (list "C:\\Dropbox\\Andrew\\org\\"))
-      (setq org-agenda-files (list "~/Dropbox/Andrew/org" "~/Dropbox/Andrew/org/journal")))
+  (let ((straight-current-profile 'pinned))
+      (straight-use-package 'org-plus-contrib)
+      (straight-use-package 'org)
+      ;; Pin org-mode version.
+      (add-to-list 'straight-x-pinned-packages
+                   '("org" . "924308a150ab82014b69c46c04d1ab71e874a2e6")))
+      (use-package org
+        :straight nil
+        :gfhook
+        #'my-org-prettify-hook
+        ('org-src-mode-hook #'my-disable-flycheck-for-elisp)
+        :preface
+        (defun my-disable-flycheck-for-elisp ()
+          (setq flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
+        :custom
+        (setq org-agenda-files (list (concat HOME_DIR "/org") (concat HOME_DIR "/org/journal")))
 
-    :config
-    (if *is-windows*
-        (setq org-directory "C:\\Dropbox\\Andrew\\org\\")
-      (setq org-directory "~/Dropbox/Andrew/org/"))
-    (define-key org-mode-map (kbd "C-'") nil) ;; This conflicts with avy
-    (my-org-prettify-settings)
-    (my-org-todo-setup)
-    (my-org-structure-templates))
+        :config
+        (setq
+         org-directory (concat HOME_DIR "/org")
+         org-startup-folded t)
+        (define-key org-mode-map (kbd "C-'") nil) ;; This conflicts with avy
+        (my-org-prettify-settings)
+        (my-org-todo-setup)
+        (my-org-structure-templates))
 #+END_SRC
 *** Org Pomodoro
 #+BEGIN_SRC emacs-lisp
