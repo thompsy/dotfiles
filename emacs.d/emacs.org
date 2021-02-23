@@ -495,7 +495,8 @@ Use a non-blinking cursor for a more zen-like experience.
             (tool-bar-lines . 0)))
     (scroll-bar-mode 0)
     (tool-bar-mode 0)
-    (menu-bar-mode 0))
+    (menu-bar-mode 0)
+    (global-hl-line-mode 1))
 #+END_SRC
 
 *** Theme
