@@ -499,19 +499,20 @@
 ;;
 ;; Spelling
 ;;
+(setenv "LANG" "en_GB")
 (use-package flyspell
   :diminish
   :hook ((prog-mode . flyspell-prog-mode)
 	 ((org-mode text-mode) . flyspell-mode))
   :config
   (if *is-windows*
-      (setq ispell-program-name "C:\\ProgramData\\chocolatey\\bin\\hunspell.exe")
+      (progn
+	(setq ispell-program-name "C:\\ProgramData\\chocolatey\\bin\\hunspell.exe")
+	(add-to-list 'ispell-dictionary-alist '("en_GB" "[[:alpha:]]" "[^[:alpha:]]" "[']" t ("-d" "en_GB") nil utf-8))
+	(setq ispell-local-dictionary-alist ispell-dictionary-alist)
+	(setq ispell-hunspell-dictionary-alist ispell-dictionary-alist))
     (setq ispell-program-name "/usr/local/bin/aspell"))
   (setq ispell-dictionary "en_GB")
-  (setq  ispell-extra-args '("--sug-mode=ultra"
-			     "--run-together"
-			     "--run-together-limit=5"
-			     "--run-together-min=2"))
   (setq ispell-silently-savep t)
   (setq ispell-personal-dictionary "~/.emacs.d/.aspell.en.pws"))
 
