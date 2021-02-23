@@ -878,6 +878,14 @@ As of Emacs 27.1, =org-tempo= is required to use these.
                    ;; symlink pointing to the actual location of all-posts.org!
                    (file+olp "blog-posts.org" "Ideas")
                    (function org-hugo-new-subtree-post-capture-template))))
+  (add-hook 'org-mode-hook (lambda ()
+     "Beautify Org Checkbox Symbol"
+     (push '("[ ]" . "☐") prettify-symbols-alist)
+     (push '("[X]" . "☑" ) prettify-symbols-alist)
+     (push '("[-]" . "❍" ) prettify-symbols-alist)
+     (prettify-symbols-mode)))
+
+
 #+end_src
 *** Use Package
 Put it all together with =use-package=.
