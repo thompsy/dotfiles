@@ -819,8 +819,18 @@ Needed by =pelican= and =nikola=
     (setq org-use-fast-todo-selection t)
     (setq org-todo-keywords
           '((sequence "TODO(t)" "NEXT(n)" "CURRENT(c)" "|" "DONE(d)")
-            (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(a@/!)")))
-    (setq org-log-done 'time))
+            (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(a@/!)")
+                  (type "MEETING")))
+      (setq org-log-done 'time)
+      (setq org-todo-keyword-faces
+        (quote (("TODO" :foreground "red" :weight bold)
+                ("NEXT" :foreground "blue" :weight bold)
+                ("DONE" :foreground "forest green" :weight bold)
+                ("WAITING" :foreground "orange" :weight bold)
+                ("HOLD" :foreground "magenta" :weight bold)
+                ("CANCELLED" :foreground "forest green" :weight bold)
+                ("MEETING" :foreground "forest green" :weight bold)
+                ("PHONE" :foreground "forest green" :weight bold)))))
 #+END_SRC
 
 *** Structure Templates
@@ -852,9 +862,19 @@ As of Emacs 27.1, =org-tempo= is required to use these.
             ("t" "Tasks")
             ("tw" "Work Task" entry (file+headline (lambda () (concat ORG_DIR "work/swrx.org")) "Tasks") "** TODO %?\n %i")
             ("tp" "Pesonal Task" entry (file+headline (lambda () (concat ORG_DIR "personal.org")) "Tasks") "* TODO %?\n %i\n %a")
-            ("th" "Household Task" entry (file+headline (lambda () (concat ORG_DIR "clermiston-road.org")) "Tasks") "* TODO %?\n %i\n %a")
-
-            ))
+            ("th" "Household Task" entry (file+headline (lambda () (concat ORG_DIR "household.org")) "Tasks") "* TODO %?\n %i\n %a")
+                  ("i" "Interruption")
+                  ("ii" "interruption" entry (file+olp+datetree (lambda () (concat ORG_DIR "tracker.org"))) "* IN-PROGRESS %?  :interruption:work:\n%U\n- ref :: %a\n"
+                   :prepend t :tree-type week :clock-in t :clock-keep t)
+                  ("ic" "chat"         entry (file+olp+datetree (lambda () (concat ORG_DIR "tracker.org"))) "* CHAT %?         :work:chat:\n%U\n- ref :: %a\n"
+                   :prepend t :tree-type week :clock-in t :clock-keep t)
+                  ("ie" "email"        entry (file+olp+datetree (lambda () (concat ORG_DIR "tracker.org"))) "* EMAIL %?        :work:email:\n%U\n- ref :: %a\n"
+                   :prepend t :tree-type week :clock-in t :clock-keep t)
+                  ("im" "meeting"      entry (file+olp+datetree (lambda () (concat ORG_DIR "tracker.org")))  "* MEETING %?      :work:meeting:\n%U\n- ref :: %a\n"
+                   :prepend t :tree-type week :clock-in t :clock-keep t)
+                  ("ir" "review"       entry (file+olp+datetree (lambda () (concat ORG_DIR "tracker.org")))  "* REVIEW %?       :work:review:\n%U\n- ref :: %a\n"
+                   :prepend t :tree-type week :clock-in t :clock-keep t)
+                  ))
 
     (defun org-hugo-new-subtree-post-capture-template ()
       "Returns `org-capture' template string for new Hugo post.
@@ -920,12 +940,68 @@ I dont need documentation for elisp in this config, so =my-disable-flycheck-for-
 
         :config
         (setq
+         org-ellipsis " [+]"
          org-directory ORG_DIR
-         org-startup-folded t)
+         org-startup-folded t
+         org-src-fontify-natively t
+         org-src-window-setup 'current-window ;; edit in current window
+         org-src-preserve-indentation nil ;; do not put two spaces on the left
+         org-src-tab-acts-natively t
+	       ;; create default clocktable
+	       org-clock-clocktable-default-properties '(:scope subtree :maxlevel 4 :timestamp t :link t :tags t :narrow 36! :match "work")
+	      ;;  display default clock report in agenda view
+	      org-agenda-clockreport-parameter-plist '(:lang "en" :maxlevel 4 :fileskip0 t :link t :indent t :narrow 80!))
+
         (define-key org-mode-map (kbd "C-'") nil) ;; This conflicts with avy
         (my-org-prettify-settings)
         (my-org-todo-setup)
         (my-org-structure-templates))
+
+#+END_SRC
+
+Some new agenda additions:
+#+BEGIN_SRC emacs-lisp
+  (setq org-log-into-drawer t) ;; hide the log state change history a bit better
+  (setq org-deadline-warning-days 7)
+  (setq org-agenda-skip-scheduled-if-deadline-is-shown t)
+  (setq org-habit-show-habits-only-for-today nil)
+  (setq org-habit-graph-column 65)
+  (setq org-duration-format 'h:mm) ;; show hours at max, not days
+  (setq org-agenda-compact-blocks t)
+  ;; default show today
+  (setq org-agenda-span 'day)
+  (setq org-agenda-start-day "-0d")
+  (setq org-agenda-start-on-weekday nil)
+  (setq org-agenda-custom-commands
+        '(("d" "Done tasks" tags "/DONE|CANCELED")
+          ("g" "Plan Today"
+           ((agenda "" ((org-agenda-span 'day)))
+            (org-agenda-skip-function '(org-agenda-skip-deadline-if-not-today))
+            (org-agenda-entry-types '(:deadline))
+            (org-agenda-overriding-header "Today's Deadlines ")))))
+
+  (use-package org-super-agenda
+    :straight t
+    :after org-agenda
+    :custom (org-super-agenda-groups
+             '( ;; Each group has an implicit boolean OR operator between its selectors.
+               (:name "Overdue" :deadline past :order 0)
+               (:name "Evening Habits" :and (:habit t :tag "evening") :order 8)
+               (:name "Habits" :habit t :order 6)
+               (:name "Today" ;; Optionally specify section name
+                :time-grid t  ;; Items that appear on the time grid (scheduled/deadline with time)
+                :order 3)     ;; capture the today first but show it in order 3
+               (:name "Low Priority" :priority "C" :tag "maybe" :order 7)
+               (:name "Due Today" :deadline today :order 1)
+               (:name "Important"
+                :and (:priority "A" :not (:todo ("DONE" "CANCELED")))
+                :order 2)
+               (:name "Due Soon" :deadline future :order 4)
+               (:name "Todo" :not (:habit t) :order 5)
+               (:name "Waiting" :todo ("WAITING" "HOLD") :order 9)))
+    :config
+    (setq org-super-agenda-header-map nil)
+    (org-super-agenda-mode t))
 #+END_SRC
 *** Org Pomodoro
 #+BEGIN_SRC emacs-lisp
