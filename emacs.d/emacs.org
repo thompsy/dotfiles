@@ -1008,13 +1008,13 @@ Some new agenda additions:
                (:name "Evening Habits" :and (:habit t :tag "evening") :order 8)
                (:name "Habits" :habit t :order 6)
                (:name "Today" ;; Optionally specify section name
-                :time-grid t  ;; Items that appear on the time grid (scheduled/deadline with time)
-                :order 3)     ;; capture the today first but show it in order 3
+                      :time-grid t  ;; Items that appear on the time grid (scheduled/deadline with time)
+                      :order 3)     ;; capture the today first but show it in order 3
                (:name "Low Priority" :priority "C" :tag "maybe" :order 7)
                (:name "Due Today" :deadline today :order 1)
                (:name "Important"
-                :and (:priority "A" :not (:todo ("DONE" "CANCELED")))
-                :order 2)
+                      :and (:priority "A" :not (:todo ("DONE" "CANCELED")))
+                      :order 2)
                (:name "Due Soon" :deadline future :order 4)
                (:name "Todo" :not (:habit t) :order 5)
                (:name "Waiting" :todo ("WAITING" "HOLD") :order 9)))
