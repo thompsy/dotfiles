@@ -1661,17 +1661,22 @@ Enable error checking everywhere.
     (my-leader-def
       "f" '(hydra-flycheck-mode/body :wk "flycheck-mode"))
     :config
-    (defhydra hydra-flycheck-mode (:hint nil :color green)
-
+    (defhydra hydra-flycheck-mode
+      (:hint nil
+       :color green
+       :pre (flycheck-list-errors)
+       :post (quit-windows-on "*Flycheck errors*"))
       "
   Find Errors        Describe Errors
   -----------------------------------
   _f_irst error      _s_how error
   _n_ext error       _e_xplain error
+  _p_rev error       ^ ^
   _l_ist errors      ^ ^
   "
       ("f" flycheck-first-error)
       ("n" flycheck-next-error)
+      ("p" flycheck-previous-error)
       ("l" flycheck-list-errors)
       ("s" flycheck-display-error-at-point)
       ("e" flycheck-explain-error-at-point))
