@@ -268,6 +268,7 @@ It also adds a =:general= use-package keyword, so this needs to be setup before 
       ;; quit / restart
       "q" '(:ignore t :wk "quit / restart")
       "qq" 'save-buffers-kill-terminal
+      "q!" 'save-buffers-kill-emacs
       "qr" 'restart-emacs)
     )
 
