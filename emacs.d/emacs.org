@@ -632,11 +632,12 @@ This resizes the windows within an Emacs frame so that their sizes conform to th
 *** ace-window
 Make it easy to switch windows
 #+BEGIN_SRC emacs-lisp
-    (use-package ace-window
-      :straight t
-      :config
-      (global-set-key (kbd "M-o") 'ace-window)
-      (setq aw-keys '(?a ?r ?s ?t ?n ?e ?i ?o)))
+  (use-package ace-window
+    :straight t
+    :general
+    ("M-o" 'ace-window)
+    :config
+    (setq aw-keys '(?a ?r ?s ?t ?n ?e ?i ?o)))
 #+END_SRC
 *** switch-window
 #+BEGIN_SRC emacs-lisp
