@@ -569,10 +569,11 @@ Highlight the line where the point is
 #+BEGIN_SRC emacs-lisp
   (use-package beacon
     :diminish
-    :config (setq beacon-color "#666600")
-    :hook   ((org-mode text-mode) . beacon-mode))
-
+    :config
+    (setq beacon-color "#666600")
+    (beacon-mode 1))
 #+END_SRC
+
 *** COMMENT  highlight indentation
 #+BEGIN_SRC emacs-lisp
   (use-package highlight-indent-guides
