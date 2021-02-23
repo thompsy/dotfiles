@@ -965,10 +965,10 @@ I dont need documentation for elisp in this config, so =my-disable-flycheck-for-
          org-src-window-setup 'current-window ;; edit in current window
          org-src-preserve-indentation nil ;; do not put two spaces on the left
          org-src-tab-acts-natively t
-	       ;; create default clocktable
-	       org-clock-clocktable-default-properties '(:scope subtree :maxlevel 4 :timestamp t :link t :tags t :narrow 36! :match "work")
-	      ;;  display default clock report in agenda view
-	      org-agenda-clockreport-parameter-plist '(:lang "en" :maxlevel 4 :fileskip0 t :link t :indent t :narrow 80!))
+         ;; create default clocktable
+         org-clock-clocktable-default-properties '(:scope subtree :maxlevel 4 :timestamp t :link t :tags t :narrow 36! :match "work")
+         ;;  display default clock report in agenda view
+         org-agenda-clockreport-parameter-plist '(:lang "en" :maxlevel 4 :fileskip0 t :link t :indent t :narrow 80!))
 
         (define-key org-mode-map (kbd "C-'") nil) ;; This conflicts with avy
         (my-org-prettify-settings)
