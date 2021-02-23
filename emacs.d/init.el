@@ -34,6 +34,12 @@
 ;; Basic Options
 ;;
 (global-auto-revert-mode t)
+(setq display-time-day-and-date t)
+(display-time)
+(line-number-mode t)
+(setq display-line-numbers-width-start t)
+(global-display-line-numbers-mode      t)
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -79,8 +85,10 @@
 (use-package dracula)
 (load-theme 'dracula)
 
-(setq display-time-day-and-date t)
-(display-time)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; Fancy battery
+;;
 (use-package fancy-battery
   :defer t
   :diminish
@@ -88,11 +96,10 @@
           (battery-update-interval       15)
 	  :config (fancy-battery-mode))
 
-(line-number-mode t)
-(setq display-line-numbers-width-start t)
-(global-display-line-numbers-mode      t)
-
-
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; Spaceline
+;;
 (use-package spaceline
   :custom (spaceline-buffer-encoding-abbrev-p nil)
           (spaceline-line-column-p t) ;; Show “line-number : column-number” in modeline.
@@ -101,9 +108,15 @@
           (spaceline-helm-mode)
           (spaceline-info-mode)
           (spaceline-emacs-theme))
-(use-package spaceline-all-the-icons
-  :after spaceline
-  :config (spaceline-all-the-icons-theme))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; all-the-icons
+;;
+(use-package all-the-icons)
+;(use-package spaceline-all-the-icons
+;  :after spaceline
+;  :config (spaceline-all-the-icons-theme))
 
 (setq-default
  powerline-height 24
