@@ -1045,8 +1045,25 @@ Add line numbers to programming mode buffers. I think they look wierd in my org 
 Enable error checking everywhere.
 #+BEGIN_SRC emacs-lisp
   (use-package flycheck
+    :general
+    (my-leader-def
+      "f" '(hydra-flycheck-mode/body :wk "flycheck-mode"))
     :config
-    (global-flycheck-mode +1))
+    (defhydra hydra-flycheck-mode (:hint nil :color green)
+
+      "
+  Find Errors        Describe Errors
+  -----------------------------------
+  _f_irst error      _s_how error
+  _n_ext error       _e_xplain error
+  _l_ist errors      ^ ^
+  "
+      ("f" flycheck-first-error)
+      ("n" flycheck-next-error)
+      ("l" flycheck-list-errors)
+      ("s" flycheck-display-error-at-point)
+      ("e" flycheck-explain-error-at-point))
+      (global-flycheck-mode +1))
 #+END_SRC
 *** company
 Company provides code completion.
