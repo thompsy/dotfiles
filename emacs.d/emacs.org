@@ -1053,6 +1053,27 @@ Enable the minor modes I use for writing
     ("C-<" . er/contract-region))
 
 #+END_SRC
+** Elfeed
+#+BEGIN_SRC emacs-lisp
+  (use-package elfeed-dashboard
+    :ensure t
+    :config
+    (setq elfeed-dashboard-file (concat HOME_DIR "/org/elfeed-dashboard.org"))
+    ;; update feed counts on elfeed-quit
+    (advice-add 'elfeed-search-quit-window :after #'elfeed-dashboard-update-links))
+
+  (use-package elfeed-org
+    :custom
+    (elfeed-org)
+    :config
+    (setq rmh-elfeed-org-files (list (concat HOME_DIR "/org/elfeed.org"))))
+
+  (use-package elfeed-goodies)
+  ;;TODO add this to dropbox
+  (use-package elfeed
+    :config
+    (setq elfeed-db-directory (concat HOME_DIR "/org/.elfeed")))
+#+END_SRC
 
 ** Code
 Things that are used when coding.
