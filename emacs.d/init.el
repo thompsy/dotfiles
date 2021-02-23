@@ -367,7 +367,7 @@
     ;; Show a diff window displaying changes between undo nodes.
     (setq undo-tree-visualizer-diff t))
 
-(global-set-key (kbd "C-'") 'avy-goto-word-or-subword-1)
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -675,8 +675,8 @@
 ;;
 ;; Avy
 ;;
-(global-set-key (kbd "C-j") 'avy-goto-char-2)
-(global-set-key (kbd "C-'") 'avy-goto-char-timer)
+(use-package avy
+  :bind ("C-'" . avy-goto-char-timer))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
