@@ -684,6 +684,12 @@ Projectile allows some nice things for projects, such as searching for files, ma
     (define-key projectile-mode-map (kbd "C-c h") 'projectile-command-map)
     (projectile-mode +1))
 
+  (use-package ibuffer-vc
+    :config
+    (add-hook 'ibuffer-hook #'ibuffer-vc-set-filter-groups-by-vc-root))
+
+  (use-package ibuffer-projectile)
+
   (use-package helm-projectile
     :after projectile
     :config
