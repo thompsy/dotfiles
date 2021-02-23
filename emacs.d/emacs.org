@@ -690,6 +690,12 @@ Make it easy to switch windows
     :init
     (eyebrowse-mode t))
 #+END_SRC
+*** Winner Mode
+#+BEGIN_SRC emacs-lisp
+  (use-package winner
+    :commands winner-mode
+    :init (winner-mode t))
+#+END_SRC
 
 *** iBuffer
 #+BEGIN_SRC emacs-lisp
