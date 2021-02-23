@@ -598,6 +598,15 @@ Make it easy to switch windows
     :config
     (global-set-key (kbd "M-o") 'ace-window))
 #+END_SRC
+*** switch-window
+#+BEGIN_SRC emacs-lisp
+  (use-package switch-window
+    :bind
+    ("C-x o" . 'switch-window)
+    :config
+    (setq switch-window-shortcut-style 'qwerty))
+#+END_SRC
+
 *** iBuffer
 #+BEGIN_SRC emacs-lisp
   (setq ibuffer-saved-filter-groups
