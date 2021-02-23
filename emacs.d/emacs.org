@@ -172,7 +172,7 @@ Emacs likes to create lots of extra files for things, these settings prevent tha
      version-control t
      vc-make-backup-files t
      recentf-max-menu-items 25
-     recentf-max-saved-items 100))
+     recentf-max-saved-items 500))
 #+end_src
 
 Use the system clipboard for killing/yanking (copying/pasting) and display column information in the modeline.
