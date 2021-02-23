@@ -672,6 +672,7 @@ Projectile allows some nice things for projects, such as searching for files, ma
 #+BEGIN_SRC emacs-lisp
   (use-package projectile
     :config
+    (define-key projectile-mode-map (kbd "C-c C-p") 'projectile-command-map)
     (projectile-mode +1))
 
   (use-package helm-projectile
