@@ -1444,6 +1444,12 @@ Test RESTful APIs in emacs!
   (use-package ob-restclient
     :defer t)
 #+END_SRC
+** Java
+#+BEGIN_SRC emacs-lisp
+  (use-package lsp-java
+    :config (add-hook 'java-mode-hook 'lsp))
+#+END_SRC
+
 ** Go
 #+BEGIN_SRC emacs-lisp
   (use-package go-mode
