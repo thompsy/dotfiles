@@ -17,6 +17,7 @@
 (setq package-list '(ace-jump-mode ace-window avy beacon color-theme-sanityinc-tomorrow company dashboard diminish dimmer docker-compose-mode dockerfile-mode helm-descbinds helm-projectile helm-swoop helm helm-core highlight-parentheses jinja2-mode magit git-commit markdown-toc markdown-mode monokai-theme page-break-lines pdf-tools popup projectile-sift projectile pkg-info epl rainbow-delimiters restart-emacs sift smartscan spaceline-all-the-icons spaceline s dash powerline all-the-icons memoize spacemacs-theme synosaurus tablist transient use-package bind-key which-key with-editor async yaml-mode expand-region))
 
 (setq package-archives '(
+			 ("org" . "https://orgmode.org/elpa/")
                          ("elpa" . "http://tromey.com/elpa/")
                          ("gnu" . "http://elpa.gnu.org/packages/")
                          ("melpa" . "http://melpa.org/packages/")))
@@ -207,7 +208,7 @@
 ;;
 (if *is-windows*
     (setq org-agenda-files (list "C:\\Dropbox\\Andrew\\org\\"))
-  (setq org-agenda-files (list "~/workspace/scratch/" "~/Dropbox/Andrew/org")))
+  (setq org-agenda-files (list "~/Dropbox/Andrew/org" "~/Dropbox/Andrew/org/journal")))
 
 (use-package org
   :ensure t
@@ -217,7 +218,15 @@
     (setq org-directory "~/Dropbox/Andrew/org/"))
   (setq org-default-notes-file (concat org-directory "inbox.org")
 	org-capture-templates '())
-  :hook (add-hook 'org-mode-hook #'visual-line-mode))
+  (define-key org-mode-map (kbd "C-'") nil)
+					;TODO: this seems to cause problems with journal and org-roam...
+  :hook (org-mode . org-indent-mode)
+					;  :hook (org-mode . visual-line-mode)
+  :bind ("C-c C-a" . org-agenda)
+)
+(use-package org-plus-contrib :ensure t :defer t)
+
+(use-package org-pomodoro)
 
 (use-package org-superstar
   :ensure t
@@ -235,10 +244,12 @@
   :defer t
   :config (if *is-windows*
 	      (setq org-journal-dir "C:\\Dropbox\\Andrew\\org\\journal")
-	    (setq org-journal-dir "~/workspace/scratch/journal/"))
+	    (setq org-journal-dir "~/Dropbox/Andrew/org/journal/"))
   (setq org-journal-date-format "%A %d %B %Y")
   (setq org-journal-time-format "%H:%M")
-  :bind ("C-c C-j" . org-journal-new-entry))
+  (setq org-journal-enable-agenda-integration t)
+  (setq org-journal-file-format "%Y%m%d.org")
+  :bind ("C-x C-j" . org-journal-new-entry))
 
 (use-package anki-editor
   :after org
