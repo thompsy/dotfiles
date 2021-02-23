@@ -1149,7 +1149,13 @@ The Language Server Protocol (LSP) defines the protocol used between an editor o
     :commands lsp
     :custom
     (lsp-completion-provider :capf)
-    (lsp-keymap-prefix "C-l"))
+    (lsp-keymap-prefix "C-c l"))
+
+(custom-set-faces
+ '(lsp-face-highlight-read ((t (:background "gray"))))
+ '(lsp-face-highlight-textual ((t (:background "gray"))))
+ '(lsp-face-highlight-write ((t (:background "SteelBlue1"))))
+ '(lsp-ui-doc-background ((t (:background "black")))))
 
   (use-package lsp-ui
     :ensure t
