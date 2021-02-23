@@ -125,6 +125,9 @@ Settings for things that are defined in the C source code, so we use =emacs= as 
     :init
     ;; answer with y/n instead of typing out yes/no
     (defalias 'yes-or-no-p 'y-or-n-p)
+    :config
+    (setq indent-tabs-mode nil
+          tab-width 4)
     :custom
     ;; load new source files instead of stale elisp bytecode
     (load-prefer-newer t)
