@@ -383,9 +383,10 @@ Replace keybindings for emacs search and evil search with swoop.
     :straight t
     :config (setq helm-swoop-pre-input-function
                   (lambda () ""))
-    :bind  (("C-s"   . 'helm-swoop)
-            ("C-M-s" . 'helm-multi-swoop-all)
-            ("C-S-s" . 'helm-swoop-back-to-last-point))
+    :general
+    ("C-s"   'helm-swoop)
+    ("C-M-s" 'helm-multi-swoop-all)
+    ("C-S-s" 'helm-swoop-back-to-last-point)
     :custom (helm-swoop-split-with-multiple-windows nil "Do not split window inside the current window."))
 #+END_SRC
 
@@ -416,7 +417,7 @@ Add find and replace info to the modeline.
   (use-package avy
     :straight t
     :config (setq avy-background t)
-    :bind ("C-'" . avy-goto-char-timer))
+    :general ("C-'" 'avy-goto-char-timer))
 #+END_SRC
 *** Text Editing
 **** multiple cursors
@@ -641,8 +642,8 @@ Make it easy to switch windows
 #+BEGIN_SRC emacs-lisp
   (use-package switch-window
     :straight t
-    :bind
-    ("C-x o" . 'switch-window)
+    :general
+    ("C-x o" 'switch-window)
     :config
     (setq switch-window-shortcut-style 'qwerty))
 #+END_SRC
@@ -955,6 +956,8 @@ I dont need documentation for elisp in this config, so =my-disable-flycheck-for-
         :custom
         (setq org-agenda-files (list ORG_DIR (concat ORG_DIR "work") (concat ORG_DIR "journal")))
 
+        :general
+        (org-mode-map "C-'" nil)
         :config
         (setq
          org-ellipsis " [+]"
@@ -969,7 +972,6 @@ I dont need documentation for elisp in this config, so =my-disable-flycheck-for-
          ;;  display default clock report in agenda view
          org-agenda-clockreport-parameter-plist '(:lang "en" :maxlevel 4 :fileskip0 t :link t :indent t :narrow 80!))
 
-        (define-key org-mode-map (kbd "C-'") nil) ;; This conflicts with avy
         (my-org-prettify-settings)
         (my-org-todo-setup)
         (my-org-structure-templates))
@@ -1037,7 +1039,7 @@ Some new agenda additions:
     (setq org-journal-time-format "%H:%M")
     (setq org-journal-enable-agenda-integration t)
     (setq org-journal-file-format "%Y%m%d.org")
-    :bind ("C-x C-j" . org-journal-new-entry))
+    :general ("C-x C-j" 'org-journal-new-entry))
 #+END_SRC
 
 *** Org Babel
@@ -1102,11 +1104,12 @@ Some new agenda additions:
   (use-package anki-editor
     :straight t
     :after org
-    :bind (:map org-mode-map
-                ("<f12>" . anki-editor-cloze-region-auto-incr)
-                ("<f11>" . anki-editor-cloze-region-dont-incr)
-                ("<f10>" . anki-editor-reset-cloze-number)
-                ("<f9>"  . anki-editor-push-tree))
+    :general
+    (org-mode-map
+     "<f12>" 'anki-editor-cloze-region-auto-incr
+     "<f11>" 'anki-editor-cloze-region-dont-incr
+     "<f10>" 'anki-editor-reset-cloze-number
+     "<f9>"  'anki-editor-push-tree)
     :hook (org-capture-after-finalize . anki-editor-reset-cloze-number) ; Reset cloze-number after each capture.
     (org-mode . anki-editor-mode)
     :config
@@ -1202,9 +1205,9 @@ Enable the minor modes I use for writing
 #+BEGIN_SRC emacs-lisp
   (use-package expand-region
     :straight t
-    :bind
-    ("C->" . er/expand-region)
-    ("C-<" . er/contract-region))
+    :general
+    ("C->" 'er/expand-region)
+    ("C-<" 'er/contract-region))
 
 #+END_SRC
 ** Elfeed
@@ -1325,10 +1328,10 @@ Company provides code completion.
   (use-package smartscan
     :straight t
     :hook ((prog-mode . smartscan-mode))
-    :config
-    (global-set-key (kbd "M-n") 'smartscan-symbol-go-forward)
-    (global-set-key (kbd "M-p") 'smartscan-symbol-go-backward)
-    (global-set-key (kbd "M-'") 'my/symbol-replace))
+    :general
+    ("M-n" 'smartscan-symbol-go-forward)
+    ("M-p" 'smartscan-symbol-go-backward)
+    ("M-'" 'my/symbol-replace))
 
   (defun my/symbol-replace (replacement)
     "Replace all standalone symbols in the buffer matching the one at point."
