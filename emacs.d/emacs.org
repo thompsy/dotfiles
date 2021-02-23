@@ -402,7 +402,21 @@ Add find and replace info to the modeline.
     :defer t
     :general
     (my-leader-def
-      "v" 'mc/edit-lines))
+      "v" '(hydra-mc/body :wk "mv-mode"))
+    :config
+    (defhydra hydra-mc (:hint nil :color green)
+      "
+  Multiple Cursors
+  -------------------
+  _e_dit lines
+  _n_ext like this
+  _p_rev like this
+  _a_ll like this
+  "
+      ("e" mc/edit-lines)
+      ("n" mc/mark-next-like-this)
+      ("p" mc/mark-previous-like-this)
+      ("a" mc/mark-all-like-this)))
 #+END_SRC
 **** iedit
 #+BEGIN_QUOTE
