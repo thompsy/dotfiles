@@ -1321,6 +1321,14 @@ Use editorconfig for projects that have them
     :config
     (editorconfig-mode +1))
 #+END_SRC
+** COMMENT Eshell
+#+BEGIN_SRC emacs-lisp
+  (use-package eshell-prompt-extras
+    :straight t
+    :config
+    (setq eshell-highlight-prompt nil
+        eshell-prompt-function 'epe-theme-lambda))
+#+END_SRC
 ** Version Control
 *** magit
 use git in emacs!
