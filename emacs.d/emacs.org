@@ -1770,7 +1770,35 @@ The Language Server Protocol (LSP) defines the protocol used between an editor o
     :commands lsp
     :custom
     (lsp-completion-provider :capf)
-    (lsp-keymap-prefix "C-c l"))
+    :general
+    (my-leader-def
+      "L" '(hydra-lsp/body :wk "lsp-mode"))
+    :config
+    (setq lsp-file-watch-threshold 5000)
+    (defhydra hydra-lsp (:exit t :hint nil)
+      "
+   Buffer^^               Server^^                   Symbol
+  -------------------------------------------------------------------------------------
+   [_f_] format           [_M-r_] restart            [_d_] declaration  [_i_] implementation  [_o_] documentation
+   [_m_] imenu            [_S_]   shutdown           [_D_] definition   [_t_] type            [_r_] rename
+   [_x_] execute action   [_M-s_] describe session   [_R_] references   [_s_] signature       [_a_] actions"
+      ("d" lsp-find-declaration)
+      ("D" lsp-ui-peek-find-definitions)
+      ("R" lsp-ui-peek-find-references)
+      ("i" lsp-ui-peek-find-implementation)
+      ("t" lsp-find-type-definition)
+      ("s" lsp-signature-help)
+      ("o" lsp-describe-thing-at-point)
+      ("r" lsp-rename)
+      ("a" helm-lsp-code-actions)
+
+      ("f" lsp-format-buffer)
+      ("m" lsp-ui-imenu)
+      ("x" lsp-execute-code-action)
+
+      ("M-s" lsp-describe-session)
+      ("M-r" lsp-restart-workspace)
+      ("S" lsp-shutdown-workspace)))
 
   (custom-set-faces
    '(lsp-face-highlight-read ((t (:background "gray"))))
