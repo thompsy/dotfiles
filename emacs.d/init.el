@@ -653,7 +653,12 @@
 ;; Optional - provides fancier overlays.
 (use-package lsp-ui
   :ensure t
-  :commands lsp-ui-mode)
+  :commands lsp-ui-mode
+  :config (setq lsp-ui-doc-enable t
+		lsp-ui-peek-enable t
+		lsp-ui-sideline-enable t
+		lsp-ui-imenu-enable t
+		lsp-ui-flycheck-enable t))
 
 (use-package dap-mode)
 (use-package dap-go)
