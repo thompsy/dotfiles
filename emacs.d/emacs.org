@@ -1399,7 +1399,8 @@ Some new agenda additions:
     ("i" org-roam-insert "insert")
     ("f" org-roam-find-file "find-file")
     ("v" org-roam-buffer-activate "backlinks"))
-  (global-set-key (kbd "C-c r") 'hydra-org-roam/body)
+  (my-leader-def
+    "r" '(hydra-org-roam/body :wk "org-roam"))
 
   (use-package org-roam-server
     :straight t
