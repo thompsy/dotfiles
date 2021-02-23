@@ -874,7 +874,7 @@ As of Emacs 27.1, =org-tempo= is required to use these.
     :config
     (setq org-capture-templates
           '(
-            ("c" "Note on current task" plain (clock) "%T from: %a \n %i \n %?")
+            ("c" "Note on current task" plain (clock) "\n\n%T from: %a\n%i\n%?")
             ("s" "Standup" entry (file+olp+datetree (concat ORG_DIR "todo.org") "Standup") "* Planned\n- %?\n %i\n %a")
             ("r" "To-Read" item (file+headline (lamdba () (concat ORG_DIR "personal.org")) "To Read") "")
             ("t" "Tasks")
