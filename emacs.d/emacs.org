@@ -38,6 +38,15 @@ What OS am I running?
   (setq *is-linux* (eq system-type 'gnu/linux))
   (setq *is-windows* (eq system-type 'windows-nt))
 #+END_SRC
+
+Setup the home directory
+#+BEGIN_SRC emacs-lisp
+  (defconst HOME_DIR
+    (if *is-windows*
+        "C:/Dropbox/Andrew/"
+      "~/Dropbox/Andrew/")
+    "Home directory. Most of this lives on Dropbox to it can sync across machines.")
+#+END_SRC
 ** Package Setup
 Set up =straight.el= instead of the built-in =package.el= to manage my packages.
 
