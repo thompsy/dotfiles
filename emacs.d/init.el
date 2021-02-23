@@ -198,9 +198,16 @@
   (setq org-default-notes-file (concat org-directory "inbox.org"))
   :hook (add-hook 'org-mode-hook #'visual-line-mode))
 
-(use-package org-bullets
-  :if *is-a-mac*
-  :hook (org-mode . org-bullets-mode))
+(use-package org-superstar
+  :ensure t
+  :defer 3
+  :hook (org-mode . org-superstar-mode)
+  :init(setq org-superstar-prettify-item-bullets t
+             org-superstar-leading-bullet ?\s
+             org-hide-leading-stars t
+             org-superstar-item-bullet-alist '((?* . ?●)
+                                               (?+ . ?➤)
+                                               (?- . ?—))))
 
 (use-package org-journal
   :ensure t
