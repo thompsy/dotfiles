@@ -247,10 +247,10 @@ It also adds a =:general= use-package keyword, so this needs to be setup before 
         "c" 'comment-dwim
         "RET" 'make-frame-command
         ;; bookmarks
-       "r" '(:ignore t :wk "bookmarks")
-        "rm" 'bookmark-set
-        "rb" 'bookmark-jump
-        "rl" 'bookmark-bmenu-list
+        "b" '(:ignore t :wk "bookmarks")
+        "bs" 'bookmark-set
+        "bg" 'bookmark-jump
+        "bl" 'bookmark-bmenu-list
         ;; quit / restart
         "q" '(:ignore t :wk "quit / restart")
         "qq" 'save-buffers-kill-terminal
