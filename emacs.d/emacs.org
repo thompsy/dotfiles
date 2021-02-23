@@ -614,7 +614,8 @@ Highlight the line where the point is
     (highlight-indent-guides-delay 0))
 #+END_SRC
 ** Buffer & Window Management
-*** golden-ratio
+*** COMMENT golden-ratio
+This resizes the windows within an Emacs frame so that their sizes conform to the golden ratio. I've disabled it for now as its a bit annoying. 
 #+BEGIN_SRC emacs-lisp
   (use-package golden-ratio
     :straight t
