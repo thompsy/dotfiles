@@ -1022,6 +1022,14 @@ Enable the minor modes I use for writing
     (setq ispell-silently-savep t)
     (setq ispell-personal-dictionary "~/.emacs.d/.aspell.en.pws"))
 #+END_SRC
+*** Expand region
+#+BEGIN_SRC emacs-lisp
+  (use-package expand-region
+    :bind
+    ("C->" . er/expand-region)
+    ("C-<" . er/contract-region))
+
+#+END_SRC
 
 ** Code
 Things that are used when coding.
