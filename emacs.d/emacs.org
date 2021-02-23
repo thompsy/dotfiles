@@ -1051,7 +1051,15 @@ Some new agenda additions:
     (org-babel-do-load-languages
      'org-babel-load-languages
      '((python . t)
-       (shell . t))))
+       (shell . t)
+       (plantuml . t))))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+  (setq org-plantuml-jar-path (expand-file-name "~/Dropbox/Andrew/code/dotfiles/bin/plantuml.1.2021.1.jar"))
+  (add-to-list 'org-src-lang-modes '("plantuml" . plantuml))
+
+  (org-babel-do-load-languages 'org-babel-load-languages '((plantuml . t)))
 #+END_SRC
 
 *** Org Roam
