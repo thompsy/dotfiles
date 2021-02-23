@@ -76,20 +76,8 @@
 ;;
 ;; Themes
 ;;
-(use-package color-theme-sanityinc-tomorrow
-  :config
-  (color-theme-sanityinc-tomorrow--define-theme eighties))
-;; Treat all themes as safe; no query before use.
-(setf custom-safe-themes t)
-
-;; Nice looking themes ^_^
-(use-package solarized-theme :defer t)
-(use-package doom-themes :defer t)
-(use-package dracula :defer t)
+(use-package dracula)
 (load-theme 'dracula)
-;(use-package spacemacs-common
-;  :defer t
-;  :ensure spacemacs-theme)
 
 (setq display-time-day-and-date t)
 (display-time)
