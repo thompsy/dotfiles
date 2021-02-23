@@ -634,6 +634,28 @@ Highlight the line where the point is
     (highlight-indent-guides-delay 0))
 #+END_SRC
 ** Buffer & Window Management
+*** Back-button
+This is a useful package for navigating backwards and forwards through recently visited locations:
+#+BEGIN_SRC emacs-lisp
+  (use-package back-button
+    :straight (back-button :host github :repo "rolandwalker/back-button")
+    :general
+    (my-leader-def
+      "k" '(hydra-back-button/body :wk "back-button"))
+    :config
+    (back-button-mode 1)
+    (defhydra hydra-back-button (:color red :hint nil)
+        "
+    Local         Global
+  --------------------------------
+    _t_ forward   _e_ forward
+    _s_ backward  _n_ backward
+    "
+        ("e" back-button-global-forward)
+        ("n" back-button-global-backward)
+        ("t" back-button-local-forward)
+        ("s" back-button-local-backward)))
+#+END_SRC
 *** COMMENT golden-ratio
 This resizes the windows within an Emacs frame so that their sizes conform to the golden ratio. I've disabled it for now as its a bit annoying. 
 #+BEGIN_SRC emacs-lisp
