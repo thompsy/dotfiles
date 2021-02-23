@@ -815,7 +815,7 @@ As of Emacs 27.1, =org-tempo= is required to use these.
             ("s" "Standup" entry (file+olp+datetree (concat ORG_DIR "todo.org") "Standup") "* Planned\n- %?\n %i\n %a")
             ("r" "To-Read" item (file+headline (lamdba () (concat ORG_DIR "personal.org")) "To Read") "")
             ("t" "Tasks")
-            ("tw" "Work Task" entry (file+headline (lambda () (concat ORG_DIR "swrx.org")) "Tasks") "** TODO %?\n %i")
+            ("tw" "Work Task" entry (file+headline (lambda () (concat ORG_DIR "work/swrx.org")) "Tasks") "** TODO %?\n %i")
             ("tp" "Pesonal Task" entry (file+headline (lambda () (concat ORG_DIR "personal.org")) "Tasks") "* TODO %?\n %i\n %a")
             ("th" "Household Task" entry (file+headline (lambda () (concat ORG_DIR "clermiston-road.org")) "Tasks") "* TODO %?\n %i\n %a")
 
@@ -873,7 +873,7 @@ I dont need documentation for elisp in this config, so =my-disable-flycheck-for-
         (defun my-disable-flycheck-for-elisp ()
           (setq flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
         :custom
-        (setq org-agenda-files (list ORG_DIR (concat ORG_DIR "journal")))
+        (setq org-agenda-files (list ORG_DIR (concat ORG_DIR "work") (concat ORG_DIR "journal")))
 
         :config
         (setq
