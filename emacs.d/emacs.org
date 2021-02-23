@@ -274,7 +274,7 @@ It also adds a =:general= use-package keyword, so this needs to be setup before 
   :defer t
   :general
   (my-leader-def
-   "P" '(hydra-straight-helper/body :wk "pkgs"))
+   "s" '(hydra-straight-helper/body :wk "pkgs"))
   :config
   (defhydra hydra-zoom (global-map "<f5>")
     "zoom"
