@@ -1725,12 +1725,13 @@ Company provides code completion.
     (bind-key* "C-/" #'company-manual-begin)
 
     ;; Bindings when the company list is active.
-    :bind (:map company-active-map
-                ("C-d" . company-show-doc-buffer) ;; In new temp buffer
-                ("<tab>" . company-complete-selection)
-                ;; Use C-n,p for navigation in addition to M-n,p
-                ("C-n" . (lambda () (interactive) (company-complete-common-or-cycle 1)))
-                ("C-p" . (lambda () (interactive) (company-complete-common-or-cycle -1)))))
+    :general
+    (company-active-map
+     "C-d" 'company-show-doc-buffer ;; In new temp buffer
+     "<tab>" 'company-complete-selection
+     ;; Use C-n,p for navigation in addition to M-n,p
+     "C-n" '(lambda () (interactive) (company-complete-common-or-cycle 1))
+     "C-p" '(lambda () (interactive) (company-complete-common-or-cycle -1))))
 
 #+END_SRC
 
