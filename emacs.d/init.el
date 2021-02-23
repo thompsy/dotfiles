@@ -130,8 +130,8 @@
 ;; Mac specific key settings
 ;;
 (when *is-a-mac*
-  (setq mac-command-modifier 'control) ;; Mac atl/option -> Control
-  (setq mac-option-modifier 'meta) ; Mac command -> Meta
+  (setq mac-command-modifier 'meta) ;; Mac atl/option -> Control
+  (setq mac-option-modifier 'control) ; Mac command -> Meta
   (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
   (add-to-list 'default-frame-alist '(ns-appearance . dark))
   (when (member "Fira Code" (font-family-list))
