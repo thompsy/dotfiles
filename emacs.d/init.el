@@ -167,7 +167,6 @@
 ;;
 ;; Set locale to UTF-8
 ;;
-
 (set-language-environment 'utf-8)
 (set-terminal-coding-system 'utf-8)
 (setq locale-coding-system 'utf-8)
@@ -191,9 +190,8 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; which key
+;; which key - Making it easier to discover Emacs key presses.
 ;; 
-;; Making it easier to discover Emacs key presses.
 (use-package which-key
   :diminish
   :defer 5
@@ -305,7 +303,7 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; beacon to easily find the cursor
+;; beacon - easily find the cursor
 ;;
 (use-package beacon
   :diminish
@@ -317,7 +315,6 @@
 ;; Keep window ratios sweet
 ;;
 (use-package golden-ratio
-  :disabled
   :diminish golden-ratio-mode
   :init (golden-ratio-mode 1))
 
