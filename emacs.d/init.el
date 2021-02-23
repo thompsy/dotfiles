@@ -293,6 +293,11 @@
 (setq x-select-enable-clipboard t
       x-select-enable-primary t)
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; org-roam
+;;
 ;; Set path to sqlite3 for org-roam
 (if *is-windows*
     (add-to-list 'exec-path "C:\\bin"))
@@ -302,6 +307,28 @@
 	      (setq org-roam-directory "C:\\Dropbox\\Andrew\\org\\roam")
 	    (setq org-roam-directory "~/Dropbox/Andrew/org/roam"))
   :hook (add-hook 'after-init-hook 'org-roam-mode))
+
+(defhydra hydra-org-roam (:exit t :idle 0.8)
+  "Launcher for `org-roam'."
+  ("i" org-roam-insert "insert")
+  ("f" org-roam-find-file "find-file")
+  ("v" org-roam-buffer-activate "backlinks"))
+(global-set-key (kbd "C-c r") 'hydra-org-roam/body)
+
+(use-package org-roam-server
+  :ensure t
+  :config
+  (setq org-roam-server-host "127.0.0.1"
+        org-roam-server-port 8080
+        org-roam-server-authenticate nil
+        org-roam-server-export-inline-images t
+        org-roam-server-serve-files nil
+        org-roam-server-served-file-extensions '("pdf" "mp4" "ogv")
+        org-roam-server-network-poll t
+        org-roam-server-network-arrows nil
+        org-roam-server-network-label-truncate t
+        org-roam-server-network-label-truncate-length 60
+        org-roam-server-network-label-wrap-length 20))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
