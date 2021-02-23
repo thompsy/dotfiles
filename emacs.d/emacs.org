@@ -696,6 +696,121 @@ Make it easy to switch windows
     :commands winner-mode
     :init (winner-mode t))
 #+END_SRC
+*** Window Management Hydra
+This is based on https://github.com/abo-abo/hydra/wiki/Window-Management
+
+#+BEGIN_SRC emacs-lisp
+  (defun hydra-move-splitter-left (delta)
+    "Move window splitter left."
+    (interactive "p")
+    (let ((windmove-wrap-around nil))
+      (if (windmove-find-other-window 'right)
+          (shrink-window-horizontally delta)
+        (enlarge-window-horizontally delta))))
+
+  (defun hydra-move-splitter-right (delta)
+    "Move window splitter right."
+    (interactive "p")
+    (let ((windmove-wrap-around nil))
+      (if (windmove-find-other-window 'right)
+          (enlarge-window-horizontally delta)
+        (shrink-window-horizontally delta))))
+
+  (defun hydra-move-splitter-up (delta)
+    "Move window splitter up."
+    (interactive "p")
+    (let ((windmove-wrap-around nil))
+      (if (windmove-find-other-window 'up)
+          (enlarge-window delta)
+        (shrink-window delta))))
+
+  (defun hydra-move-splitter-down (delta)
+    "Move window splitter down."
+    (interactive "p")
+    (let ((windmove-wrap-around nil))
+      (if (windmove-find-other-window 'up)
+          (shrink-window delta)
+        (enlarge-window delta))))
+
+  (defhydra hydra-window-delux ()
+         "
+      Movement^^        ^Split^          ^Switch^	        ^Resize^    ^Eyebrowse^
+      -----------------------------------------------------------------------------
+      _n_ ←             _v_ertical       _b_uffer	        _q_ X←       _c_lose config
+      _e_ ↓             _x_ horizontal   _f_ind files         _w_ X↓       _r_ename config
+      _i_ ↑             _z_ undo         _a_ce 1	        _f_ X↑       _1_ setup 1
+      _o_ →             _Z_ reset        _s_wap	        _p_ X→       _2_ setup 2
+      _F_ollow	      _D_lt Other      _S_ave	        _m_aximize   _3_ setup 3
+      _SPC_ cancel      _O_nly this      _d_elete	        _=_ balance  _4_ setup 4
+      "
+         ("n" windmove-left )
+         ("e" windmove-down )
+         ("i" windmove-up )
+         ("o" windmove-right )
+
+         ("q" hydra-move-splitter-left)
+         ("w" hydra-move-splitter-down)
+         ("f" hydra-move-splitter-up)
+         ("p" hydra-move-splitter-right)
+         ("b" helm-mini)
+         ;("f" helm-find-files)
+         ("F" follow-mode)
+         ("a" (lambda ()
+                (interactive)
+                (ace-window 1)
+                (add-hook 'ace-window-end-once-hook
+                          'hydra-window/body))
+             )
+         ("v" (lambda ()
+                (interactive)
+                (split-window-right)
+                (windmove-right))
+             )
+         ("x" (lambda ()
+                (interactive)
+                (split-window-below)
+                (windmove-down))
+             )
+         ("s" (lambda ()
+                (interactive)
+                (ace-window 4)
+                (add-hook 'ace-window-end-once-hook
+                          'hydra-window/body)))
+         ("S" save-buffer)
+         ("d" delete-window)
+         ("D" (lambda ()
+                (interactive)
+                (ace-window 16)
+                (add-hook 'ace-window-end-once-hook
+                          'hydra-window/body))
+             )
+         ("O" delete-other-windows)
+         ("m" ace-maximize-window)
+         ("z" (progn
+                (winner-undo)
+                (setq this-command 'winner-undo))
+         )
+         ("Z" winner-redo)
+         ("=" balance-window)
+
+         ("c" eyebrowse-close-window-config)
+         ("r" eyebrowse-rename-window-config)
+
+         ("0" eyebrowse-switch-to-window-config-0)
+         ("1" eyebrowse-switch-to-window-config-1)
+         ("2" eyebrowse-switch-to-window-config-2)
+         ("3" eyebrowse-switch-to-window-config-3)
+         ("4" eyebrowse-switch-to-window-config-4)
+         ("5" eyebrowse-switch-to-window-config-5)
+         ("6" eyebrowse-switch-to-window-config-6)
+         ("7" eyebrowse-switch-to-window-config-7)
+         ("8" eyebrowse-switch-to-window-config-8)
+         ("9" eyebrowse-switch-to-window-config-9)
+         ("SPC" nil)
+         )
+  (my-leader-def
+    "w" '(hydra-window-delux/body :wk "Window Management"))
+#+END_SRC
 
 *** iBuffer
 #+BEGIN_SRC emacs-lisp
