@@ -889,9 +889,8 @@ I dont need documentation for elisp in this config, so =my-disable-flycheck-for-
   (use-package org-journal
     :straight nil
     :defer t
-    :config (if *is-windows*
-              (setq org-journal-dir "C:\\Dropbox\\Andrew\\org\\journal")
-            (setq org-journal-dir "~/Dropbox/Andrew/org/journal/"))
+    :config
+    (setq org-journal-dir (concat HOME_DIR "/org/journal"))
     (setq org-journal-date-format "%A %d %B %Y")
     (setq org-journal-time-format "%H:%M")
     (setq org-journal-enable-agenda-integration t)
@@ -917,9 +916,8 @@ I dont need documentation for elisp in this config, so =my-disable-flycheck-for-
       (add-to-list 'exec-path "C:\\bin"))
 
   (use-package org-roam
-    :config (if *is-windows*
-                (setq org-roam-directory "C:\\Dropbox\\Andrew\\org\\roam")
-              (setq org-roam-directory "~/Dropbox/Andrew/org/roam"))
+    :config
+    (setq org-roam-directory (concat HOME_DIR "/org/roam"))
     :hook (add-hook 'after-init-hook 'org-roam-mode))
 
   (defhydra hydra-org-roam (:exit t :idle 0.8)
