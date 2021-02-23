@@ -813,7 +813,7 @@ As of Emacs 27.1, =org-tempo= is required to use these.
           '(
             ("c" "Note on current task" plain (clock) "%T from: %a \n %i \n %?")
             ("s" "Standup" entry (file+olp+datetree (concat HOME_DIR "/org/todo.org") "Standup") "* Planned\n- %?\n %i\n %a")
-            ("r" "To-Read" entry )
+            ("r" "To-Read" item (file+headline (lamdba () (concat HOME_DIR "/org/personal.org")) "To Read") "")
             ("t" "Tasks")
             ("tw" "Work Task" entry (file+headline (lambda () (concat HOME_DIR "/org/swrx.org")) "Tasks") "** TODO %?\n %i")
             ("tp" "Pesonal Task" entry (file+headline (lambda () (concat HOME_DIR "/org/personal.org")) "Tasks") "* TODO %?\n %i\n %a")
