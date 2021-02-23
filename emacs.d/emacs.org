@@ -1274,6 +1274,7 @@ I dont need documentation for elisp in this config, so =my-disable-flycheck-for-
         (defun my-disable-flycheck-for-elisp ()
           (setq flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
         :general
+        ("C-c l" 'org-store-link)
         (org-mode-map "C-'" nil)
         :config
         (setq
