@@ -955,7 +955,8 @@ I dont need documentation for elisp in this config, so =my-disable-flycheck-for-
     :config
     (org-babel-do-load-languages
      'org-babel-load-languages
-     '((python . t))))
+     '((python . t)
+       (shell . t))))
 #+END_SRC
 
 *** Org Roam
