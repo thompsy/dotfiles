@@ -127,7 +127,8 @@ Settings for things that are defined in the C source code, so we use =emacs= as 
     (defalias 'yes-or-no-p 'y-or-n-p)
     :config
     (setq indent-tabs-mode nil
-          tab-width 4)
+          tab-width 4
+          show-trailing-whitespace t)
     :custom
     ;; load new source files instead of stale elisp bytecode
     (load-prefer-newer t)
