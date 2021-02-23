@@ -190,12 +190,14 @@
     (setq org-agenda-files (list "C:\\Dropbox\\Andrew\\org\\"))
   (setq org-agenda-files (list "~/workspace/scratch/" "~/Dropbox/Andrew/org")))
 
-(use-package org-mode
+(use-package org
+  :ensure t
   :config
   (if *is-windows*
       (setq org-directory "C:\\Dropbox\\Andrew\\org\\")
     (setq org-directory "~/Dropbox/Andrew/org/"))
-  (setq org-default-notes-file (concat org-directory "inbox.org"))
+  (setq org-default-notes-file (concat org-directory "inbox.org")
+	org-capture-templates '())
   :hook (add-hook 'org-mode-hook #'visual-line-mode))
 
 (use-package org-superstar
@@ -219,8 +221,6 @@
   (setq org-journal-time-format "%H:%M")
   :bind ("C-c C-j" . org-journal-new-entry))
 
-
-
 (use-package anki-editor
   :after org
   :bind (:map org-mode-map
@@ -229,11 +229,23 @@
               ("<f10>" . anki-editor-reset-cloze-number)
               ("<f9>"  . anki-editor-push-tree))
   :hook (org-capture-after-finalize . anki-editor-reset-cloze-number) ; Reset cloze-number after each capture.
+  (org-mode . anki-editor-mode)
   :config
   (setq anki-editor-create-decks t ;; Allow anki-editor to create a new deck if it doesn't exist
         anki-editor-org-tags-as-anki-tags t
-	anki-editor-use-math-jax t)
-
+	anki-editor-use-math-jax t
+	org-my-anki-file org-default-notes-file)
+	;; Org-capture templates
+  (add-to-list 'org-capture-templates
+               '("a" "Anki basic"
+		 entry
+		 (file+headline org-my-anki-file "Dispatch Shelf")
+		 "* %<%H:%M>   %^g\n:PROPERTIES:\n:ANKI_NOTE_TYPE: Basic\n:ANKI_DECK: Mega\n:END:\n** Front\n%?\n** Back\n%x\n"))
+  (add-to-list 'org-capture-templates
+               '("A" "Anki cloze"
+		 entry
+		 (file+headline org-my-anki-file "Dispatch Shelf")
+		 "* %<%H:%M>   %^g\n:PROPERTIES:\n:ANKI_NOTE_TYPE: Cloze\n:ANKI_DECK: Mega\n:END:\n** Text\n%x\n** Extra\n"))
   (defun anki-editor-cloze-region-auto-incr (&optional arg)
     "Cloze region without hint and increase card number."
     (interactive)
@@ -257,19 +269,6 @@
   ;; Initialize
   (anki-editor-reset-cloze-number)
   )
-
-;; Org-capture templates
-(setq org-my-anki-file org-default-notes-file)
-(add-to-list 'org-capture-templates
-             '("a" "Anki basic"
-               entry
-               (file+headline org-my-anki-file "Dispatch Shelf")
-               "* %<%H:%M>   %^g\n:PROPERTIES:\n:ANKI_NOTE_TYPE: Basic\n:ANKI_DECK: Mega\n:END:\n** Front\n%?\n** Back\n%x\n"))
-(add-to-list 'org-capture-templates
-             '("A" "Anki cloze"
-               entry
-               (file+headline org-my-anki-file "Dispatch Shelf")
-               "* %<%H:%M>   %^g\n:PROPERTIES:\n:ANKI_NOTE_TYPE: Cloze\n:ANKI_DECK: Mega\n:END:\n** Text\n%x\n** Extra\n"))
 
 ;; Allow Emacs to access content from clipboard.
 (setq x-select-enable-clipboard t
