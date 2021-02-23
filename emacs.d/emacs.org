@@ -732,6 +732,16 @@ Projectile allows some nice things for projects, such as searching for files, ma
     :after projectile
     :config
     (helm-projectile-on))
+
+  (use-package helm-rg
+    :straight t
+    :ensure t
+    :config
+    (setq helm-rg-default-directory 'git-root))
+
+  (use-package helm-ag
+    :straight t
+    :ensure t)
 #+END_SRC
 *** treemacs
 A file tree.
