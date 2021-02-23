@@ -1111,7 +1111,7 @@ Enable the minor modes I use for writing
     :straight t
     :ensure t
     :config
-    (setq elfeed-dashboard-file (concat ORG_DIR "elfeed-dashboard.org"))
+    (setq elfeed-dashboard-file (concat ORG_DIR "elfeed/elfeed-dashboard.org"))
     ;; update feed counts on elfeed-quit
     (advice-add 'elfeed-search-quit-window :after #'elfeed-dashboard-update-links))
 
@@ -1120,14 +1120,15 @@ Enable the minor modes I use for writing
     :custom
     (elfeed-org)
     :config
-    (setq rmh-elfeed-org-files (list (concat ORG_DIR "elfeed.org"))))
+    (setq rmh-elfeed-org-files (list (concat ORG_DIR "elfeed/elfeed.org"))))
+
   (use-package elfeed-goodies
     :straight t)
 
   (use-package elfeed
     :straight t
     :config
-    (setq elfeed-db-directory (concat ORG_DIR ".elfeed")))
+    (setq elfeed-db-directory (concat ORG_DIR "elfeed/data")))
 #+END_SRC
 
 ** Code
