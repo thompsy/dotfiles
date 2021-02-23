@@ -162,6 +162,8 @@
 (global-set-key (kbd "C-x C-k") 'kill-region)
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 (global-set-key [f5] '(lambda () (interactive) (revert-buffer nil t nil)))
+(global-set-key "\C-x\C-m" 'helm-M-x)
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
