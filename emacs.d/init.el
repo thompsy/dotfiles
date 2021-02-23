@@ -403,8 +403,9 @@
 
 ;; Helm - Describe Keybindings - C-h b
 (use-package helm-descbinds
-  :config
-  (helm-descbinds-mode))
+  :config (helm-descbinds-mode))
+
+(use-package helm-make)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
