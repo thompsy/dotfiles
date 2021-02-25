@@ -1799,20 +1799,51 @@ Enable the minor modes I use for writing
   (use-package flyspell
     :straight t
     :diminish
+    :general
+    (my-leader-def
+      "n" 'hydra-spelling/body) ;;oryx: just 'c' would be better here
     :hook ((prog-mode . flyspell-prog-mode)
          ((org-mode text-mode) . flyspell-mode))
     :config
     (if *is-windows*
         (progn
-        (setq ispell-program-name "C:\\ProgramData\\chocolatey\\bin\\hunspell.exe")
-        (add-to-list 'ispell-dictionary-alist '("en_GB" "[[:alpha:]]" "[^[:alpha:]]" "[']" t ("-d" "en_GB") nil utf-8))
-        (setq ispell-local-dictionary-alist ispell-dictionary-alist)
-        (setq ispell-hunspell-dictionary-alist ispell-dictionary-alist))
+          (setq ispell-program-name "C:\\ProgramData\\chocolatey\\bin\\hunspell.exe")
+          (add-to-list 'ispell-dictionary-alist '("en_GB" "[[:alpha:]]" "[^[:alpha:]]" "[']" t ("-d" "en_GB") nil utf-8))
+          (setq ispell-local-dictionary-alist ispell-dictionary-alist)
+          (setq ispell-hunspell-dictionary-alist ispell-dictionary-alist))
       (setq ispell-program-name "/usr/local/bin/aspell"))
-    (setq ispell-dictionary "en_GB")
-    (setq ispell-silently-savep t)
-    (setq ispell-personal-dictionary "~/.emacs.d/.aspell.en.pws"))
+    (setq ispell-dictionary "en_GB"
+          ispell-silently-savep t
+          ispell-personal-dictionary "~/.emacs.d/.aspell.en.pws")
+    :hydra (hydra-spelling (:color blue)
+      "
+  ^
+  ^Spelling^          ^Errors^            ^Checker^
+  ^────────^──────────^──────^────────────^───────^───────
+  _q_ quit            _<_ previous        _c_ correction
+  ^^                  _>_ next            _d_ dictionary
+  ^^                  _f_ check           _m_ mode
+  ^^                  ^^                  ^^
+  "
+      ("q" nil)
+      ("<" flyspell-correct-previous :color pink)
+      (">" flyspell-correct-next :color pink)
+      ("c" ispell)
+      ("d" ispell-change-dictionary)
+      ("f" flyspell-buffer)
+      ("m" flyspell-mode)))
 #+END_SRC
+
+Add the handy ~flyspell-correct~ package.
+#+begin_src emacs-lisp
+  (use-package flyspell-correct
+    :straight t
+    :after flyspell)
+
+  (use-package flyspell-correct-helm
+    :straight t
+    :after flyspell)
+#+end_src
 *** Expand region
 #+BEGIN_SRC emacs-lisp
   (use-package expand-region
