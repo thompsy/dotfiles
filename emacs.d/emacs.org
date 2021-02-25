@@ -841,7 +841,7 @@ This is based on https://github.com/abo-abo/hydra/wiki/Window-Management
       ^Movement^        ^Split^          ^Switch^	        ^Resize^    ^Eyebrowse^
       -----------------------------------------------------------------------------
       _n_ ←             _v_ertical       _b_uffer	        _q_ X←       _c_lose config
-      _e_ ↓             _x_ horizontal   _f_ind files         _w_ X↓       _r_ename config
+      _e_ ↓             _h_orizontal     _f_ind files         _w_ X↓       _r_ename config
       _i_ ↑             _z_ undo         _a_ce 1	        _f_ X↑       _1_ setup 1
       _o_ →             _Z_ reset        _s_wap	        _p_ X→       _2_ setup 2
       _F_ollow	      _D_lt Other      _S_ave	        _m_aximize   _3_ setup 3
@@ -870,7 +870,7 @@ This is based on https://github.com/abo-abo/hydra/wiki/Window-Management
                 (split-window-right)
                 (windmove-right))
              )
-         ("x" (lambda ()
+         ("h" (lambda ()
                 (interactive)
                 (split-window-below)
                 (windmove-down))
@@ -895,7 +895,7 @@ This is based on https://github.com/abo-abo/hydra/wiki/Window-Management
                 (setq this-command 'winner-undo))
          )
          ("Z" winner-redo)
-         ("=" balance-window)
+         ("=" balance-windows)
 
          ("c" eyebrowse-close-window-config)
          ("r" eyebrowse-rename-window-config)
