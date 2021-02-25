@@ -333,10 +333,10 @@ One for editing rectangles.
                                        :hint nil
                                        :post (deactivate-mark))
          "
-      ^_i_^       _w_ copy      _O_pen       _N_umber-lines            |\\     -,,,--,,_
-    _n_   _o_     _y_ank        _t_ype       _E_xchange-point          /,`.-'`'   ..  \-;;,_
-      ^_e_^       _d_ kill      _c_lear      _r_eset-region-mark      |,4-  ) )_   .;.(  `'-'
-    ^^^^          _u_ndo        _g_ quit     ^ ^                     '---''(./..)-'(_\_)
+      ^_i_^       _w_ copy      _O_pen       _N_umber-lines
+    _n_   _o_     _y_ank        _t_ype       _E_xchange-point
+      ^_e_^       _d_ kill      _c_lear      _r_eset-region-mark
+    ^^^^          _u_ndo        _g_ quit     ^ ^
     "
          ("i" rectangle-previous-line)
          ("e" rectangle-next-line)
