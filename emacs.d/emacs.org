@@ -285,9 +285,13 @@ It also adds a =:general= use-package keyword, so this needs to be setup before 
 #+END_SRC
 **** hydra
 #+BEGIN_SRC emacs-lisp
-    (use-package hydra
-      :straight t
-      :defer t)
+  (use-package hydra
+    :straight t
+    :defer t)
+
+  ;; This allows us to use :hydra within use-package
+  (use-package use-package-hydra
+    :ensure t)
 #+END_SRC
 Now for some specific hydras.
 
@@ -493,14 +497,25 @@ Add find and replace info to the modeline.
 #+BEGIN_SRC emacs-lisp
   (use-package undo-tree
     :straight t
-    :diminish                       ;; Don't show an icon in the modeline
+    :diminish
+    :after hydra
+    :general ("C-x /" 'hydra-undo-tree/body)
     :config
-      ;; Always have it on
-      (global-undo-tree-mode)
-      ;; Each node in the undo tree should have a timestamp.
-      (setq undo-tree-visualizer-timestamps t)
-      ;; Show a diff window displaying changes between undo nodes.
-      (setq undo-tree-visualizer-diff t))
+      (global-undo-tree-mode 1)
+      (setq undo-tree-visualizer-timestamps t
+            undo-tree-visualizer-diff t
+            undo-tree-show-minibuffer-help t
+            undo-tree-minibuffer-help-dynamic t
+            undo-tree-show-help-in-visualize-buffer t)
+    :hydra (hydra-undo-tree (:hint nil)
+  "
+  _p_: undo  _n_: redo _s_: save _l_: load   "
+      ("p"   undo-tree-undo)
+      ("n"   undo-tree-redo)
+      ("s"   undo-tree-save-history)
+      ("l"   undo-tree-load-history)
+      ("u"   undo-tree-visualize "visualize" :color blue)
+      ("q"   nil "quit" :color blue)))
 #+END_SRC
 *** avy
 #+BEGIN_SRC emacs-lisp
