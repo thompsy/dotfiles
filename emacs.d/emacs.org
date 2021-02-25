@@ -533,8 +533,8 @@ Add find and replace info to the modeline.
       :general
       (my-leader-def
         "v" '(hydra-multiple-cursors/body :wk "mv-mode")) ;;oryx
-      :config
-      (defhydra hydra-multiple-cursors (:hint nil)
+      :hydra
+      (hydra-multiple-cursors (:hint nil)
         "
      Up^^             Down^^           Miscellaneous           % 2(mc/num-cursors) cursor%s(if (> (mc/num-cursors) 1) \"s\" \"\")
     ------------------------------------------------------------------
@@ -717,7 +717,7 @@ Add rainbow delimiters in all programming language modes
     (setq show-paren-style 'mixed))
 #+END_SRC
 *** beacon
-Highlight the line where the point is 
+Highlight the line where the point is
 #+BEGIN_SRC emacs-lisp
   (use-package beacon
     :straight t
@@ -748,20 +748,21 @@ This is a useful package for navigating backwards and forwards through recently 
       "k" '(hydra-back-button/body :wk "back-button"))
     :config
     (back-button-mode 1)
-    (defhydra hydra-back-button (:color red :hint nil)
+    :hydra
+    (hydra-back-button (:color red :hint nil)
         "
     Local         Global
   --------------------------------
     _t_ forward   _e_ forward
     _s_ backward  _n_ backward
     "
-        ("e" back-button-global-forward)
-        ("n" back-button-global-backward)
-        ("t" back-button-local-forward)
-        ("s" back-button-local-backward)))
+      ("e" back-button-global-forward)
+      ("n" back-button-global-backward)
+      ("t" back-button-local-forward)
+      ("s" back-button-local-backward)))
 #+END_SRC
 *** COMMENT golden-ratio
-This resizes the windows within an Emacs frame so that their sizes conform to the golden ratio. I've disabled it for now as its a bit annoying. 
+This resizes the windows within an Emacs frame so that their sizes conform to the golden ratio. I've disabled it for now as its a bit annoying.
 #+BEGIN_SRC emacs-lisp
   (use-package golden-ratio
     :straight t
@@ -1064,8 +1065,8 @@ Some tips for using dired:
     (my-leader-def
       "d" 'dired)
     (dired-mode-map "." 'hydra-dired/body)
-    :config
-    (defhydra hydra-dired (:hint nil :color pink)
+    :hydra
+    (hydra-dired (:hint nil :color pink)
     "
   _+_ mkdir          _v_iew           _m_ark             _(_ details        _i_nsert-subdir    wdired
   _C_opy             _O_ view other   _U_nmark all       _)_ omit-mode      _$_ hide-subdir    C-x C-q : edit
@@ -1142,7 +1143,8 @@ Projectile allows some nice things for projects, such as searching for files, ma
     (projectile-mode-map "C-c h" 'projectile-command-map)
     :config
     (projectile-mode +1)
-    (defhydra hydra-projectile (:color teal
+    :hydra
+    (hydra-projectile (:color teal
                               :hint nil)
     "
        PROJECTILE: %(projectile-project-root)
@@ -1683,15 +1685,16 @@ A handy hydra for org-agenda:
     :straight t
     :config
     (setq org-roam-directory (concat ORG_DIR "roam"))
-    :hook (add-hook 'after-init-hook 'org-roam-mode))
-
-  (defhydra hydra-org-roam (:exit t :idle 0.8)
-    "Launcher for `org-roam'."
-    ("i" org-roam-insert "insert")
-    ("f" org-roam-find-file "find-file")
-    ("v" org-roam-buffer-activate "backlinks"))
-  (my-leader-def
-    "r" '(hydra-org-roam/body :wk "org-roam"))
+    :hook (add-hook 'after-init-hook 'org-roam-mode)
+    :general
+    (my-leader-def
+      "r" '(hydra-org-roam/body :wk "org-roam"))
+    :hydra
+    (hydra-org-roam (:exit t :idle 0.8)
+      "Launcher for `org-roam'."
+      ("i" org-roam-insert "insert")
+      ("f" org-roam-find-file "find-file")
+      ("v" org-roam-buffer-activate "backlinks")))
 
   (use-package org-roam-server
     :straight t
@@ -1898,7 +1901,9 @@ Enable error checking everywhere.
     (my-leader-def
       "f" '(hydra-flycheck-mode/body :wk "flycheck-mode"))
     :config
-    (defhydra hydra-flycheck-mode
+    (global-flycheck-mode +1)
+    :hydra
+    (hydra-flycheck-mode
       (:hint nil
        :color green
        :pre (flycheck-list-errors)
@@ -1916,8 +1921,7 @@ Enable error checking everywhere.
       ("p" flycheck-previous-error)
       ("l" flycheck-list-errors)
       ("s" flycheck-display-error-at-point)
-      ("e" flycheck-explain-error-at-point))
-      (global-flycheck-mode +1))
+      ("e" flycheck-explain-error-at-point)))
 #+END_SRC
 *** company
 Company provides code completion.
@@ -2110,8 +2114,8 @@ Use editorconfig for projects that have them
     :hook (prog-mode . origami-mode)
     :general
     (my-leader-def "e" '(hydra-folding/body :wk "code folding"))
-    :config
-    (defhydra hydra-folding (:color red)
+    :hydra
+    (hydra-folding (:color red)
      "
     _o_pen node    _n_ext fold       _t_oggle node     _s_how current only
     _c_lose node   _p_revious fold   toggle _f_orward
@@ -2356,9 +2360,9 @@ Test RESTful APIs in emacs!
     (add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
     :general
     (my-leader-def
-      "p" '(hydra-go-mode/body :wk "go-mode"))
-    :config
-    (defhydra hydra-go-mode (:hint nil :color green)
+      "p" '(hydra-go-mode/body :wk "go-mode")) ;;oryx - this could be better?
+    :hydra
+    (hydra-go-mode (:hint nil :color green)
 
       "
   Imports             Describe             GoTo
