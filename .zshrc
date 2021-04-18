@@ -6,7 +6,7 @@ ZSH_THEME="dracula"
 plugins=(history git common-aliases sudo tmux emacs docker docker-compose fasd you-should-use zsh-syntax-highlighting zsh-autosuggestions zsh-aliases-exa)
 source ${ZSH}/oh-my-zsh.sh 
 
-LAYERS="$(dirname $0)/zsh-layers"
+LAYERS="~/code/dotfiles/zsh-layers"
 
 # Generic (ish) Layers
 source ${LAYERS}/gcloud.zsh
