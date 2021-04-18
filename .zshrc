@@ -6,7 +6,7 @@ export ZSH=${HOME}/.oh-my-zsh
 plugins=(history git common-aliases sudo tmux emacs docker docker-compose fasd you-should-use zsh-syntax-highlighting zsh-autosuggestions zsh-aliases-exa)
 source ${ZSH}/oh-my-zsh.sh 
 
-LAYERS="~/code/dotfiles/zsh-layers"
+LAYERS="${HOME}/code/dotfiles/zsh-layers"
 
 # Generic (ish) Layers
 source ${LAYERS}/gcloud.zsh
