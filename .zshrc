@@ -2,7 +2,7 @@ export PATH=${PATH}:~/.local/bin:~/bin:~/.cargo/bin
 export ZSH=${HOME}/.oh-my-zsh
 
 
-#ZSH_THEME="dracula"
+ZSH_THEME="robbyrussell"
 plugins=(history git common-aliases sudo tmux emacs docker docker-compose fasd you-should-use zsh-syntax-highlighting zsh-autosuggestions zsh-aliases-exa)
 source ${ZSH}/oh-my-zsh.sh 
 
