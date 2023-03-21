@@ -2026,7 +2026,7 @@ message listing the hooks."
 (defun my/today ()
   "Create Org file from skeleton with current time as name."
   (interactive)
-  (find-file (format-time-string "/Volumes/code/notebook/journal/%Y-%m-%d.org")))
+  (find-file (format-time-string (concat my/org-dir "/journal/%Y-%m-%d.org"))))
 ;  (insert "Skeleton contents"))
 
 (use-package gradle-mode
