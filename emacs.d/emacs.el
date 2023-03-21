@@ -6,10 +6,6 @@
       *is-linux* (eq system-type 'gnu/linux)
       *is-windows* (eq system-type 'windows-nt))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;
-;; Setup straight package-manager
-;;
 (setq straight-repository-branch "develop")
 
 (defvar bootstrap-version)
@@ -36,10 +32,6 @@
   :custom
   (straight-use-package-by-default t))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;
-;; Actual packages below
-;;
 (use-package compat
   :straight (:host github :repo "emacs-compat/compat"))
 
@@ -2026,13 +2018,9 @@ message listing the hooks."
 (defun my/today ()
   "Create Org file from skeleton with current time as name."
   (interactive)
-  (find-file (format-time-string (concat my/org-dir "/journal/%Y-%m-%d.org"))))
+  (find-file (format-time-string (concat my/org-dir "journal/%Y-%m-%d.org"))))
 ;  (insert "Skeleton contents"))
 
 (use-package gradle-mode
   :straight t
   :ensure t)
-
-
-
-
