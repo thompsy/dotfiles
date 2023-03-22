@@ -97,6 +97,9 @@ From the straight docs:
 #+BEGIN_QUOTE
 By setting the variable straight-cache-autoloads to a non-nil value, you can cause straight.el to cache the autoloads of all used packages in a single file on disk, and load them from there instead of from the individual package files if they are still up to date. This reduces the number of disk IO operations during startup from O(number of packages) to O(1), so it should improve performance. No other configuration should be necessary to make this work; however, you may wish to call straight-prune-build occasionally, since otherwise this cache file may grow quite large over time.
 #+END_QUOTE
+#+BEGIN_SRC emacs-lisp
+  (setq straight-cache-autoloads t)
+#+END_SRC
 
 In addition:
 #+BEGIN_QUOTE
@@ -104,24 +107,27 @@ You may customize straight-use-package-by-default to make it so that :straight t
 #+END_QUOTE
 
 #+BEGIN_SRC emacs-lisp
-  (setq straight-cache-autoloads t
-	straight-use-package-by-default t)
+  (setq	straight-use-package-by-default t)
 #+END_SRC
 
+Install ~use-package~ for easily installing other packages.
 #+BEGIN_SRC emacs-lisp
-
   ;; Install use-package to use with straight.el
   (straight-use-package 'use-package)
+#+END_SRC
 
-  ;; Configure use-package to use straight.el by default
-  (use-package straight
-    :custom
-    (straight-use-package-by-default t))
-
+Diminish hides or abbreviates the mode line displays of minor-modes. It basically de-clutters the
+mode line.
+#+BEGIN_SRC emacs-lisp
   (use-package diminish)
+#+END_SRC
+
+TODO: I actually only call this once, so I can probably get rid of it.
+#+BEGIN_SRC emacs-lisp
   (use-package bind-key)
 #+END_SRC
 
+TODO: check if I can get rid of this.
 #+BEGIN_SRC emacs-lisp
   ;; I needed to install this at some point due to an issue with Magit. I'm not sure if I need it anymore.
   (use-package compat
@@ -129,19 +135,22 @@ You may customize straight-use-package-by-default to make it so that :straight t
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-
-  ;; TODO not sure why this appears so early in the file.
+  ;; TODO not sure why this appears so early in the file. It probably needs to before I reference anything else related to org. It would be good to test and see if this is still needed.
   (straight-use-package 'org)
-
-  ;; TODO not sure what this does.
-  (use-package use-package-ensure-system-package)
-
-  (use-package gcmh
-    :hook (after-init . gcmh-mode))
-
-  (setq read-process-output-max (* 1024 1024)) ;; 1mb
 #+END_SRC
 
+The ~gcmh~ (Garbage Collector Magic Hack) package updates Emacs's GC strategy to minimise interference
+with user activity.
+#+BEGIN_SRC emacs-lisp
+  (use-package gcmh
+    :hook (after-init . gcmh-mode))
+#+END_SRC
+
+Allow Emacs to read larger chunks of data from subprocesses. Things like ~lsp-mode~ can generate
+responses from 800k to 3M, so the default of 4k is too small.
+#+BEGIN_SRC emacs-lisp
+  (setq read-process-output-max (* 1024 1024 3)) ;; 3mb
+#+END_SRC
 
 #+BEGIN_SRC emacs-lisp
   (use-package emacs
