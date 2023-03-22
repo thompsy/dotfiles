@@ -1,9 +1,14 @@
 #+TITLE: emacs.org
-#+PROPERTY: header-args:emacs-lisp :tangle yes :results silent :exports code
+#+PROPERTY: header-args:emacs-lisp :tangle ~/.emacs.d/init.el :results silent :exports code
 
 * emacs.org
 ** What is this?
-This is my emacs configuration in =org-mode=. It's loaded using =(org-babel-load-file "~/dotfiles/emacs.org")= from my =init.el=. It contains a lot of things inspired (stolen) from places around the on web such as:
+This is my emacs configuration in =org-mode=. To output the source code run ~org-babel-tangle~
+(typically ~C-c~ ~C-v~ ~t~). This will output the relevant files into ~~/.emacs.d/~ where Emacs will pick
+them up.
+
+Many (most!) things in this file have been inspired by others making their configuration
+available. A few places that I've found particularly useful include:
 - [[https://github.com/kwpav/dotfiles/blob/master/emacs.org][kwpav's config]]
 - [[http://pages.sachachua.com/.emacs.d/Sacha.html][Sacha Chua's config]]
 - [[https://github.com/TheBB/dotemacs][TheBB's config]]
@@ -14,14 +19,46 @@ This is my emacs configuration in =org-mode=. It's loaded using =(org-babel-load
 - [[https://github.com/ianpan870102/yay-evil-emacs/blob/master/config.org][yay-evil]]
 - [[https://framagit.org/steckerhalter/steckemacs.el/-/tree/master][steckemacs]]
 
+* TODO
+- rationalise Hydra config across packages
+- rationalise General config across packages
+
 * Emacs
-** Preamble
-Lexical binding is supposed to make stuff faster.
-#+BEGIN_SRC emacs-lisp
-;;; -*- lexical-binding: t -*-
+** Local
+These are various, installation specific settings that might differ across machines, some of which I
+don't want to commit to Git.
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/local.el" :eval no
+  (provide 'local-setup)
+
+  (setq user-full-name "Andrew Thompson"
+	user-mail-address "github@downthewire.co.uk")
+
+  (defconst my/org-dir
+    "~/notebook/")
+
+  (defconst my/org-agenda-files
+    (list
+     my/org-dir
+     (concat my/org-dir "journal")))
 #+END_SRC
 
-Load some local setup.
+** Early Init
+The ~early-init.el~ file is called very early in the initialisation process, so this is a good point
+to disable ~package.el~ in favour of ~straight.el~.
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/early-init.el" :eval no
+(setq package-enable-at-startup nil)
+#+END_SRC
+
+** Preamble
+Some initial comment blurb.
+#+BEGIN_SRC emacs-lisp
+  ;;; init.el --- Initialization file for Emacs
+  ;;; Commentary: Emacs Startup File --- initialization for Emacs
+  ;;; Code:
+#+END_SRC
+
+Load some local setup. As noted above, this is generally installation specific, so its easiest to
+keep it in a separate file.
 #+BEGIN_SRC emacs-lisp
 (require 'local-setup "~/.emacs.d/local.el")
 #+END_SRC
@@ -36,50 +73,69 @@ Determine the operating system to tailor aspects of the config.
 ** Straight Package Manager
 Setup the straight package manager.
 #+BEGIN_SRC emacs-lisp
-(setq straight-repository-branch "develop")
+  (setq straight-repository-branch "develop")
 
-(defvar bootstrap-version)
-(let ((bootstrap-file
-       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-      (bootstrap-version 5))
-  (unless (file-exists-p bootstrap-file)
-    (with-current-buffer
-        (url-retrieve-synchronously
-         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-         'silent 'inhibit-cookies)
-      (goto-char (point-max))
-      (eval-print-last-sexp)))
-  (load bootstrap-file nil 'nomessage))
+  (defvar bootstrap-version)
+  (let ((bootstrap-file
+	 (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+	(bootstrap-version 5))
+    (unless (file-exists-p bootstrap-file)
+      (with-current-buffer
+	  (url-retrieve-synchronously
+	   "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+	   'silent 'inhibit-cookies)
+	(goto-char (point-max))
+	(eval-print-last-sexp)))
+    (load bootstrap-file nil 'nomessage))
+#+END_SRC
 
-(setq straight-cache-autoloads t
-      straight-use-package-by-default t)
+From the straight docs:
+#+BEGIN_QUOTE
+By setting the variable straight-cache-autoloads to a non-nil value, you can cause straight.el to cache the autoloads of all used packages in a single file on disk, and load them from there instead of from the individual package files if they are still up to date. This reduces the number of disk IO operations during startup from O(number of packages) to O(1), so it should improve performance. No other configuration should be necessary to make this work; however, you may wish to call straight-prune-build occasionally, since otherwise this cache file may grow quite large over time.
+#+END_QUOTE
 
-;; Install use-package
-(straight-use-package 'use-package)
+In addition:
+#+BEGIN_QUOTE
+You may customize straight-use-package-by-default to make it so that :straight t is assumed unless you explicitly override it with :straight nil.
+#+END_QUOTE
 
-;; Configure use-package to use straight.el by default
-(use-package straight
-  :custom
-  (straight-use-package-by-default t))
+#+BEGIN_SRC emacs-lisp
+  (setq straight-cache-autoloads t
+	straight-use-package-by-default t)
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-    (use-package compat
-      :straight (:host github :repo "emacs-compat/compat"))
 
-    (use-package diminish) ;; for :diminish
-    (use-package bind-key) ;; for :bind
+  ;; Install use-package to use with straight.el
+  (straight-use-package 'use-package)
 
-    ;; TODO not sure why this appears so early in the file.
-    (straight-use-package 'org)
+  ;; Configure use-package to use straight.el by default
+  (use-package straight
+    :custom
+    (straight-use-package-by-default t))
 
-    ;; TODO not sure what this does.
-    (use-package use-package-ensure-system-package)
+  (use-package diminish)
+  (use-package bind-key)
+#+END_SRC
 
-    (use-package gcmh
-      :hook (after-init . gcmh-mode))
+#+BEGIN_SRC emacs-lisp
+  ;; I needed to install this at some point due to an issue with Magit. I'm not sure if I need it anymore.
+  (use-package compat
+    :straight (:host github :repo "emacs-compat/compat"))
+#+END_SRC
 
-    (setq read-process-output-max (* 1024 1024)) ;; 1mb
+#+BEGIN_SRC emacs-lisp
+
+  ;; TODO not sure why this appears so early in the file.
+  (straight-use-package 'org)
+
+  ;; TODO not sure what this does.
+  (use-package use-package-ensure-system-package)
+
+  (use-package gcmh
+    :hook (after-init . gcmh-mode))
+
+  (setq read-process-output-max (* 1024 1024)) ;; 1mb
 #+END_SRC
 
 
@@ -168,7 +224,6 @@ Setup the straight package manager.
 
 #+BEGIN_SRC emacs-lisp
     (use-package general
-      :straight t
       :custom
       (general-override-states '(insert emacs hybrid normal visual motion operator replace))
       :config
@@ -203,7 +258,6 @@ Setup the straight package manager.
 
 #+BEGIN_SRC emacs-lisp
     (use-package which-key
-      :straight t
       :custom
       (which-key-idle-delay 0)
       :config
@@ -215,7 +269,6 @@ Setup the straight package manager.
 
 #+BEGIN_SRC emacs-lisp
     (use-package hydra
-      :straight t
       :defer t)
 
     ;; This allows us to use :hydra within use-package
@@ -337,63 +390,59 @@ Setup the straight package manager.
 
 #+BEGIN_SRC emacs-lisp
     (use-package keyfreq
-      :straight t
       :config
       (keyfreq-autosave-mode 1))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-    (use-package helm
-      :straight t
-      :diminish
-      :init (helm-mode t)
-      :config
-      (setq helm-buffer-max-length 40)
-      :bind (("M-x"     . helm-M-x)
-	     ("C-x C-f" . helm-find-files)
-	     ("C-x b"   . helm-mini)     ;; See buffers & recent files; more useful.
-	     ("C-x r b" . helm-filtered-bookmarks)
-	     ("C-x C-r" . helm-recentf)  ;; Search for recently edited files
-	     ("C-c i"   . helm-imenu)
-	     ("C-h a"   . helm-apropos)
-	     ;; Look at what was cut recently & paste it in.
-	     ("M-y" . helm-show-kill-ring)
+  (use-package helm
+    :diminish
+    :init (helm-mode t)
+    :config
+    (setq helm-buffer-max-length 40)
+    :bind (("M-x"     . helm-M-x)
+	   ("C-x C-f" . helm-find-files)
+	   ("C-x b"   . helm-mini)     ;; See buffers & recent files; more useful.
+	   ("C-x r b" . helm-filtered-bookmarks)
+	   ("C-x C-r" . helm-recentf)  ;; Search for recently edited files
+	   ("C-c i"   . helm-imenu)
+	   ("C-h a"   . helm-apropos)
+	   ;; Look at what was cut recently & paste it in.
+	   ("M-y" . helm-show-kill-ring)
 
-	     :map helm-map
-	     ;; We can list ‘actions’ on the currently selected item by C-z.
-	     ("C-z" . helm-select-action)
-	     ;; Let's keep tab-completetion anyhow.
-	     ("TAB"   . helm-execute-persistent-action)
-	      ("<tab>" . helm-execute-persistent-action)))
+	   :map helm-map
+	   ;; We can list ‘actions’ on the currently selected item by C-z.
+	   ("C-z" . helm-select-action)
+	   ;; Let's keep tab-completetion anyhow.
+	   ("TAB"   . helm-execute-persistent-action)
+	    ("<tab>" . helm-execute-persistent-action)))
 
-    (setq helm-mini-default-sources '(helm-source-buffers-list
-				      helm-source-recentf
-				      helm-source-bookmarks
-				      helm-source-bookmark-set
-				      helm-source-buffer-not-found))
-    ;; this stops helm pinging websites when it interprets texts as a url
-    (setq ffap-machine-p-known 'reject)
-    (use-package helm-descbinds
-      :straight t
-      :config (helm-descbinds-mode))
+  (setq helm-mini-default-sources '(helm-source-buffers-list
+				    helm-source-recentf
+				    helm-source-bookmarks
+				    helm-source-bookmark-set
+				    helm-source-buffer-not-found))
+  ;; this stops helm pinging websites when it interprets texts as a url
+  (setq ffap-machine-p-known 'reject)
 
-    (use-package helm-make
-      :straight t)
 
-    (use-package helm-swoop
-      :straight t
-      :config (setq helm-swoop-pre-input-function
-		    (lambda () ""))
-      :general
-      ("C-s"   'helm-swoop)
-      ("C-M-s" 'helm-multi-swoop-all)
-      ("C-S-s" 'helm-swoop-back-to-last-point)
-      :custom (helm-swoop-split-with-multiple-windows nil "Do not split window inside the current window."))
+  (use-package helm-descbinds
+    :config (helm-descbinds-mode))
+
+  (use-package helm-make)
+
+  (use-package helm-swoop
+    :config (setq helm-swoop-pre-input-function
+		  (lambda () ""))
+    :general
+    ("C-s"   'helm-swoop)
+    ("C-M-s" 'helm-multi-swoop-all)
+    ("C-S-s" 'helm-swoop-back-to-last-point)
+    :custom (helm-swoop-split-with-multiple-windows nil "Do not split window inside the current window."))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
     (use-package anzu
-      :straight t
       :config
       (global-anzu-mode)
       (global-set-key [remap query-replace] 'anzu-query-replace)
@@ -402,7 +451,6 @@ Setup the straight package manager.
 
 #+BEGIN_SRC emacs-lisp
     (use-package undo-tree
-      :straight t
       :ensure t
       :diminish
       :after hydra
@@ -429,14 +477,12 @@ Setup the straight package manager.
 
 #+BEGIN_SRC emacs-lisp
     (use-package avy
-      :straight t
       :config (setq avy-background t)
       :general ("C-'" 'avy-goto-char-timer))
   #+END_SRC
 
   #+BEGIN_SRC emacs-lisp
     (use-package multiple-cursors
-      :straight t
       :defer t
       :general
       (my-leader-def
@@ -470,14 +516,12 @@ Setup the straight package manager.
   #+END_SRC
 
   #+BEGIN_SRC emacs-lisp
-    (use-package iedit
-      :straight t)
+    (use-package iedit)
   #+END_SRC
 
   #+BEGIN_SRC emacs-lisp
     (use-package dashboard
-      :straight t
-      :config
+        :config
       (dashboard-setup-startup-hook)
       (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
       (setq dashboard-items '((recents  . 5)
@@ -493,8 +537,7 @@ Setup the straight package manager.
 
     ;; Emacs Start-up Profiler
     (use-package esup
-      :straight t
-      :commands (esup))
+        :commands (esup))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
@@ -541,8 +584,7 @@ Setup the straight package manager.
 
 #+BEGIN_SRC emacs-lisp
     (use-package dracula-theme
-      :straight t
-      :config
+        :config
       (load-theme 'dracula))
 
     (add-to-list 'default-frame-alist '(font . "Fira Code-14"))
@@ -550,48 +592,43 @@ Setup the straight package manager.
 
 #+BEGIN_SRC emacs-lisp
     (use-package all-the-icons
-      :straight t
-      :defer t)
+        :defer t)
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-    (use-package doom-modeline
-      :straight t
-      :demand t
-      :preface
-      (defun my-doom-modeline-setup ()
-	(column-number-mode +1)
-	(doom-modeline-mode +1))
-      :init (my-doom-modeline-setup)
-      :config
-      (setq doom-modeline-height 1)
-      (set-face-attribute 'mode-line nil :height 150)
-      (set-face-attribute 'mode-line-inactive nil :height 150)
-      :custom
-      (doom-modeline-vcs-max-length 50)
-      (doom-modeline-buffer-file-name-style 'truncate-upto-project))
+  (use-package doom-modeline
+    :demand t
+    :preface
+    (defun my-doom-modeline-setup ()
+      (column-number-mode +1)
+      (doom-modeline-mode +1))
+    :init (my-doom-modeline-setup)
+    :config
+    (setq doom-modeline-height 1)
+    (set-face-attribute 'mode-line nil :height 150)
+    (set-face-attribute 'mode-line-inactive nil :height 150)
+    :custom
+    (doom-modeline-vcs-max-length 50)
+    (doom-modeline-buffer-file-name-style 'truncate-upto-project))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-    (use-package rainbow-delimiters
-      :straight t
-      :hook (prog-mode . rainbow-delimiters-mode)
-      :config
-      (setq show-paren-delay  0)
-      (setq show-paren-style 'mixed))
+  (use-package rainbow-delimiters
+    :hook (prog-mode . rainbow-delimiters-mode)
+    :config
+    (setq show-paren-delay  0)
+    (setq show-paren-style 'mixed))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-    (use-package beacon
-      :straight t
-      :diminish
-      :config
-      (setq beacon-color "#666600")
-      (beacon-mode 1))
+  (use-package beacon
+    :diminish
+    :config
+    (setq beacon-color "#666600")
+    (beacon-mode 1))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-
     (use-package back-button
       :straight (back-button :host github :repo "rolandwalker/back-button")
       :general
@@ -614,19 +651,15 @@ Setup the straight package manager.
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-
-    (use-package ace-window
-      :straight t
-      :general
-      ("M-o" 'ace-window)
-      :config
-      (setq aw-keys '(?a ?r ?s ?t ?n ?e ?i ?o)))
+  (use-package ace-window
+    :general
+    ("M-o" 'ace-window)
+    :config
+    (setq aw-keys '(?a ?r ?s ?t ?n ?e ?i ?o)))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-
     (use-package switch-window
-      :straight t
       :general
       ("C-x o" 'switch-window)
       :config
@@ -949,20 +982,17 @@ Setup the straight package manager.
 
     ;; Colourful columns.
     (use-package diredfl
-      :straight t
       :after dired
       :config
       (diredfl-global-mode +1))
 
     (use-package dired-git-info
-	:straight t
 	:general ('dired-mode-map
 		  "C-(" 'dired-git-info-mode))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
     (use-package projectile
-      :straight t
       :general
       (my-leader-def
 	"H" '(hydra-projectile/body :wk "projectile-mode")) ;;oryx
@@ -1011,29 +1041,24 @@ Setup the straight package manager.
 
 #+BEGIN_SRC emacs-lisp
     (use-package ibuffer-vc
-      :straight t
       :config
       (add-hook 'ibuffer-hook #'ibuffer-vc-set-filter-groups-by-vc-root))
 
-    (use-package ibuffer-projectile
-      :straight t)
+    (use-package ibuffer-projectile)
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
     (use-package helm-projectile
-      :straight t
       :after projectile
       :config
       (helm-projectile-on))
 
     (use-package helm-rg
-      :straight t
       :ensure t
       :config
       (setq helm-rg-default-directory 'git-root))
 
     (use-package helm-ag
-      :straight t
       :ensure t
       :config
       (setq ag-arguments (list "--smart-case" "--column")))
@@ -1041,37 +1066,32 @@ Setup the straight package manager.
 
 #+BEGIN_SRC emacs-lisp
     (use-package treemacs
-      :straight t
       :defer t
       :general ([f8] 'treemacs))
 
     (use-package treemacs-projectile
-      :straight t
       :after (projectile treemacs))
 
     (use-package treemacs-magit
-      :straight t
       :after (treemacs))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-    (defun my-org-prettify-hook ()
-      (turn-on-visual-line-mode))
+  (defun my-org-prettify-hook ()
+    (turn-on-visual-line-mode))
 
-
-    (defun my-org-prettify-settings ()
-      (setq org-startup-indented nil
-	    org-src-fontify-natively nil
-	    org-hide-emphasis-markers t
-	    org-fontify-whole-heading-line t
-	    org-fontify-done-headline t
-	    org-fontify-quote-and-verse-blocks t
-	    line-spacing 0.2))
+  (defun my-org-prettify-settings ()
+    (setq org-startup-indented nil
+	  org-src-fontify-natively nil
+	  org-hide-emphasis-markers t
+	  org-fontify-whole-heading-line t
+	  org-fontify-done-headline t
+	  org-fontify-quote-and-verse-blocks t
+	  line-spacing 0.2))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
     (use-package htmlize
-      :straight t
       :defer t)
 #+END_SRC
 
@@ -1273,147 +1293,142 @@ TODO: straight should be t here
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-    (use-package org-super-agenda
-      :straight t
-      :after org-agenda
-      :custom (org-super-agenda-groups
-	       '( ;; Each group has an implicit boolean OR operator between its selectors.
-		 (:name "Overdue" :deadline past :order 0)
-		 (:name "Evening Habits" :and (:habit t :tag "evening") :order 8)
-		 (:name "Habits" :habit t :order 6)
-		 (:name "Today" ;; Optionally specify section name
-			:time-grid t  ;; Items that appear on the time grid (scheduled/deadline with time)
-			:order 3)     ;; capture the today first but show it in order 3
-		 (:name "Low Priority" :priority "C" :tag "maybe" :order 7)
-		 (:name "Due Today" :deadline today :order 1)
-		 (:name "Important"
-			:and (:priority "A" :not (:todo ("DONE" "CANCELED")))
-			:order 2)
-		 (:name "Due Soon" :deadline future :order 4)
-		 (:name "Todo" :not (:habit t) :order 5)
-		 (:name "Waiting" :todo ("WAITING" "HOLD") :order 9)))
-      :config
-      (setq org-super-agenda-header-map nil
-	    org-super-agenda-mode t))
+  (use-package org-super-agenda
+    :after org-agenda
+    :custom (org-super-agenda-groups
+	     '( ;; Each group has an implicit boolean OR operator between its selectors.
+	       (:name "Overdue" :deadline past :order 0)
+	       (:name "Evening Habits" :and (:habit t :tag "evening") :order 8)
+	       (:name "Habits" :habit t :order 6)
+	       (:name "Today" ;; Optionally specify section name
+		      :time-grid t  ;; Items that appear on the time grid (scheduled/deadline with time)
+		      :order 3)     ;; capture the today first but show it in order 3
+	       (:name "Low Priority" :priority "C" :tag "maybe" :order 7)
+	       (:name "Due Today" :deadline today :order 1)
+	       (:name "Important"
+		      :and (:priority "A" :not (:todo ("DONE" "CANCELED")))
+		      :order 2)
+	       (:name "Due Soon" :deadline future :order 4)
+	       (:name "Todo" :not (:habit t) :order 5)
+	       (:name "Waiting" :todo ("WAITING" "HOLD") :order 9)))
+    :config
+    (setq org-super-agenda-header-map nil
+	  org-super-agenda-mode t))
 
 
-    (defhydra hydra-org-agenda (:pre (setq which-key-inhibit t)
-				     :post (setq which-key-inhibit nil)
-				     :hint none)
-      "
-    Org agenda (_q_uit)
-
-    ^Clock^      ^Visit entry^              ^Date^             ^Other^
-    ^-----^----  ^-----------^------------  ^----^-----------  ^-----^---------
-    _ci_ in      _SPC_ in other window      _ds_ schedule      _gr_ reload
-    _co_ out     _TAB_ & go to location     _dd_ set deadline  _._  go to today
-    _cq_ cancel  _RET_ & del other windows  _dt_ timestamp     _gd_ go to date
-    _cj_ jump    _o_   link                 _+_  do later      ^^
-    ^^           ^^                         _-_  do earlier    ^^
-    ^^           ^^                         ^^                 ^^
-    ^View^          ^Filter^                 ^Headline^         ^Toggle mode^
-    ^----^--------  ^------^---------------  ^--------^-------  ^-----------^----
-    _vd_ day        _ft_ by tag              _ht_ set status    _tf_ follow
-    _vw_ week       _fr_ refine by tag       _hk_ kill          _tl_ log
-    _vt_ fortnight  _fc_ by category         _hr_ refile        _ta_ archive trees
-    _vm_ month      _fh_ by top headline     _hA_ archive       _tA_ archive files
-    _vy_ year       _fx_ by regexp           _h:_ set tags      _tr_ clock report
-    _vn_ next span  _fd_ delete all filters  _hp_ set priority  _td_ diaries
-    _vp_ prev span  ^^                       ^^                 ^^
-    _vr_ reset      ^^                       ^^                 ^^
-    ^^              ^^                       ^^                 ^^
+  (defhydra hydra-org-agenda (:pre (setq which-key-inhibit t)
+				   :post (setq which-key-inhibit nil)
+				   :hint none)
     "
-      ;; Entry
-      ("hA" org-agenda-archive-default)
-      ("hk" org-agenda-kill)
-      ("hp" org-agenda-priority)
-      ("hr" org-agenda-refile)
-      ("h:" org-agenda-set-tags)
-      ("ht" org-agenda-todo)
-      ;; Visit entry
-      ("o"   link-hint-open-link :exit t)
-      ("<tab>" org-agenda-goto :exit t)
-      ("TAB" org-agenda-goto :exit t)
-      ("SPC" org-agenda-show-and-scroll-up)
-      ("RET" org-agenda-switch-to :exit t)
-      ;; Date
-      ("dt" org-agenda-date-prompt)
-      ("dd" org-agenda-deadline)
-      ("+" org-agenda-do-date-later)
-      ("-" org-agenda-do-date-earlier)
-      ("ds" org-agenda-schedule)
-      ;; View
-      ("vd" org-agenda-day-view)
-      ("vw" org-agenda-week-view)
-      ("vt" org-agenda-fortnight-view)
-      ("vm" org-agenda-month-view)
-      ("vy" org-agenda-year-view)
-      ("vn" org-agenda-later)
-      ("vp" org-agenda-earlier)
-      ("vr" org-agenda-reset-view)
-      ;; Toggle mode
-      ("ta" org-agenda-archives-mode)
-      ("tA" (org-agenda-archives-mode 'files))
-      ("tr" org-agenda-clockreport-mode)
-      ("tf" org-agenda-follow-mode)
-      ("tl" org-agenda-log-mode)
-      ("td" org-agenda-toggle-diary)
-      ;; Filter
-      ("fc" org-agenda-filter-by-category)
-      ("fx" org-agenda-filter-by-regexp)
-      ("ft" org-agenda-filter-by-tag)
-      ("fr" org-agenda-filter-by-tag-refine)
-      ("fh" org-agenda-filter-by-top-headline)
-      ("fd" org-agenda-filter-remove-all)
-      ;; Clock
-      ("cq" org-agenda-clock-cancel)
-      ("cj" org-agenda-clock-goto :exit t)
-      ("ci" org-agenda-clock-in :exit t)
-      ("co" org-agenda-clock-out)
-      ;; Other
-      ("q" nil :exit t)
-      ("gd" org-agenda-goto-date)
-      ("." org-agenda-goto-today)
-      ("gr" org-agenda-redo))
-    ;; TODO: This doesn't seem to load automatically
-    (general-define-key
-      :keymaps 'org-agenda-mode-map
-      "." 'hydra-org-agenda/body)
+  Org agenda (_q_uit)
 
-    (use-package org-pomodoro
-      :straight t)
+  ^Clock^      ^Visit entry^              ^Date^             ^Other^
+  ^-----^----  ^-----------^------------  ^----^-----------  ^-----^---------
+  _ci_ in      _SPC_ in other window      _ds_ schedule      _gr_ reload
+  _co_ out     _TAB_ & go to location     _dd_ set deadline  _._  go to today
+  _cq_ cancel  _RET_ & del other windows  _dt_ timestamp     _gd_ go to date
+  _cj_ jump    _o_   link                 _+_  do later      ^^
+  ^^           ^^                         _-_  do earlier    ^^
+  ^^           ^^                         ^^                 ^^
+  ^View^          ^Filter^                 ^Headline^         ^Toggle mode^
+  ^----^--------  ^------^---------------  ^--------^-------  ^-----------^----
+  _vd_ day        _ft_ by tag              _ht_ set status    _tf_ follow
+  _vw_ week       _fr_ refine by tag       _hk_ kill          _tl_ log
+  _vt_ fortnight  _fc_ by category         _hr_ refile        _ta_ archive trees
+  _vm_ month      _fh_ by top headline     _hA_ archive       _tA_ archive files
+  _vy_ year       _fx_ by regexp           _h:_ set tags      _tr_ clock report
+  _vn_ next span  _fd_ delete all filters  _hp_ set priority  _td_ diaries
+  _vp_ prev span  ^^                       ^^                 ^^
+  _vr_ reset      ^^                       ^^                 ^^
+  ^^              ^^                       ^^                 ^^
+  "
+    ;; Entry
+    ("hA" org-agenda-archive-default)
+    ("hk" org-agenda-kill)
+    ("hp" org-agenda-priority)
+    ("hr" org-agenda-refile)
+    ("h:" org-agenda-set-tags)
+    ("ht" org-agenda-todo)
+    ;; Visit entry
+    ("o"   link-hint-open-link :exit t)
+    ("<tab>" org-agenda-goto :exit t)
+    ("TAB" org-agenda-goto :exit t)
+    ("SPC" org-agenda-show-and-scroll-up)
+    ("RET" org-agenda-switch-to :exit t)
+    ;; Date
+    ("dt" org-agenda-date-prompt)
+    ("dd" org-agenda-deadline)
+    ("+" org-agenda-do-date-later)
+    ("-" org-agenda-do-date-earlier)
+    ("ds" org-agenda-schedule)
+    ;; View
+    ("vd" org-agenda-day-view)
+    ("vw" org-agenda-week-view)
+    ("vt" org-agenda-fortnight-view)
+    ("vm" org-agenda-month-view)
+    ("vy" org-agenda-year-view)
+    ("vn" org-agenda-later)
+    ("vp" org-agenda-earlier)
+    ("vr" org-agenda-reset-view)
+    ;; Toggle mode
+    ("ta" org-agenda-archives-mode)
+    ("tA" (org-agenda-archives-mode 'files))
+    ("tr" org-agenda-clockreport-mode)
+    ("tf" org-agenda-follow-mode)
+    ("tl" org-agenda-log-mode)
+    ("td" org-agenda-toggle-diary)
+    ;; Filter
+    ("fc" org-agenda-filter-by-category)
+    ("fx" org-agenda-filter-by-regexp)
+    ("ft" org-agenda-filter-by-tag)
+    ("fr" org-agenda-filter-by-tag-refine)
+    ("fh" org-agenda-filter-by-top-headline)
+    ("fd" org-agenda-filter-remove-all)
+    ;; Clock
+    ("cq" org-agenda-clock-cancel)
+    ("cj" org-agenda-clock-goto :exit t)
+    ("ci" org-agenda-clock-in :exit t)
+    ("co" org-agenda-clock-out)
+    ;; Other
+    ("q" nil :exit t)
+    ("gd" org-agenda-goto-date)
+    ("." org-agenda-goto-today)
+    ("gr" org-agenda-redo))
+  ;; TODO: This doesn't seem to load automatically
+  (general-define-key
+    :keymaps 'org-agenda-mode-map
+    "." 'hydra-org-agenda/body)
 
-    (use-package org-journal
-      :straight t
-      :defer t
-      :config
-      (setq org-journal-dir (concat my/org-dir "journal"))
-      (setq org-journal-date-format "%A %d %B %Y")
-      (setq org-journal-time-format "%H:%M")
-      (setq org-journal-enable-agenda-integration t)
-      (setq org-journal-file-format "%Y%m%d.org")
-      :general ("C-x C-j" 'org-journal-new-entry))
+  (use-package org-pomodoro)
 
-    (use-package org-babel
-      :no-require
-      :straight nil
-      :config
-      (org-babel-do-load-languages
-       'org-babel-load-languages
-       '((python . t)
-	 (shell . t)
-	 (plantuml . t))))
+  (use-package org-journal
+    :defer t
+    :config
+    (setq org-journal-dir (concat my/org-dir "journal"))
+    (setq org-journal-date-format "%A %d %B %Y")
+    (setq org-journal-time-format "%H:%M")
+    (setq org-journal-enable-agenda-integration t)
+    (setq org-journal-file-format "%Y%m%d.org")
+    :general ("C-x C-j" 'org-journal-new-entry))
+
+  (use-package org-babel
+    :no-require
+    :straight nil
+    :config
+    (org-babel-do-load-languages
+     'org-babel-load-languages
+     '((python . t)
+       (shell . t)
+       (plantuml . t))))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
     (use-package olivetti
-      :straight t
       :defer t
       :custom
       (olivetti-body-width 90))
 
     (use-package writegood-mode
-      :straight t
       :defer t)
 
     (defun my/writing-modes ()
@@ -1424,49 +1439,45 @@ TODO: straight should be t here
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-    (setenv "LANG" "en_GB")
-    (use-package flyspell
-      :straight t
-      :diminish
-      :general
-      (my-leader-def
-	"n" 'hydra-spelling/body) ;;oryx: just 'c' would be better here
-      :hook ((prog-mode . flyspell-prog-mode)
-	   ((org-mode text-mode) . flyspell-mode))
-      :config
-      (setq ispell-dictionary "english"
-	    ispell-silently-savep t
-	    ispell-personal-dictionary "~/.emacs.d/.aspell.en.pws")
-      :hydra (hydra-spelling (:color blue)
-	"
-    ^
-    ^Spelling^          ^Errors^            ^Checker^
-    ^────────^──────────^──────^────────────^───────^───────
-    _q_ quit            _<_ previous        _c_ correction
-    ^^                  _>_ next            _d_ dictionary
-    ^^                  _f_ check           _m_ mode
-    ^^                  ^^                  ^^
-    "
-	("q" nil)
-	("<" flyspell-correct-previous :color pink)
-	(">" flyspell-correct-next :color pink)
-	("c" ispell)
-	("d" ispell-change-dictionary)
-	("f" flyspell-buffer)
-	("m" flyspell-mode)))
+  (setenv "LANG" "en_GB")
+  (use-package flyspell
+    :diminish
+    :general
+    (my-leader-def
+      "n" 'hydra-spelling/body) ;;oryx: just 'c' would be better here
+    :hook ((prog-mode . flyspell-prog-mode)
+	 ((org-mode text-mode) . flyspell-mode))
+    :config
+    (setq ispell-dictionary "english"
+	  ispell-silently-savep t
+	  ispell-personal-dictionary "~/.emacs.d/.aspell.en.pws")
+    :hydra (hydra-spelling (:color blue)
+      "
+  ^
+  ^Spelling^          ^Errors^            ^Checker^
+  ^────────^──────────^──────^────────────^───────^───────
+  _q_ quit            _<_ previous        _c_ correction
+  ^^                  _>_ next            _d_ dictionary
+  ^^                  _f_ check           _m_ mode
+  ^^                  ^^                  ^^
+  "
+      ("q" nil)
+      ("<" flyspell-correct-previous :color pink)
+      (">" flyspell-correct-next :color pink)
+      ("c" ispell)
+      ("d" ispell-change-dictionary)
+      ("f" flyspell-buffer)
+      ("m" flyspell-mode)))
 
-    (use-package flyspell-correct
-      :straight t
-      :after flyspell)
-
-    (use-package flyspell-correct-helm
-      :straight t
-      :after flyspell)
+  (use-package flyspell-correct
+    :after flyspell)
+  ;;TODO am I using this?
+  (use-package flyspell-correct-helm
+    :after flyspell)
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
     (use-package expand-region
-      :straight t
       :general
       ("C->" 'er/expand-region)
       ("C-<" 'er/contract-region))
@@ -1481,7 +1492,6 @@ TODO: straight should be t here
 
 #+BEGIN_SRC emacs-lisp
     (use-package flycheck
-      :straight t
       :general
       (my-leader-def
 	"f" '(hydra-flycheck-mode/body :wk "flycheck-mode"))
@@ -1512,7 +1522,6 @@ TODO: straight should be t here
 
 #+BEGIN_SRC emacs-lisp
     (use-package yasnippet
-      :straight t
      :custom
      (yas-snippet-dirs
       '("~/.emacs.d/snippets"))
@@ -1520,76 +1529,74 @@ TODO: straight should be t here
      (yas-global-mode +1))
 
     (use-package yasnippet-snippets
-      :straight t
       :after yasnippet)
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-    (use-package company
-      :straight t
-      :diminish
-      :ensure t
-      :config
-      (global-company-mode 1)
-      (setq ;; Only 1 letters required for completion to activate.
-       company-minimum-prefix-length 1
-       ;; Search other buffers for compleition candidates
-       company-dabbrev-other-buffers t
-       company-dabbrev-code-other-buffers t
-       ;; Show candidates according to importance, then case, then in-buffer frequency
-       company-transformers ;'(company-sort-by-backend-importance
-			    ;  company-sort-prefer-same-case-prefix
-			      '(company-sort-by-occurrence)
-       ;; Flushright any annotations for a compleition;
-       ;; e.g., the description of what a snippet template word expands into.
-       company-tooltip-align-annotations t
-       ;; Allow (lengthy) numbers to be eligible for completion.
-       company-complete-number nil
-       ;; M-⟪num⟫ to select an option according to its number.
-       company-show-numbers t
-       ;; Show 10 items in a tooltip; scrollbar otherwise or C-s ^_^
-       company-tooltip-limit 10
-       ;; Edge of the completion list cycles around.
-       company-selection-wrap-around t
-       ;; Do not downcase completions by default.
-       company-dabbrev-downcase nil
-       ;; Even if I write something with the ‘wrong’ case,
-       ;; provide the ‘correct’ casing.
-       company-dabbrev-ignore-case nil
-       ;; Immediately activate completion.
-       company-idle-delay 0
-       ;;company-backends (mapcar #'company-mode/backend-with-yas company-backends)
-       ;;company-backends '((:separate company-capf company-yasnippet))
-       ;; don't try to complete numbers
-       company-dabbrev-char-regexp "[A-z:-]"
-       )
+  (use-package company
+    :diminish
+    :ensure t
+    :config
+    (global-company-mode 1)
+    (setq ;; Only 1 letters required for completion to activate.
+     company-minimum-prefix-length 1
+     ;; Search other buffers for compleition candidates
+     company-dabbrev-other-buffers t
+     company-dabbrev-code-other-buffers t
+     ;; Show candidates according to importance, then case, then in-buffer frequency
+     company-transformers ;'(company-sort-by-backend-importance
+			  ;  company-sort-prefer-same-case-prefix
+			    '(company-sort-by-occurrence)
+     ;; Flushright any annotations for a compleition;
+     ;; e.g., the description of what a snippet template word expands into.
+     company-tooltip-align-annotations t
+     ;; Allow (lengthy) numbers to be eligible for completion.
+     company-complete-number nil
+     ;; M-⟪num⟫ to select an option according to its number.
+     company-show-numbers t
+     ;; Show 10 items in a tooltip; scrollbar otherwise or C-s ^_^
+     company-tooltip-limit 10
+     ;; Edge of the completion list cycles around.
+     company-selection-wrap-around t
+     ;; Do not downcase completions by default.
+     company-dabbrev-downcase nil
+     ;; Even if I write something with the ‘wrong’ case,
+     ;; provide the ‘correct’ casing.
+     company-dabbrev-ignore-case nil
+     ;; Immediately activate completion.
+     company-idle-delay 0
+     ;;company-backends (mapcar #'company-mode/backend-with-yas company-backends)
+     ;;company-backends '((:separate company-capf company-yasnippet))
+     ;; don't try to complete numbers
+     company-dabbrev-char-regexp "[A-z:-]"
+     )
 
-      ;; Added from https://emacs.stackexchange.com/questions/10431/get-company-to-show-suggestions-for-yasnippet-names
-      (defvar company-mode/enable-yas t
-	"Enable yasnippet for all backends.")
-      (defun company-mode/backend-with-yas (backend)
-	(if (or (not company-mode/enable-yas) (and (listp backend) (member 'company-yasnippet backend)))
-	    backend
-	  (append (if (consp backend) backend (list backend))
-		  '(:with company-yasnippet))))
-      (setq company-backends (mapcar #'company-mode/backend-with-yas company-backends))
+    ;; Added from https://emacs.stackexchange.com/questions/10431/get-company-to-show-suggestions-for-yasnippet-names
+    (defvar company-mode/enable-yas t
+      "Enable yasnippet for all backends.")
+    (defun company-mode/backend-with-yas (backend)
+      (if (or (not company-mode/enable-yas) (and (listp backend) (member 'company-yasnippet backend)))
+	  backend
+	(append (if (consp backend) backend (list backend))
+		'(:with company-yasnippet))))
+    (setq company-backends (mapcar #'company-mode/backend-with-yas company-backends))
 
-      ;; Use C-/ to manually start company mode at point. C-/ is used by undo-tree.
-      ;; Override all minor modes that use C-/; bind-key* is discussed below.
-      (bind-key* "C-/" #'company-manual-begin)
+    ;; Use C-/ to manually start company mode at point. C-/ is used by undo-tree.
+    ;; Override all minor modes that use C-/; bind-key* is discussed below.
+    (bind-key* "C-/" #'company-manual-begin)
 
-      ;; Bindings when the company list is active.
-      :general
-      ;; TODO add cancel binding
-      (company-active-map
-       "C-d" 'company-show-doc-buffer ;; In new temp buffer
-       "<tab>" 'company-complete-selection
-       ;; Keep this as the global binding
-       "C-w" 'backward-kill-word
-       ;; Use C-n,p for navigation in addition to M-n,p
-       ;;"C-n" '(lambda () (interactive) (company-complete-common-or-cycle 1))
-       ;;"C-p" '(lambda () (interactive) (company-complete-common-or-cycle -1))
-       ))
+    ;; Bindings when the company list is active.
+    :general
+    ;; TODO add cancel binding
+    (company-active-map
+     "C-d" 'company-show-doc-buffer ;; In new temp buffer
+     "<tab>" 'company-complete-selection
+     ;; Keep this as the global binding
+     "C-w" 'backward-kill-word
+     ;; Use C-n,p for navigation in addition to M-n,p
+     ;;"C-n" '(lambda () (interactive) (company-complete-common-or-cycle 1))
+     ;;"C-p" '(lambda () (interactive) (company-complete-common-or-cycle -1))
+     ))
 #+END_SRC
 
 Nice icons for company-mode
@@ -1636,92 +1643,86 @@ Nice icons for company-mode
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-    (use-package smartscan
-      :straight t
-      :hook ((prog-mode . smartscan-mode))
-      :general
-      ("M-n" 'smartscan-symbol-go-forward)
-      ("M-p" 'smartscan-symbol-go-backward)
-      ("M-'" 'my/symbol-replace))
+  (use-package smartscan
+    :hook ((prog-mode . smartscan-mode))
+    :general
+    ("M-n" 'smartscan-symbol-go-forward)
+    ("M-p" 'smartscan-symbol-go-backward)
+    ("M-'" 'my/symbol-replace))
 
-    (defun my/symbol-replace (replacement)
-      "Replace all standalone symbols in the buffer matching the one at point."
-      (interactive  (list (read-from-minibuffer "Replacement for thing at point: " nil)))
-      (save-excursion
-	(let ((symbol (or (thing-at-point 'symbol) (error "No symbol at point!"))))
-	  (beginning-of-buffer)
-	  ;; (query-replace-regexp symbol replacement)
-	  (replace-regexp (format "\\b%s\\b" (regexp-quote symbol)) replacement))))
+  (defun my/symbol-replace (replacement)
+    "Replace all standalone symbols in the buffer matching the one at point."
+    (interactive  (list (read-from-minibuffer "Replacement for thing at point: " nil)))
+    (save-excursion
+      (let ((symbol (or (thing-at-point 'symbol) (error "No symbol at point!"))))
+	(beginning-of-buffer)
+	;; (query-replace-regexp symbol replacement)
+	(replace-regexp (format "\\b%s\\b" (regexp-quote symbol)) replacement))))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-    (use-package lsp-mode
-      :straight t
-      :hook (lsp-mode . lsp-enable-which-key-integration)
-      (go-mode . lsp-deferred)
-      :commands lsp
-      :custom
-      (lsp-completion-provider :none)
-      :general
-      (my-leader-def
-	"L" '(hydra-lsp/body :wk "lsp-mode"))
-      :config
-      (setq lsp-file-watch-threshold 500)
-      (defhydra hydra-lsp (:exit t :hint nil)
-	"
-     Buffer^^               Server^^                   Symbol
-    -------------------------------------------------------------------------------------
-     [_f_] format           [_M-r_] restart            [_d_] declaration  [_i_] implementation  [_o_] documentation
-     [_m_] imenu            [_S_]   shutdown           [_D_] definition   [_t_] type            [_r_] rename
-     [_x_] execute action   [_M-s_] describe session   [_R_] references   [_s_] signature       [_a_] actions"
-	("d" lsp-find-declaration)
-	("D" lsp-ui-peek-find-definitions)
-	("R" lsp-ui-peek-find-references)
-	("i" lsp-ui-peek-find-implementation)
-	("t" lsp-find-type-definition)
-	("s" lsp-signature-help)
-	("o" lsp-describe-thing-at-point)
-	("r" lsp-rename)
-	("a" helm-lsp-code-actions)
+  (use-package lsp-mode
+    :hook (lsp-mode . lsp-enable-which-key-integration)
+    (go-mode . lsp-deferred)
+    :commands lsp
+    :custom
+    (lsp-completion-provider :none)
+    :general
+    (my-leader-def
+      "L" '(hydra-lsp/body :wk "lsp-mode"))
+    :config
+    (setq lsp-file-watch-threshold 500)
+    (defhydra hydra-lsp (:exit t :hint nil)
+      "
+   Buffer^^               Server^^                   Symbol
+  -------------------------------------------------------------------------------------
+   [_f_] format           [_M-r_] restart            [_d_] declaration  [_i_] implementation  [_o_] documentation
+   [_m_] imenu            [_S_]   shutdown           [_D_] definition   [_t_] type            [_r_] rename
+   [_x_] execute action   [_M-s_] describe session   [_R_] references   [_s_] signature       [_a_] actions"
+      ("d" lsp-find-declaration)
+      ("D" lsp-ui-peek-find-definitions)
+      ("R" lsp-ui-peek-find-references)
+      ("i" lsp-ui-peek-find-implementation)
+      ("t" lsp-find-type-definition)
+      ("s" lsp-signature-help)
+      ("o" lsp-describe-thing-at-point)
+      ("r" lsp-rename)
+      ("a" helm-lsp-code-actions)
 
-	("f" lsp-format-buffer)
-	("m" lsp-ui-imenu)
-	("x" lsp-execute-code-action)
+      ("f" lsp-format-buffer)
+      ("m" lsp-ui-imenu)
+      ("x" lsp-execute-code-action)
 
-	("M-s" lsp-describe-session)
-	("M-r" lsp-restart-workspace)
-	("S" lsp-shutdown-workspace)))
+      ("M-s" lsp-describe-session)
+      ("M-r" lsp-restart-workspace)
+      ("S" lsp-shutdown-workspace)))
 
-    (custom-set-faces
-     '(lsp-face-highlight-read ((t (:background "gray"))))
-     '(lsp-face-highlight-textual ((t (:background "gray"))))
-     '(lsp-face-highlight-write ((t (:background "SteelBlue1"))))
-     '(lsp-ui-doc-background ((t (:background "black")))))
+  (custom-set-faces
+   '(lsp-face-highlight-read ((t (:background "gray"))))
+   '(lsp-face-highlight-textual ((t (:background "gray"))))
+   '(lsp-face-highlight-write ((t (:background "SteelBlue1"))))
+   '(lsp-ui-doc-background ((t (:background "black")))))
 
-    (use-package lsp-ui
-      :straight t
-      :ensure t
-      :commands lsp-ui-mode
-      :config (setq lsp-ui-doc-enable t
-		    lsp-ui-peek-enable t
-		    lsp-ui-sideline-enable t
-		    lsp-ui-imenu-enable t
-		    lsp-ui-flycheck-enable t))
+  (use-package lsp-ui
+    :ensure t
+    :commands lsp-ui-mode
+    :config (setq lsp-ui-doc-enable t
+		  lsp-ui-peek-enable t
+		  lsp-ui-sideline-enable t
+		  lsp-ui-imenu-enable t
+		  lsp-ui-flycheck-enable t))
 
-    (use-package helm-lsp
-      :straight t
-      :commands (helm-lsp-workspace-symbol))
+  (use-package helm-lsp
+    :commands (helm-lsp-workspace-symbol))
 
-    (use-package lsp-treemacs
-      :straight t
-      :commands lsp-treemacs-errors-list)
-    (use-package dap-mode
-      :straight t)
+  (use-package lsp-treemacs
+    :commands lsp-treemacs-errors-list)
+  (use-package dap-mode)
 #+END_SRC
 
+TODO: what is this?
 #+BEGIN_SRC emacs-lisp
     (use-package editorconfig
-      :straight t
       :delight
       :config
       (editorconfig-mode +1))
@@ -1729,7 +1730,6 @@ Nice icons for company-mode
 
 #+BEGIN_SRC emacs-lisp
     (use-package origami
-      :straight t
       :hook (prog-mode . origami-mode)
       :general
       (my-leader-def "e" '(hydra-folding/body :wk "code folding"))
@@ -1752,7 +1752,6 @@ Nice icons for company-mode
 
 #+BEGIN_SRC emacs-lisp
     (use-package magit
-      :straight t
       :defer t
       :general
       ("C-x g" 'magit-status)
@@ -1778,21 +1777,17 @@ Nice icons for company-mode
 	    (user-error "There is not current branch")))))
 
     (use-package git-timemachine
-      :straight t
       :defer t)
 
     (use-package git-messenger
-      :straight t
       :defer t)
 
     (use-package git-gutter-fringe
-      :straight t
       :config
       (global-git-gutter-mode +1)
       (setq-default fringes-outside-margins t))
 
     (use-package git-link
-      :straight t
       :general
       (my-leader-def
 	"gl" '(:ignore t :wk "git link")
@@ -1801,7 +1796,6 @@ Nice icons for company-mode
 	"glh" 'git-link-homepage))
 
     (use-package browse-at-remote
-      :straight t
       :general
       (my-leader-def
 	"glg" 'browse-at-remote))
@@ -1865,33 +1859,28 @@ Nice icons for company-mode
 
 #+BEGIN_SRC emacs-lisp
     (use-package restart-emacs
-      :straight t
       :defer t)
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
     (use-package restclient
-      :straight t
       :defer  t)
 
     (use-package company-restclient
-      :straight t
       :defer t)
 
     (use-package ob-restclient
-      :straight t
       :defer t)
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
     (use-package lsp-java
-      :straight t
       :config (add-hook 'java-mode-hook 'lsp))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
   (use-package go-mode
-    :straight t
+    :mode "\\.go\\'"
     :custom
     (defun lsp-go-install-save-hooks ()
       (add-hook 'before-save-hook #'lsp-format-buffer t t)
@@ -1931,21 +1920,17 @@ Nice icons for company-mode
 
 #+BEGIN_SRC emacs-lisp
   (use-package dockerfile-mode
-    :straight t
     :defer t)
 
   (use-package docker
-    :straight t
     :defer t)
 
   (use-package kubernetes
-    :straight t
     :commands (kubernetes-overview))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
   (use-package js2-mode
-    :straight t
     :mode "\\.js$"
     :hook (js2-mode . lsp)
     :interpreter "node"
@@ -1960,13 +1945,11 @@ Nice icons for company-mode
     (flycheck-javascript-eslint-executable "eslint_d"))
 
   (use-package json-mode
-    :straight t
     :mode "\\.json\\'")
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
   (use-package skewer-mode
-    :straight t
     :defer t
     :ghook ('js2-mode-hook)
     :general
@@ -2022,7 +2005,6 @@ Nice icons for company-mode
 
 
   (use-package sly
-    :straight t
     :defer t
     :hook (sly-mrepl-mode . rainbow-delimiters-mode)
     :general
@@ -2036,15 +2018,12 @@ Nice icons for company-mode
     (setq inferior-lisp-program "/usr/bin/sbcl"))
 
   (use-package sly-quicklisp
-    :straight t
     :after sly)
 
   (use-package sly-asdf
-    :straight t
     :after sly)
 
   (use-package hy-mode
-    :straight t
     :mode "\\.hy\\'"
     :general
     (my-local-leader-def 'hy-mode-map
@@ -2054,9 +2033,9 @@ Nice icons for company-mode
       "ed" 'hy-shell-eval-current-form))
 #+END_SRC
 
+TODO: I've no idea what this does.
 #+BEGIN_SRC emacs-lisp
   (use-package geiser
-    :straight t
     :defer t
     :general
     (my-local-leader-def
@@ -2075,7 +2054,6 @@ Nice icons for company-mode
 
 #+BEGIN_SRC emacs-lisp
   (use-package python
-    :straight t
     :mode "\\.py\\'"
     :ghook
     ('python-mode-hook #'lsp)
@@ -2087,7 +2065,6 @@ Nice icons for company-mode
       "es" 'python-shell-send-string))
 
   (use-package pipenv
-    :straight t
     :hook ((python-mode . pipenv-mode)
 	   (hy-mode . pipenv-mode))
     :init
@@ -2096,7 +2073,6 @@ Nice icons for company-mode
 
 #+BEGIN_SRC emacs-lisp
   (use-package web-mode
-    :straight t
     :defer t
     :preface
     (defun my-web-mode-hook ()
@@ -2116,25 +2092,21 @@ Nice icons for company-mode
 
 #+BEGIN_SRC emacs-lisp
   (use-package yaml-mode
-    :straight t
     :defer t)
 
   (use-package markdown-mode
-    :ensure t
     :mode ("README\\.md\\'" . gfm-mode)
     :init (setq markdown-command "multimarkdown"))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
   (use-package terraform-mode
-    :straight t
     :ensure t)
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
   (use-package sqlformat
     :ensure t
-    :straight t
     :init
     ;(add-hook 'sql-mode-hook 'sqlformat-on-save-mode)
     :config
@@ -2193,6 +2165,5 @@ Nice icons for company-mode
 
 #+BEGIN_SRC emacs-lisp
   (use-package gradle-mode
-    :straight t
     :ensure t)
 #+END_SRC
