@@ -22,7 +22,11 @@ available. A few places that I've found particularly useful include:
 * TODO
 - rationalise Hydra config across packages
 - rationalise General config across packages
-
+- understand ~:defer~ and ~:ensure~
+- consider having Emacs manage system packages that it depends on so that they can be auto-installed
+  - something like this: ~(use-package use-package-ensure-system-package)~
+  - see https://github.com/jwiegley/use-package#use-package-ensure-system-package
+- explore prescient.el to sort company-mode suggestions
 * Emacs
 ** Local
 These are various, installation specific settings that might differ across machines, some of which I
