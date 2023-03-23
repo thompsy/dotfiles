@@ -28,10 +28,12 @@ available. A few places that I've found particularly useful include:
   - something like this: ~(use-package use-package-ensure-system-package)~
   - see https://github.com/jwiegley/use-package#use-package-ensure-system-package
 - explore prescient.el to sort company-mode suggestions
+- try crux, it has some useful looking things
 * Emacs
 ** Local
 These are various, installation specific settings that might differ across machines, some of which I
 don't want to commit to Git.
+
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/local.el" :eval no
   (provide 'local-setup)
 
