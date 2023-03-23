@@ -1833,28 +1833,6 @@ TODO: what is this?
       (editorconfig-mode +1))
 #+END_SRC
 
-#+BEGIN_SRC emacs-lisp
-    (use-package origami
-      :hook (prog-mode . origami-mode)
-      :general
-      (my-leader-def "e" '(hydra-folding/body :wk "code folding"))
-      :hydra
-      (hydra-folding (:color red)
-       "
-      _o_pen node    _n_ext fold       _t_oggle node     _s_how current only
-      _c_lose node   _p_revious fold   toggle _f_orward
-      ^ ^            ^ ^               toggle _a_ll
-      "
-	("o" origami-open-node)
-	("c" origami-close-node)
-	("n" origami-next-fold)
-	("p" origami-previous-fold)
-	("t" origami-toggle-node)
-	("f" origami-forward-toggle-node)
-	("a" origami-toggle-all-nodes)
-	("s" origami-show-only-node)))
-#+END_SRC
-
 ** Git
 #+BEGIN_SRC emacs-lisp
     (use-package magit
