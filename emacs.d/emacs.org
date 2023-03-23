@@ -263,6 +263,73 @@ than spamming them in inconsistent places.
     (show-paren-mode +1))
 #+END_SRC
 
+*** Asthetics
+#+BEGIN_SRC emacs-lisp
+  (use-package frame
+    :straight nil
+    :config
+    (blink-cursor-mode -1)
+    (setq initial-scratch-message ""
+	  inhibit-startup-message t
+	  visible-bell nil
+	  ring-bell-function 'ignore
+	  initial-frame-alist
+	  '((menu-bar-lines . 0)
+	    (tool-bar-lines . 0)))
+    (scroll-bar-mode 0)
+    (tool-bar-mode 0)
+    (menu-bar-mode 0)
+    (global-hl-line-mode 1))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+  (use-package dracula-theme
+    :config
+    (load-theme 'dracula))
+
+  ;; TODO this could live somewhere more tidy...
+  (add-to-list 'default-frame-alist '(font . "Fira Code-14"))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+  (use-package all-the-icons
+    :defer t)
+#+END_SRC
+
+TODO explore other mode-lines
+#+BEGIN_SRC emacs-lisp
+  (use-package doom-modeline
+    :demand t
+    :preface
+    (defun my-doom-modeline-setup ()
+      (column-number-mode +1)
+      (doom-modeline-mode +1))
+    :init (my-doom-modeline-setup)
+    :config
+    (setq doom-modeline-height 1)
+    (set-face-attribute 'mode-line nil :height 150)
+    (set-face-attribute 'mode-line-inactive nil :height 150)
+    :custom
+    (doom-modeline-vcs-max-length 50)
+    (doom-modeline-buffer-file-name-style 'truncate-upto-project))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+  (use-package rainbow-delimiters
+    :hook (prog-mode . rainbow-delimiters-mode)
+    :config
+    (setq show-paren-delay  0)
+    (setq show-paren-style 'mixed))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+  (use-package display-line-numbers
+    :straight nil
+    :ghook
+    ('prog-mode-hook #'display-line-numbers-mode))
+#+END_SRC
+
+*** Keybindings
 [[https://github.com/noctuid/general.el][~general.el~]] provides a convenient method for binding keys. It also integrates well with
 ~use-package~.
 
@@ -637,62 +704,6 @@ startup time without leaving emacs.
 	(load-file custom-file)))
 #+END_SRC
 
-#+BEGIN_SRC emacs-lisp
-  (use-package frame
-    :straight nil
-    :config
-    (blink-cursor-mode -1)
-    (setq initial-scratch-message ""
-	  inhibit-startup-message t
-	  visible-bell nil
-	  ring-bell-function 'ignore
-	  initial-frame-alist
-	  '((menu-bar-lines . 0)
-	    (tool-bar-lines . 0)))
-    (scroll-bar-mode 0)
-    (tool-bar-mode 0)
-    (menu-bar-mode 0)
-    (global-hl-line-mode 1))
-#+END_SRC
-
-#+BEGIN_SRC emacs-lisp
-  (use-package dracula-theme
-    :config
-    (load-theme 'dracula))
-
-  (add-to-list 'default-frame-alist '(font . "Fira Code-14"))
-#+END_SRC
-
-#+BEGIN_SRC emacs-lisp
-  (use-package all-the-icons
-    :defer t)
-#+END_SRC
-
-TODO explore other mode-lines
-#+BEGIN_SRC emacs-lisp
-  (use-package doom-modeline
-    :demand t
-    :preface
-    (defun my-doom-modeline-setup ()
-      (column-number-mode +1)
-      (doom-modeline-mode +1))
-    :init (my-doom-modeline-setup)
-    :config
-    (setq doom-modeline-height 1)
-    (set-face-attribute 'mode-line nil :height 150)
-    (set-face-attribute 'mode-line-inactive nil :height 150)
-    :custom
-    (doom-modeline-vcs-max-length 50)
-    (doom-modeline-buffer-file-name-style 'truncate-upto-project))
-#+END_SRC
-
-#+BEGIN_SRC emacs-lisp
-  (use-package rainbow-delimiters
-    :hook (prog-mode . rainbow-delimiters-mode)
-    :config
-    (setq show-paren-delay  0)
-    (setq show-paren-style 'mixed))
-#+END_SRC
 
 #+BEGIN_SRC emacs-lisp
   (use-package beacon
@@ -1169,6 +1180,7 @@ TODO explore other mode-lines
     :defer t)
 #+END_SRC
 
+*** Org-Mode
 #+BEGIN_SRC emacs-lisp
   (defun my-org-todo-setup ()
     (setq org-use-fast-todo-selection t)
@@ -1560,12 +1572,6 @@ TODO: straight should be t here
     ("C-<" 'er/contract-region))
 #+END_SRC
 
-#+BEGIN_SRC emacs-lisp
-  (use-package display-line-numbers
-    :straight nil
-    :ghook
-    ('prog-mode-hook #'display-line-numbers-mode))
-#+END_SRC
 
 #+BEGIN_SRC emacs-lisp
   (use-package flycheck
@@ -2089,7 +2095,7 @@ TODO: what is this?
       "ed" 'hy-shell-eval-current-form))
 #+END_SRC
 
-TODO: I've no idea what this does.
+TODO: this is a scheme mode. I don't really use it much.
 #+BEGIN_SRC emacs-lisp
   (use-package geiser
     :defer t
