@@ -223,10 +223,7 @@ Use UTF-8 everywhere.
     :straight nil
     :custom
     ;; killing and yanking uses the system clipboard
-    (save-interprogram-paste-before-kill t)
-    :config
-    ;; display column info in the modeline
-    (column-number-mode +1))
+    (save-interprogram-paste-before-kill t))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
