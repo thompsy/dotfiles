@@ -130,13 +130,15 @@ TODO: I actually only call this once, so I can probably get rid of it.
 
 TODO: check if I can get rid of this.
 #+BEGIN_SRC emacs-lisp
-  ;; I needed to install this at some point due to an issue with Magit. I'm not sure if I need it anymore.
+  ;; I needed to install this at some point due to an issue with Magit. I'm not sure if I need it
+  ;; anymore.
   (use-package compat
     :straight (:host github :repo "emacs-compat/compat"))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-  ;; TODO not sure why this appears so early in the file. It probably needs to before I reference anything else related to org. It would be good to test and see if this is still needed.
+  ;; TODO not sure why this appears so early in the file. It probably needs to before I reference
+  ;; anything else related to org. It would be good to test and see if this is still needed.
   (straight-use-package 'org)
 #+END_SRC
 
@@ -232,8 +234,8 @@ Use UTF-8 everywhere.
     (global-so-long-mode +1))
 #+END_SRC
 
-[[https://github.com/emacs-mirror/emacs/blob/master/lisp/saveplace.el][~saveplace~]] jumps back to the last when later visiting a file. This is handy to pick up where you left off. See:
-
+[[https://github.com/emacs-mirror/emacs/blob/master/lisp/saveplace.el][~saveplace~]] jumps back to the last when later visiting a file. This is handy to pick up where you
+left off.
 #+BEGIN_SRC emacs-lisp
   (use-package saveplace
     :straight nil
@@ -261,7 +263,8 @@ than spamming them in inconsistent places.
     (show-paren-mode +1))
 #+END_SRC
 
-[[https://github.com/noctuid/general.el][~general.el~]] provides a convenient method for binding keys. It also integrates well with ~use-package~.
+[[https://github.com/noctuid/general.el][~general.el~]] provides a convenient method for binding keys. It also integrates well with
+~use-package~.
 
 In particular, this allows us to easily setup a global leader key, ~my-leader-def~ and chain bindings
 from that.
@@ -297,6 +300,7 @@ from that.
       "b" '(:ignore t :wk "bookmarks")
       "bs" 'bookmark-set
       "bg" 'bookmark-jump
+      ;; TODO have this call helm-bookmarks
       "bl" 'bookmark-bmenu-list
       ;; quit / restart
       "q" '(:ignore t :wk "quit / restart")
@@ -450,11 +454,10 @@ Note that ~:wk~ allows us to specify the text that is displayed by ~which-key~ f
     ("o" (my/insert-unicode "RIGHTWARDS ARROW")))
 #+END_SRC
 
-[[https://github.com/dacap/keyfreq][~keyfreq~]] tracks how many times you use various Emacs
-commands. This can be helpful to identify commands that you're using a lot which could benefit from
-a better keybinding. This is really a manual way to emulate something like the great Key Promoter X
-plugin for IntelliJ which tells you when there's a keyboard shortcut to do something that you've
-just used the mouse for.
+[[https://github.com/dacap/keyfreq][~keyfreq~]] tracks how many times you use various Emacs commands. This can be helpful to identify
+commands that you're using a lot which could benefit from a better keybinding. This is really a
+manual way to emulate something like the great Key Promoter X plugin for IntelliJ which tells you
+when there's a keyboard shortcut to do something that you've just used the mouse for.
 #+BEGIN_SRC emacs-lisp
   (use-package keyfreq
     :init (keyfreq-mode 1)
@@ -538,7 +541,9 @@ TODO: there's probably more useful options here I could explore
 [[https://elpa.gnu.org/packages/undo-tree.html][~undo-tree~]] gives a nice undo visualisation.
 
 TODO this is a nice way to incorporate Hydras directly into the use-package setup.
+
 TODO this doesn't seem to be enabled by default, at least in org, or Go. Maybe add hooks
+
 TODO try vundo instead https://github.com/casouri/vundo
 #+BEGIN_SRC emacs-lisp
   (use-package undo-tree
