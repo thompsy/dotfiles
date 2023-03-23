@@ -76,7 +76,7 @@ Determine the operating system to tailor aspects of the config.
 #+END_SRC
 
 ** Straight Package Manager
-Setup the straight package manager.
+Setup the [[https://github.com/radian-software/straight.el][~straight.el~]] package manager.
 #+BEGIN_SRC emacs-lisp
   (setq straight-repository-branch "develop")
 
@@ -140,7 +140,7 @@ TODO: check if I can get rid of this.
   (straight-use-package 'org)
 #+END_SRC
 
-The ~gcmh~ (Garbage Collector Magic Hack) package updates Emacs's GC strategy to minimise interference
+The [[https://github.com/emacsmirror/gcmh][~gcmh~]] (Garbage Collector Magic Hack) package updates Emacs's GC strategy to minimise interference
 with user activity.
 #+BEGIN_SRC emacs-lisp
   (use-package gcmh
@@ -153,6 +153,8 @@ responses from 800k to 3M, so the default of 4k is too small.
   (setq read-process-output-max (* 1024 1024 3)) ;; 3mb
 #+END_SRC
 
+A few miscellaneous settings. Note that ~emacs~ is not really a package strictly speaking which is why
+we include ~:straight nil~ so that our package manager doesn't try to fetch the source.
 #+BEGIN_SRC emacs-lisp
   (use-package emacs
     :straight nil
@@ -170,14 +172,21 @@ responses from 800k to 3M, so the default of 4k is too small.
     (load-prefer-newer t)
     ;; allow emacs to be any size, removes black bars
     (frame-resize-pixelwise t))
+#+END_SRC
 
+It's useful to have buffers auto-revert when files on disk change especially when using Git branches
+a lot!
+#+BEGIN_SRC emacs-lisp
   (use-package autorevert
     :straight nil
     :custom
     (global-revert-check-vc-info t)
     :config
     (global-auto-revert-mode +1))
+#+END_SRC
 
+Use UTF-8 everywhere.
+#+BEGIN_SRC emacs-lisp
   (use-package mule
     :straight nil
     :config
@@ -187,7 +196,9 @@ responses from 800k to 3M, so the default of 4k is too small.
     (set-terminal-coding-system 'utf-8-unix)
     (setq locale-coding-system 'utf-8-unix)
     (set-selection-coding-system 'utf-8-unix))
+#+END_SRC
 
+#+BEGIN_SRC emacs-lisp
   (use-package files
     :straight nil
     :config
@@ -201,7 +212,9 @@ responses from 800k to 3M, so the default of 4k is too small.
      vc-make-backup-files t
      recentf-max-menu-items 25
      recentf-max-saved-items 500))
+#+END_SRC
 
+#+BEGIN_SRC emacs-lisp
   (use-package simple
     :straight nil
     :custom
@@ -210,24 +223,36 @@ responses from 800k to 3M, so the default of 4k is too small.
     :config
     ;; display column info in the modeline
     (column-number-mode +1))
+#+END_SRC
 
+#+BEGIN_SRC emacs-lisp
   (use-package so-long
     :straight nil
     :config
     (global-so-long-mode +1))
+#+END_SRC
 
+[[https://github.com/emacs-mirror/emacs/blob/master/lisp/saveplace.el][~saveplace~]] jumps back to the last when later visiting a file. This is handy to pick up where you left off. See:
+
+#+BEGIN_SRC emacs-lisp
   (use-package saveplace
     :straight nil
     :config
     (save-place-mode +1))
+#+END_SRC
 
+[[https://github.com/emacscollective/no-littering][~no-littering~]] keeps configuration files and other persistent data under ~user-emacs-directory~ rather
+than spamming them in inconsistent places.
+#+BEGIN_SRC emacs-lisp
   (use-package no-littering
     :init
     (setq no-littering-etc-directory
 	  (expand-file-name "etc/" user-emacs-directory))
     (setq no-littering-var-directory
 	  (expand-file-name "var/" user-emacs-directory)))
+#+END_SRC
 
+#+BEGIN_SRC emacs-lisp
   (use-package paren
     :straight nil
     :custom
@@ -236,39 +261,58 @@ responses from 800k to 3M, so the default of 4k is too small.
     (show-paren-mode +1))
 #+END_SRC
 
-#+BEGIN_SRC emacs-lisp
-    (use-package general
-      :custom
-      (general-override-states '(insert emacs hybrid normal visual motion operator replace))
-      :config
-      (general-define-key
-       "C-w" 'backward-kill-word
-       "C-c C-k" 'kill-region
-       "C-x C-k" 'kill-region
-       "C-x C-b" 'ibuffer
-       "M-s" 'highlight-symbol-at-point
-       "M-c" 'hi-lock-mode
-       "M-z" 'pop-global-mark
-       )
+[[https://github.com/noctuid/general.el][~general.el~]] provides a convenient method for binding keys. It also integrates well with ~use-package~.
 
-      (general-override-mode)
-      (general-create-definer my-leader-def
-	:prefix "C-c")
-      (my-leader-def
-	"a" 'org-agenda
-	"c" 'comment-dwim
-	"RET" 'make-frame-command
-	;; bookmarks
-	"b" '(:ignore t :wk "bookmarks")
-	"bs" 'bookmark-set
-	"bg" 'bookmark-jump
-	"bl" 'bookmark-bmenu-list
-	;; quit / restart
-	"q" '(:ignore t :wk "quit / restart")
-	"qq" 'save-buffers-kill-terminal
-	"qQ" 'save-buffers-kill-emacs
-	"qr" 'restart-emacs))
+In particular, this allows us to easily setup a global leader key, ~my-leader-def~ and chain bindings
+from that.
+#+BEGIN_SRC emacs-lisp
+  (use-package general
+    :custom
+    (general-override-states '(insert emacs hybrid normal visual motion operator replace))
+    :config
+    (general-define-key
+     "C-w" 'backward-kill-word
+     "C-c C-k" 'kill-region
+     "C-x C-k" 'kill-region
+     "C-x C-b" 'ibuffer
+     "M-s" 'highlight-symbol-at-point
+     "M-c" 'hi-lock-mode
+     "M-z" 'pop-global-mark
+     )
+
+    ;; Make general's keybindings take precedence over keys bound to other minor mode keymaps.
+    (general-override-mode)
+
+    ;; Create a definer where most of my commands will live under
+    (general-create-definer my-leader-def
+      :prefix "C-c")
+
+    ;; Setup some initial bindings.
+    ;; TODO some of these should probably live elsewhere
+    (my-leader-def
+      "a" 'org-agenda
+      "c" 'comment-dwim
+      "RET" 'make-frame-command
+      ;; bookmarks - TODO setup a Hydra for this
+      "b" '(:ignore t :wk "bookmarks")
+      "bs" 'bookmark-set
+      "bg" 'bookmark-jump
+      "bl" 'bookmark-bmenu-list
+      ;; quit / restart
+      "q" '(:ignore t :wk "quit / restart")
+      "qq" 'save-buffers-kill-terminal
+      "qQ" 'save-buffers-kill-emacs
+      "qr" 'restart-emacs))
 #+END_SRC
+
+[[https://github.com/justbur/emacs-which-key][~which-key~]] displays all of the available keybindings following a incompletely entered command. For
+example, pressing ~C-x~ and waiting a moment will cause ~which-key~ to populate the minibuffer with all
+the available next keys along with their corresponding commands. This makes discovery of new
+commands very easy.
+
+The only slight issue with this is that the size of the minibuffer expands a lot which can cause the
+view of the current buffer to change depending on where the point is. I've not been able to find a
+way around this yet.
 
 #+BEGIN_SRC emacs-lisp
     (use-package which-key
@@ -281,139 +325,160 @@ responses from 800k to 3M, so the default of 4k is too small.
       )
 #+END_SRC
 
+[[https://github.com/abo-abo/hydra][~hydra~]]
+
+Note that ~:wk~ allows us to specify the text that is displayed by ~which-key~ for this hydra.
 #+BEGIN_SRC emacs-lisp
-    (use-package hydra
-      :defer t)
+  (use-package hydra
+    :defer t)
 
-    ;; This allows us to use :hydra within use-package
-    (use-package use-package-hydra
-      :ensure t)
+  ;; This allows us to use :hydra within use-package
+  (use-package use-package-hydra
+    :ensure t)
 
-    (my-leader-def "z" '(hydra-zoom/body :wk "zoom"))
-    (defhydra hydra-zoom (:column 2)
-	("n" text-scale-increase "Zoom in")
-	("t" text-scale-decrease "Zoom out")
-	("r" (text-scale-set 0) "Reset zoom")
-	("0" (text-scale-set 0) :bind nil :exit t))
+  ;; Add an easy zoom function
+  (my-leader-def "z" '(hydra-zoom/body :wk "zoom"))
+  (defhydra hydra-zoom (:column 2)
+      ("n" text-scale-increase "Zoom in")
+      ("t" text-scale-decrease "Zoom out")
+      ("r" (text-scale-set 0) "Reset zoom")
+      ("0" (text-scale-set 0) :bind nil :exit t))
 
-    (general-define-key "C-n" 'hydra-move/body)
-    (defhydra hydra-move
-      (:body-pre (next-line))
-      "navigation"
-      ("n" next-line)
-      ("p" previous-line)
-      ("f" forward-char)
-      ("b" backward-char)
-      ("a" beginning-of-line)
-      ("e" move-end-of-line)
-      ("v" scroll-up-command)
-      ;; Converting M-v to V here by analogy.
-      ("V" scroll-down-command)
-      ("l" recenter-top-bottom)
-      ("<" beginning-of-buffer)
-      (">" end-of-buffer))
+  (general-define-key "C-n" 'hydra-move/body)
+  (defhydra hydra-move
+    (:body-pre (next-line))
+    "navigation"
+    ("n" next-line)
+    ("p" previous-line)
+    ("f" forward-char)
+    ("b" backward-char)
+    ("a" beginning-of-line)
+    ("e" move-end-of-line)
+    ("v" scroll-up-command)
+    ;; Converting M-v to V here by analogy.
+    ("V" scroll-down-command)
+    ("l" recenter-top-bottom)
+    ("<" beginning-of-buffer)
+    (">" end-of-buffer))
 
-    (my-leader-def "R" '(hydra-rectangle/body :wk "rectangle"))
-    (defhydra hydra-rectangle (:body-pre (rectangle-mark-mode 1)
-					 :color pink
-					 :hint nil
-					 :post (deactivate-mark))
-	   "
-	^_i_^       _w_ copy      _O_pen       _N_umber-lines
-      _n_   _o_     _y_ank        _t_ype       _E_xchange-point
-	^_e_^       _d_ kill      _c_lear      _r_eset-region-mark
-      ^^^^          _u_ndo        _g_ quit     ^ ^
-      "
-	   ("i" rectangle-previous-line)
-	   ("e" rectangle-next-line)
-	   ("n" rectangle-backward-char)
-	   ("o" rectangle-forward-char)
-	   ("d" kill-rectangle)                    ;; C-x r k
-	   ("y" yank-rectangle)                    ;; C-x r y
-	   ("w" copy-rectangle-as-kill)            ;; C-x r M-w
-	   ("O" open-rectangle)                    ;; C-x r o
-	   ("t" string-rectangle)                  ;; C-x r t
-	   ("c" clear-rectangle)                   ;; C-x r c
-	   ("E" rectangle-exchange-point-and-mark) ;; C-x C-x
-	   ("N" rectangle-number-lines)            ;; C-x r N
-	   ("r" (if (region-active-p)
-		    (deactivate-mark)
-		  (rectangle-mark-mode 1)))
-	   ("u" undo nil)
-	   ("g" nil))
+  (my-leader-def "R" '(hydra-rectangle/body :wk "rectangle"))
+  (defhydra hydra-rectangle (:body-pre (rectangle-mark-mode 1)
+				       :color pink
+				       :hint nil
+				       :post (deactivate-mark))
+	 "
+      ^_i_^       _w_ copy      _O_pen       _N_umber-lines
+    _n_   _o_     _y_ank        _t_ype       _E_xchange-point
+      ^_e_^       _d_ kill      _c_lear      _r_eset-region-mark
+    ^^^^          _u_ndo        _g_ quit     ^ ^
+    "
+	 ("i" rectangle-previous-line)
+	 ("e" rectangle-next-line)
+	 ("n" rectangle-backward-char)
+	 ("o" rectangle-forward-char)
+	 ("d" kill-rectangle)                    ;; C-x r k
+	 ("y" yank-rectangle)                    ;; C-x r y
+	 ("w" copy-rectangle-as-kill)            ;; C-x r M-w
+	 ("O" open-rectangle)                    ;; C-x r o
+	 ("t" string-rectangle)                  ;; C-x r t
+	 ("c" clear-rectangle)                   ;; C-x r c
+	 ("E" rectangle-exchange-point-and-mark) ;; C-x C-x
+	 ("N" rectangle-number-lines)            ;; C-x r N
+	 ("r" (if (region-active-p)
+		  (deactivate-mark)
+		(rectangle-mark-mode 1)))
+	 ("u" undo nil)
+	 ("g" nil))
 
-    (my-leader-def "s" '(hydra-straight-helper/body :wk "pkgs"))
-    (defhydra hydra-straight-helper (:hint nil :color green)
-	   "
-	  _c_heck all       |_f_etch all     |_m_erge all      |_n_ormalize all   |p_u_sh all
-	  _C_heck package   |_F_etch package |_M_erge package  |_N_ormlize package|p_U_sh package
-	  ----------------^^+--------------^^+---------------^^+----------------^^+------------||_q_uit||
-	  _r_ebuild all     |_p_ull all      |_v_ersions freeze|_w_atcher start   |_g_et recipe
-	  _R_ebuild package |_P_ull package  |_V_ersions thaw  |_W_atcher quit    |prun_e_ build"
-	   ("c" straight-check-all)
-	   ("C" straight-check-package)
-	   ("r" straight-rebuild-all)
-	   ("R" straight-rebuild-package)
-	   ("f" straight-fetch-all)
-	   ("F" straight-fetch-package)
-	   ("p" straight-pull-all)
-	   ("P" straight-pull-package)
-	   ("m" straight-merge-all)
-	   ("M" straight-merge-package)
-	   ("n" straight-normalize-all)
-	   ("N" straight-normalize-package)
-	   ("u" straight-push-all)
-	   ("U" straight-push-package)
-	   ("v" straight-freeze-versions)
-	   ("V" straight-thaw-versions)
-	   ("w" straight-watcher-start)
-	   ("W" straight-watcher-quit)
-	   ("g" straight-get-recipe)
-	   ("e" straight-prune-build)
-	   ("q" nil))
+  (my-leader-def "s" '(hydra-straight-helper/body :wk "pkgs"))
+  (defhydra hydra-straight-helper (:hint nil :color green)
+	 "
+	_c_heck all       |_f_etch all     |_m_erge all      |_n_ormalize all   |p_u_sh all
+	_C_heck package   |_F_etch package |_M_erge package  |_N_ormlize package|p_U_sh package
+	----------------^^+--------------^^+---------------^^+----------------^^+------------||_q_uit||
+	_r_ebuild all     |_p_ull all      |_v_ersions freeze|_w_atcher start   |_g_et recipe
+	_R_ebuild package |_P_ull package  |_V_ersions thaw  |_W_atcher quit    |prun_e_ build"
+	 ("c" straight-check-all)
+	 ("C" straight-check-package)
+	 ("r" straight-rebuild-all)
+	 ("R" straight-rebuild-package)
+	 ("f" straight-fetch-all)
+	 ("F" straight-fetch-package)
+	 ("p" straight-pull-all)
+	 ("P" straight-pull-package)
+	 ("m" straight-merge-all)
+	 ("M" straight-merge-package)
+	 ("n" straight-normalize-all)
+	 ("N" straight-normalize-package)
+	 ("u" straight-push-all)
+	 ("U" straight-push-package)
+	 ("v" straight-freeze-versions)
+	 ("V" straight-thaw-versions)
+	 ("w" straight-watcher-start)
+	 ("W" straight-watcher-quit)
+	 ("g" straight-get-recipe)
+	 ("e" straight-prune-build)
+	 ("q" nil))
 
-    (defun my/insert-unicode (unicode-name)
-      "Same as C-x 8 enter UNICODE-NAME."
-      (insert-char (gethash unicode-name (ucs-names))))
+  (defun my/insert-unicode (unicode-name)
+    "Same as C-x 8 enter UNICODE-NAME."
+    (insert-char (gethash unicode-name (ucs-names))))
 
-    (my-leader-def "u" '(hydra-unicode/body :wk "unicode"))
-    (defhydra hydra-unicode (:hint nil)
-      "
-	    Unicode  _e_ €  _g_ £
-		     _f_ ♀  _r_ ♂
-		     _o_ °  _m_ µ  _z_ ë  _Z_ Ë
-		     _n_ ←  _e_ ↓  _i_ ↑  _o_ →
-	    "
-      ("e" (my/insert-unicode "EURO SIGN"))
-      ("g" (my/insert-unicode "POUND SIGN"))
+  (my-leader-def "u" '(hydra-unicode/body :wk "unicode"))
+  (defhydra hydra-unicode (:hint nil)
+    "
+	  Unicode  _e_ €  _g_ £
+		   _f_ ♀  _r_ ♂
+		   _o_ °  _m_ µ  _z_ ë  _Z_ Ë
+		   _n_ ←  _e_ ↓  _i_ ↑  _o_ →
+	  "
+    ("e" (my/insert-unicode "EURO SIGN"))
+    ("g" (my/insert-unicode "POUND SIGN"))
 
-      ("r" (my/insert-unicode "MALE SIGN"))
-      ("f" (my/insert-unicode "FEMALE SIGN"))
+    ("r" (my/insert-unicode "MALE SIGN"))
+    ("f" (my/insert-unicode "FEMALE SIGN"))
 
-      ("o" (my/insert-unicode "DEGREE SIGN"))
-      ("m" (my/insert-unicode "MICRO SIGN"))
+    ("o" (my/insert-unicode "DEGREE SIGN"))
+    ("m" (my/insert-unicode "MICRO SIGN"))
 
-      ("z" (my/insert-unicode "LATIN SMALL LETTER E DIAERESIS"))
-      ("Z" (my/insert-unicode "LATIN CAPITAL LETTER E DIAERESIS"))
+    ("z" (my/insert-unicode "LATIN SMALL LETTER E DIAERESIS"))
+    ("Z" (my/insert-unicode "LATIN CAPITAL LETTER E DIAERESIS"))
 
-      ("n" (my/insert-unicode "LEFTWARDS ARROW"))
-      ("e" (my/insert-unicode "DOWNWARDS ARROW"))
-      ("i" (my/insert-unicode "UPWARDS ARROW"))
-      ("o" (my/insert-unicode "RIGHTWARDS ARROW")))
+    ("n" (my/insert-unicode "LEFTWARDS ARROW"))
+    ("e" (my/insert-unicode "DOWNWARDS ARROW"))
+    ("i" (my/insert-unicode "UPWARDS ARROW"))
+    ("o" (my/insert-unicode "RIGHTWARDS ARROW")))
 #+END_SRC
 
+[[https://github.com/dacap/keyfreq][~keyfreq~]] tracks how many times you use various Emacs
+commands. This can be helpful to identify commands that you're using a lot which could benefit from
+a better keybinding. This is really a manual way to emulate something like the great Key Promoter X
+plugin for IntelliJ which tells you when there's a keyboard shortcut to do something that you've
+just used the mouse for.
 #+BEGIN_SRC emacs-lisp
-    (use-package keyfreq
-      :config
-      (keyfreq-autosave-mode 1))
+  (use-package keyfreq
+    :init (keyfreq-mode 1)
+    :config (keyfreq-autosave-mode 1))
 #+END_SRC
 
+** Helm
+
+[[https://github.com/emacs-helm/helm][~helm~]]
 #+BEGIN_SRC emacs-lisp
   (use-package helm
     :diminish
-    :init (helm-mode t)
+    :init
+    (helm-mode t)
     :config
-    (setq helm-buffer-max-length 40)
+    (setq helm-buffer-max-length 40
+	  ;; this stops helm trying to ping websites when it interprets text as a url
+	  ffap-machine-p-known 'reject
+	  helm-mini-default-sources '(helm-source-buffers-list
+				  helm-source-recentf
+				  helm-source-bookmarks
+				  helm-source-bookmark-set
+				  helm-source-buffer-not-found))
+    ;; TODO why not use general here?
     :bind (("M-x"     . helm-M-x)
 	   ("C-x C-f" . helm-find-files)
 	   ("C-x b"   . helm-mini)     ;; See buffers & recent files; more useful.
@@ -429,40 +494,52 @@ responses from 800k to 3M, so the default of 4k is too small.
 	   ("C-z" . helm-select-action)
 	   ;; Let's keep tab-completetion anyhow.
 	   ("TAB"   . helm-execute-persistent-action)
-	    ("<tab>" . helm-execute-persistent-action)))
+	   ("<tab>" . helm-execute-persistent-action)))
 
-  (setq helm-mini-default-sources '(helm-source-buffers-list
-				    helm-source-recentf
-				    helm-source-bookmarks
-				    helm-source-bookmark-set
-				    helm-source-buffer-not-found))
-  ;; this stops helm pinging websites when it interprets texts as a url
-  (setq ffap-machine-p-known 'reject)
+#+END_SRC
 
-
+[[https://github.com/emacs-helm/helm-descbinds][~helm-descbinds~]] makes it easy to search the
+current active keybindings using ~helm~.
+#+BEGIN_SRC emacs-lisp
   (use-package helm-descbinds
     :config (helm-descbinds-mode))
 
-  (use-package helm-make)
-
-  (use-package helm-swoop
-    :config (setq helm-swoop-pre-input-function
-		  (lambda () ""))
-    :general
-    ("C-s"   'helm-swoop)
-    ("C-M-s" 'helm-multi-swoop-all)
-    ("C-S-s" 'helm-swoop-back-to-last-point)
-    :custom (helm-swoop-split-with-multiple-windows nil "Do not split window inside the current window."))
 #+END_SRC
 
+[[https://github.com/abo-abo/helm-make][~helm-make~]] shows all the targets in a ~Makefile~ for easy
+searching and navigation. 
 #+BEGIN_SRC emacs-lisp
-    (use-package anzu
-      :config
-      (global-anzu-mode)
-      (global-set-key [remap query-replace] 'anzu-query-replace)
-      (global-set-key [remap query-replace-regexp] 'anzu-query-replace-regexp))
+  (use-package helm-make)
 #+END_SRC
 
+[[https://github.com/emacsorphanage/helm-swoop][~helm-swoop~]] is a useful way to search a buffer
+using ~helm~.
+
+TODO: there's probably more useful options here I could explore
+#+BEGIN_SRC emacs-lisp
+    (use-package helm-swoop
+      :config
+      (setq
+       ;; show syntax highlighting in swoop minibuffer
+       helm-swoop-speed-or-color t
+       ;; don't pre-populate the swoop minibuffer with the symbol at the point
+       helm-swoop-pre-input-function (lambda () "")
+       helm-swoop-use-fuzzy-matching t)
+      :general
+      ("C-s"   'helm-swoop)
+      ("C-M-s" 'helm-multi-swoop-all)
+      ("C-S-s" 'helm-swoop-back-to-last-point)
+      ;; keep C-w mapped to backward-kill-word even when swooping
+      (helm-swoop-map "C-w" 'backward-kill-word)
+      :custom
+      (helm-swoop-split-with-multiple-windows t "Do not split window inside the current window."))
+#+END_SRC
+
+[[https://elpa.gnu.org/packages/undo-tree.html][~undo-tree~]] gives a nice undo visualisation.
+
+TODO this is a nice way to incorporate Hydras directly into the use-package setup.
+TODO this doesn't seem to be enabled by default, at least in org, or Go. Maybe add hooks
+TODO try vundo instead https://github.com/casouri/vundo
 #+BEGIN_SRC emacs-lisp
     (use-package undo-tree
       :ensure t
@@ -489,69 +566,81 @@ responses from 800k to 3M, so the default of 4k is too small.
     (with-eval-after-load 'undo-tree (defun undo-tree-overridden-undo-bindings-p () nil))
 #+END_SRC
 
+[[https://github.com/abo-abo/avy][~avy~]] is an easy way to jump around any visible buffers. Hit ~C-'~
+and hit a few characters, then select from the list of options.
 #+BEGIN_SRC emacs-lisp
-    (use-package avy
-      :config (setq avy-background t)
-      :general ("C-'" 'avy-goto-char-timer))
-  #+END_SRC
+  (use-package avy
+    :config (setq avy-background t)
+    :general ("C-'" 'avy-goto-char-timer))
+#+END_SRC
 
-  #+BEGIN_SRC emacs-lisp
-    (use-package multiple-cursors
-      :defer t
-      :general
-      (my-leader-def
-	"v" '(hydra-multiple-cursors/body :wk "mv-mode")) ;;oryx
-      :hydra
-      (hydra-multiple-cursors (:hint nil)
-	"
-     Up^^             Down^^           Miscellaneous           % 2(mc/num-cursors) cursor%s(if (> (mc/num-cursors) 1) \"s\" \"\")
-    ------------------------------------------------------------------
-     [_p_]   Next     [_n_]   Next     [_l_] Edit lines  [_0_] Insert numbers
-     [_P_]   Skip     [_N_]   Skip     [_a_] Mark all    [_A_] Insert letters
-     [_M-p_] Unmark   [_M-n_] Unmark   [_s_] Search      [_q_] Quit
-     [_|_] Align with input CHAR       [Click] Cursor at point"
-	("l" mc/edit-lines)
-	("a" mc/mark-all-like-this :exit t)
-	("n" mc/mark-next-like-this)
-	("N" mc/skip-to-next-like-this)
-	("M-n" mc/unmark-next-like-this)
-	("p" mc/mark-previous-like-this)
-	("P" mc/skip-to-previous-like-this)
-	("M-p" mc/unmark-previous-like-this)
-	("|" mc/vertical-align)
-	("s" mc/mark-all-in-region-regexp :exit t)
-	("0" mc/insert-numbers :exit t)
-	("A" mc/insert-letters :exit t)
-	("<mouse-1>" mc/add-cursor-on-click)
-	;; Help with click recognition in this hydra
-	("<down-mouse-1>" ignore)
-	("<drag-mouse-1>" ignore)
-	("q" nil)))
-  #+END_SRC
+TODO I don't really ever use this
+#+BEGIN_SRC emacs-lisp
+  (use-package multiple-cursors
+    :defer t
+    :general
+    (my-leader-def
+      "v" '(hydra-multiple-cursors/body :wk "mv-mode")) ;;oryx
+    :hydra
+    (hydra-multiple-cursors (:hint nil)
+      "
+   Up^^             Down^^           Miscellaneous           % 2(mc/num-cursors) cursor%s(if (> (mc/num-cursors) 1) \"s\" \"\")
+  ------------------------------------------------------------------
+   [_p_]   Next     [_n_]   Next     [_l_] Edit lines  [_0_] Insert numbers
+   [_P_]   Skip     [_N_]   Skip     [_a_] Mark all    [_A_] Insert letters
+   [_M-p_] Unmark   [_M-n_] Unmark   [_s_] Search      [_q_] Quit
+   [_|_] Align with input CHAR       [Click] Cursor at point"
+      ("l" mc/edit-lines)
+      ("a" mc/mark-all-like-this :exit t)
+      ("n" mc/mark-next-like-this)
+      ("N" mc/skip-to-next-like-this)
+      ("M-n" mc/unmark-next-like-this)
+      ("p" mc/mark-previous-like-this)
+      ("P" mc/skip-to-previous-like-this)
+      ("M-p" mc/unmark-previous-like-this)
+      ("|" mc/vertical-align)
+      ("s" mc/mark-all-in-region-regexp :exit t)
+      ("0" mc/insert-numbers :exit t)
+      ("A" mc/insert-letters :exit t)
+      ("<mouse-1>" mc/add-cursor-on-click)
+      ;; Help with click recognition in this hydra
+      ("<down-mouse-1>" ignore)
+      ("<drag-mouse-1>" ignore)
+      ("q" nil)))
+#+END_SRC
 
-  #+BEGIN_SRC emacs-lisp
-    (use-package iedit)
-  #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package iedit)
+#+END_SRC
 
-  #+BEGIN_SRC emacs-lisp
-    (use-package dashboard
-        :config
-      (dashboard-setup-startup-hook)
-      (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
-      (setq dashboard-items '((recents  . 5)
-			      (bookmarks . 5)
-			      (projects . 5)
-			      (registers . 5)))
-      (setq dashboard-set-heading-icons t)
-      (setq dashboard-set-file-icons t)
-      (setq dashboard-init-info (concat "Welcome "     user-full-name
-					"! Emacs "      emacs-version
-					"; System "     (system-name)
-					"; Time "       (emacs-init-time))))
+[[https://github.com/emacs-dashboard/emacs-dashboard][~dashboard~]] is a nice little splash screen
+that shows some recent items on starting Emacs.
 
-    ;; Emacs Start-up Profiler
-    (use-package esup
-        :commands (esup))
+#+BEGIN_SRC emacs-lisp
+  (use-package dashboard
+      :config
+    (dashboard-setup-startup-hook)
+    (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
+    (setq dashboard-items '((recents  . 5)
+			    (bookmarks . 5)
+			    (projects . 5)
+			    (registers . 5)))
+    (setq dashboard-set-heading-icons t)
+    (setq dashboard-set-file-icons t)
+    (setq dashboard-init-info (concat "Welcome "     user-full-name
+				      "! Emacs "      emacs-version
+				      "; System "     (system-name)
+				      "; Time "       (emacs-init-time))))
+#+END_SRC
+
+Emacs Start-up Profiler, [[https://github.com/jschaf/esup][esup]], enables profiling your emacs
+startup time without leaving emacs.
+#+BEGIN_SRC emacs-lisp
+  ;; Emacs Start-up Profiler
+  (use-package esup
+    ;; This config is needed to fix a minor bug: https://github.com/jschaf/esup/issues/54
+    :config (setq esup-depth 0)
+    :commands (esup))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
@@ -609,6 +698,7 @@ responses from 800k to 3M, so the default of 4k is too small.
         :defer t)
 #+END_SRC
 
+TODO explore other mode-lines
 #+BEGIN_SRC emacs-lisp
   (use-package doom-modeline
     :demand t
@@ -1128,75 +1218,76 @@ responses from 800k to 3M, so the default of 4k is too small.
 		  ("PHONE" :foreground "forest green" :weight bold)))))
 #+END_SRC
 
+
 #+BEGIN_SRC emacs-lisp
-    (defun my-org-structure-templates ()
-      (require 'org-tempo)
-      (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
-      (add-to-list 'org-structure-template-alist '("sh" . "src sh")))
+  (defun my-org-structure-templates ()
+    (require 'org-tempo)
+    (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
+    (add-to-list 'org-structure-template-alist '("sh" . "src sh")))
 
-    (defhydra hydra-org-template (:color blue :hint nil)
-      "
-     _c_enter  _q_uote     _e_macs-lisp    _L_aTeX:
-     _l_atex   _E_xample   _p_erl          _i_ndex:
-     _a_scii   _v_erse     _P_erl tangled  _I_NCLUDE:
-     _s_rc     _n_ote      plant_u_ml      _H_TML:
-     _h_tml    ^ ^         ^ ^             _A_SCII:
+  (defhydra hydra-org-template (:color blue :hint nil)
     "
-      ("s" (hot-expand "<s"))
-      ("E" (hot-expand "<e"))
-      ("q" (hot-expand "<q"))
-      ("v" (hot-expand "<v"))
-      ("n" (hot-expand "<not"))
-      ("c" (hot-expand "<c"))
-      ("l" (hot-expand "<l"))
-      ("h" (hot-expand "<h"))
-      ("a" (hot-expand "<a"))
-      ("L" (hot-expand "<L"))
-      ("i" (hot-expand "<i"))
-      ("e" (hot-expand "<s" "emacs-lisp"))
-      ("p" (hot-expand "<s" "perl"))
-      ("u" (hot-expand "<s" "plantuml :file CHANGE.png"))
-      ("P" (hot-expand "<s" "perl" ":results output :exports both :shebang \"#!/usr/bin/env perl\"\n"))
-      ("I" (hot-expand "<I"))
-      ("H" (hot-expand "<H"))
-      ("A" (hot-expand "<A"))
-      ("<" self-insert-command "ins")
-      ("o" nil "quit"))
+   _c_enter  _q_uote     _e_macs-lisp    _L_aTeX:
+   _l_ink    _E_xample   _p_erl          _i_ndex:
+   _a_scii   _v_erse     _P_erl tangled  _I_NCLUDE:
+   _s_rc     _n_ote      plant_u_ml      _H_TML:
+   _h_tml    ^ ^         ^ ^             _A_SCII:
+  "
+    ("s" (hot-expand "<s"))
+    ("E" (hot-expand "<e"))
+    ("q" (hot-expand "<q"))
+    ("v" (hot-expand "<v"))
+    ("n" (hot-expand "<not"))
+    ("c" (hot-expand "<c"))
+    ("l" (hot-expand "<li"))
+    ("h" (hot-expand "<h"))
+    ("a" (hot-expand "<a"))
+    ("L" (hot-expand "<L"))
+    ("i" (hot-expand "<i"))
+    ("e" (hot-expand "<s" "emacs-lisp"))
+    ("p" (hot-expand "<s" "perl"))
+    ("u" (hot-expand "<s" "plantuml :file CHANGE.png"))
+    ("P" (hot-expand "<s" "perl" ":results output :exports both :shebang \"#!/usr/bin/env perl\"\n"))
+    ("I" (hot-expand "<I"))
+    ("H" (hot-expand "<H"))
+    ("A" (hot-expand "<A"))
+    ("<" self-insert-command "ins")
+    ("o" nil "quit"))
 
-    (require 'org-tempo) ; Required from org 9 onwards for old template expansion
-    ;; Reset the org-template expnsion system, this is need after upgrading to org 9 for some reason
-    (setq org-structure-template-alist (eval (car (get 'org-structure-template-alist 'standard-value))))
-    (defun hot-expand (str &optional mod header)
-      "Expand org template.
+  (require 'org-tempo) ; Required from org 9 onwards for old template expansion
+  ;; Reset the org-template expnsion system, this is need after upgrading to org 9 for some reason
+  (setq org-structure-template-alist (eval (car (get 'org-structure-template-alist 'standard-value))))
+  (defun hot-expand (str &optional mod header)
+    "Expand org template.
 
-    STR is a structure template string recognised by org like <s. MOD is a
-    string with additional parameters to add the begin line of the
-    structure element. HEADER string includes more parameters that are
-    prepended to the element after the #+HEADER: tag."
-      (let (text)
-	(when (region-active-p)
-	  (setq text (buffer-substring (region-beginning) (region-end)))
-	  (delete-region (region-beginning) (region-end))
-	  (deactivate-mark))
-	(when header (insert "#+HEADER: " header) (forward-line))
-	(insert str)
-	(org-tempo-complete-tag)
-	(when mod (insert mod) (forward-line))
-	(when text (insert text))))
+  STR is a structure template string recognised by org like <s. MOD is a
+  string with additional parameters to add the begin line of the
+  structure element. HEADER string includes more parameters that are
+  prepended to the element after the #+HEADER: tag."
+    (let (text)
+      (when (region-active-p)
+	(setq text (buffer-substring (region-beginning) (region-end)))
+	(delete-region (region-beginning) (region-end))
+	(deactivate-mark))
+      (when header (insert "#+HEADER: " header) (forward-line))
+      (insert str)
+      (org-tempo-complete-tag)
+      (when mod (insert mod) (forward-line))
+      (when text (insert text))))
 
-    (general-define-key
-     :keymaps 'org-mode-map
-     ;; disable this agenda key since I use it for avy
-     "C-'" nil
-     "<" '(lambda () (interactive)
-	    (if (or (region-active-p) (looking-back "^"))
-		(hydra-org-template/body)
-	      (self-insert-command 1))))
+  (general-define-key
+   :keymaps 'org-mode-map
+   ;; disable this agenda key since I use it for avy
+   "C-'" nil
+   "<" '(lambda () (interactive)
+	  (if (or (region-active-p) (looking-back "^"))
+	      (hydra-org-template/body)
+	    (self-insert-command 1))))
 
-    (eval-after-load "org"
-      '(cl-pushnew
-	'("not" . "note")
-	org-structure-template-alist))
+  (eval-after-load "org"
+    '(cl-pushnew
+      '("not" . "note")
+      org-structure-template-alist))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
@@ -1613,7 +1704,7 @@ TODO: straight should be t here
      ))
 #+END_SRC
 
-Nice icons for company-mode
+Nice icons for company-mode. These are the Doom Emacs defaults, taken from: https://github.com/TheBB/dotemacs/blob/master/init.el#L527-L570
 #+BEGIN_SRC emacs-lisp
     (use-package company-box
       :diminish company-box-mode
@@ -1623,8 +1714,6 @@ Nice icons for company-mode
       :config
       (setq company-box-icons-alist 'company-box-icons-all-the-icons
 	    company-box-backends-colors nil
-
-	    ;; These are the Doom Emacs defaults. Taken from: https://github.com/TheBB/dotemacs/blob/master/init.el#L527-L570
 	    company-box-icons-all-the-icons
 	    `((Unknown       . ,(all-the-icons-material "find_in_page"             :face 'all-the-icons-purple))
 	      (Text          . ,(all-the-icons-material "text_fields"              :face 'all-the-icons-green))
@@ -1686,6 +1775,7 @@ Nice icons for company-mode
       "L" '(hydra-lsp/body :wk "lsp-mode"))
     :config
     (setq lsp-file-watch-threshold 500)
+    ;;TODO this should use :hydra
     (defhydra hydra-lsp (:exit t :hint nil)
       "
    Buffer^^               Server^^                   Symbol
@@ -1711,6 +1801,7 @@ Nice icons for company-mode
       ("M-r" lsp-restart-workspace)
       ("S" lsp-shutdown-workspace)))
 
+  ;; TODO this should be fdolded into the config above
   (custom-set-faces
    '(lsp-face-highlight-read ((t (:background "gray"))))
    '(lsp-face-highlight-textual ((t (:background "gray"))))
@@ -1764,6 +1855,7 @@ TODO: what is this?
 	("s" origami-show-only-node)))
 #+END_SRC
 
+** Git
 #+BEGIN_SRC emacs-lisp
     (use-package magit
       :defer t
@@ -2180,4 +2272,13 @@ TODO: I've no idea what this does.
 #+BEGIN_SRC emacs-lisp
   (use-package gradle-mode
     :ensure t)
+#+END_SRC
+
+
+[[https://www.gnu.org/software/emacs/manual/html_node/emacs/Saving-Emacs-Sessions.html][~desktop~]] saves the state of Emacs and restores it on restart. 
+#+BEGIN_SRC emacs-lisp
+  (use-package desktop
+    :straight nil
+    :init
+    (desktop-save-mode 1))
 #+END_SRC
