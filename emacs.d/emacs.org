@@ -541,29 +541,29 @@ TODO this is a nice way to incorporate Hydras directly into the use-package setu
 TODO this doesn't seem to be enabled by default, at least in org, or Go. Maybe add hooks
 TODO try vundo instead https://github.com/casouri/vundo
 #+BEGIN_SRC emacs-lisp
-    (use-package undo-tree
-      :ensure t
-      :diminish
-      :after hydra
-      :general ("C-x /" 'hydra-undo-tree/body)
-      :config
-	(global-undo-tree-mode 1)
-	(setq undo-tree-visualizer-timestamps t
-	      undo-tree-visualizer-diff t
-	      undo-tree-show-minibuffer-help t
-	      undo-tree-minibuffer-help-dynamic t
-	      undo-tree-show-help-in-visualize-buffer t)
-      :hydra (hydra-undo-tree (:hint nil)
-    "
-    _p_: undo  _n_: redo _s_: save _l_: load   "
-	("p"   undo-tree-undo)
-	("n"   undo-tree-redo)
-	("s"   undo-tree-save-history)
-	("l"   undo-tree-load-history)
-	("u"   undo-tree-visualize "visualize" :color blue)
-	("q"   nil "quit" :color blue)))
-    ; This helps undo-tree keep loading: https://github.com/syl20bnr/spacemacs/issues/14064
-    (with-eval-after-load 'undo-tree (defun undo-tree-overridden-undo-bindings-p () nil))
+  (use-package undo-tree
+    :ensure t
+    :diminish
+    :after hydra
+    :general ("C-x /" 'hydra-undo-tree/body)
+    :config
+      (global-undo-tree-mode 1)
+      (setq undo-tree-visualizer-timestamps t
+	    undo-tree-visualizer-diff t
+	    undo-tree-show-minibuffer-help t
+	    undo-tree-minibuffer-help-dynamic t
+	    undo-tree-show-help-in-visualize-buffer t)
+    :hydra (hydra-undo-tree (:hint nil)
+  "
+  _p_: undo  _n_: redo _s_: save _l_: load   "
+      ("p"   undo-tree-undo)
+      ("n"   undo-tree-redo)
+      ("s"   undo-tree-save-history)
+      ("l"   undo-tree-load-history)
+      ("u"   undo-tree-visualize "visualize" :color blue)
+      ("q"   nil "quit" :color blue)))
+  ; This helps undo-tree keep loading: https://github.com/syl20bnr/spacemacs/issues/14064
+  (with-eval-after-load 'undo-tree (defun undo-tree-overridden-undo-bindings-p () nil))
 #+END_SRC
 
 [[https://github.com/abo-abo/avy][~avy~]] is an easy way to jump around any visible buffers. Hit ~C-'~
@@ -583,7 +583,7 @@ that shows some recent items on starting Emacs.
 
 #+BEGIN_SRC emacs-lisp
   (use-package dashboard
-      :config
+    :config
     (dashboard-setup-startup-hook)
     (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
     (setq dashboard-items '((recents  . 5)
@@ -609,58 +609,58 @@ startup time without leaving emacs.
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-    ;; Some basic config
-    (use-package emacs
-      :straight nil
-      :when *is-a-mac*
-      :config
-      (setq mac-command-modifier 'meta) ;; Mac atl/option to Control
-      (setq mac-option-modifier 'control) ; Mac command to Meta
-      (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
-      (add-to-list 'default-frame-alist '(ns-appearance . dark))
-      (set-fontset-font t 'symbol (font-spec :family "Apple Symbols") nil 'prepend)
-      (set-fontset-font t 'symbol (font-spec :family "Apple Color Emoji") nil 'prepend))
+  ;; Some basic config
+  (use-package emacs
+    :straight nil
+    :when *is-a-mac*
+    :config
+    (setq mac-command-modifier 'meta) ;; Mac atl/option to Control
+    (setq mac-option-modifier 'control) ; Mac command to Meta
+    (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
+    (add-to-list 'default-frame-alist '(ns-appearance . dark))
+    (set-fontset-font t 'symbol (font-spec :family "Apple Symbols") nil 'prepend)
+    (set-fontset-font t 'symbol (font-spec :family "Apple Color Emoji") nil 'prepend))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-    (use-package cus-edit
-      :straight nil
-      :custom
-      (custom-file (expand-file-name "custom.el" user-emacs-directory))
-      :config
-      (if (file-exists-p custom-file)
-	  (load-file custom-file)))
+  (use-package cus-edit
+    :straight nil
+    :custom
+    (custom-file (expand-file-name "custom.el" user-emacs-directory))
+    :config
+    (if (file-exists-p custom-file)
+	(load-file custom-file)))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-    (use-package frame
-      :straight nil
-      :config
-      (blink-cursor-mode -1)
-      (setq initial-scratch-message ""
-	    inhibit-startup-message t
-	    visible-bell nil
-	    ring-bell-function 'ignore
-	    initial-frame-alist
-	    '((menu-bar-lines . 0)
-	      (tool-bar-lines . 0)))
-      (scroll-bar-mode 0)
-      (tool-bar-mode 0)
-      (menu-bar-mode 0)
-      (global-hl-line-mode 1))
+  (use-package frame
+    :straight nil
+    :config
+    (blink-cursor-mode -1)
+    (setq initial-scratch-message ""
+	  inhibit-startup-message t
+	  visible-bell nil
+	  ring-bell-function 'ignore
+	  initial-frame-alist
+	  '((menu-bar-lines . 0)
+	    (tool-bar-lines . 0)))
+    (scroll-bar-mode 0)
+    (tool-bar-mode 0)
+    (menu-bar-mode 0)
+    (global-hl-line-mode 1))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-    (use-package dracula-theme
-        :config
-      (load-theme 'dracula))
+  (use-package dracula-theme
+    :config
+    (load-theme 'dracula))
 
-    (add-to-list 'default-frame-alist '(font . "Fira Code-14"))
+  (add-to-list 'default-frame-alist '(font . "Fira Code-14"))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-    (use-package all-the-icons
-        :defer t)
+  (use-package all-the-icons
+    :defer t)
 #+END_SRC
 
 TODO explore other mode-lines
@@ -698,25 +698,25 @@ TODO explore other mode-lines
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-    (use-package back-button
-      :straight (back-button :host github :repo "rolandwalker/back-button")
-      :general
-      (my-leader-def
-	"k" '(hydra-back-button/body :wk "back-button"))
-      :config
-      (back-button-mode 1)
-      :hydra
-      (hydra-back-button (:color red :hint nil)
-	  "
-      Local         Global
-    --------------------------------
-      _t_ forward   _e_ forward
-      _s_ backward  _n_ backward
-      "
-	("e" back-button-global-forward)
-	("n" back-button-global-backward)
-	("t" back-button-local-forward)
-	("s" back-button-local-backward)))
+  (use-package back-button
+    :straight (back-button :host github :repo "rolandwalker/back-button")
+    :general
+    (my-leader-def
+      "k" '(hydra-back-button/body :wk "back-button"))
+    :config
+    (back-button-mode 1)
+    :hydra
+    (hydra-back-button (:color red :hint nil)
+	"
+    Local         Global
+  --------------------------------
+    _t_ forward   _e_ forward
+    _s_ backward  _n_ backward
+    "
+      ("e" back-button-global-forward)
+      ("n" back-button-global-backward)
+      ("t" back-button-local-forward)
+      ("s" back-button-local-backward)))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
@@ -728,11 +728,11 @@ TODO explore other mode-lines
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-    (use-package switch-window
-      :general
-      ("C-x o" 'switch-window)
-      :config
-      (setq switch-window-shortcut-style 'qwerty))
+  (use-package switch-window
+    :general
+    ("C-x o" 'switch-window)
+    :config
+    (setq switch-window-shortcut-style 'qwerty))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
@@ -743,406 +743,406 @@ TODO explore other mode-lines
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-    (use-package winner
-      :commands winner-mode
-      :init (winner-mode t))
+  (use-package winner
+    :commands winner-mode
+    :init (winner-mode t))
 
-    (defun hydra-move-splitter-left (delta)
-      "Move window splitter left."
-      (interactive "p")
-      (let ((windmove-wrap-around nil))
-	(if (windmove-find-other-window 'right)
-	    (shrink-window-horizontally delta)
-	  (enlarge-window-horizontally delta))))
+  (defun hydra-move-splitter-left (delta)
+    "Move window splitter left."
+    (interactive "p")
+    (let ((windmove-wrap-around nil))
+      (if (windmove-find-other-window 'right)
+	  (shrink-window-horizontally delta)
+	(enlarge-window-horizontally delta))))
 
-    (defun hydra-move-splitter-right (delta)
-      "Move window splitter right."
-      (interactive "p")
-      (let ((windmove-wrap-around nil))
-	(if (windmove-find-other-window 'right)
-	    (enlarge-window-horizontally delta)
-	  (shrink-window-horizontally delta))))
+  (defun hydra-move-splitter-right (delta)
+    "Move window splitter right."
+    (interactive "p")
+    (let ((windmove-wrap-around nil))
+      (if (windmove-find-other-window 'right)
+	  (enlarge-window-horizontally delta)
+	(shrink-window-horizontally delta))))
 
-    (defun hydra-move-splitter-up (delta)
-      "Move window splitter up."
-      (interactive "p")
-      (let ((windmove-wrap-around nil))
-	(if (windmove-find-other-window 'up)
-	    (enlarge-window delta)
-	  (shrink-window delta))))
+  (defun hydra-move-splitter-up (delta)
+    "Move window splitter up."
+    (interactive "p")
+    (let ((windmove-wrap-around nil))
+      (if (windmove-find-other-window 'up)
+	  (enlarge-window delta)
+	(shrink-window delta))))
 
-    (defun hydra-move-splitter-down (delta)
-      "Move window splitter down."
-      (interactive "p")
-      (let ((windmove-wrap-around nil))
-	(if (windmove-find-other-window 'up)
-	    (shrink-window delta)
-	  (enlarge-window delta))))
+  (defun hydra-move-splitter-down (delta)
+    "Move window splitter down."
+    (interactive "p")
+    (let ((windmove-wrap-around nil))
+      (if (windmove-find-other-window 'up)
+	  (shrink-window delta)
+	(enlarge-window delta))))
 
-    (defhydra hydra-window-delux ()
-	   "
-	^Movement^        ^Split^          ^Switch^	        ^Resize^    ^Eyebrowse^
-	-----------------------------------------------------------------------------
-	_n_ ←             _v_ertical       _b_uffer	        _q_ X←       _c_lose config
-	_e_ ↓             _h_orizontal     _f_ind files         _w_ X↓       _r_ename config
-	_i_ ↑             _z_ undo         _a_ce 1	        _f_ X↑       _1_ setup 1
-	_o_ →             _Z_ reset        _s_wap	        _p_ X→       _2_ setup 2
-	_F_ollow	      _D_lt Other      _S_ave	        _m_aximize   _3_ setup 3
-	_SPC_ cancel      _O_nly this      _d_elete	        _=_ balance  _4_ setup 4
-	"
-	   ("n" windmove-left )
-	   ("e" windmove-down )
-	   ("i" windmove-up )
-	   ("o" windmove-right )
+  (defhydra hydra-window-delux ()
+	 "
+      ^Movement^        ^Split^          ^Switch^	        ^Resize^    ^Eyebrowse^
+      -----------------------------------------------------------------------------
+      _n_ ←             _v_ertical       _b_uffer	        _q_ X←       _c_lose config
+      _e_ ↓             _h_orizontal     _f_ind files         _w_ X↓       _r_ename config
+      _i_ ↑             _z_ undo         _a_ce 1	        _f_ X↑       _1_ setup 1
+      _o_ →             _Z_ reset        _s_wap	        _p_ X→       _2_ setup 2
+      _F_ollow	      _D_lt Other      _S_ave	        _m_aximize   _3_ setup 3
+      _SPC_ cancel      _O_nly this      _d_elete	        _=_ balance  _4_ setup 4
+      "
+	 ("n" windmove-left )
+	 ("e" windmove-down )
+	 ("i" windmove-up )
+	 ("o" windmove-right )
 
-	   ("q" hydra-move-splitter-left)
-	   ("w" hydra-move-splitter-down)
-	   ("f" hydra-move-splitter-up)
-	   ("p" hydra-move-splitter-right)
-	   ("b" helm-mini)
-	   ;("f" helm-find-files)
-	   ("F" follow-mode)
-	   ("a" (lambda ()
-		  (interactive)
-		  (ace-window 1)
-		  (add-hook 'ace-window-end-once-hook
-			    'hydra-window/body))
-	       )
-	   ("v" (lambda ()
-		  (interactive)
-		  (split-window-right)
-		  (windmove-right))
-	       )
-	   ("h" (lambda ()
-		  (interactive)
-		  (split-window-below)
-		  (windmove-down))
-	       )
-	   ("s" (lambda ()
-		  (interactive)
-		  (ace-window 4)
-		  (add-hook 'ace-window-end-once-hook
-			    'hydra-window/body)))
-	   ("S" save-buffer)
-	   ("d" delete-window)
-	   ("D" (lambda ()
-		  (interactive)
-		  (ace-window 16)
-		  (add-hook 'ace-window-end-once-hook
-			    'hydra-window/body))
-	       )
-	   ("O" delete-other-windows)
-	   ("m" ace-maximize-window)
-	   ("z" (progn
-		  (winner-undo)
-		  (setq this-command 'winner-undo))
-	   )
-	   ("Z" winner-redo)
-	   ("=" balance-windows)
+	 ("q" hydra-move-splitter-left)
+	 ("w" hydra-move-splitter-down)
+	 ("f" hydra-move-splitter-up)
+	 ("p" hydra-move-splitter-right)
+	 ("b" helm-mini)
+	 ;("f" helm-find-files)
+	 ("F" follow-mode)
+	 ("a" (lambda ()
+		(interactive)
+		(ace-window 1)
+		(add-hook 'ace-window-end-once-hook
+			  'hydra-window/body))
+	     )
+	 ("v" (lambda ()
+		(interactive)
+		(split-window-right)
+		(windmove-right))
+	     )
+	 ("h" (lambda ()
+		(interactive)
+		(split-window-below)
+		(windmove-down))
+	     )
+	 ("s" (lambda ()
+		(interactive)
+		(ace-window 4)
+		(add-hook 'ace-window-end-once-hook
+			  'hydra-window/body)))
+	 ("S" save-buffer)
+	 ("d" delete-window)
+	 ("D" (lambda ()
+		(interactive)
+		(ace-window 16)
+		(add-hook 'ace-window-end-once-hook
+			  'hydra-window/body))
+	     )
+	 ("O" delete-other-windows)
+	 ("m" ace-maximize-window)
+	 ("z" (progn
+		(winner-undo)
+		(setq this-command 'winner-undo))
+	 )
+	 ("Z" winner-redo)
+	 ("=" balance-windows)
 
-	   ("c" eyebrowse-close-window-config)
-	   ("r" eyebrowse-rename-window-config)
+	 ("c" eyebrowse-close-window-config)
+	 ("r" eyebrowse-rename-window-config)
 
-	   ("0" eyebrowse-switch-to-window-config-0)
-	   ("1" eyebrowse-switch-to-window-config-1)
-	   ("2" eyebrowse-switch-to-window-config-2)
-	   ("3" eyebrowse-switch-to-window-config-3)
-	   ("4" eyebrowse-switch-to-window-config-4)
-	   ("5" eyebrowse-switch-to-window-config-5)
-	   ("6" eyebrowse-switch-to-window-config-6)
-	   ("7" eyebrowse-switch-to-window-config-7)
-	   ("8" eyebrowse-switch-to-window-config-8)
-	   ("9" eyebrowse-switch-to-window-config-9)
-	   ("SPC" nil)
-	   )
+	 ("0" eyebrowse-switch-to-window-config-0)
+	 ("1" eyebrowse-switch-to-window-config-1)
+	 ("2" eyebrowse-switch-to-window-config-2)
+	 ("3" eyebrowse-switch-to-window-config-3)
+	 ("4" eyebrowse-switch-to-window-config-4)
+	 ("5" eyebrowse-switch-to-window-config-5)
+	 ("6" eyebrowse-switch-to-window-config-6)
+	 ("7" eyebrowse-switch-to-window-config-7)
+	 ("8" eyebrowse-switch-to-window-config-8)
+	 ("9" eyebrowse-switch-to-window-config-9)
+	 ("SPC" nil)
+	 )
+  (my-leader-def
+    "w" '(hydra-window-delux/body :wk "Window Management"))
+
+  (setq ibuffer-saved-filter-groups
+	'(("home"
+	   ("system-config" (or (filename . "dotfiles")
+				(filename . "emacs-config")))
+	   ("Org" (or (mode . org-mode)
+		      (filename . "OrgMode")))
+	   ("code" (or (filename . "code")
+		       (filename . ".py")
+		       (filename . ".go")
+		       (filename . ".java")))
+	   ("Web Dev" (or (mode . html-mode)
+			  (mode . css-mode)))
+	   ("Directories" (mode . dired-mode))
+	   ("Help" (or (name . "\*Help\*")
+		       (name . "\*Apropos\*")
+		       (name . "\*info\*")))
+	   ("Builtin" (or (name . "\*Messages\*")
+			  (name . "\*Completions\*")
+			  (name . "\*Backtrace\*")
+			  (name . "\*Compile-Log\*")
+			  (name . "\*Calendar\*")
+			  (name . "\*Calculator\*")
+			  (name . "'*Scratch\*"))))))
+  (add-hook 'ibuffer-mode-hook
+	    '(lambda ()
+	       (ibuffer-auto-mode 1)
+	       (ibuffer-switch-to-saved-filter-groups "home")))
+  ; hide empty filter groups
+  (setq ibuffer-show-empty-filter-groups nil)
+
+  (defhydra hydra-ibuffer-main (:color pink :hint nil)
+    "
+    ^Mark^         ^Actions^         ^View^          ^Select^              ^Navigation^
+    _m_: mark      _D_: delete       _g_: refresh    _q_: quit             _i_:   ↑    _n_
+    _u_: unmark    _s_: save marked  _S_: sort       _TAB_: toggle         _RET_: visit
+    _*_: specific  _a_: all actions  _/_: filter     _o_: other window     _e_:   ↓    _o_
+    _t_: toggle    _._: toggle hydra _H_: help       C-o other win no-select
+    "
+    ("m" ibuffer-mark-forward)
+    ("u" ibuffer-unmark-forward)
+    ("*" hydra-ibuffer-mark/body :color blue)
+    ("t" ibuffer-toggle-marks)
+
+    ("D" ibuffer-do-delete)
+    ("s" ibuffer-do-save)
+    ("a" hydra-ibuffer-action/body :color blue)
+
+    ("g" ibuffer-update)
+    ("S" hydra-ibuffer-sort/body :color blue)
+    ("/" hydra-ibuffer-filter/body :color blue)
+    ("H" describe-mode :color blue)
+
+    ("n" ibuffer-backward-filter-group)
+    ("i" ibuffer-backward-line)
+    ("o" ibuffer-forward-filter-group)
+    ("e" ibuffer-forward-line)
+    ("RET" ibuffer-visit-buffer :color blue)
+
+    ("TAB" ibuffer-toggle-filter-group)
+
+    ("O" ibuffer-visit-buffer-other-window :color blue)
+    ("q" quit-window :color blue)
+    ("." nil :color blue))
+
+  (defhydra hydra-ibuffer-mark (:color teal :columns 5
+				       :after-exit (hydra-ibuffer-main/body))
+    "Mark"
+    ("*" ibuffer-unmark-all "unmark all")
+    ("M" ibuffer-mark-by-mode "mode")
+    ("m" ibuffer-mark-modified-buffers "modified")
+    ("u" ibuffer-mark-unsaved-buffers "unsaved")
+    ("s" ibuffer-mark-special-buffers "special")
+    ("r" ibuffer-mark-read-only-buffers "read-only")
+    ("/" ibuffer-mark-dired-buffers "dired")
+    ("e" ibuffer-mark-dissociated-buffers "dissociated")
+    ("h" ibuffer-mark-help-buffers "help")
+    ("z" ibuffer-mark-compressed-file-buffers "compressed")
+    ("b" hydra-ibuffer-main/body "back" :color blue))
+
+  (defhydra hydra-ibuffer-action (:color teal :columns 4
+					 :after-exit
+					 (if (eq major-mode 'ibuffer-mode)
+					     (hydra-ibuffer-main/body)))
+    "Action"
+    ("A" ibuffer-do-view "view")
+    ("E" ibuffer-do-eval "eval")
+    ("F" ibuffer-do-shell-command-file "shell-command-file")
+    ("I" ibuffer-do-query-replace-regexp "query-replace-regexp")
+    ("H" ibuffer-do-view-other-frame "view-other-frame")
+    ("N" ibuffer-do-shell-command-pipe-replace "shell-cmd-pipe-replace")
+    ("M" ibuffer-do-toggle-modified "toggle-modified")
+    ("O" ibuffer-do-occur "occur")
+    ("P" ibuffer-do-print "print")
+    ("Q" ibuffer-do-query-replace "query-replace")
+    ("R" ibuffer-do-rename-uniquely "rename-uniquely")
+    ("T" ibuffer-do-toggle-read-only "toggle-read-only")
+    ("U" ibuffer-do-replace-regexp "replace-regexp")
+    ("V" ibuffer-do-revert "revert")
+    ("W" ibuffer-do-view-and-eval "view-and-eval")
+    ("X" ibuffer-do-shell-command-pipe "shell-command-pipe")
+    ("b" nil "back"))
+
+  (defhydra hydra-ibuffer-sort (:color amaranth :columns 3)
+    "Sort"
+    ("i" ibuffer-invert-sorting "invert")
+    ("a" ibuffer-do-sort-by-alphabetic "alphabetic")
+    ("v" ibuffer-do-sort-by-recency "recently used")
+    ("s" ibuffer-do-sort-by-size "size")
+    ("f" ibuffer-do-sort-by-filename/process "filename")
+    ("m" ibuffer-do-sort-by-major-mode "mode")
+    ("b" hydra-ibuffer-main/body "back" :color blue))
+
+  (defhydra hydra-ibuffer-filter (:color amaranth :columns 4)
+    "Filter"
+    ("m" ibuffer-filter-by-used-mode "mode")
+    ("M" ibuffer-filter-by-derived-mode "derived mode")
+    ("n" ibuffer-filter-by-name "name")
+    ("c" ibuffer-filter-by-content "content")
+    ("e" ibuffer-filter-by-predicate "predicate")
+    ("f" ibuffer-filter-by-filename "filename")
+    (">" ibuffer-filter-by-size-gt "size")
+    ("<" ibuffer-filter-by-size-lt "size")
+    ("/" ibuffer-filter-disable "disable")
+    ("b" hydra-ibuffer-main/body "back" :color blue))
+
+  (general-define-key
+   :keymaps 'ibuffer-mode-map
+   "." 'hydra-ibuffer-main/body)
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+  (use-package dired
+    :straight nil
+    :defer t
+    :hook (dired-mode . dired-hide-details-mode)
+    :general
     (my-leader-def
-      "w" '(hydra-window-delux/body :wk "Window Management"))
-
-    (setq ibuffer-saved-filter-groups
-	  '(("home"
-	     ("system-config" (or (filename . "dotfiles")
-				  (filename . "emacs-config")))
-	     ("Org" (or (mode . org-mode)
-			(filename . "OrgMode")))
-	     ("code" (or (filename . "code")
-			 (filename . ".py")
-			 (filename . ".go")
-			 (filename . ".java")))
-	     ("Web Dev" (or (mode . html-mode)
-			    (mode . css-mode)))
-	     ("Directories" (mode . dired-mode))
-	     ("Help" (or (name . "\*Help\*")
-			 (name . "\*Apropos\*")
-			 (name . "\*info\*")))
-	     ("Builtin" (or (name . "\*Messages\*")
-			    (name . "\*Completions\*")
-			    (name . "\*Backtrace\*")
-			    (name . "\*Compile-Log\*")
-			    (name . "\*Calendar\*")
-			    (name . "\*Calculator\*")
-			    (name . "'*Scratch\*"))))))
-    (add-hook 'ibuffer-mode-hook
-	      '(lambda ()
-		 (ibuffer-auto-mode 1)
-		 (ibuffer-switch-to-saved-filter-groups "home")))
-    ; hide empty filter groups
-    (setq ibuffer-show-empty-filter-groups nil)
-
-    (defhydra hydra-ibuffer-main (:color pink :hint nil)
-      "
-      ^Mark^         ^Actions^         ^View^          ^Select^              ^Navigation^
-      _m_: mark      _D_: delete       _g_: refresh    _q_: quit             _i_:   ↑    _n_
-      _u_: unmark    _s_: save marked  _S_: sort       _TAB_: toggle         _RET_: visit
-      _*_: specific  _a_: all actions  _/_: filter     _o_: other window     _e_:   ↓    _o_
-      _t_: toggle    _._: toggle hydra _H_: help       C-o other win no-select
-      "
-      ("m" ibuffer-mark-forward)
-      ("u" ibuffer-unmark-forward)
-      ("*" hydra-ibuffer-mark/body :color blue)
-      ("t" ibuffer-toggle-marks)
-
-      ("D" ibuffer-do-delete)
-      ("s" ibuffer-do-save)
-      ("a" hydra-ibuffer-action/body :color blue)
-
-      ("g" ibuffer-update)
-      ("S" hydra-ibuffer-sort/body :color blue)
-      ("/" hydra-ibuffer-filter/body :color blue)
-      ("H" describe-mode :color blue)
-
-      ("n" ibuffer-backward-filter-group)
-      ("i" ibuffer-backward-line)
-      ("o" ibuffer-forward-filter-group)
-      ("e" ibuffer-forward-line)
-      ("RET" ibuffer-visit-buffer :color blue)
-
-      ("TAB" ibuffer-toggle-filter-group)
-
-      ("O" ibuffer-visit-buffer-other-window :color blue)
-      ("q" quit-window :color blue)
-      ("." nil :color blue))
-
-    (defhydra hydra-ibuffer-mark (:color teal :columns 5
-					 :after-exit (hydra-ibuffer-main/body))
-      "Mark"
-      ("*" ibuffer-unmark-all "unmark all")
-      ("M" ibuffer-mark-by-mode "mode")
-      ("m" ibuffer-mark-modified-buffers "modified")
-      ("u" ibuffer-mark-unsaved-buffers "unsaved")
-      ("s" ibuffer-mark-special-buffers "special")
-      ("r" ibuffer-mark-read-only-buffers "read-only")
-      ("/" ibuffer-mark-dired-buffers "dired")
-      ("e" ibuffer-mark-dissociated-buffers "dissociated")
-      ("h" ibuffer-mark-help-buffers "help")
-      ("z" ibuffer-mark-compressed-file-buffers "compressed")
-      ("b" hydra-ibuffer-main/body "back" :color blue))
-
-    (defhydra hydra-ibuffer-action (:color teal :columns 4
-					   :after-exit
-					   (if (eq major-mode 'ibuffer-mode)
-					       (hydra-ibuffer-main/body)))
-      "Action"
-      ("A" ibuffer-do-view "view")
-      ("E" ibuffer-do-eval "eval")
-      ("F" ibuffer-do-shell-command-file "shell-command-file")
-      ("I" ibuffer-do-query-replace-regexp "query-replace-regexp")
-      ("H" ibuffer-do-view-other-frame "view-other-frame")
-      ("N" ibuffer-do-shell-command-pipe-replace "shell-cmd-pipe-replace")
-      ("M" ibuffer-do-toggle-modified "toggle-modified")
-      ("O" ibuffer-do-occur "occur")
-      ("P" ibuffer-do-print "print")
-      ("Q" ibuffer-do-query-replace "query-replace")
-      ("R" ibuffer-do-rename-uniquely "rename-uniquely")
-      ("T" ibuffer-do-toggle-read-only "toggle-read-only")
-      ("U" ibuffer-do-replace-regexp "replace-regexp")
-      ("V" ibuffer-do-revert "revert")
-      ("W" ibuffer-do-view-and-eval "view-and-eval")
-      ("X" ibuffer-do-shell-command-pipe "shell-command-pipe")
-      ("b" nil "back"))
-
-    (defhydra hydra-ibuffer-sort (:color amaranth :columns 3)
-      "Sort"
-      ("i" ibuffer-invert-sorting "invert")
-      ("a" ibuffer-do-sort-by-alphabetic "alphabetic")
-      ("v" ibuffer-do-sort-by-recency "recently used")
-      ("s" ibuffer-do-sort-by-size "size")
-      ("f" ibuffer-do-sort-by-filename/process "filename")
-      ("m" ibuffer-do-sort-by-major-mode "mode")
-      ("b" hydra-ibuffer-main/body "back" :color blue))
-
-    (defhydra hydra-ibuffer-filter (:color amaranth :columns 4)
-      "Filter"
-      ("m" ibuffer-filter-by-used-mode "mode")
-      ("M" ibuffer-filter-by-derived-mode "derived mode")
-      ("n" ibuffer-filter-by-name "name")
-      ("c" ibuffer-filter-by-content "content")
-      ("e" ibuffer-filter-by-predicate "predicate")
-      ("f" ibuffer-filter-by-filename "filename")
-      (">" ibuffer-filter-by-size-gt "size")
-      ("<" ibuffer-filter-by-size-lt "size")
-      ("/" ibuffer-filter-disable "disable")
-      ("b" hydra-ibuffer-main/body "back" :color blue))
-
-    (general-define-key
-     :keymaps 'ibuffer-mode-map
-     "." 'hydra-ibuffer-main/body)
-#+END_SRC
-
-#+BEGIN_SRC emacs-lisp
-    (use-package dired
-      :straight nil
-      :defer t
-      :hook (dired-mode . dired-hide-details-mode)
-      :general
-      (my-leader-def
-	"d" 'dired)
-      (dired-mode-map "." 'hydra-dired/body)
-      :hydra
-      (hydra-dired (:hint nil :color pink)
-      "
-    _+_ mkdir          _v_iew           _m_ark             _(_ details        _i_nsert-subdir    wdired
-    _C_opy             _O_ view other   _U_nmark all       _)_ omit-mode      _$_ hide-subdir    C-x C-q : edit
-    _D_elete           _o_pen other     _u_nmark           _l_ redisplay      _w_ kill-subdir    C-c C-c : commit
-    _R_ename           _M_ chmod        _t_oggle           _g_ revert buf     _e_ ediff          C-c ESC : abort
-    _Y_ rel symlink    _G_ chgrp        _E_xtension mark   _s_ort             _=_ pdiff
-    _S_ymlink          ^ ^              _F_ind marked      _._ toggle hydra   \\ flyspell
-    _r_sync            ^ ^              ^ ^                ^ ^                _?_ summary
-    _z_ compress-file  _A_ find regexp
-    _Z_ compress       _Q_ repl regexp
-
-    T - tag prefix
+      "d" 'dired)
+    (dired-mode-map "." 'hydra-dired/body)
+    :hydra
+    (hydra-dired (:hint nil :color pink)
     "
-	("\\" dired-do-ispell)
-	("(" dired-hide-details-mode)
-	(")" dired-omit-mode)
-	("+" dired-create-directory)
-	("=" diredp-ediff)         ;; smart diff
-	("?" dired-summary)
-	("$" diredp-hide-subdir-nomove)
-	("A" dired-do-find-regexp)
-	("C" dired-do-copy)        ;; Copy all marked files
-	("D" dired-do-delete)
-	("E" dired-mark-extension)
-	("e" dired-ediff-files)
-	("F" dired-do-find-marked-files)
-	("G" dired-do-chgrp)
-	("g" revert-buffer)        ;; read all directories again (refresh)
-	("i" dired-maybe-insert-subdir)
-	("l" dired-do-redisplay)   ;; relist the marked or singel directory
-	("M" dired-do-chmod)
-	("m" dired-mark)
-	("O" dired-display-file)
-	("o" dired-find-file-other-window)
-	("Q" dired-do-find-regexp-and-replace)
-	("R" dired-do-rename)
-	("r" dired-do-rsynch)
-	("S" dired-do-symlink)
-	("s" dired-sort-toggle-or-edit)
-	("t" dired-toggle-marks)
-	("U" dired-unmark-all-marks)
-	("u" dired-unmark)
-	("v" dired-view-file)      ;; q to exit, s to search, = gets line #
-	("w" dired-kill-subdir)
-	("Y" dired-do-relsymlink)
-	("z" diredp-compress-this-file)
-	("Z" dired-do-compress)
-	("q" nil)
-	("." nil :color blue)))
+  _+_ mkdir          _v_iew           _m_ark             _(_ details        _i_nsert-subdir    wdired
+  _C_opy             _O_ view other   _U_nmark all       _)_ omit-mode      _$_ hide-subdir    C-x C-q : edit
+  _D_elete           _o_pen other     _u_nmark           _l_ redisplay      _w_ kill-subdir    C-c C-c : commit
+  _R_ename           _M_ chmod        _t_oggle           _g_ revert buf     _e_ ediff          C-c ESC : abort
+  _Y_ rel symlink    _G_ chgrp        _E_xtension mark   _s_ort             _=_ pdiff
+  _S_ymlink          ^ ^              _F_ind marked      _._ toggle hydra   \\ flyspell
+  _r_sync            ^ ^              ^ ^                ^ ^                _?_ summary
+  _z_ compress-file  _A_ find regexp
+  _Z_ compress       _Q_ repl regexp
 
-    ;; Colourful columns.
-    (use-package diredfl
-      :after dired
-      :config
-      (diredfl-global-mode +1))
+  T - tag prefix
+  "
+      ("\\" dired-do-ispell)
+      ("(" dired-hide-details-mode)
+      (")" dired-omit-mode)
+      ("+" dired-create-directory)
+      ("=" diredp-ediff)         ;; smart diff
+      ("?" dired-summary)
+      ("$" diredp-hide-subdir-nomove)
+      ("A" dired-do-find-regexp)
+      ("C" dired-do-copy)        ;; Copy all marked files
+      ("D" dired-do-delete)
+      ("E" dired-mark-extension)
+      ("e" dired-ediff-files)
+      ("F" dired-do-find-marked-files)
+      ("G" dired-do-chgrp)
+      ("g" revert-buffer)        ;; read all directories again (refresh)
+      ("i" dired-maybe-insert-subdir)
+      ("l" dired-do-redisplay)   ;; relist the marked or singel directory
+      ("M" dired-do-chmod)
+      ("m" dired-mark)
+      ("O" dired-display-file)
+      ("o" dired-find-file-other-window)
+      ("Q" dired-do-find-regexp-and-replace)
+      ("R" dired-do-rename)
+      ("r" dired-do-rsynch)
+      ("S" dired-do-symlink)
+      ("s" dired-sort-toggle-or-edit)
+      ("t" dired-toggle-marks)
+      ("U" dired-unmark-all-marks)
+      ("u" dired-unmark)
+      ("v" dired-view-file)      ;; q to exit, s to search, = gets line #
+      ("w" dired-kill-subdir)
+      ("Y" dired-do-relsymlink)
+      ("z" diredp-compress-this-file)
+      ("Z" dired-do-compress)
+      ("q" nil)
+      ("." nil :color blue)))
 
-    (use-package dired-git-info
-	:general ('dired-mode-map
-		  "C-(" 'dired-git-info-mode))
+  ;; Colourful columns.
+  (use-package diredfl
+    :after dired
+    :config
+    (diredfl-global-mode +1))
+
+  (use-package dired-git-info
+      :general ('dired-mode-map
+		"C-(" 'dired-git-info-mode))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-    (use-package projectile
-      :general
-      (my-leader-def
-	"H" '(hydra-projectile/body :wk "projectile-mode")) ;;oryx
-      (projectile-mode-map "C-c h" 'projectile-command-map)
-      :config
-      (projectile-mode +1)
-      :hydra
-      (hydra-projectile (:color teal
-				:hint nil)
-      "
-	 PROJECTILE: %(projectile-project-root)
-
-	 Find File            Search/Tags          Buffers                Cache
-    ------------------------------------------------------------------------------------------
-    _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache clear
-     _ff_: file dwim       _g_: update gtags      _b_: switch to buffer  _x_: remove known project
-     _fd_: file curr dir   _o_: multi-occur     _s-k_: Kill all buffers  _X_: cleanup non-existing
-      _r_: recent file                                               ^^^^_z_: cache current
-      _d_: dir
-
+  (use-package projectile
+    :general
+    (my-leader-def
+      "H" '(hydra-projectile/body :wk "projectile-mode")) ;;oryx
+    (projectile-mode-map "C-c h" 'projectile-command-map)
+    :config
+    (projectile-mode +1)
+    :hydra
+    (hydra-projectile (:color teal
+			      :hint nil)
     "
-	("a"   helm-rg)
-	("b"   projectile-switch-to-buffer)
-	("c"   projectile-invalidate-cache)
-	("d"   projectile-find-dir)
-	("s-f" projectile-find-file)
-	("ff"  projectile-find-file-dwim)
-	("fd"  projectile-find-file-in-directory)
-	("g"   ggtags-update-tags)
-	("s-g" ggtags-update-tags)
-	("i"   projectile-ibuffer)
-	("K"   projectile-kill-buffers)
-	("s-k" projectile-kill-buffers)
-	("m"   projectile-multi-occur)
-	("o"   projectile-multi-occur)
-	("s-p" projectile-switch-project "switch project")
-	("p"   projectile-switch-project)
-	("s"   projectile-switch-project)
-	("r"   projectile-recentf)
-	("x"   projectile-remove-known-project)
-	("X"   projectile-cleanup-known-projects)
-	("z"   projectile-cache-current-file)
-	("`"   hydra-projectile-other-window/body "other window")
-	("q"   nil "cancel" :color blue)))
+       PROJECTILE: %(projectile-project-root)
+
+       Find File            Search/Tags          Buffers                Cache
+  ------------------------------------------------------------------------------------------
+  _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache clear
+   _ff_: file dwim       _g_: update gtags      _b_: switch to buffer  _x_: remove known project
+   _fd_: file curr dir   _o_: multi-occur     _s-k_: Kill all buffers  _X_: cleanup non-existing
+    _r_: recent file                                               ^^^^_z_: cache current
+    _d_: dir
+
+  "
+      ("a"   helm-rg)
+      ("b"   projectile-switch-to-buffer)
+      ("c"   projectile-invalidate-cache)
+      ("d"   projectile-find-dir)
+      ("s-f" projectile-find-file)
+      ("ff"  projectile-find-file-dwim)
+      ("fd"  projectile-find-file-in-directory)
+      ("g"   ggtags-update-tags)
+      ("s-g" ggtags-update-tags)
+      ("i"   projectile-ibuffer)
+      ("K"   projectile-kill-buffers)
+      ("s-k" projectile-kill-buffers)
+      ("m"   projectile-multi-occur)
+      ("o"   projectile-multi-occur)
+      ("s-p" projectile-switch-project "switch project")
+      ("p"   projectile-switch-project)
+      ("s"   projectile-switch-project)
+      ("r"   projectile-recentf)
+      ("x"   projectile-remove-known-project)
+      ("X"   projectile-cleanup-known-projects)
+      ("z"   projectile-cache-current-file)
+      ("`"   hydra-projectile-other-window/body "other window")
+      ("q"   nil "cancel" :color blue)))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-    (use-package ibuffer-vc
-      :config
-      (add-hook 'ibuffer-hook #'ibuffer-vc-set-filter-groups-by-vc-root))
+  (use-package ibuffer-vc
+    :config
+    (add-hook 'ibuffer-hook #'ibuffer-vc-set-filter-groups-by-vc-root))
 
-    (use-package ibuffer-projectile)
+  (use-package ibuffer-projectile)
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-    (use-package helm-projectile
-      :after projectile
-      :config
-      (helm-projectile-on))
+  (use-package helm-projectile
+    :after projectile
+    :config
+    (helm-projectile-on))
 
-    (use-package helm-rg
-      :ensure t
-      :config
-      (setq helm-rg-default-directory 'git-root))
+  (use-package helm-rg
+    :ensure t
+    :config
+    (setq helm-rg-default-directory 'git-root))
 
-    (use-package helm-ag
-      :ensure t
-      :config
-      (setq ag-arguments (list "--smart-case" "--column")))
+  (use-package helm-ag
+    :ensure t
+    :config
+    (setq ag-arguments (list "--smart-case" "--column")))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-    (use-package treemacs
-      :defer t
-      :general ([f8] 'treemacs))
+  (use-package treemacs
+    :defer t
+    :general ([f8] 'treemacs))
 
-    (use-package treemacs-projectile
-      :after (projectile treemacs))
+  (use-package treemacs-projectile
+    :after (projectile treemacs))
 
-    (use-package treemacs-magit
-      :after (treemacs))
+  (use-package treemacs-magit
+    :after (treemacs))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
@@ -1160,19 +1160,19 @@ TODO explore other mode-lines
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-    (use-package htmlize
-      :defer t)
+  (use-package htmlize
+    :defer t)
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-    (defun my-org-todo-setup ()
-      (setq org-use-fast-todo-selection t)
-      (setq org-todo-keywords
-	    '((sequence "TODO(t)" "NEXT(n)" "CURRENT(c)" "|" "DONE(d)")
-	      (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(a@/!)")
-		    (type "MEETING")))
-	(setq org-log-done 'time)
-	(setq org-todo-keyword-faces
+  (defun my-org-todo-setup ()
+    (setq org-use-fast-todo-selection t)
+    (setq org-todo-keywords
+	  '((sequence "TODO(t)" "NEXT(n)" "CURRENT(c)" "|" "DONE(d)")
+	    (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(a@/!)")
+	    (type "MEETING")))
+    (setq org-log-done 'time)
+    (setq org-todo-keyword-faces
 	  (quote (("TODO" :foreground "red" :weight bold)
 		  ("NEXT" :foreground "blue" :weight bold)
 		  ("DONE" :foreground "forest green" :weight bold)
@@ -1256,110 +1256,110 @@ TODO explore other mode-lines
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-    (use-package org-capture
-      :straight nil
-      :general
-      (my-leader-def
-	"C" 'org-capture)
-      :config
-      (setq org-capture-templates
-	    '(
-	      ("c" "Note on current task" plain (clock) "\n\n%T from: %a\n%i\n%?")
-	      ("s" "Standup" entry (file+olp+datetree (concat my/org-dir "todo.org") "Standup") "* Planned\n- %?\n %i\n %a")
-	      ("r" "To-Read" item (file+headline (lamdba () (concat my/org-dir "personal.org")) "To Read") "")
-	      ("t" "Tasks")
-	      ("tw" "Work Task" entry (file+headline (lambda () (concat my/org-dir "work/swrx.org")) "Tasks") "** TODO %?\n %i")
-	      ("tp" "Pesonal Task" entry (file+headline (lambda () (concat my/org-dir "personal.org")) "Tasks") "* TODO %?\n %i\n %a")
-	      ("th" "Household Task" entry (file+headline (lambda () (concat my/org-dir "household.org")) "Tasks") "* TODO %?\n %i\n %a")
-		    ("i" "Interruption")
-		    ("ii" "interruption" entry (file+olp+datetree (lambda () (concat my/org-dir "tracker.org"))) "* IN-PROGRESS %?  :interruption:work:\n%U\n- ref :: %a\n"
-		     :prepend t :tree-type week :clock-in t :clock-keep t)
-		    ("ic" "chat"         entry (file+olp+datetree (lambda () (concat my/org-dir "tracker.org"))) "* CHAT %?         :work:chat:\n%U\n- ref :: %a\n"
-		     :prepend t :tree-type week :clock-in t :clock-keep t)
-		    ("ie" "email"        entry (file+olp+datetree (lambda () (concat my/org-dir "tracker.org"))) "* EMAIL %?        :work:email:\n%U\n- ref :: %a\n"
-		     :prepend t :tree-type week :clock-in t :clock-keep t)
-		    ("im" "meeting"      entry (file+olp+datetree (lambda () (concat my/org-dir "tracker.org")))  "* MEETING %?      :work:meeting:\n%U\n- ref :: %a\n"
-		     :prepend t :tree-type week :clock-in t :clock-keep t)
-		    ("ir" "review"       entry (file+olp+datetree (lambda () (concat my/org-dir "tracker.org")))  "* REVIEW %?       :work:review:\n%U\n- ref :: %a\n"
-		     :prepend t :tree-type week :clock-in t :clock-keep t)
-		    ))
+  (use-package org-capture
+    :straight nil
+    :general
+    (my-leader-def
+      "C" 'org-capture)
+    :config
+    (setq org-capture-templates
+	  '(
+	    ("c" "Note on current task" plain (clock) "\n\n%T from: %a\n%i\n%?")
+	    ("s" "Standup" entry (file+olp+datetree (concat my/org-dir "todo.org") "Standup") "* Planned\n- %?\n %i\n %a")
+	    ("r" "To-Read" item (file+headline (lamdba () (concat my/org-dir "personal.org")) "To Read") "")
+	    ("t" "Tasks")
+	    ("tw" "Work Task" entry (file+headline (lambda () (concat my/org-dir "work/swrx.org")) "Tasks") "** TODO %?\n %i")
+	    ("tp" "Pesonal Task" entry (file+headline (lambda () (concat my/org-dir "personal.org")) "Tasks") "* TODO %?\n %i\n %a")
+	    ("th" "Household Task" entry (file+headline (lambda () (concat my/org-dir "household.org")) "Tasks") "* TODO %?\n %i\n %a")
+	    ("i" "Interruption")
+	    ("ii" "interruption" entry (file+olp+datetree (lambda () (concat my/org-dir "tracker.org"))) "* IN-PROGRESS %?  :interruption:work:\n%U\n- ref :: %a\n"
+	     :prepend t :tree-type week :clock-in t :clock-keep t)
+	    ("ic" "chat"         entry (file+olp+datetree (lambda () (concat my/org-dir "tracker.org"))) "* CHAT %?         :work:chat:\n%U\n- ref :: %a\n"
+	     :prepend t :tree-type week :clock-in t :clock-keep t)
+	    ("ie" "email"        entry (file+olp+datetree (lambda () (concat my/org-dir "tracker.org"))) "* EMAIL %?        :work:email:\n%U\n- ref :: %a\n"
+	     :prepend t :tree-type week :clock-in t :clock-keep t)
+	    ("im" "meeting"      entry (file+olp+datetree (lambda () (concat my/org-dir "tracker.org")))  "* MEETING %?      :work:meeting:\n%U\n- ref :: %a\n"
+	     :prepend t :tree-type week :clock-in t :clock-keep t)
+	    ("ir" "review"       entry (file+olp+datetree (lambda () (concat my/org-dir "tracker.org")))  "* REVIEW %?       :work:review:\n%U\n- ref :: %a\n"
+	     :prepend t :tree-type week :clock-in t :clock-keep t)
+	    ))
 
-      (defun org-hugo-new-subtree-post-capture-template ()
-	"Returns `org-capture' template string for new Hugo post.
-    See `org-capture-templates' for more information."
-	(let* ((title (read-from-minibuffer "Post Title: ")) ;Prompt to enter the post title
-	       (fname (org-hugo-slug title)))
-	  (mapconcat #'identity
-		     `(
-		       ,(concat "* TODO " title)
-		       ":PROPERTIES:"
-		       ,(concat ":EXPORT_FILE_NAME: " fname)
-		       ":END:"
-		       "%?\n")          ;Place the cursor here finally
-		     "\n")))
+    (defun org-hugo-new-subtree-post-capture-template ()
+      "Returns `org-capture' template string for new Hugo post.
+  See `org-capture-templates' for more information."
+      (let* ((title (read-from-minibuffer "Post Title: ")) ;Prompt to enter the post title
+	     (fname (org-hugo-slug title)))
+	(mapconcat #'identity
+		   `(
+		     ,(concat "* TODO " title)
+		     ":PROPERTIES:"
+		     ,(concat ":EXPORT_FILE_NAME: " fname)
+		     ":END:"
+		     "%?\n")          ;Place the cursor here finally
+		   "\n")))
 
-      (add-to-list 'org-capture-templates
-		   '("b"
-		     "Blog Post"
-		     entry
-		     ;; It is assumed that below file is present in `org-directory'
-		     ;; and that it has a "Blog Ideas" heading. It can even be a
-		     ;; symlink pointing to the actual location of all-posts.org!
-		     (file+olp "blog-posts.org" "Ideas")
-		     (function org-hugo-new-subtree-post-capture-template))))
-    (add-hook 'org-mode-hook (lambda ()
-       "Beautify Org Checkbox Symbol"
-       (push '("[ ]" . "☐") prettify-symbols-alist)
-       (push '("[X]" . "☑" ) prettify-symbols-alist)
-       (push '("[-]" . "❍" ) prettify-symbols-alist)
-       (prettify-symbols-mode)))
+    (add-to-list 'org-capture-templates
+		 '("b"
+		   "Blog Post"
+		   entry
+		   ;; It is assumed that below file is present in `org-directory'
+		   ;; and that it has a "Blog Ideas" heading. It can even be a
+		   ;; symlink pointing to the actual location of all-posts.org!
+		   (file+olp "blog-posts.org" "Ideas")
+		   (function org-hugo-new-subtree-post-capture-template))))
+  (add-hook 'org-mode-hook (lambda ()
+     "Beautify Org Checkbox Symbol"
+     (push '("[ ]" . "☐") prettify-symbols-alist)
+     (push '("[X]" . "☑" ) prettify-symbols-alist)
+     (push '("[-]" . "❍" ) prettify-symbols-alist)
+     (prettify-symbols-mode)))
 
-    (add-hook 'org-mode-hook 'turn-on-auto-fill)
+  (add-hook 'org-mode-hook 'turn-on-auto-fill)
 #+END_SRC
 
 TODO: straight should be t here
 #+BEGIN_SRC emacs-lisp
-    (use-package org
-      :straight nil
-      :gfhook
-      #'my-org-prettify-hook
-      ('org-src-mode-hook #'my-disable-flycheck-for-elisp)
-      :preface
-      (defun my-disable-flycheck-for-elisp ()
-	(setq flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
-      :general
-      ("C-c l" 'org-store-link)
-      (org-mode-map "C-'" nil)
+  (use-package org
+    :straight nil
+    :gfhook
+    #'my-org-prettify-hook
+    ('org-src-mode-hook #'my-disable-flycheck-for-elisp)
+    :preface
+    (defun my-disable-flycheck-for-elisp ()
+      (setq flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
+    :general
+    ("C-c l" 'org-store-link)
+    (org-mode-map "C-'" nil)
 
-      :config
-      (setq org-agenda-files my/org-agenda-files
-	    org-directory my/org-dir
-	    org-tags-column 75
-	    org-log-into-drawer t ;; hide the log state change history a bit better
-	    org-deadline-warning-days 7
-	    org-agenda-skip-scheduled-if-deadline-is-shown t
-	    org-habit-show-habits-only-for-today nil
-	    org-habit-graph-column 65
-	    org-duration-format 'h:mm ;; show hours at max, not days
-	    org-agenda-compact-blocks t
-	    org-cycle-separator-lines 0
-	    ;; hide empty agenda sections
-	    org-agenda-clockreport-parameter-plist '(:stepskip0 t :link t :maxlevel 2 :fileskip0 t)
-	    ;; default show today
-	    org-agenda-span 'day
-	    org-agenda-start-day "-0d"
-	    org-agenda-start-on-weekday 1
-	    org-agenda-custom-commands
-	    '(("d" "Done tasks" tags "/DONE|CANCELED")
-	      ("g" "Plan Today"
-	       ((agenda "" ((org-agenda-span 'day)))
-		(org-agenda-skip-function '(org-agenda-skip-deadline-if-not-today))
-		(org-agenda-entry-types '(:deadline))
-		(org-agenda-overriding-header "Today's Deadlines "))))
-	    )
-      (my-org-prettify-settings)
-      (my-org-todo-setup)
-      (my-org-structure-templates))
+    :config
+    (setq org-agenda-files my/org-agenda-files
+	  org-directory my/org-dir
+	  org-tags-column 75
+	  org-log-into-drawer t ;; hide the log state change history a bit better
+	  org-deadline-warning-days 7
+	  org-agenda-skip-scheduled-if-deadline-is-shown t
+	  org-habit-show-habits-only-for-today nil
+	  org-habit-graph-column 65
+	  org-duration-format 'h:mm ;; show hours at max, not days
+	  org-agenda-compact-blocks t
+	  org-cycle-separator-lines 0
+	  ;; hide empty agenda sections
+	  org-agenda-clockreport-parameter-plist '(:stepskip0 t :link t :maxlevel 2 :fileskip0 t)
+	  ;; default show today
+	  org-agenda-span 'day
+	  org-agenda-start-day "-0d"
+	  org-agenda-start-on-weekday 1
+	  org-agenda-custom-commands
+	  '(("d" "Done tasks" tags "/DONE|CANCELED")
+	    ("g" "Plan Today"
+	     ((agenda "" ((org-agenda-span 'day)))
+	      (org-agenda-skip-function '(org-agenda-skip-deadline-if-not-today))
+	      (org-agenda-entry-types '(:deadline))
+	      (org-agenda-overriding-header "Today's Deadlines "))))
+	  )
+    (my-org-prettify-settings)
+    (my-org-todo-setup)
+    (my-org-structure-templates))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
@@ -1494,19 +1494,19 @@ TODO: straight should be t here
 
 *** Writing Modes
 #+BEGIN_SRC emacs-lisp
-    (use-package olivetti
-      :defer t
-      :custom
-      (olivetti-body-width 90))
+  (use-package olivetti
+    :defer t
+    :custom
+    (olivetti-body-width 90))
 
-    (use-package writegood-mode
-      :defer t)
+  (use-package writegood-mode
+    :defer t)
 
-    (defun my/writing-modes ()
-      (interactive)
-      (flyspell-mode +1)
-      (olivetti-mode +1)
-      (writegood-mode +1))
+  (defun my/writing-modes ()
+    (interactive)
+    (flyspell-mode +1)
+    (olivetti-mode +1)
+    (writegood-mode +1))
 #+END_SRC
 
 *** Spelling
@@ -1549,59 +1549,59 @@ TODO: straight should be t here
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-    (use-package expand-region
-      :general
-      ("C->" 'er/expand-region)
-      ("C-<" 'er/contract-region))
+  (use-package expand-region
+    :general
+    ("C->" 'er/expand-region)
+    ("C-<" 'er/contract-region))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-    (use-package display-line-numbers
-      :straight nil
-      :ghook
-      ('prog-mode-hook #'display-line-numbers-mode))
+  (use-package display-line-numbers
+    :straight nil
+    :ghook
+    ('prog-mode-hook #'display-line-numbers-mode))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-    (use-package flycheck
-      :general
-      (my-leader-def
-	"f" '(hydra-flycheck-mode/body :wk "flycheck-mode"))
-      :config
-      (global-flycheck-mode +1)
-      (setq-default flycheck-disabled-checkers '(json-python-json))
-      :hydra
-      (hydra-flycheck-mode
-	(:hint nil
-	 :color green
-	 :pre (flycheck-list-errors)
-	 :post (quit-windows-on "*Flycheck errors*"))
-	"
-    Find Errors        Describe Errors
-    -----------------------------------
-    _f_irst error      _s_how error
-    _n_ext error       _e_xplain error
-    _p_rev error       ^ ^
-    _l_ist errors      ^ ^
-    "
-	("f" flycheck-first-error)
-	("n" flycheck-next-error)
-	("p" flycheck-previous-error)
-	("l" flycheck-list-errors)
-	("s" flycheck-display-error-at-point)
-	("e" flycheck-explain-error-at-point)))
+  (use-package flycheck
+    :general
+    (my-leader-def
+      "f" '(hydra-flycheck-mode/body :wk "flycheck-mode"))
+    :config
+    (global-flycheck-mode +1)
+    (setq-default flycheck-disabled-checkers '(json-python-json))
+    :hydra
+    (hydra-flycheck-mode
+      (:hint nil
+       :color green
+       :pre (flycheck-list-errors)
+       :post (quit-windows-on "*Flycheck errors*"))
+      "
+  Find Errors        Describe Errors
+  -----------------------------------
+  _f_irst error      _s_how error
+  _n_ext error       _e_xplain error
+  _p_rev error       ^ ^
+  _l_ist errors      ^ ^
+  "
+      ("f" flycheck-first-error)
+      ("n" flycheck-next-error)
+      ("p" flycheck-previous-error)
+      ("l" flycheck-list-errors)
+      ("s" flycheck-display-error-at-point)
+      ("e" flycheck-explain-error-at-point)))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-    (use-package yasnippet
-     :custom
-     (yas-snippet-dirs
-      '("~/.emacs.d/snippets"))
-     :config
-     (yas-global-mode +1))
+  (use-package yasnippet
+   :custom
+   (yas-snippet-dirs
+    '("~/.emacs.d/snippets"))
+   :config
+   (yas-global-mode +1))
 
-    (use-package yasnippet-snippets
-      :after yasnippet)
+  (use-package yasnippet-snippets
+    :after yasnippet)
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
@@ -1673,43 +1673,43 @@ TODO: straight should be t here
 
 Nice icons for company-mode. These are the Doom Emacs defaults, taken from: https://github.com/TheBB/dotemacs/blob/master/init.el#L527-L570
 #+BEGIN_SRC emacs-lisp
-    (use-package company-box
-      :diminish company-box-mode
-      :hook (company-mode . company-box-mode)
-      :init
-      (setq company-box-icons-alist 'company-box-icons-all-the-icons)
-      :config
-      (setq company-box-icons-alist 'company-box-icons-all-the-icons
-	    company-box-backends-colors nil
-	    company-box-icons-all-the-icons
-	    `((Unknown       . ,(all-the-icons-material "find_in_page"             :face 'all-the-icons-purple))
-	      (Text          . ,(all-the-icons-material "text_fields"              :face 'all-the-icons-green))
-	      (Method        . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
-	      (Function      . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
-	      (Constructor   . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
-	      (Field         . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
-	      (Variable      . ,(all-the-icons-material "adjust"                   :face 'all-the-icons-blue))
-	      (Class         . ,(all-the-icons-material "class"                    :face 'all-the-icons-red))
-	      (Interface     . ,(all-the-icons-material "settings_input_component" :face 'all-the-icons-red))
-	      (Module        . ,(all-the-icons-material "view_module"              :face 'all-the-icons-red))
-	      (Property      . ,(all-the-icons-material "settings"                 :face 'all-the-icons-red))
-	      (Unit          . ,(all-the-icons-material "straighten"               :face 'all-the-icons-red))
-	      (Value         . ,(all-the-icons-material "filter_1"                 :face 'all-the-icons-red))
-	      (Enum          . ,(all-the-icons-material "plus_one"                 :face 'all-the-icons-red))
-	      (Keyword       . ,(all-the-icons-material "filter_center_focus"      :face 'all-the-icons-red))
-	      (Snippet       . ,(all-the-icons-material "short_text"               :face 'all-the-icons-red))
-	      (Color         . ,(all-the-icons-material "color_lens"               :face 'all-the-icons-red))
-	      (File          . ,(all-the-icons-material "insert_drive_file"        :face 'all-the-icons-red))
-	      (Reference     . ,(all-the-icons-material "collections_bookmark"     :face 'all-the-icons-red))
-	      (Folder        . ,(all-the-icons-material "folder"                   :face 'all-the-icons-red))
-	      (EnumMember    . ,(all-the-icons-material "people"                   :face 'all-the-icons-red))
-	      (Constant      . ,(all-the-icons-material "pause_circle_filled"      :face 'all-the-icons-red))
-	      (Struct        . ,(all-the-icons-material "streetview"               :face 'all-the-icons-red))
-	      (Event         . ,(all-the-icons-material "event"                    :face 'all-the-icons-red))
-	      (Operator      . ,(all-the-icons-material "control_point"            :face 'all-the-icons-red))
-	      (TypeParameter . ,(all-the-icons-material "class"                    :face 'all-the-icons-red))
-	      (Template      . ,(all-the-icons-material "short_text"               :face 'all-the-icons-green))))
-      )
+  (use-package company-box
+    :diminish company-box-mode
+    :hook (company-mode . company-box-mode)
+    :init
+    (setq company-box-icons-alist 'company-box-icons-all-the-icons)
+    :config
+    (setq company-box-icons-alist 'company-box-icons-all-the-icons
+	  company-box-backends-colors nil
+	  company-box-icons-all-the-icons
+	  `((Unknown       . ,(all-the-icons-material "find_in_page"             :face 'all-the-icons-purple))
+	    (Text          . ,(all-the-icons-material "text_fields"              :face 'all-the-icons-green))
+	    (Method        . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
+	    (Function      . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
+	    (Constructor   . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
+	    (Field         . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
+	    (Variable      . ,(all-the-icons-material "adjust"                   :face 'all-the-icons-blue))
+	    (Class         . ,(all-the-icons-material "class"                    :face 'all-the-icons-red))
+	    (Interface     . ,(all-the-icons-material "settings_input_component" :face 'all-the-icons-red))
+	    (Module        . ,(all-the-icons-material "view_module"              :face 'all-the-icons-red))
+	    (Property      . ,(all-the-icons-material "settings"                 :face 'all-the-icons-red))
+	    (Unit          . ,(all-the-icons-material "straighten"               :face 'all-the-icons-red))
+	    (Value         . ,(all-the-icons-material "filter_1"                 :face 'all-the-icons-red))
+	    (Enum          . ,(all-the-icons-material "plus_one"                 :face 'all-the-icons-red))
+	    (Keyword       . ,(all-the-icons-material "filter_center_focus"      :face 'all-the-icons-red))
+	    (Snippet       . ,(all-the-icons-material "short_text"               :face 'all-the-icons-red))
+	    (Color         . ,(all-the-icons-material "color_lens"               :face 'all-the-icons-red))
+	    (File          . ,(all-the-icons-material "insert_drive_file"        :face 'all-the-icons-red))
+	    (Reference     . ,(all-the-icons-material "collections_bookmark"     :face 'all-the-icons-red))
+	    (Folder        . ,(all-the-icons-material "folder"                   :face 'all-the-icons-red))
+	    (EnumMember    . ,(all-the-icons-material "people"                   :face 'all-the-icons-red))
+	    (Constant      . ,(all-the-icons-material "pause_circle_filled"      :face 'all-the-icons-red))
+	    (Struct        . ,(all-the-icons-material "streetview"               :face 'all-the-icons-red))
+	    (Event         . ,(all-the-icons-material "event"                    :face 'all-the-icons-red))
+	    (Operator      . ,(all-the-icons-material "control_point"            :face 'all-the-icons-red))
+	    (TypeParameter . ,(all-the-icons-material "class"                    :face 'all-the-icons-red))
+	    (Template      . ,(all-the-icons-material "short_text"               :face 'all-the-icons-green))))
+    )
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
@@ -1794,139 +1794,139 @@ Nice icons for company-mode. These are the Doom Emacs defaults, taken from: http
 
 TODO: what is this?
 #+BEGIN_SRC emacs-lisp
-    (use-package editorconfig
-      :delight
-      :config
-      (editorconfig-mode +1))
+  (use-package editorconfig
+    :delight
+    :config
+    (editorconfig-mode +1))
 #+END_SRC
 
 ** Git
 #+BEGIN_SRC emacs-lisp
-    (use-package magit
-      :defer t
-      :general
-      ("C-x g" 'magit-status)
-      (my-leader-def
-	"g" '(:ignore t :wk "git")
-	"gs" 'magit-status
-	"gc" 'magit-checkout
-	"gC" 'magit-commit
-	"gb" 'magit-blame
-	"gS" 'magit-stage-file
-	"gU" 'magit-unstage-file
-	"gg" 'hydra-my-git-menu/body
-	"gy" 'my/magit-yank-branch-name)
-      :config
-      (setq magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
-      (defun my/magit-yank-branch-name ()
-	"Show the current branch in the echo-area and add it to the `kill-ring'."
-	(interactive)
-	(let ((branch (magit-get-current-branch)))
-	  (if branch
-	      (progn (kill-new branch)
-		     (message "%s" branch))
-	    (user-error "There is not current branch")))))
+  (use-package magit
+    :defer t
+    :general
+    ("C-x g" 'magit-status)
+    (my-leader-def
+      "g" '(:ignore t :wk "git")
+      "gs" 'magit-status
+      "gc" 'magit-checkout
+      "gC" 'magit-commit
+      "gb" 'magit-blame
+      "gS" 'magit-stage-file
+      "gU" 'magit-unstage-file
+      "gg" 'hydra-my-git-menu/body
+      "gy" 'my/magit-yank-branch-name)
+    :config
+    (setq magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
+    (defun my/magit-yank-branch-name ()
+      "Show the current branch in the echo-area and add it to the `kill-ring'."
+      (interactive)
+      (let ((branch (magit-get-current-branch)))
+	(if branch
+	    (progn (kill-new branch)
+		   (message "%s" branch))
+	  (user-error "There is not current branch")))))
 
-    (use-package git-timemachine
-      :defer t)
+  (use-package git-timemachine
+    :defer t)
 
-    (use-package git-messenger
-      :defer t)
+  (use-package git-messenger
+    :defer t)
 
-    (use-package git-gutter-fringe
-      :config
-      (global-git-gutter-mode +1)
-      (setq-default fringes-outside-margins t))
+  (use-package git-gutter-fringe
+    :config
+    (global-git-gutter-mode +1)
+    (setq-default fringes-outside-margins t))
 
-    (use-package git-link
-      :general
-      (my-leader-def
-	"gl" '(:ignore t :wk "git link")
-	"gll" 'git-link
-	"glc" 'git-link-commit
-	"glh" 'git-link-homepage))
+  (use-package git-link
+    :general
+    (my-leader-def
+      "gl" '(:ignore t :wk "git link")
+      "gll" 'git-link
+      "glc" 'git-link-commit
+      "glh" 'git-link-homepage))
 
-    (use-package browse-at-remote
-      :general
-      (my-leader-def
-	"glg" 'browse-at-remote))
+  (use-package browse-at-remote
+    :general
+    (my-leader-def
+      "glg" 'browse-at-remote))
 
-    (defhydra hydra-my-git-menu (global-map "<f7>"
-					    :color blue)
-      "
-    ^Navigate^        ^Action^               ^Info^
-    ^^^^^^^^^^^^---------------------------------------------------
-    _j_: next hunk    _s_: stage hunk        _d_: diff
-    _k_: prev hunk    _S_: stage file        _c_: show commit
-    ^ ^               _U_: unstage file      _g_: magit status
-    ^ ^               ^ ^                    _t_: git timemachine
-    ^ ^               ^ ^                    ^ ^
+  (defhydra hydra-my-git-menu (global-map "<f7>"
+					  :color blue)
     "
-      ("j" git-gutter:next-hunk)
-      ("k" git-gutter:previous-hunk)
-      ("s" git-gutter:stage-hunk)
-      ("S" magit-stage-file)
-      ("U" magit-unstage-file)
-      ("c" git-messenger:popup-show)
-      ("g" magit-status :exit t)
-      ("d" magit-diff-buffer-file)
-      ("t" git-timemachine :exit t)
-      ("q" quit-window "quit-window")
-      ("<ESC>" git-gutter:update-all-windows "quit" :exit t))
+  ^Navigate^        ^Action^               ^Info^
+  ^^^^^^^^^^^^---------------------------------------------------
+  _j_: next hunk    _s_: stage hunk        _d_: diff
+  _k_: prev hunk    _S_: stage file        _c_: show commit
+  ^ ^               _U_: unstage file      _g_: magit status
+  ^ ^               ^ ^                    _t_: git timemachine
+  ^ ^               ^ ^                    ^ ^
+  "
+    ("j" git-gutter:next-hunk)
+    ("k" git-gutter:previous-hunk)
+    ("s" git-gutter:stage-hunk)
+    ("S" magit-stage-file)
+    ("U" magit-unstage-file)
+    ("c" git-messenger:popup-show)
+    ("g" magit-status :exit t)
+    ("d" magit-diff-buffer-file)
+    ("t" git-timemachine :exit t)
+    ("q" quit-window "quit-window")
+    ("<ESC>" git-gutter:update-all-windows "quit" :exit t))
 
-    (defhydra hydra-my-git-timemachine-menu (:color blue)
-      ("s" git-timemachine "start")
-      ("j" git-timemachine-show-next-revision "next revision")
-      ("k" git-timemachine-show-previous-revision "prev revision")
-      ("c" git-timemachine-show-current-revision "curr revision")
-      ("<ESC>" git-timemachine-show-current-revision "quit" :exit t))
+  (defhydra hydra-my-git-timemachine-menu (:color blue)
+    ("s" git-timemachine "start")
+    ("j" git-timemachine-show-next-revision "next revision")
+    ("k" git-timemachine-show-previous-revision "prev revision")
+    ("c" git-timemachine-show-current-revision "curr revision")
+    ("<ESC>" git-timemachine-show-current-revision "quit" :exit t))
 
-    (setq exec-path (append exec-path '("/Users/andrew.thompson/go/bin/")))
-    (setq exec-path (append exec-path '("/opt/homebrew/bin/")))
+  (setq exec-path (append exec-path '("/Users/andrew.thompson/go/bin/")))
+  (setq exec-path (append exec-path '("/opt/homebrew/bin/")))
 
-    ;; I can't quite get this to work for some reason
-    ;; (use-package exec-path-from-shell
-    ;;   :straight nil
-    ;;   :ensure t
-    ;;   :config
-    ;;   (exec-path-from-shell-initialize))
+  ;; I can't quite get this to work for some reason
+  ;; (use-package exec-path-from-shell
+  ;;   :straight nil
+  ;;   :ensure t
+  ;;   :config
+  ;;   (exec-path-from-shell-initialize))
 
-    ;; (when (eq system-type 'darwin)
-    ;;   (mac-auto-operator-composition-mode))
+  ;; (when (eq system-type 'darwin)
+  ;;   (mac-auto-operator-composition-mode))
 
-    (when (eq system-type 'darwin)
-      (setq python-shell-interpreter "/usr/local/bin/python3"))
+  (when (eq system-type 'darwin)
+    (setq python-shell-interpreter "/usr/local/bin/python3"))
 
-    (when (eq system-type 'darwin)
-      (setq visible-bell nil
-	    ring-bell-function 'flash-mode-line)
-      (defun flash-mode-line ()
-	(invert-face 'mode-line)
-	(run-with-timer 0.1 nil #'invert-face 'mode-line)))
+  (when (eq system-type 'darwin)
+    (setq visible-bell nil
+	  ring-bell-function 'flash-mode-line)
+    (defun flash-mode-line ()
+      (invert-face 'mode-line)
+      (run-with-timer 0.1 nil #'invert-face 'mode-line)))
 
-    (when (eq system-type 'darwin)
-      (setq magit-git-executable "/usr/bin/git"))
+  (when (eq system-type 'darwin)
+    (setq magit-git-executable "/usr/bin/git"))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-    (use-package restart-emacs
-      :defer t)
+  (use-package restart-emacs
+    :defer t)
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-    (use-package restclient
-      :defer  t)
+  (use-package restclient
+    :defer  t)
 
-    (use-package company-restclient
-      :defer t)
+  (use-package company-restclient
+    :defer t)
 
-    (use-package ob-restclient
-      :defer t)
+  (use-package ob-restclient
+    :defer t)
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-    (use-package lsp-java
-      :config (add-hook 'java-mode-hook 'lsp))
+  (use-package lsp-java
+    :config (add-hook 'java-mode-hook 'lsp))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
