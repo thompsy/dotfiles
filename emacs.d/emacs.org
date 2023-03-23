@@ -1492,6 +1492,7 @@ TODO: straight should be t here
        (plantuml . t))))
 #+END_SRC
 
+*** Writing Modes
 #+BEGIN_SRC emacs-lisp
     (use-package olivetti
       :defer t
@@ -1508,6 +1509,7 @@ TODO: straight should be t here
       (writegood-mode +1))
 #+END_SRC
 
+*** Spelling
 #+BEGIN_SRC emacs-lisp
   (setenv "LANG" "en_GB")
   (use-package flyspell
