@@ -136,8 +136,8 @@ TODO: check if I can get rid of this.
 #+BEGIN_SRC emacs-lisp
   ;; I needed to install this at some point due to an issue with Magit. I'm not sure if I need it
   ;; anymore.
-  (use-package compat
-    :straight (:host github :repo "emacs-compat/compat"))
+  ;;(use-package compat
+  ;;  :straight (:host github :repo "emacs-compat/compat"))
 #+END_SRC
 
 
