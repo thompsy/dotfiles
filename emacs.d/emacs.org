@@ -260,6 +260,17 @@ than spamming them in inconsistent places.
 	  (expand-file-name "var/" user-emacs-directory)))
 #+END_SRC
 
+Use a separate custom file to remove auto-generated code from ~init.el~. This should be loaded prior
+to any themes so that they confirmation code gets stored in ~custom.el~.
+#+BEGIN_SRC emacs-lisp
+  (use-package cus-edit
+    :straight nil
+    :custom
+    (custom-file (expand-file-name "custom.el" user-emacs-directory))
+    :config
+    (if (file-exists-p custom-file)
+	(load-file custom-file)))
+#+END_SRC
 
 *** Asthetics
 TODO: commentary
@@ -689,16 +700,6 @@ TODO: commentary
     (set-fontset-font t 'symbol (font-spec :family "Apple Color Emoji") nil 'prepend))
 #+END_SRC
 
-Use a separate custom file to remove auto-generated code from ~init.el~.
-#+BEGIN_SRC emacs-lisp
-  (use-package cus-edit
-    :straight nil
-    :custom
-    (custom-file (expand-file-name "custom.el" user-emacs-directory))
-    :config
-    (if (file-exists-p custom-file)
-	(load-file custom-file)))
-#+END_SRC
 
 TODO: commentary
 #+BEGIN_SRC emacs-lisp
