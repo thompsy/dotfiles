@@ -281,7 +281,7 @@ TODO: commentary
     (global-hl-line-mode 1))
 #+END_SRC
 
-TODO: commentary
+[[https://draculatheme.com/emacs][Dracula]] is a nice theme that's available for lots of apps.
 #+BEGIN_SRC emacs-lisp
   (use-package dracula-theme
     :config
@@ -291,14 +291,16 @@ TODO: commentary
   (add-to-list 'default-frame-alist '(font . "Fira Code-14"))
 #+END_SRC
 
-TODO: commentary
+[[https://github.com/domtronn/all-the-icons.el][~all-the-icons.el~]] is a nice utility package that collects various icon fonts and makes them
+available to Emacs.
 #+BEGIN_SRC emacs-lisp
   (use-package all-the-icons
     :defer t)
 #+END_SRC
 
 TODO explore other mode-lines
-TODO: commentary
+
+[[https://github.com/seagle0128/doom-modeline][~doom-modeline~]] is a fancy, fast and minimal mode-line.
 #+BEGIN_SRC emacs-lisp
   (use-package doom-modeline
     :demand t
@@ -398,6 +400,12 @@ Note that ~:wk~ allows us to specify the text that is displayed by ~which-key~ f
 
 
 TODO: commentary
+
+This is a simple hydra to scale the font of the current buffer. In future it would be good to
+improve this to apply the changes to the current frame so that the changes took affect in all
+buffers in that frame.
+
+There seem to be a few existing options to do this according to this [[https://stackoverflow.com/questions/24705984/increase-decrease-font-size-in-an-emacs-frame-not-just-buffer][stackoverflow question]].
 #+BEGIN_SRC emacs-lisp
   ;; Add an easy zoom function
   (my-leader-def "z" '(hydra-zoom/body :wk "zoom"))
@@ -641,13 +649,6 @@ TODO try vundo instead https://github.com/casouri/vundo
   (with-eval-after-load 'undo-tree (defun undo-tree-overridden-undo-bindings-p () nil))
 #+END_SRC
 
-[[https://github.com/abo-abo/avy][~avy~]] is an easy way to jump around any visible buffers. Hit ~C-'~ and hit a few characters, then
-select from the list of options.
-#+BEGIN_SRC emacs-lisp
-  (use-package avy
-    :config (setq avy-background t)
-    :general ("C-'" 'avy-goto-char-timer))
-#+END_SRC
 
 TODO: commentary
 #+BEGIN_SRC emacs-lisp
@@ -688,7 +689,7 @@ TODO: commentary
     (set-fontset-font t 'symbol (font-spec :family "Apple Color Emoji") nil 'prepend))
 #+END_SRC
 
-TODO: commentary
+Use a separate custom file to remove auto-generated code from ~init.el~.
 #+BEGIN_SRC emacs-lisp
   (use-package cus-edit
     :straight nil
@@ -708,304 +709,8 @@ TODO: commentary
     (beacon-mode 1))
 #+END_SRC
 
-TODO: commentary
-#+BEGIN_SRC emacs-lisp
-  (use-package back-button
-    :straight (back-button :host github :repo "rolandwalker/back-button")
-    :general
-    (my-leader-def
-      "k" '(hydra-back-button/body :wk "back-button"))
-    :config
-    (back-button-mode 1)
-    :hydra
-    (hydra-back-button (:color red :hint nil)
-	"
-    Local         Global
-  --------------------------------
-    _t_ forward   _e_ forward
-    _s_ backward  _n_ backward
-    "
-      ("e" back-button-global-forward)
-      ("n" back-button-global-backward)
-      ("t" back-button-local-forward)
-      ("s" back-button-local-backward)))
-#+END_SRC
 
-TODO: commentary
-#+BEGIN_SRC emacs-lisp
-  (use-package ace-window
-    :general
-    ("M-o" 'ace-window)
-    :config
-    (setq aw-keys '(?a ?r ?s ?t ?n ?e ?i ?o)))
-#+END_SRC
 
-TODO: commentary
-#+BEGIN_SRC emacs-lisp
-  (use-package switch-window
-    :general
-    ("C-x o" 'switch-window)
-    :config
-    (setq switch-window-shortcut-style 'qwerty))
-#+END_SRC
-
-TODO: commentary
-#+BEGIN_SRC emacs-lisp
-  (use-package eyebrowse
-    :ensure t
-    :init
-    (eyebrowse-mode t))
-#+END_SRC
-
-TODO: commentary
-#+BEGIN_SRC emacs-lisp
-  (use-package winner
-    :commands winner-mode
-    :init (winner-mode t))
-
-  (defun hydra-move-splitter-left (delta)
-    "Move window splitter left."
-    (interactive "p")
-    (let ((windmove-wrap-around nil))
-      (if (windmove-find-other-window 'right)
-	  (shrink-window-horizontally delta)
-	(enlarge-window-horizontally delta))))
-
-  (defun hydra-move-splitter-right (delta)
-    "Move window splitter right."
-    (interactive "p")
-    (let ((windmove-wrap-around nil))
-      (if (windmove-find-other-window 'right)
-	  (enlarge-window-horizontally delta)
-	(shrink-window-horizontally delta))))
-
-  (defun hydra-move-splitter-up (delta)
-    "Move window splitter up."
-    (interactive "p")
-    (let ((windmove-wrap-around nil))
-      (if (windmove-find-other-window 'up)
-	  (enlarge-window delta)
-	(shrink-window delta))))
-
-  (defun hydra-move-splitter-down (delta)
-    "Move window splitter down."
-    (interactive "p")
-    (let ((windmove-wrap-around nil))
-      (if (windmove-find-other-window 'up)
-	  (shrink-window delta)
-	(enlarge-window delta))))
-
-  (defhydra hydra-window-delux ()
-	 "
-      ^Movement^        ^Split^          ^Switch^	        ^Resize^    ^Eyebrowse^
-      -----------------------------------------------------------------------------
-      _n_ ←             _v_ertical       _b_uffer	        _q_ X←       _c_lose config
-      _e_ ↓             _h_orizontal     _f_ind files         _w_ X↓       _r_ename config
-      _i_ ↑             _z_ undo         _a_ce 1	        _f_ X↑       _1_ setup 1
-      _o_ →             _Z_ reset        _s_wap	        _p_ X→       _2_ setup 2
-      _F_ollow	      _D_lt Other      _S_ave	        _m_aximize   _3_ setup 3
-      _SPC_ cancel      _O_nly this      _d_elete	        _=_ balance  _4_ setup 4
-      "
-	 ("n" windmove-left )
-	 ("e" windmove-down )
-	 ("i" windmove-up )
-	 ("o" windmove-right )
-
-	 ("q" hydra-move-splitter-left)
-	 ("w" hydra-move-splitter-down)
-	 ("f" hydra-move-splitter-up)
-	 ("p" hydra-move-splitter-right)
-	 ("b" helm-mini)
-	 ;("f" helm-find-files)
-	 ("F" follow-mode)
-	 ("a" (lambda ()
-		(interactive)
-		(ace-window 1)
-		(add-hook 'ace-window-end-once-hook
-			  'hydra-window/body))
-	     )
-	 ("v" (lambda ()
-		(interactive)
-		(split-window-right)
-		(windmove-right))
-	     )
-	 ("h" (lambda ()
-		(interactive)
-		(split-window-below)
-		(windmove-down))
-	     )
-	 ("s" (lambda ()
-		(interactive)
-		(ace-window 4)
-		(add-hook 'ace-window-end-once-hook
-			  'hydra-window/body)))
-	 ("S" save-buffer)
-	 ("d" delete-window)
-	 ("D" (lambda ()
-		(interactive)
-		(ace-window 16)
-		(add-hook 'ace-window-end-once-hook
-			  'hydra-window/body))
-	     )
-	 ("O" delete-other-windows)
-	 ("m" ace-maximize-window)
-	 ("z" (progn
-		(winner-undo)
-		(setq this-command 'winner-undo))
-	 )
-	 ("Z" winner-redo)
-	 ("=" balance-windows)
-
-	 ("c" eyebrowse-close-window-config)
-	 ("r" eyebrowse-rename-window-config)
-
-	 ("0" eyebrowse-switch-to-window-config-0)
-	 ("1" eyebrowse-switch-to-window-config-1)
-	 ("2" eyebrowse-switch-to-window-config-2)
-	 ("3" eyebrowse-switch-to-window-config-3)
-	 ("4" eyebrowse-switch-to-window-config-4)
-	 ("5" eyebrowse-switch-to-window-config-5)
-	 ("6" eyebrowse-switch-to-window-config-6)
-	 ("7" eyebrowse-switch-to-window-config-7)
-	 ("8" eyebrowse-switch-to-window-config-8)
-	 ("9" eyebrowse-switch-to-window-config-9)
-	 ("SPC" nil)
-	 )
-  (my-leader-def
-    "w" '(hydra-window-delux/body :wk "Window Management"))
-#+END_SRC
-
-TODO: commentary
-#+BEGIN_SRC emacs-lisp
-  (setq ibuffer-saved-filter-groups
-	'(("home"
-	   ("system-config" (or (filename . "dotfiles")
-				(filename . "emacs-config")))
-	   ("Org" (or (mode . org-mode)
-		      (filename . "OrgMode")))
-	   ("code" (or (filename . "code")
-		       (filename . ".py")
-		       (filename . ".go")
-		       (filename . ".java")))
-	   ("Web Dev" (or (mode . html-mode)
-			  (mode . css-mode)))
-	   ("Directories" (mode . dired-mode))
-	   ("Help" (or (name . "\*Help\*")
-		       (name . "\*Apropos\*")
-		       (name . "\*info\*")))
-	   ("Builtin" (or (name . "\*Messages\*")
-			  (name . "\*Completions\*")
-			  (name . "\*Backtrace\*")
-			  (name . "\*Compile-Log\*")
-			  (name . "\*Calendar\*")
-			  (name . "\*Calculator\*")
-			  (name . "'*Scratch\*"))))))
-  (add-hook 'ibuffer-mode-hook
-	    '(lambda ()
-	       (ibuffer-auto-mode 1)
-	       (ibuffer-switch-to-saved-filter-groups "home")))
-  ; hide empty filter groups
-  (setq ibuffer-show-empty-filter-groups nil)
-
-  (defhydra hydra-ibuffer-main (:color pink :hint nil)
-    "
-    ^Mark^         ^Actions^         ^View^          ^Select^              ^Navigation^
-    _m_: mark      _D_: delete       _g_: refresh    _q_: quit             _i_:   ↑    _n_
-    _u_: unmark    _s_: save marked  _S_: sort       _TAB_: toggle         _RET_: visit
-    _*_: specific  _a_: all actions  _/_: filter     _o_: other window     _e_:   ↓    _o_
-    _t_: toggle    _._: toggle hydra _H_: help       C-o other win no-select
-    "
-    ("m" ibuffer-mark-forward)
-    ("u" ibuffer-unmark-forward)
-    ("*" hydra-ibuffer-mark/body :color blue)
-    ("t" ibuffer-toggle-marks)
-
-    ("D" ibuffer-do-delete)
-    ("s" ibuffer-do-save)
-    ("a" hydra-ibuffer-action/body :color blue)
-
-    ("g" ibuffer-update)
-    ("S" hydra-ibuffer-sort/body :color blue)
-    ("/" hydra-ibuffer-filter/body :color blue)
-    ("H" describe-mode :color blue)
-
-    ("n" ibuffer-backward-filter-group)
-    ("i" ibuffer-backward-line)
-    ("o" ibuffer-forward-filter-group)
-    ("e" ibuffer-forward-line)
-    ("RET" ibuffer-visit-buffer :color blue)
-
-    ("TAB" ibuffer-toggle-filter-group)
-
-    ("O" ibuffer-visit-buffer-other-window :color blue)
-    ("q" quit-window :color blue)
-    ("." nil :color blue))
-
-  (defhydra hydra-ibuffer-mark (:color teal :columns 5
-				       :after-exit (hydra-ibuffer-main/body))
-    "Mark"
-    ("*" ibuffer-unmark-all "unmark all")
-    ("M" ibuffer-mark-by-mode "mode")
-    ("m" ibuffer-mark-modified-buffers "modified")
-    ("u" ibuffer-mark-unsaved-buffers "unsaved")
-    ("s" ibuffer-mark-special-buffers "special")
-    ("r" ibuffer-mark-read-only-buffers "read-only")
-    ("/" ibuffer-mark-dired-buffers "dired")
-    ("e" ibuffer-mark-dissociated-buffers "dissociated")
-    ("h" ibuffer-mark-help-buffers "help")
-    ("z" ibuffer-mark-compressed-file-buffers "compressed")
-    ("b" hydra-ibuffer-main/body "back" :color blue))
-
-  (defhydra hydra-ibuffer-action (:color teal :columns 4
-					 :after-exit
-					 (if (eq major-mode 'ibuffer-mode)
-					     (hydra-ibuffer-main/body)))
-    "Action"
-    ("A" ibuffer-do-view "view")
-    ("E" ibuffer-do-eval "eval")
-    ("F" ibuffer-do-shell-command-file "shell-command-file")
-    ("I" ibuffer-do-query-replace-regexp "query-replace-regexp")
-    ("H" ibuffer-do-view-other-frame "view-other-frame")
-    ("N" ibuffer-do-shell-command-pipe-replace "shell-cmd-pipe-replace")
-    ("M" ibuffer-do-toggle-modified "toggle-modified")
-    ("O" ibuffer-do-occur "occur")
-    ("P" ibuffer-do-print "print")
-    ("Q" ibuffer-do-query-replace "query-replace")
-    ("R" ibuffer-do-rename-uniquely "rename-uniquely")
-    ("T" ibuffer-do-toggle-read-only "toggle-read-only")
-    ("U" ibuffer-do-replace-regexp "replace-regexp")
-    ("V" ibuffer-do-revert "revert")
-    ("W" ibuffer-do-view-and-eval "view-and-eval")
-    ("X" ibuffer-do-shell-command-pipe "shell-command-pipe")
-    ("b" nil "back"))
-
-  (defhydra hydra-ibuffer-sort (:color amaranth :columns 3)
-    "Sort"
-    ("i" ibuffer-invert-sorting "invert")
-    ("a" ibuffer-do-sort-by-alphabetic "alphabetic")
-    ("v" ibuffer-do-sort-by-recency "recently used")
-    ("s" ibuffer-do-sort-by-size "size")
-    ("f" ibuffer-do-sort-by-filename/process "filename")
-    ("m" ibuffer-do-sort-by-major-mode "mode")
-    ("b" hydra-ibuffer-main/body "back" :color blue))
-
-  (defhydra hydra-ibuffer-filter (:color amaranth :columns 4)
-    "Filter"
-    ("m" ibuffer-filter-by-used-mode "mode")
-    ("M" ibuffer-filter-by-derived-mode "derived mode")
-    ("n" ibuffer-filter-by-name "name")
-    ("c" ibuffer-filter-by-content "content")
-    ("e" ibuffer-filter-by-predicate "predicate")
-    ("f" ibuffer-filter-by-filename "filename")
-    (">" ibuffer-filter-by-size-gt "size")
-    ("<" ibuffer-filter-by-size-lt "size")
-    ("/" ibuffer-filter-disable "disable")
-    ("b" hydra-ibuffer-main/body "back" :color blue))
-
-  (general-define-key
-   :keymaps 'ibuffer-mode-map
-   "." 'hydra-ibuffer-main/body)
-#+END_SRC
 
 TODO: commentary
 #+BEGIN_SRC emacs-lisp
@@ -2311,4 +2016,315 @@ TODO see how ~ensure-system-package~ works on windows.
 
 #+BEGIN_SRC emacs-lisp
 (use-package dap-mode)
+#+END_SRC
+
+** Navigation
+[[https://github.com/abo-abo/avy][~avy~]] is an easy way to jump around any visible buffers. Hit ~C-'~ and hit a few characters, then
+select from the list of options.
+#+BEGIN_SRC emacs-lisp
+  (use-package avy
+    :config (setq avy-background t)
+    :general ("C-'" 'avy-goto-char-timer))
+#+END_SRC
+
+TODO: commentary
+#+BEGIN_SRC emacs-lisp
+  (use-package back-button
+    :straight (back-button :host github :repo "rolandwalker/back-button")
+    :general
+    (my-leader-def
+      "k" '(hydra-back-button/body :wk "back-button"))
+    :config
+    (back-button-mode 1)
+    :hydra
+    (hydra-back-button (:color red :hint nil)
+	"
+    Local         Global
+  --------------------------------
+    _t_ forward   _e_ forward
+    _s_ backward  _n_ backward
+    "
+      ("e" back-button-global-forward)
+      ("n" back-button-global-backward)
+      ("t" back-button-local-forward)
+      ("s" back-button-local-backward)))
+#+END_SRC
+
+** Window Management
+
+TODO: commentary
+#+BEGIN_SRC emacs-lisp
+  (use-package ace-window
+    :general
+    ("M-o" 'ace-window)
+    :config
+    (setq aw-keys '(?a ?r ?s ?t ?n ?e ?i ?o)))
+#+END_SRC
+
+TODO: commentary
+#+BEGIN_SRC emacs-lisp
+  (use-package switch-window
+    :general
+    ("C-x o" 'switch-window)
+    :config
+    (setq switch-window-shortcut-style 'qwerty))
+#+END_SRC
+
+TODO: commentary
+#+BEGIN_SRC emacs-lisp
+  (use-package eyebrowse
+    :ensure t
+    :init
+    (eyebrowse-mode t))
+#+END_SRC
+
+TODO: commentary
+#+BEGIN_SRC emacs-lisp
+  (use-package winner
+    :commands winner-mode
+    :init (winner-mode t))
+
+  (defun hydra-move-splitter-left (delta)
+    "Move window splitter left."
+    (interactive "p")
+    (let ((windmove-wrap-around nil))
+      (if (windmove-find-other-window 'right)
+	  (shrink-window-horizontally delta)
+	(enlarge-window-horizontally delta))))
+
+  (defun hydra-move-splitter-right (delta)
+    "Move window splitter right."
+    (interactive "p")
+    (let ((windmove-wrap-around nil))
+      (if (windmove-find-other-window 'right)
+	  (enlarge-window-horizontally delta)
+	(shrink-window-horizontally delta))))
+
+  (defun hydra-move-splitter-up (delta)
+    "Move window splitter up."
+    (interactive "p")
+    (let ((windmove-wrap-around nil))
+      (if (windmove-find-other-window 'up)
+	  (enlarge-window delta)
+	(shrink-window delta))))
+
+  (defun hydra-move-splitter-down (delta)
+    "Move window splitter down."
+    (interactive "p")
+    (let ((windmove-wrap-around nil))
+      (if (windmove-find-other-window 'up)
+	  (shrink-window delta)
+	(enlarge-window delta))))
+
+  (defhydra hydra-window-delux ()
+	 "
+      ^Movement^        ^Split^          ^Switch^	        ^Resize^    ^Eyebrowse^
+      -----------------------------------------------------------------------------
+      _n_ ←             _v_ertical       _b_uffer	        _q_ X←       _c_lose config
+      _e_ ↓             _h_orizontal     _f_ind files         _w_ X↓       _r_ename config
+      _i_ ↑             _z_ undo         _a_ce 1	        _f_ X↑       _1_ setup 1
+      _o_ →             _Z_ reset        _s_wap	        _p_ X→       _2_ setup 2
+      _F_ollow	      _D_lt Other      _S_ave	        _m_aximize   _3_ setup 3
+      _SPC_ cancel      _O_nly this      _d_elete	        _=_ balance  _4_ setup 4
+      "
+	 ("n" windmove-left )
+	 ("e" windmove-down )
+	 ("i" windmove-up )
+	 ("o" windmove-right )
+
+	 ("q" hydra-move-splitter-left)
+	 ("w" hydra-move-splitter-down)
+	 ("f" hydra-move-splitter-up)
+	 ("p" hydra-move-splitter-right)
+	 ("b" helm-mini)
+	 ;("f" helm-find-files)
+	 ("F" follow-mode)
+	 ("a" (lambda ()
+		(interactive)
+		(ace-window 1)
+		(add-hook 'ace-window-end-once-hook
+			  'hydra-window/body))
+	     )
+	 ("v" (lambda ()
+		(interactive)
+		(split-window-right)
+		(windmove-right))
+	     )
+	 ("h" (lambda ()
+		(interactive)
+		(split-window-below)
+		(windmove-down))
+	     )
+	 ("s" (lambda ()
+		(interactive)
+		(ace-window 4)
+		(add-hook 'ace-window-end-once-hook
+			  'hydra-window/body)))
+	 ("S" save-buffer)
+	 ("d" delete-window)
+	 ("D" (lambda ()
+		(interactive)
+		(ace-window 16)
+		(add-hook 'ace-window-end-once-hook
+			  'hydra-window/body))
+	     )
+	 ("O" delete-other-windows)
+	 ("m" ace-maximize-window)
+	 ("z" (progn
+		(winner-undo)
+		(setq this-command 'winner-undo))
+	 )
+	 ("Z" winner-redo)
+	 ("=" balance-windows)
+
+	 ("c" eyebrowse-close-window-config)
+	 ("r" eyebrowse-rename-window-config)
+
+	 ("0" eyebrowse-switch-to-window-config-0)
+	 ("1" eyebrowse-switch-to-window-config-1)
+	 ("2" eyebrowse-switch-to-window-config-2)
+	 ("3" eyebrowse-switch-to-window-config-3)
+	 ("4" eyebrowse-switch-to-window-config-4)
+	 ("5" eyebrowse-switch-to-window-config-5)
+	 ("6" eyebrowse-switch-to-window-config-6)
+	 ("7" eyebrowse-switch-to-window-config-7)
+	 ("8" eyebrowse-switch-to-window-config-8)
+	 ("9" eyebrowse-switch-to-window-config-9)
+	 ("SPC" nil)
+	 )
+  (my-leader-def
+    "w" '(hydra-window-delux/body :wk "Window Management"))
+#+END_SRC
+
+** IBuffer
+TODO: commentary
+#+BEGIN_SRC emacs-lisp
+  (setq ibuffer-saved-filter-groups
+	'(("home"
+	   ("system-config" (or (filename . "dotfiles")
+				(filename . "emacs-config")))
+	   ("Org" (or (mode . org-mode)
+		      (filename . "OrgMode")))
+	   ("code" (or (filename . "code")
+		       (filename . ".py")
+		       (filename . ".go")
+		       (filename . ".java")))
+	   ("Web Dev" (or (mode . html-mode)
+			  (mode . css-mode)))
+	   ("Directories" (mode . dired-mode))
+	   ("Help" (or (name . "\*Help\*")
+		       (name . "\*Apropos\*")
+		       (name . "\*info\*")))
+	   ("Builtin" (or (name . "\*Messages\*")
+			  (name . "\*Completions\*")
+			  (name . "\*Backtrace\*")
+			  (name . "\*Compile-Log\*")
+			  (name . "\*Calendar\*")
+			  (name . "\*Calculator\*")
+			  (name . "'*Scratch\*"))))))
+  (add-hook 'ibuffer-mode-hook
+	    '(lambda ()
+	       (ibuffer-auto-mode 1)
+	       (ibuffer-switch-to-saved-filter-groups "home")))
+  ; hide empty filter groups
+  (setq ibuffer-show-empty-filter-groups nil)
+
+  (defhydra hydra-ibuffer-main (:color pink :hint nil)
+    "
+    ^Mark^         ^Actions^         ^View^          ^Select^              ^Navigation^
+    _m_: mark      _D_: delete       _g_: refresh    _q_: quit             _i_:   ↑    _n_
+    _u_: unmark    _s_: save marked  _S_: sort       _TAB_: toggle         _RET_: visit
+    _*_: specific  _a_: all actions  _/_: filter     _o_: other window     _e_:   ↓    _o_
+    _t_: toggle    _._: toggle hydra _H_: help       C-o other win no-select
+    "
+    ("m" ibuffer-mark-forward)
+    ("u" ibuffer-unmark-forward)
+    ("*" hydra-ibuffer-mark/body :color blue)
+    ("t" ibuffer-toggle-marks)
+
+    ("D" ibuffer-do-delete)
+    ("s" ibuffer-do-save)
+    ("a" hydra-ibuffer-action/body :color blue)
+
+    ("g" ibuffer-update)
+    ("S" hydra-ibuffer-sort/body :color blue)
+    ("/" hydra-ibuffer-filter/body :color blue)
+    ("H" describe-mode :color blue)
+
+    ("n" ibuffer-backward-filter-group)
+    ("i" ibuffer-backward-line)
+    ("o" ibuffer-forward-filter-group)
+    ("e" ibuffer-forward-line)
+    ("RET" ibuffer-visit-buffer :color blue)
+
+    ("TAB" ibuffer-toggle-filter-group)
+
+    ("O" ibuffer-visit-buffer-other-window :color blue)
+    ("q" quit-window :color blue)
+    ("." nil :color blue))
+
+  (defhydra hydra-ibuffer-mark (:color teal :columns 5
+				       :after-exit (hydra-ibuffer-main/body))
+    "Mark"
+    ("*" ibuffer-unmark-all "unmark all")
+    ("M" ibuffer-mark-by-mode "mode")
+    ("m" ibuffer-mark-modified-buffers "modified")
+    ("u" ibuffer-mark-unsaved-buffers "unsaved")
+    ("s" ibuffer-mark-special-buffers "special")
+    ("r" ibuffer-mark-read-only-buffers "read-only")
+    ("/" ibuffer-mark-dired-buffers "dired")
+    ("e" ibuffer-mark-dissociated-buffers "dissociated")
+    ("h" ibuffer-mark-help-buffers "help")
+    ("z" ibuffer-mark-compressed-file-buffers "compressed")
+    ("b" hydra-ibuffer-main/body "back" :color blue))
+
+  (defhydra hydra-ibuffer-action (:color teal :columns 4
+					 :after-exit
+					 (if (eq major-mode 'ibuffer-mode)
+					     (hydra-ibuffer-main/body)))
+    "Action"
+    ("A" ibuffer-do-view "view")
+    ("E" ibuffer-do-eval "eval")
+    ("F" ibuffer-do-shell-command-file "shell-command-file")
+    ("I" ibuffer-do-query-replace-regexp "query-replace-regexp")
+    ("H" ibuffer-do-view-other-frame "view-other-frame")
+    ("N" ibuffer-do-shell-command-pipe-replace "shell-cmd-pipe-replace")
+    ("M" ibuffer-do-toggle-modified "toggle-modified")
+    ("O" ibuffer-do-occur "occur")
+    ("P" ibuffer-do-print "print")
+    ("Q" ibuffer-do-query-replace "query-replace")
+    ("R" ibuffer-do-rename-uniquely "rename-uniquely")
+    ("T" ibuffer-do-toggle-read-only "toggle-read-only")
+    ("U" ibuffer-do-replace-regexp "replace-regexp")
+    ("V" ibuffer-do-revert "revert")
+    ("W" ibuffer-do-view-and-eval "view-and-eval")
+    ("X" ibuffer-do-shell-command-pipe "shell-command-pipe")
+    ("b" nil "back"))
+
+  (defhydra hydra-ibuffer-sort (:color amaranth :columns 3)
+    "Sort"
+    ("i" ibuffer-invert-sorting "invert")
+    ("a" ibuffer-do-sort-by-alphabetic "alphabetic")
+    ("v" ibuffer-do-sort-by-recency "recently used")
+    ("s" ibuffer-do-sort-by-size "size")
+    ("f" ibuffer-do-sort-by-filename/process "filename")
+    ("m" ibuffer-do-sort-by-major-mode "mode")
+    ("b" hydra-ibuffer-main/body "back" :color blue))
+
+  (defhydra hydra-ibuffer-filter (:color amaranth :columns 4)
+    "Filter"
+    ("m" ibuffer-filter-by-used-mode "mode")
+    ("M" ibuffer-filter-by-derived-mode "derived mode")
+    ("n" ibuffer-filter-by-name "name")
+    ("c" ibuffer-filter-by-content "content")
+    ("e" ibuffer-filter-by-predicate "predicate")
+    ("f" ibuffer-filter-by-filename "filename")
+    (">" ibuffer-filter-by-size-gt "size")
+    ("<" ibuffer-filter-by-size-lt "size")
+    ("/" ibuffer-filter-disable "disable")
+    ("b" hydra-ibuffer-main/body "back" :color blue))
+
+  (general-define-key
+   :keymaps 'ibuffer-mode-map
+   "." 'hydra-ibuffer-main/body)
 #+END_SRC
