@@ -98,7 +98,13 @@ Setup the [[https://github.com/radian-software/straight.el][~straight.el~]] pack
 
 From the straight docs:
 #+BEGIN_QUOTE
-By setting the variable straight-cache-autoloads to a non-nil value, you can cause straight.el to cache the autoloads of all used packages in a single file on disk, and load them from there instead of from the individual package files if they are still up to date. This reduces the number of disk IO operations during startup from O(number of packages) to O(1), so it should improve performance. No other configuration should be necessary to make this work; however, you may wish to call straight-prune-build occasionally, since otherwise this cache file may grow quite large over time.
+By setting the variable straight-cache-autoloads to a non-nil value, you can cause straight.el to
+cache the autoloads of all used packages in a single file on disk, and load them from there instead
+of from the individual package files if they are still up to date. This reduces the number of disk
+IO operations during startup from O(number of packages) to O(1), so it should improve
+performance. No other configuration should be necessary to make this work; however, you may wish to
+call straight-prune-build occasionally, since otherwise this cache file may grow quite large over
+time.
 #+END_QUOTE
 #+BEGIN_SRC emacs-lisp
   (setq straight-cache-autoloads t)
@@ -106,7 +112,8 @@ By setting the variable straight-cache-autoloads to a non-nil value, you can cau
 
 In addition:
 #+BEGIN_QUOTE
-You may customize straight-use-package-by-default to make it so that :straight t is assumed unless you explicitly override it with :straight nil.
+You may customize straight-use-package-by-default to make it so that :straight t is assumed unless
+you explicitly override it with :straight nil.
 #+END_QUOTE
 
 #+BEGIN_SRC emacs-lisp
@@ -199,6 +206,7 @@ Use UTF-8 everywhere.
     (set-selection-coding-system 'utf-8-unix))
 #+END_SRC
 
+TODO: commentary
 #+BEGIN_SRC emacs-lisp
   (use-package files
     :straight nil
@@ -215,6 +223,7 @@ Use UTF-8 everywhere.
      recentf-max-saved-items 500))
 #+END_SRC
 
+TODO: commentary
 #+BEGIN_SRC emacs-lisp
   (use-package simple
     :straight nil
@@ -223,6 +232,7 @@ Use UTF-8 everywhere.
     (save-interprogram-paste-before-kill t))
 #+END_SRC
 
+~so-long~ is a built-in mode which deals with very long lines, like those in minified Javascript for example.
 #+BEGIN_SRC emacs-lisp
   (use-package so-long
     :straight nil
@@ -250,6 +260,7 @@ than spamming them in inconsistent places.
 	  (expand-file-name "var/" user-emacs-directory)))
 #+END_SRC
 
+TODO: commentary
 #+BEGIN_SRC emacs-lisp
   (use-package paren
     :straight nil
@@ -260,6 +271,7 @@ than spamming them in inconsistent places.
 #+END_SRC
 
 *** Asthetics
+TODO: commentary
 #+BEGIN_SRC emacs-lisp
   (use-package frame
     :straight nil
@@ -278,6 +290,7 @@ than spamming them in inconsistent places.
     (global-hl-line-mode 1))
 #+END_SRC
 
+TODO: commentary
 #+BEGIN_SRC emacs-lisp
   (use-package dracula-theme
     :config
@@ -287,12 +300,14 @@ than spamming them in inconsistent places.
   (add-to-list 'default-frame-alist '(font . "Fira Code-14"))
 #+END_SRC
 
+TODO: commentary
 #+BEGIN_SRC emacs-lisp
   (use-package all-the-icons
     :defer t)
 #+END_SRC
 
 TODO explore other mode-lines
+TODO: commentary
 #+BEGIN_SRC emacs-lisp
   (use-package doom-modeline
     :demand t
@@ -309,8 +324,6 @@ TODO explore other mode-lines
     (doom-modeline-vcs-max-length 50)
     (doom-modeline-buffer-file-name-style 'truncate-upto-project))
 #+END_SRC
-
-
 
 *** Keybindings
 [[https://github.com/noctuid/general.el][~general.el~]] provides a convenient method for binding keys. It also integrates well with
@@ -390,7 +403,11 @@ Note that ~:wk~ allows us to specify the text that is displayed by ~which-key~ f
   ;; This allows us to use :hydra within use-package
   (use-package use-package-hydra
     :ensure t)
+#+END_SRC
 
+
+TODO: commentary
+#+BEGIN_SRC emacs-lisp
   ;; Add an easy zoom function
   (my-leader-def "z" '(hydra-zoom/body :wk "zoom"))
   (defhydra hydra-zoom (:column 2)
@@ -398,7 +415,10 @@ Note that ~:wk~ allows us to specify the text that is displayed by ~which-key~ f
       ("t" text-scale-decrease "Zoom out")
       ("r" (text-scale-set 0) "Reset zoom")
       ("0" (text-scale-set 0) :bind nil :exit t))
+#+END_SRC
 
+TODO: commentary
+#+BEGIN_SRC emacs-lisp
   (general-define-key "C-n" 'hydra-move/body)
   (defhydra hydra-move
     (:body-pre (next-line))
@@ -415,7 +435,10 @@ Note that ~:wk~ allows us to specify the text that is displayed by ~which-key~ f
     ("l" recenter-top-bottom)
     ("<" beginning-of-buffer)
     (">" end-of-buffer))
+#+END_SRC
 
+TODO: commentary
+#+BEGIN_SRC emacs-lisp
   (my-leader-def "R" '(hydra-rectangle/body :wk "rectangle"))
   (defhydra hydra-rectangle (:body-pre (rectangle-mark-mode 1)
 				       :color pink
@@ -444,7 +467,10 @@ Note that ~:wk~ allows us to specify the text that is displayed by ~which-key~ f
 		(rectangle-mark-mode 1)))
 	 ("u" undo nil)
 	 ("g" nil))
+#+END_SRC
 
+TODO: commentary
+#+BEGIN_SRC emacs-lisp
   (my-leader-def "s" '(hydra-straight-helper/body :wk "pkgs"))
   (defhydra hydra-straight-helper (:hint nil :color green)
 	 "
@@ -474,7 +500,10 @@ Note that ~:wk~ allows us to specify the text that is displayed by ~which-key~ f
 	 ("g" straight-get-recipe)
 	 ("e" straight-prune-build)
 	 ("q" nil))
+#+END_SRC
 
+TODO: commentary
+#+BEGIN_SRC emacs-lisp
   (defun my/insert-unicode (unicode-name)
     "Same as C-x 8 enter UNICODE-NAME."
     (insert-char (gethash unicode-name (ucs-names))))
@@ -516,7 +545,7 @@ when there's a keyboard shortcut to do something that you've just used the mouse
 #+END_SRC
 
 ** Helm
-
+TODO: commentary
 [[https://github.com/emacs-helm/helm][~helm~]]
 #+BEGIN_SRC emacs-lisp
   (use-package helm
@@ -552,22 +581,21 @@ when there's a keyboard shortcut to do something that you've just used the mouse
 
 #+END_SRC
 
-[[https://github.com/emacs-helm/helm-descbinds][~helm-descbinds~]] makes it easy to search the
-current active keybindings using ~helm~.
+[[https://github.com/emacs-helm/helm-descbinds][~helm-descbinds~]] makes it easy to search the current active keybindings using ~helm~.
 #+BEGIN_SRC emacs-lisp
   (use-package helm-descbinds
     :config (helm-descbinds-mode))
 
 #+END_SRC
 
-[[https://github.com/abo-abo/helm-make][~helm-make~]] shows all the targets in a ~Makefile~ for easy
-searching and navigation. 
+[[https://github.com/abo-abo/helm-make][~helm-make~]] shows all the targets in a ~Makefile~ for easy searching and navigation.
+
+TODO: move this down to the programming section
 #+BEGIN_SRC emacs-lisp
   (use-package helm-make)
 #+END_SRC
 
-[[https://github.com/emacsorphanage/helm-swoop][~helm-swoop~]] is a useful way to search a buffer
-using ~helm~.
+[[https://github.com/emacsorphanage/helm-swoop][~helm-swoop~]] is a useful way to search a buffer using ~helm~.
 
 TODO: there's probably more useful options here I could explore
 #+BEGIN_SRC emacs-lisp
@@ -622,20 +650,20 @@ TODO try vundo instead https://github.com/casouri/vundo
   (with-eval-after-load 'undo-tree (defun undo-tree-overridden-undo-bindings-p () nil))
 #+END_SRC
 
-[[https://github.com/abo-abo/avy][~avy~]] is an easy way to jump around any visible buffers. Hit ~C-'~
-and hit a few characters, then select from the list of options.
+[[https://github.com/abo-abo/avy][~avy~]] is an easy way to jump around any visible buffers. Hit ~C-'~ and hit a few characters, then
+select from the list of options.
 #+BEGIN_SRC emacs-lisp
   (use-package avy
     :config (setq avy-background t)
     :general ("C-'" 'avy-goto-char-timer))
 #+END_SRC
 
+TODO: commentary
 #+BEGIN_SRC emacs-lisp
   (use-package iedit)
 #+END_SRC
 
-[[https://github.com/emacs-dashboard/emacs-dashboard][~dashboard~]] is a nice little splash screen
-that shows some recent items on starting Emacs.
+[[https://github.com/emacs-dashboard/emacs-dashboard][~dashboard~]] is a nice little splash screen that shows some recent items on starting Emacs.
 
 #+BEGIN_SRC emacs-lisp
   (use-package dashboard
@@ -654,7 +682,7 @@ that shows some recent items on starting Emacs.
 				      "; Time "       (emacs-init-time))))
 #+END_SRC
 
-
+TODO: commentary
 #+BEGIN_SRC emacs-lisp
   ;; Some basic config
   (use-package emacs
@@ -669,6 +697,7 @@ that shows some recent items on starting Emacs.
     (set-fontset-font t 'symbol (font-spec :family "Apple Color Emoji") nil 'prepend))
 #+END_SRC
 
+TODO: commentary
 #+BEGIN_SRC emacs-lisp
   (use-package cus-edit
     :straight nil
@@ -679,7 +708,7 @@ that shows some recent items on starting Emacs.
 	(load-file custom-file)))
 #+END_SRC
 
-
+TODO: commentary
 #+BEGIN_SRC emacs-lisp
   (use-package beacon
     :diminish
@@ -688,6 +717,7 @@ that shows some recent items on starting Emacs.
     (beacon-mode 1))
 #+END_SRC
 
+TODO: commentary
 #+BEGIN_SRC emacs-lisp
   (use-package back-button
     :straight (back-button :host github :repo "rolandwalker/back-button")
@@ -710,6 +740,7 @@ that shows some recent items on starting Emacs.
       ("s" back-button-local-backward)))
 #+END_SRC
 
+TODO: commentary
 #+BEGIN_SRC emacs-lisp
   (use-package ace-window
     :general
@@ -718,6 +749,7 @@ that shows some recent items on starting Emacs.
     (setq aw-keys '(?a ?r ?s ?t ?n ?e ?i ?o)))
 #+END_SRC
 
+TODO: commentary
 #+BEGIN_SRC emacs-lisp
   (use-package switch-window
     :general
@@ -726,6 +758,7 @@ that shows some recent items on starting Emacs.
     (setq switch-window-shortcut-style 'qwerty))
 #+END_SRC
 
+TODO: commentary
 #+BEGIN_SRC emacs-lisp
   (use-package eyebrowse
     :ensure t
@@ -733,6 +766,7 @@ that shows some recent items on starting Emacs.
     (eyebrowse-mode t))
 #+END_SRC
 
+TODO: commentary
 #+BEGIN_SRC emacs-lisp
   (use-package winner
     :commands winner-mode
@@ -848,7 +882,10 @@ that shows some recent items on starting Emacs.
 	 )
   (my-leader-def
     "w" '(hydra-window-delux/body :wk "Window Management"))
+#+END_SRC
 
+TODO: commentary
+#+BEGIN_SRC emacs-lisp
   (setq ibuffer-saved-filter-groups
 	'(("home"
 	   ("system-config" (or (filename . "dotfiles")
@@ -979,6 +1016,7 @@ that shows some recent items on starting Emacs.
    "." 'hydra-ibuffer-main/body)
 #+END_SRC
 
+TODO: commentary
 #+BEGIN_SRC emacs-lisp
   (use-package dired
     :straight nil
@@ -1051,6 +1089,7 @@ that shows some recent items on starting Emacs.
 		"C-(" 'dired-git-info-mode))
 #+END_SRC
 
+TODO: commentary
 #+BEGIN_SRC emacs-lisp
   (use-package projectile
     :general
@@ -1099,6 +1138,7 @@ that shows some recent items on starting Emacs.
       ("q"   nil "cancel" :color blue)))
 #+END_SRC
 
+TODO: commentary
 #+BEGIN_SRC emacs-lisp
   (use-package ibuffer-vc
     :config
@@ -1107,6 +1147,7 @@ that shows some recent items on starting Emacs.
   (use-package ibuffer-projectile)
 #+END_SRC
 
+TODO: commentary
 #+BEGIN_SRC emacs-lisp
   (use-package helm-projectile
     :after projectile
@@ -1124,6 +1165,7 @@ that shows some recent items on starting Emacs.
     (setq ag-arguments (list "--smart-case" "--column")))
 #+END_SRC
 
+TODO: commentary
 #+BEGIN_SRC emacs-lisp
   (defun my-org-prettify-hook ()
     (turn-on-visual-line-mode))
@@ -1138,12 +1180,14 @@ that shows some recent items on starting Emacs.
 	  line-spacing 0.2))
 #+END_SRC
 
+TODO: commentary
 #+BEGIN_SRC emacs-lisp
   (use-package htmlize
     :defer t)
 #+END_SRC
 
 *** Org-Mode
+TODO: commentary
 #+BEGIN_SRC emacs-lisp
   (defun my-org-todo-setup ()
     (setq org-use-fast-todo-selection t)
@@ -1163,7 +1207,7 @@ that shows some recent items on starting Emacs.
 		  ("PHONE" :foreground "forest green" :weight bold)))))
 #+END_SRC
 
-
+TODO: commentary
 #+BEGIN_SRC emacs-lisp
   (defun my-org-structure-templates ()
     (require 'org-tempo)
@@ -1235,6 +1279,7 @@ that shows some recent items on starting Emacs.
       org-structure-template-alist))
 #+END_SRC
 
+TODO: commentary
 #+BEGIN_SRC emacs-lisp
   (use-package org-capture
     :straight nil
@@ -1342,6 +1387,7 @@ TODO: straight should be t here
     (my-org-structure-templates))
 #+END_SRC
 
+TODO: commentary
 #+BEGIN_SRC emacs-lisp
   (use-package org-super-agenda
     :after org-agenda
@@ -1473,6 +1519,7 @@ TODO: straight should be t here
 #+END_SRC
 
 *** Writing Modes
+TODO: commentary
 #+BEGIN_SRC emacs-lisp
   (use-package olivetti
     :defer t
@@ -1490,6 +1537,7 @@ TODO: straight should be t here
 #+END_SRC
 
 *** Spelling
+TODO: commentary
 #+BEGIN_SRC emacs-lisp
   (setenv "LANG" "en_GB")
   (use-package flyspell
@@ -1528,6 +1576,7 @@ TODO: straight should be t here
     :after flyspell)
 #+END_SRC
 
+TODO: commentary
 #+BEGIN_SRC emacs-lisp
   (use-package expand-region
     :general
@@ -1535,7 +1584,7 @@ TODO: straight should be t here
     ("C-<" 'er/contract-region))
 #+END_SRC
 
-
+TODO: commentary
 #+BEGIN_SRC emacs-lisp
   (use-package flycheck
     :general
@@ -1566,6 +1615,7 @@ TODO: straight should be t here
       ("e" flycheck-explain-error-at-point)))
 #+END_SRC
 
+TODO: commentary
 #+BEGIN_SRC emacs-lisp
   (use-package yasnippet
    :custom
@@ -1578,6 +1628,8 @@ TODO: straight should be t here
     :after yasnippet)
 #+END_SRC
 
+** Completion
+TODO: commentary
 #+BEGIN_SRC emacs-lisp
   (use-package company
     :diminish
@@ -1641,7 +1693,8 @@ TODO: straight should be t here
      ))
 #+END_SRC
 
-Nice icons for company-mode. These are the Doom Emacs defaults, taken from: https://github.com/TheBB/dotemacs/blob/master/init.el#L527-L570
+Nice icons for company-mode. These are the Doom Emacs defaults, taken from:
+https://github.com/TheBB/dotemacs/blob/master/init.el#L527-L570
 #+BEGIN_SRC emacs-lisp
   (use-package company-box
     :diminish company-box-mode
@@ -1682,6 +1735,7 @@ Nice icons for company-mode. These are the Doom Emacs defaults, taken from: http
     )
 #+END_SRC
 
+TODO: commentary
 #+BEGIN_SRC emacs-lisp
   (use-package smartscan
     :hook ((prog-mode . smartscan-mode))
@@ -1700,10 +1754,6 @@ Nice icons for company-mode. These are the Doom Emacs defaults, taken from: http
 	(replace-regexp (format "\\b%s\\b" (regexp-quote symbol)) replacement))))
 #+END_SRC
 
-
-  (use-package dap-mode)
-#+END_SRC
-
 TODO: what is this?
 #+BEGIN_SRC emacs-lisp
   (use-package editorconfig
@@ -1713,6 +1763,7 @@ TODO: what is this?
 #+END_SRC
 
 ** Git
+TODO: commentary
 #+BEGIN_SRC emacs-lisp
   (use-package magit
     :defer t
@@ -1738,18 +1789,26 @@ TODO: what is this?
 	    (progn (kill-new branch)
 		   (message "%s" branch))
 	  (user-error "There is not current branch")))))
-
+#+END_SRC
+TODO: commentary
+#+BEGIN_SRC emacs-lisp
   (use-package git-timemachine
     :defer t)
-
+#+END_SRC
+TODO: commentary
+#+BEGIN_SRC emacs-lisp
   (use-package git-messenger
     :defer t)
-
+#+END_SRC
+TODO: commentary
+#+BEGIN_SRC emacs-lisp
   (use-package git-gutter-fringe
     :config
     (global-git-gutter-mode +1)
     (setq-default fringes-outside-margins t))
-
+#+END_SRC
+TODO: commentary
+#+BEGIN_SRC emacs-lisp
   (use-package git-link
     :general
     (my-leader-def
@@ -1757,7 +1816,9 @@ TODO: what is this?
       "gll" 'git-link
       "glc" 'git-link-commit
       "glh" 'git-link-homepage))
-
+#+END_SRC
+TODO: commentary
+#+BEGIN_SRC emacs-lisp
   (use-package browse-at-remote
     :general
     (my-leader-def
@@ -1792,7 +1853,9 @@ TODO: what is this?
     ("k" git-timemachine-show-previous-revision "prev revision")
     ("c" git-timemachine-show-current-revision "curr revision")
     ("<ESC>" git-timemachine-show-current-revision "quit" :exit t))
-
+#+END_SRC
+TODO: commentary
+#+BEGIN_SRC emacs-lisp
   (setq exec-path (append exec-path '("/Users/andrew.thompson/go/bin/")))
   (setq exec-path (append exec-path '("/opt/homebrew/bin/")))
 
@@ -1820,11 +1883,13 @@ TODO: what is this?
     (setq magit-git-executable "/usr/bin/git"))
 #+END_SRC
 
+TODO: commentary
 #+BEGIN_SRC emacs-lisp
   (use-package restart-emacs
     :defer t)
 #+END_SRC
 
+TODO: commentary
 #+BEGIN_SRC emacs-lisp
   (use-package restclient
     :defer  t)
@@ -1837,7 +1902,7 @@ TODO: what is this?
 #+END_SRC
 
 
-
+TODO: commentary
 #+BEGIN_SRC emacs-lisp
   (use-package dockerfile-mode
     :defer t)
@@ -1849,7 +1914,7 @@ TODO: what is this?
     :commands (kubernetes-overview))
 #+END_SRC
 
-
+TODO: commentary
 #+BEGIN_SRC emacs-lisp
   (use-package skewer-mode
     :defer t
@@ -1866,6 +1931,7 @@ TODO: what is this?
   (which-key-add-major-mode-key-based-replacements 'scheme-mode "C-c e" "eval")
 #+END_SRC
 
+TODO: commentary
 #+BEGIN_SRC emacs-lisp
   (defconst my-lisp-mode-hooks
     '(lisp-mode-hook
@@ -1954,7 +2020,7 @@ TODO: this is a scheme mode. I don't really use it much.
     (geiser-active-implementations '(guile mit racket)))
 #+END_SRC
 
-
+TODO: commentary
 #+BEGIN_SRC emacs-lisp
   (use-package web-mode
     :defer t
@@ -1974,6 +2040,7 @@ TODO: this is a scheme mode. I don't really use it much.
     (add-to-list `auto-mode-alist '("\\.css\\'" . web-mode)))
 #+END_SRC
 
+TODO: commentary
 #+BEGIN_SRC emacs-lisp
   (use-package yaml-mode
     :defer t)
@@ -1983,11 +2050,13 @@ TODO: this is a scheme mode. I don't really use it much.
     :init (setq markdown-command "multimarkdown"))
 #+END_SRC
 
+TODO: commentary
 #+BEGIN_SRC emacs-lisp
   (use-package terraform-mode
     :ensure t)
 #+END_SRC
 
+TODO: commentary
 #+BEGIN_SRC emacs-lisp
   (use-package sqlformat
     :ensure t
@@ -2039,6 +2108,7 @@ TODO: this is a scheme mode. I don't really use it much.
       log))
 #+END_SRC
 
+TODO: commentary
 #+BEGIN_SRC emacs-lisp
   (defun my/today ()
     "Create Org file from skeleton with current time as name."
@@ -2047,10 +2117,6 @@ TODO: this is a scheme mode. I don't really use it much.
   ;  (insert "Skeleton contents"))
 #+END_SRC
 
-#+BEGIN_SRC emacs-lisp
-  (use-package gradle-mode
-    :ensure t)
-#+END_SRC
 
 
 [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Saving-Emacs-Sessions.html][~desktop~]] saves the state of Emacs and restores it on restart. 
@@ -2180,11 +2246,16 @@ TODO: this is a scheme mode. I don't really use it much.
 #+END_SRC
 
 *** Java
-Commenting this for now since its a real slow loader.
-TODO possible candidate for ~:defer~?
+Commenting this for now since its a real slow loader.  TODO possible candidate for ~:defer~?
 #+BEGIN_SRC emacs-lisp
   ;; (use-package lsp-java
   ;;   :config (add-hook 'java-mode-hook 'lsp))
+#+END_SRC
+
+TODO: commentary
+#+BEGIN_SRC emacs-lisp
+  (use-package gradle-mode
+    :ensure t)
 #+END_SRC
 
 *** Javascript
@@ -2228,4 +2299,10 @@ TODO see how ~ensure-system-package~ works on windows.
 	   (hy-mode . pipenv-mode))
     :init
     (setq pipenv-projectile-after-switch-function #'pipenv-projectile-after-switch-extended))
+#+END_SRC
+
+
+
+#+BEGIN_SRC emacs-lisp
+(use-package dap-mode)
 #+END_SRC
