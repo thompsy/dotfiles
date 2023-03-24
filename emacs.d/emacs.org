@@ -139,6 +139,15 @@ with user activity.
     :hook (after-init . gcmh-mode))
 #+END_SRC
 
+Emacs Start-up Profiler, [[https://github.com/jschaf/esup][esup]], enables profiling your Emacs startup time without leaving emacs.
+#+BEGIN_SRC emacs-lisp
+  ;; Emacs Start-up Profiler
+  (use-package esup
+    ;; This config is needed to fix a minor bug: https://github.com/jschaf/esup/issues/54
+    :config (setq esup-depth 0)
+    :commands (esup))
+#+END_SRC
+
 Allow Emacs to read larger chunks of data from subprocesses. Things like ~lsp-mode~ can generate
 responses from 800k to 3M, so the default of 4k is too small.
 #+BEGIN_SRC emacs-lisp
@@ -657,15 +666,6 @@ that shows some recent items on starting Emacs.
 				      "; Time "       (emacs-init-time))))
 #+END_SRC
 
-Emacs Start-up Profiler, [[https://github.com/jschaf/esup][esup]], enables profiling your emacs
-startup time without leaving emacs.
-#+BEGIN_SRC emacs-lisp
-  ;; Emacs Start-up Profiler
-  (use-package esup
-    ;; This config is needed to fix a minor bug: https://github.com/jschaf/esup/issues/54
-    :config (setq esup-depth 0)
-    :commands (esup))
-#+END_SRC
 
 #+BEGIN_SRC emacs-lisp
   ;; Some basic config
