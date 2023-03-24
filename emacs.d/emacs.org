@@ -320,6 +320,7 @@ In particular, this allows us to easily setup a global leader key, ~my-leader-de
 from that.
 #+BEGIN_SRC emacs-lisp
   (use-package general
+    :demand t
     :custom
     (general-override-states '(insert emacs hybrid normal visual motion operator replace))
     :config
