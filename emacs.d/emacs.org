@@ -2187,13 +2187,16 @@ TODO possible candidate for ~:defer~?
 #+END_SRC
 
 *** Javascript
+
+TODO see how ~ensure-system-package~ works on windows.
 #+BEGIN_SRC emacs-lisp
   (use-package js2-mode
     :mode "\\.js$"
     :hook (js2-mode . lsp)
     :interpreter "node"
-    :ensure-system-package ((typescript-language-server . "npm i -g typescript-language-server")
-			    (eslint_d . "npm i -g eslint_d"))
+    ;; commenting below line since I've removed this functionality for now
+    ;; :ensure-system-package ((typescript-language-server . "npm i -g typescript-language-server")
+    ;; (eslint_d . "npm i -g eslint_d"))
     :custom
     ;; set the indent level to 2
     (js2-basic-offset 2)
