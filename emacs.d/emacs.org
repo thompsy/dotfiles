@@ -310,20 +310,7 @@ TODO explore other mode-lines
     (doom-modeline-buffer-file-name-style 'truncate-upto-project))
 #+END_SRC
 
-#+BEGIN_SRC emacs-lisp
-  (use-package rainbow-delimiters
-    :hook (prog-mode . rainbow-delimiters-mode)
-    :config
-    (setq show-paren-delay  0)
-    (setq show-paren-style 'mixed))
-#+END_SRC
 
-#+BEGIN_SRC emacs-lisp
-  (use-package display-line-numbers
-    :straight nil
-    :ghook
-    ('prog-mode-hook #'display-line-numbers-mode))
-#+END_SRC
 
 *** Keybindings
 [[https://github.com/noctuid/general.el][~general.el~]] provides a convenient method for binding keys. It also integrates well with
@@ -2133,6 +2120,23 @@ TODO: this is a scheme mode. I don't really use it much.
 #+END_SRC
 
 ** Other Programming Modes
+*** General Programming Utilities
+
+#+BEGIN_SRC emacs-lisp
+  (use-package display-line-numbers
+    :straight nil
+    :ghook
+    ('prog-mode-hook #'display-line-numbers-mode))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+  (use-package rainbow-delimiters
+    :hook (prog-mode . rainbow-delimiters-mode)
+    :config
+    (setq show-paren-delay  0)
+    (setq show-paren-style 'mixed))
+#+END_SRC
+
 *** Golang
 #+BEGIN_SRC emacs-lisp
   (use-package go-mode
