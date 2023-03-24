@@ -260,15 +260,6 @@ than spamming them in inconsistent places.
 	  (expand-file-name "var/" user-emacs-directory)))
 #+END_SRC
 
-TODO: commentary
-#+BEGIN_SRC emacs-lisp
-  (use-package paren
-    :straight nil
-    :custom
-    (show-paren-delay 0)
-    :config
-    (show-paren-mode +1))
-#+END_SRC
 
 *** Asthetics
 TODO: commentary
@@ -2196,12 +2187,27 @@ TODO: commentary
     ('prog-mode-hook #'display-line-numbers-mode))
 #+END_SRC
 
+TODO: commentary
+#+BEGIN_SRC emacs-lisp
+  (use-package paren
+    :straight nil
+    :custom
+    ;; show matching paren without delay
+    (show-paren-delay 0)
+    :config
+    ;; show matching parens by default
+    (show-paren-mode +1))
+#+END_SRC
+
+[[https://github.com/Fanael/rainbow-delimiters][~rainbow-delimiters~]] highlights delimiters, like parentheses, brackets, or braces, according to
+their depth. It makes it much easier to visually identify which closing braces matches which opening
+one.
 #+BEGIN_SRC emacs-lisp
   (use-package rainbow-delimiters
     :hook (prog-mode . rainbow-delimiters-mode)
     :config
-    (setq show-paren-delay  0)
-    (setq show-paren-style 'mixed))
+    (setq show-paren-delay  0
+	  show-paren-style 'mixed))
 #+END_SRC
 
 *** Golang
