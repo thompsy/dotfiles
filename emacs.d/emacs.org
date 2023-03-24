@@ -1721,62 +1721,6 @@ Nice icons for company-mode. These are the Doom Emacs defaults, taken from: http
 	(replace-regexp (format "\\b%s\\b" (regexp-quote symbol)) replacement))))
 #+END_SRC
 
-#+BEGIN_SRC emacs-lisp
-  (use-package lsp-mode
-    :hook (lsp-mode . lsp-enable-which-key-integration)
-    (go-mode . lsp-deferred)
-    :commands lsp
-    :custom
-    (lsp-completion-provider :none)
-    :general
-    (my-leader-def
-      "L" '(hydra-lsp/body :wk "lsp-mode"))
-    :config
-    (setq lsp-file-watch-threshold 500)
-    ;;TODO this should use :hydra
-    (defhydra hydra-lsp (:exit t :hint nil)
-      "
-   Buffer^^               Server^^                   Symbol
-  -------------------------------------------------------------------------------------
-   [_f_] format           [_M-r_] restart            [_d_] declaration  [_i_] implementation  [_o_] documentation
-   [_m_] imenu            [_S_]   shutdown           [_D_] definition   [_t_] type            [_r_] rename
-   [_x_] execute action   [_M-s_] describe session   [_R_] references   [_s_] signature       [_a_] actions"
-      ("d" lsp-find-declaration)
-      ("D" lsp-ui-peek-find-definitions)
-      ("R" lsp-ui-peek-find-references)
-      ("i" lsp-ui-peek-find-implementation)
-      ("t" lsp-find-type-definition)
-      ("s" lsp-signature-help)
-      ("o" lsp-describe-thing-at-point)
-      ("r" lsp-rename)
-      ("a" helm-lsp-code-actions)
-
-      ("f" lsp-format-buffer)
-      ("m" lsp-ui-imenu)
-      ("x" lsp-execute-code-action)
-
-      ("M-s" lsp-describe-session)
-      ("M-r" lsp-restart-workspace)
-      ("S" lsp-shutdown-workspace)))
-
-  ;; TODO this should be fdolded into the config above
-  (custom-set-faces
-   '(lsp-face-highlight-read ((t (:background "gray"))))
-   '(lsp-face-highlight-textual ((t (:background "gray"))))
-   '(lsp-face-highlight-write ((t (:background "SteelBlue1"))))
-   '(lsp-ui-doc-background ((t (:background "black")))))
-
-  (use-package lsp-ui
-    :ensure t
-    :commands lsp-ui-mode
-    :config (setq lsp-ui-doc-enable t
-		  lsp-ui-peek-enable t
-		  lsp-ui-sideline-enable t
-		  lsp-ui-imenu-enable t
-		  lsp-ui-flycheck-enable t))
-
-  (use-package helm-lsp
-    :commands (helm-lsp-workspace-symbol))
 
   (use-package dap-mode)
 #+END_SRC
@@ -1913,50 +1857,7 @@ TODO: what is this?
     :defer t)
 #+END_SRC
 
-#+BEGIN_SRC emacs-lisp
-  (use-package lsp-java
-    :config (add-hook 'java-mode-hook 'lsp))
-#+END_SRC
 
-#+BEGIN_SRC emacs-lisp
-  (use-package go-mode
-    :mode "\\.go\\'"
-    :custom
-    (defun lsp-go-install-save-hooks ()
-      (add-hook 'before-save-hook #'lsp-format-buffer t t)
-      (add-hook 'before-save-hook #'lsp-organize-imports t t))
-    (add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
-    :config
-    (setq gofmt-command "goimports")
-    (add-hook 'before-save-hook 'gofmt-before-save)
-    :general
-    (my-leader-def
-      "p" '(hydra-go-mode/body :wk "go-mode")) ;;oryx - this could be better?
-    :hydra
-    (hydra-go-mode (:hint nil :color green)
-
-      "
-  Imports             Describe             GoTo
-  --------------------------------------------------------
-  _ig_ import go      _d_escribe           _ga_ arguments
-  _ia_ import add     _j_ump to definition _gd_ docstring
-  _ir_ import remove  ^ ^                  _gf_ function
-  ^ ^                 ^ ^                  _gn_ function name
-  ^ ^                 ^ ^                  _gr_ return values
-  "
-      ("ig" go-goto-imports)
-      ("ia" go-import-add)
-      ("ir" go-remove-unused-imports)
-      ("d" godef-describe)
-      ("j" godef-jump)
-      ("ga" go-goto-arguments)
-      ("gd" go-goto-docstring)
-      ("gf" go-goto-function)
-      ("gn" go-goto-function-name)
-      ("gr" go-goto-return-values)))
-  (setq lsp-go-env '((GOFLAGS . "-tags=integration")))
-
-#+END_SRC
 
 #+BEGIN_SRC emacs-lisp
   (use-package dockerfile-mode
@@ -1969,24 +1870,6 @@ TODO: what is this?
     :commands (kubernetes-overview))
 #+END_SRC
 
-#+BEGIN_SRC emacs-lisp
-  (use-package js2-mode
-    :mode "\\.js$"
-    :hook (js2-mode . lsp)
-    :interpreter "node"
-    :ensure-system-package ((typescript-language-server . "npm i -g typescript-language-server")
-			    (eslint_d . "npm i -g eslint_d"))
-    :custom
-    ;; set the indent level to 2
-    (js2-basic-offset 2)
-    (js-chain-indent t)
-    (js-indent-level 2)
-    ;; use eslint_d instead of eslint for faster linting
-    (flycheck-javascript-eslint-executable "eslint_d"))
-
-  (use-package json-mode
-    :mode "\\.json\\'")
-#+END_SRC
 
 #+BEGIN_SRC emacs-lisp
   (use-package skewer-mode
@@ -2092,24 +1975,6 @@ TODO: this is a scheme mode. I don't really use it much.
     (geiser-active-implementations '(guile mit racket)))
 #+END_SRC
 
-#+BEGIN_SRC emacs-lisp
-  (use-package python
-    :mode "\\.py\\'"
-    :ghook
-    ('python-mode-hook #'lsp)
-    :general
-    (my-local-leader-def 'python-mode-map
-      "er" 'python-shell-send-region
-      "eb" 'python-shell-send-buffer
-      "ef" 'python-shell-send-file
-      "es" 'python-shell-send-string))
-
-  (use-package pipenv
-    :hook ((python-mode . pipenv-mode)
-	   (hy-mode . pipenv-mode))
-    :init
-    (setq pipenv-projectile-after-switch-function #'pipenv-projectile-after-switch-extended))
-#+END_SRC
 
 #+BEGIN_SRC emacs-lisp
   (use-package web-mode
@@ -2215,4 +2080,153 @@ TODO: this is a scheme mode. I don't really use it much.
     :straight nil
     :init
     (desktop-save-mode 1))
+#+END_SRC
+
+** LSP Mode
+#+BEGIN_SRC emacs-lisp
+  (use-package lsp-mode
+    :hook (lsp-mode . lsp-enable-which-key-integration)
+    (go-mode . lsp-deferred)
+    :commands lsp
+    :custom
+    (lsp-completion-provider :none)
+    :general
+    (my-leader-def
+      "L" '(hydra-lsp/body :wk "lsp-mode"))
+    :config
+    (setq lsp-file-watch-threshold 500)
+    ;;TODO this should use :hydra
+    (defhydra hydra-lsp (:exit t :hint nil)
+      "
+   Buffer^^               Server^^                   Symbol
+  -------------------------------------------------------------------------------------
+   [_f_] format           [_M-r_] restart            [_d_] declaration  [_i_] implementation  [_o_] documentation
+   [_m_] imenu            [_S_]   shutdown           [_D_] definition   [_t_] type            [_r_] rename
+   [_x_] execute action   [_M-s_] describe session   [_R_] references   [_s_] signature       [_a_] actions"
+      ("d" lsp-find-declaration)
+      ("D" lsp-ui-peek-find-definitions)
+      ("R" lsp-ui-peek-find-references)
+      ("i" lsp-ui-peek-find-implementation)
+      ("t" lsp-find-type-definition)
+      ("s" lsp-signature-help)
+      ("o" lsp-describe-thing-at-point)
+      ("r" lsp-rename)
+      ("a" helm-lsp-code-actions)
+
+      ("f" lsp-format-buffer)
+      ("m" lsp-ui-imenu)
+      ("x" lsp-execute-code-action)
+
+      ("M-s" lsp-describe-session)
+      ("M-r" lsp-restart-workspace)
+      ("S" lsp-shutdown-workspace)))
+
+  ;; TODO this should be fdolded into the config above
+  (custom-set-faces
+   '(lsp-face-highlight-read ((t (:background "gray"))))
+   '(lsp-face-highlight-textual ((t (:background "gray"))))
+   '(lsp-face-highlight-write ((t (:background "SteelBlue1"))))
+   '(lsp-ui-doc-background ((t (:background "black")))))
+
+  (use-package lsp-ui
+    :ensure t
+    :commands lsp-ui-mode
+    :config (setq lsp-ui-doc-enable t
+		  lsp-ui-peek-enable t
+		  lsp-ui-sideline-enable t
+		  lsp-ui-imenu-enable t
+		  lsp-ui-flycheck-enable t))
+
+  (use-package helm-lsp
+    :commands (helm-lsp-workspace-symbol))
+#+END_SRC
+
+** Other Programming Modes
+*** Golang
+#+BEGIN_SRC emacs-lisp
+  (use-package go-mode
+    :mode "\\.go\\'"
+    :custom
+    (defun lsp-go-install-save-hooks ()
+      (add-hook 'before-save-hook #'lsp-format-buffer t t)
+      (add-hook 'before-save-hook #'lsp-organize-imports t t))
+    (add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
+    :config
+    (setq gofmt-command "goimports")
+    (add-hook 'before-save-hook 'gofmt-before-save)
+    :general
+    (my-leader-def
+      "p" '(hydra-go-mode/body :wk "go-mode")) ;;oryx - this could be better?
+    :hydra
+    (hydra-go-mode (:hint nil :color green)
+
+      "
+  Imports             Describe             GoTo
+  --------------------------------------------------------
+  _ig_ import go      _d_escribe           _ga_ arguments
+  _ia_ import add     _j_ump to definition _gd_ docstring
+  _ir_ import remove  ^ ^                  _gf_ function
+  ^ ^                 ^ ^                  _gn_ function name
+  ^ ^                 ^ ^                  _gr_ return values
+  "
+      ("ig" go-goto-imports)
+      ("ia" go-import-add)
+      ("ir" go-remove-unused-imports)
+      ("d" godef-describe)
+      ("j" godef-jump)
+      ("ga" go-goto-arguments)
+      ("gd" go-goto-docstring)
+      ("gf" go-goto-function)
+      ("gn" go-goto-function-name)
+      ("gr" go-goto-return-values)))
+  (setq lsp-go-env '((GOFLAGS . "-tags=integration")))
+
+#+END_SRC
+
+*** Java
+Commenting this for now since its a real slow loader.
+TODO possible candidate for ~:defer~?
+#+BEGIN_SRC emacs-lisp
+  ;; (use-package lsp-java
+  ;;   :config (add-hook 'java-mode-hook 'lsp))
+#+END_SRC
+
+*** Javascript
+#+BEGIN_SRC emacs-lisp
+  (use-package js2-mode
+    :mode "\\.js$"
+    :hook (js2-mode . lsp)
+    :interpreter "node"
+    :ensure-system-package ((typescript-language-server . "npm i -g typescript-language-server")
+			    (eslint_d . "npm i -g eslint_d"))
+    :custom
+    ;; set the indent level to 2
+    (js2-basic-offset 2)
+    (js-chain-indent t)
+    (js-indent-level 2)
+    ;; use eslint_d instead of eslint for faster linting
+    (flycheck-javascript-eslint-executable "eslint_d"))
+
+  (use-package json-mode
+    :mode "\\.json\\'")
+#+END_SRC
+
+*** Python
+#+BEGIN_SRC emacs-lisp
+  (use-package python
+    :mode "\\.py\\'"
+    :ghook
+    ('python-mode-hook #'lsp)
+    :general
+    (my-local-leader-def 'python-mode-map
+      "er" 'python-shell-send-region
+      "eb" 'python-shell-send-buffer
+      "ef" 'python-shell-send-file
+      "es" 'python-shell-send-string))
+
+  (use-package pipenv
+    :hook ((python-mode . pipenv-mode)
+	   (hy-mode . pipenv-mode))
+    :init
+    (setq pipenv-projectile-after-switch-function #'pipenv-projectile-after-switch-extended))
 #+END_SRC
