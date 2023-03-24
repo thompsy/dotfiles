@@ -119,15 +119,17 @@ Install ~use-package~ for easily installing other packages.
   (straight-use-package 'use-package)
 #+END_SRC
 
-Diminish hides or abbreviates the mode line displays of minor-modes. It basically de-clutters the
-mode line.
+I don't want to use the built-in version of org-mode since it's usually pretty old. Instead I want
+straight to pull down the latest version. To avoid the built-in version getting loaded we need to
+explicitly load it with straight early in the init process. See more details in the [[https://github.com/radian-software/straight.el#the-wrong-version-of-my-package-was-loaded][README.md]].
 #+BEGIN_SRC emacs-lisp
-  (use-package diminish)
+  (straight-use-package 'org)
 #+END_SRC
 
-TODO: I actually only call this once, so I can probably get rid of it.
+Diminish hides or abbreviates the mode line displays of minor-modes. It basically de-clutters the
+mode line, keeping things minimal and focused.
 #+BEGIN_SRC emacs-lisp
-  (use-package bind-key)
+  (use-package diminish)
 #+END_SRC
 
 TODO: check if I can get rid of this.
@@ -138,11 +140,6 @@ TODO: check if I can get rid of this.
     :straight (:host github :repo "emacs-compat/compat"))
 #+END_SRC
 
-#+BEGIN_SRC emacs-lisp
-  ;; TODO not sure why this appears so early in the file. It probably needs to before I reference
-  ;; anything else related to org. It would be good to test and see if this is still needed.
-  (straight-use-package 'org)
-#+END_SRC
 
 The [[https://github.com/emacsmirror/gcmh][~gcmh~]] (Garbage Collector Magic Hack) package updates Emacs's GC strategy to minimise interference
 with user activity.
@@ -1662,10 +1659,6 @@ TODO: straight should be t here
 	(append (if (consp backend) backend (list backend))
 		'(:with company-yasnippet))))
     (setq company-backends (mapcar #'company-mode/backend-with-yas company-backends))
-
-    ;; Use C-/ to manually start company mode at point. C-/ is used by undo-tree.
-    ;; Override all minor modes that use C-/; bind-key* is discussed below.
-    (bind-key* "C-/" #'company-manual-begin)
 
     ;; Bindings when the company list is active.
     :general
