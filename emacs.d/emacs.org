@@ -132,15 +132,6 @@ mode line, keeping things minimal and focused.
   (use-package diminish)
 #+END_SRC
 
-TODO: check if I can get rid of this.
-#+BEGIN_SRC emacs-lisp
-  ;; I needed to install this at some point due to an issue with Magit. I'm not sure if I need it
-  ;; anymore.
-  ;;(use-package compat
-  ;;  :straight (:host github :repo "emacs-compat/compat"))
-#+END_SRC
-
-
 The [[https://github.com/emacsmirror/gcmh][~gcmh~]] (Garbage Collector Magic Hack) package updates Emacs's GC strategy to minimise interference
 with user activity.
 #+BEGIN_SRC emacs-lisp
