@@ -1146,18 +1146,6 @@ startup time without leaving emacs.
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-  (use-package treemacs
-    :defer t
-    :general ([f8] 'treemacs))
-
-  (use-package treemacs-projectile
-    :after (projectile treemacs))
-
-  (use-package treemacs-magit
-    :after (treemacs))
-#+END_SRC
-
-#+BEGIN_SRC emacs-lisp
   (defun my-org-prettify-hook ()
     (turn-on-visual-line-mode))
 
@@ -1790,8 +1778,6 @@ Nice icons for company-mode. These are the Doom Emacs defaults, taken from: http
   (use-package helm-lsp
     :commands (helm-lsp-workspace-symbol))
 
-  (use-package lsp-treemacs
-    :commands lsp-treemacs-errors-list)
   (use-package dap-mode)
 #+END_SRC
 
