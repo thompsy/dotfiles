@@ -1191,8 +1191,6 @@ TODO: commentary
     :keymaps 'org-agenda-mode-map
     "." 'hydra-org-agenda/body)
 
-  (use-package org-pomodoro)
-
   (use-package org-journal
     :defer t
     :config
