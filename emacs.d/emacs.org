@@ -292,47 +292,6 @@ Map some keys on MacOS.
     (set-fontset-font t 'symbol (font-spec :family "Apple Color Emoji") nil 'prepend))
 #+END_SRC
 
-** Editing
-
-[[https://github.com/bbatsov/crux][~crux~]] has a bunch of handy editing features that originated in Prelude Emacs.
-#+BEGIN_SRC emacs-lisp
-  (use-package crux
-    :general
-    ;; First kill to end of line, then kill the whole then.
-    ("C-k" 'crux-smart-kill-line))
-#+END_SRC
-
-
-
-This snippet provides smarter moving to the beginning of the line.
-Copied from [[https://emacsredux.com/blog/2013/05/22/smarter-navigation-to-the-beginning-of-a-line/]].
-#+BEGIN_SRC emacs-lisp
-  (defun smarter-move-beginning-of-line (arg)
-    "Move point back to indentation of beginning of line.
-
-    Move point to the first non-whitespace character on this line.
-    If point is already there, move to the beginning of the line.
-    Effectively toggle between the first non-whitespace character and
-    the beginning of the line.
-
-    If ARG is not nil or 1, move forward ARG - 1 lines first.  If
-    point reaches the beginning or end of the buffer, stop there."
-    (interactive "^p")
-    (setq arg (or arg 1))
-
-    ;; Move lines first
-    (when (/= arg 1)
-      (let ((line-move-visual nil))
-        (forward-line (1- arg))))
-
-    (let ((orig-point (point)))
-      (back-to-indentation)
-      (when (= orig-point (point))
-        (move-beginning-of-line 1))))
-
-  ;; remap C-a to `smarter-move-beginning-of-line'
-  (general-define-key "C-a" 'smarter-move-beginning-of-line)
-#+END_SRC
 ** Aesthetics
 
 Turn off a bunch of frame related functionality for a more minimal experience.
@@ -1664,126 +1623,9 @@ TODO: commentary
 
 
 
-TODO: commentary
-#+BEGIN_SRC emacs-lisp
-  (which-key-add-major-mode-key-based-replacements 'clojure-mode "C-c e" "eval")
-  (which-key-add-major-mode-key-based-replacements 'emacs-lisp-mode "C-c e" "eval")
-  (which-key-add-major-mode-key-based-replacements 'hy-mode "C-c e" "eval")
-  (which-key-add-major-mode-key-based-replacements 'lisp-interaction-mode "C-c e" "eval")
-  (which-key-add-major-mode-key-based-replacements 'scheme-mode "C-c e" "eval")
-#+END_SRC
-
-TODO: commentary
-#+BEGIN_SRC emacs-lisp
-  (defconst my-lisp-mode-hooks
-    '(lisp-mode-hook
-      sly-mrepl-mode-hook
-      emacs-lisp-mode-hook
-      scheme-mode-hook
-      geiser-repl-mode-hook
-      hy-mode-hook
-      inferior-hy-mode-hook
-      clojure-mode-hook
-      cider-repl-mode-hook))
-
-  (defun my-lisp-setup ()
-    (electric-pair-mode -1))
-
-  ;; (use-package paredit
-  ;;   :straight nil
-  ;;   :defer t
-  ;;   :ghook my-lisp-mode-hooks
-  ;;   :gfhook #'my-lisp-setup)
-
-  (my-leader-def
-    :keymaps 'emacs-lisp-mode-map
-    "eb" 'eval-buffer
-    "el" 'eval-last-sexp
-    "ed" 'eval-defun
-    "er" 'eval-region)
-
-  (my-leader-def
-    :keymaps 'lisp-interaction-mode-map
-    "eb" 'eval-buffer
-    "el" 'eval-last-sexp
-    "ed" 'eval-defun
-    "er" 'eval-region)
-
-  (add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
-  (add-hook 'lisp-interaction-mode-hook 'turn-on-eldoc-mode)
-  (add-hook 'ielm-mode-hook 'turn-on-eldoc-mode)
 
 
-  (use-package sly
-    :defer t
-    :hook (sly-mrepl-mode . rainbow-delimiters-mode)
-    :general
-    (my-local-leader-def
-      :keymaps 'lisp-mode-map
-      "eb" 'sly-eval-buffer
-      "el" 'sly-eval-last-expression
-      "ed" 'sly-eval-defun
-      "er" 'sly-eval-region)
-    :config
-    (setq inferior-lisp-program "/usr/bin/sbcl"))
-
-  (use-package sly-quicklisp
-    :after sly)
-
-  (use-package sly-asdf
-    :after sly)
-
-  (use-package hy-mode
-    :mode "\\.hy\\'"
-    :general
-    (my-local-leader-def 'hy-mode-map
-      "er" 'hy-shell-eval-region
-      "eb" 'hy-shell-eval-buffer
-      "el" 'hy-shell-eval-last-sexp
-      "ed" 'hy-shell-eval-current-form))
-#+END_SRC
-
-TODO: this is a scheme mode. I don't really use it much.
-#+BEGIN_SRC emacs-lisp
-  (use-package geiser
-    :defer t
-    :general
-    (my-local-leader-def
-      :keymaps 'scheme-mode-map
-      "r" 'run-geiser
-      "er" 'geiser-eval-region
-      "eR" 'geiser-eval-region-and-go
-      "eb" 'geiser-eval-buffer
-      "eB" 'geiser-eval-buffer-and-go
-      "ed" 'geiser-eval-definition
-      "eD" 'geiser-eval-definition-and-go
-      "el" 'geiser-eval-eval-sexp)
-    :custom
-    (geiser-active-implementations '(guile mit racket)))
-#+END_SRC
-
-TODO: commentary
-#+BEGIN_SRC emacs-lisp
-  (use-package web-mode
-    :defer t
-    :preface
-    (defun my-web-mode-hook ()
-      ;; set the html indent to 2
-      (setq web-mode-markup-indent-offset 2)
-      ;; highlight matching elements in html
-      (setq web-mode-enable-current-element-highlight 1))
-    :hook (web-mode . my-web-mode-hook)
-    :init
-    (add-hook 'web-mode-before-auto-complete-hooks
-              '(lambda ()
-                 (let ((web-mode-cur-language
-                        (web-mode-language-at-pos))))))
-    (add-to-list `auto-mode-alist '("\\.html?\\'" . web-mode))
-    (add-to-list `auto-mode-alist '("\\.css\\'" . web-mode)))
-#+END_SRC
-
-
-TODO: commentary
+This is just a little function to open today's journal file.
 #+BEGIN_SRC emacs-lisp
   (defun my/today ()
     "Create Org file from skeleton with current time as name."
@@ -1950,6 +1792,26 @@ TODO see how ~ensure-system-package~ works on windows.
     :mode "\\.json\\'")
 #+END_SRC
 
+[[https://web-mode.org/][~web-mode~]] is a package for editing HTML.
+#+BEGIN_SRC emacs-lisp
+  (use-package web-mode
+    :defer t
+    :preface
+    (defun my-web-mode-hook ()
+      ;; set the html indent to 2
+      (setq web-mode-markup-indent-offset 2)
+      ;; highlight matching elements in html
+      (setq web-mode-enable-current-element-highlight 1))
+    :hook (web-mode . my-web-mode-hook)
+    :init
+    (add-hook 'web-mode-before-auto-complete-hooks
+              '(lambda ()
+                 (let ((web-mode-cur-language
+                        (web-mode-language-at-pos))))))
+    (add-to-list `auto-mode-alist '("\\.html?\\'" . web-mode))
+    (add-to-list `auto-mode-alist '("\\.css\\'" . web-mode)))
+#+END_SRC
+
 *** Python
 #+BEGIN_SRC emacs-lisp
   (use-package python
@@ -2028,6 +1890,99 @@ editing Dockerfiles.
 
   (use-package docker
     :defer t)
+#+END_SRC
+
+*** Lisp
+There's a bunch of Lispy stuff here that I don't use much. I should consider getting rid of it in
+due course. Or I should consider writing more lisp...
+#+BEGIN_SRC emacs-lisp
+  (which-key-add-major-mode-key-based-replacements 'clojure-mode "C-c e" "eval")
+  (which-key-add-major-mode-key-based-replacements 'emacs-lisp-mode "C-c e" "eval")
+  (which-key-add-major-mode-key-based-replacements 'hy-mode "C-c e" "eval")
+  (which-key-add-major-mode-key-based-replacements 'lisp-interaction-mode "C-c e" "eval")
+  (which-key-add-major-mode-key-based-replacements 'scheme-mode "C-c e" "eval")
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+  (defconst my-lisp-mode-hooks
+    '(lisp-mode-hook
+      sly-mrepl-mode-hook
+      emacs-lisp-mode-hook
+      scheme-mode-hook
+      geiser-repl-mode-hook
+      hy-mode-hook
+      inferior-hy-mode-hook
+      clojure-mode-hook
+      cider-repl-mode-hook))
+
+  (defun my-lisp-setup ()
+    (electric-pair-mode -1))
+
+  (my-leader-def
+    :keymaps 'emacs-lisp-mode-map
+    "eb" 'eval-buffer
+    "el" 'eval-last-sexp
+    "ed" 'eval-defun
+    "er" 'eval-region)
+
+  (my-leader-def
+    :keymaps 'lisp-interaction-mode-map
+    "eb" 'eval-buffer
+    "el" 'eval-last-sexp
+    "ed" 'eval-defun
+    "er" 'eval-region)
+
+  (add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
+  (add-hook 'lisp-interaction-mode-hook 'turn-on-eldoc-mode)
+  (add-hook 'ielm-mode-hook 'turn-on-eldoc-mode)
+
+
+  (use-package sly
+    :defer t
+    :hook (sly-mrepl-mode . rainbow-delimiters-mode)
+    :general
+    (my-local-leader-def
+      :keymaps 'lisp-mode-map
+      "eb" 'sly-eval-buffer
+      "el" 'sly-eval-last-expression
+      "ed" 'sly-eval-defun
+      "er" 'sly-eval-region)
+    :config
+    (setq inferior-lisp-program "/usr/bin/sbcl"))
+
+  (use-package sly-quicklisp
+    :after sly)
+
+  (use-package sly-asdf
+    :after sly)
+
+  (use-package hy-mode
+    :mode "\\.hy\\'"
+    :general
+    (my-local-leader-def 'hy-mode-map
+      "er" 'hy-shell-eval-region
+      "eb" 'hy-shell-eval-buffer
+      "el" 'hy-shell-eval-last-sexp
+      "ed" 'hy-shell-eval-current-form))
+#+END_SRC
+
+This is a scheme mode. I don't really use it much.
+#+BEGIN_SRC emacs-lisp
+  (use-package geiser
+    :defer t
+    :general
+    (my-local-leader-def
+      :keymaps 'scheme-mode-map
+      "r" 'run-geiser
+      "er" 'geiser-eval-region
+      "eR" 'geiser-eval-region-and-go
+      "eb" 'geiser-eval-buffer
+      "eB" 'geiser-eval-buffer-and-go
+      "ed" 'geiser-eval-definition
+      "eD" 'geiser-eval-definition-and-go
+      "el" 'geiser-eval-eval-sexp)
+    :custom
+    (geiser-active-implementations '(guile mit racket)))
 #+END_SRC
 
 ** Navigation
