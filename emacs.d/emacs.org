@@ -30,8 +30,6 @@ available. A few places that I've found particularly useful include:
 - explore prescient.el to sort company-mode suggestions
 - try crux, it has some useful looking things
 - try other modelines in due course
-- experiment with C-t as the leader key
-- setup hydra for bookmarks, using helm
 - have all hydras use q for quit
 - use ~:after~ to specify any dependencies
 * Emacs
