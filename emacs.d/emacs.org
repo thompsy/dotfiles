@@ -609,22 +609,22 @@ TODO: move this down to the programming section
 
 TODO: there's probably more useful options here I could explore
 #+BEGIN_SRC emacs-lisp
-    (use-package helm-swoop
-      :config
-      (setq
-       ;; show syntax highlighting in swoop minibuffer
-       helm-swoop-speed-or-color t
-       ;; don't pre-populate the swoop minibuffer with the symbol at the point
-       helm-swoop-pre-input-function (lambda () "")
-       helm-swoop-use-fuzzy-matching t)
-      :general
-      ("C-s"   'helm-swoop)
-      ("C-M-s" 'helm-multi-swoop-all)
-      ("C-S-s" 'helm-swoop-back-to-last-point)
-      ;; keep C-w mapped to backward-kill-word even when swooping
-      (helm-swoop-map "C-w" 'backward-kill-word)
-      :custom
-      (helm-swoop-split-with-multiple-windows t "Do not split window inside the current window."))
+  (use-package helm-swoop
+    :config
+    (setq
+     ;; show syntax highlighting in swoop minibuffer
+     helm-swoop-speed-or-color t
+     ;; don't pre-populate the swoop minibuffer with the symbol at the point
+     ;;helm-swoop-pre-input-function (lambda () "")
+     helm-swoop-use-fuzzy-matching t)
+    :general
+    ("C-s"   'helm-swoop)
+    ("C-M-s" 'helm-multi-swoop-all)
+    ("C-S-s" 'helm-swoop-back-to-last-point)
+    ;; keep C-w mapped to backward-kill-word even when swooping
+    (helm-swoop-map "C-w" 'backward-kill-word)
+    :custom
+    (helm-swoop-split-with-multiple-windows t "Do not split window inside the current window."))
 #+END_SRC
 
 [[https://elpa.gnu.org/packages/undo-tree.html][~undo-tree~]] gives a nice undo visualisation.
