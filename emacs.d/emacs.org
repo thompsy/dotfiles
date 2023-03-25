@@ -1111,7 +1111,7 @@ TODO: commentary
 
   (defhydra hydra-org-agenda (:pre (setq which-key-inhibit t)
 				   :post (setq which-key-inhibit nil)
-				   :hint none)
+				   :hint nil)
     "
   Org agenda (_q_uit)
 
@@ -1520,7 +1520,8 @@ TODO: commentary
       "glg" 'browse-at-remote))
 
   (defhydra hydra-my-git-menu (global-map "<f7>"
-					  :color blue)
+					  :color blue
+					  :hint nil)
     "
   ^Navigate^        ^Action^               ^Info^
   ^^^^^^^^^^^^---------------------------------------------------
