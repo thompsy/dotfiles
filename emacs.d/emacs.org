@@ -358,15 +358,16 @@ global leader key, ~my-leader-def~ and chain bindings from that.
     ;; Make general's keybindings take precedence over keys bound to other minor mode keymaps.
     (general-override-mode)
 
+    ;; We need to call this so that we can allocate C-t as a prefix key. See
+    ;; https://github.com/noctuid/general.el#automatic-key-unbinding for details.
+    (general-auto-unbind-keys)
     ;; Create a definer where most of my commands will live under
     (general-create-definer my-leader-def
-      :prefix "C-c")
-
+      :prefix "C-t")
     ;; Setup some initial bindings.
     ;; TODO some of these should probably live elsewhere
     (my-leader-def
       "a" 'org-agenda
-      "c" 'comment-dwim
       "RET" 'make-frame-command
       ;; bookmarks - TODO setup a Hydra for this
       "b" '(:ignore t :wk "bookmarks")
