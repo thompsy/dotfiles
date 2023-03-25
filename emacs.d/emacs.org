@@ -29,6 +29,10 @@ available. A few places that I've found particularly useful include:
   - see https://github.com/jwiegley/use-package#use-package-ensure-system-package
 - explore prescient.el to sort company-mode suggestions
 - try crux, it has some useful looking things
+- try other modelines in due course
+- experiment with C-t as the leader key
+- setup hydra for bookmarks, using helm
+- setup hydra for registers, using helm
 * Emacs
 ** Local
 These are various, installation specific settings that might differ across machines, some of which I
@@ -133,6 +137,7 @@ explicitly load it with straight early in the init process. See more details in 
   (straight-use-package 'org)
 #+END_SRC
 
+** Basic Configuration
 Diminish hides or abbreviates the mode line displays of minor-modes. It basically de-clutters the
 mode line, keeping things minimal and focused.
 #+BEGIN_SRC emacs-lisp
@@ -207,7 +212,7 @@ Use UTF-8 everywhere.
     (set-selection-coding-system 'utf-8-unix))
 #+END_SRC
 
-TODO: commentary
+Setup some basic file hygiene. Keep some backup files around, but keep them out of sight.
 #+BEGIN_SRC emacs-lisp
   (use-package files
     :straight nil
@@ -224,7 +229,7 @@ TODO: commentary
      recentf-max-saved-items 500))
 #+END_SRC
 
-TODO: commentary
+Use the system keyboard when killing and yanking.
 #+BEGIN_SRC emacs-lisp
   (use-package simple
     :straight nil
@@ -233,7 +238,8 @@ TODO: commentary
     (save-interprogram-paste-before-kill t))
 #+END_SRC
 
-~so-long~ is a built-in mode which deals with very long lines, like those in minified Javascript for example.
+~so-long~ is a built-in mode which deals with very long lines, like those in minified Javascript for
+example.
 #+BEGIN_SRC emacs-lisp
   (use-package so-long
     :straight nil
@@ -241,8 +247,8 @@ TODO: commentary
     (global-so-long-mode +1))
 #+END_SRC
 
-[[https://github.com/emacs-mirror/emacs/blob/master/lisp/saveplace.el][~saveplace~]] jumps back to the last when later visiting a file. This is handy to pick up where you
-left off.
+[[https://github.com/emacs-mirror/emacs/blob/master/lisp/saveplace.el][~saveplace~]] jumps back to
+the last when later visiting a file. This is handy to pick up where you left off.
 #+BEGIN_SRC emacs-lisp
   (use-package saveplace
     :straight nil
@@ -250,8 +256,8 @@ left off.
     (save-place-mode +1))
 #+END_SRC
 
-[[https://github.com/emacscollective/no-littering][~no-littering~]] keeps configuration files and other persistent data under ~user-emacs-directory~ rather
-than spamming them in inconsistent places.
+[[https://github.com/emacscollective/no-littering][~no-littering~]] keeps configuration files and
+other persistent data under ~user-emacs-directory~ rather than spamming them in inconsistent places.
 #+BEGIN_SRC emacs-lisp
   (use-package no-littering
     :init
@@ -273,8 +279,9 @@ to any themes so that they confirmation code gets stored in ~custom.el~.
         (load-file custom-file)))
 #+END_SRC
 
-*** Asthetics
-TODO: commentary
+** Aesthetics
+
+Turn off a bunch of frame related functionality for a more minimal experience.
 #+BEGIN_SRC emacs-lisp
   (use-package frame
     :straight nil
@@ -310,8 +317,6 @@ available to Emacs.
     :defer t)
 #+END_SRC
 
-TODO explore other mode-lines
-
 [[https://github.com/seagle0128/doom-modeline][~doom-modeline~]] is a fancy, fast and minimal mode-line.
 #+BEGIN_SRC emacs-lisp
   (use-package doom-modeline
@@ -330,12 +335,10 @@ TODO explore other mode-lines
     (doom-modeline-buffer-file-name-style 'truncate-upto-project))
 #+END_SRC
 
-*** Keybindings
-[[https://github.com/noctuid/general.el][~general.el~]] provides a convenient method for binding keys. It also integrates well with
-~use-package~.
-
-In particular, this allows us to easily setup a global leader key, ~my-leader-def~ and chain bindings
-from that.
+** Keybindings
+[[https://github.com/noctuid/general.el][~general.el~]] provides a convenient method for binding
+keys. It also integrates well with ~use-package~. In particular, this allows us to easily setup a
+global leader key, ~my-leader-def~ and chain bindings from that.
 #+BEGIN_SRC emacs-lisp
   (use-package general
     :demand t
@@ -349,8 +352,7 @@ from that.
      "C-x C-b" 'ibuffer
      "M-s" 'highlight-symbol-at-point
      "M-c" 'hi-lock-mode
-     "M-z" 'pop-global-mark
-     )
+     "M-z" 'pop-global-mark)
 
     ;; Make general's keybindings take precedence over keys bound to other minor mode keymaps.
     (general-override-mode)
@@ -402,9 +404,8 @@ improvement on this by popping up in a floating window. I'll try it for a while 
     (setq which-key-posframe-poshandler 'posframe-poshandler-point-bottom-left-corner))
 #+END_SRC
 
-[[https://github.com/abo-abo/hydra][~hydra~]]
-
-Note that ~:wk~ allows us to specify the text that is displayed by ~which-key~ for this hydra.
+[[https://github.com/abo-abo/hydra][~hydra~]] allows us to specify related keybindings together in a
+neat way. Note that ~:wk~ allows us to specify the text that is displayed by ~which-key~ for this hydra.
 #+BEGIN_SRC emacs-lisp
   (use-package hydra
     :defer t)
@@ -414,14 +415,13 @@ Note that ~:wk~ allows us to specify the text that is displayed by ~which-key~ f
     :ensure t)
 #+END_SRC
 
+This is a simple hydra to scale the font of the current buffer.
 
-TODO: commentary
-
-This is a simple hydra to scale the font of the current buffer. In future it would be good to
-improve this to apply the changes to the current frame so that the changes took affect in all
-buffers in that frame.
-
-There seem to be a few existing options to do this according to this [[https://stackoverflow.com/questions/24705984/increase-decrease-font-size-in-an-emacs-frame-not-just-buffer][stackoverflow question]].
+TODO: In future it would be good to improve this to apply the changes to the current frame so that
+the changes took affect in all buffers in that frame. There seem to be a few existing options to do
+this according to this
+[[https://stackoverflow.com/questions/24705984/increase-decrease-font-size-in-an-emacs-frame-not-just-buffer][stackoverflow
+question]].
 #+BEGIN_SRC emacs-lisp
   ;; Add an easy zoom function
   (my-leader-def "z" '(hydra-zoom/body :wk "zoom"))
@@ -432,7 +432,7 @@ There seem to be a few existing options to do this according to this [[https://s
       ("0" (text-scale-set 0) :bind nil :exit t))
 #+END_SRC
 
-TODO: commentary
+This is a basic movement hydra.
 #+BEGIN_SRC emacs-lisp
   (general-define-key "C-n" 'hydra-move/body)
   (defhydra hydra-move
@@ -452,7 +452,11 @@ TODO: commentary
     (">" end-of-buffer))
 #+END_SRC
 
-TODO: commentary
+This is a hydra for working with the ~rectangle~ commands.
+
+TODO: I should understand how this works better.
+
+TODO: helm-mini should create buffer before bookmark.
 #+BEGIN_SRC emacs-lisp
   (my-leader-def "R" '(hydra-rectangle/body :wk "rectangle"))
   (defhydra hydra-rectangle (:body-pre (rectangle-mark-mode 1)
@@ -916,6 +920,7 @@ TODO: commentary
     (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
     (add-to-list 'org-structure-template-alist '("sh" . "src sh")))
 
+  ;; todo this shuold be part of the org setup
   (defhydra hydra-org-template (:color blue :hint nil)
     "
    _c_enter  _q_uote     _e_macs-lisp    _L_aTeX:
@@ -1603,28 +1608,9 @@ TODO: commentary
 #+END_SRC
 
 
-TODO: commentary
-#+BEGIN_SRC emacs-lisp
-  (use-package dockerfile-mode
-    :defer t)
-
-  (use-package docker
-    :defer t)
-
-  (use-package kubernetes
-    :commands (kubernetes-overview))
-#+END_SRC
 
 TODO: commentary
 #+BEGIN_SRC emacs-lisp
-  (use-package skewer-mode
-    :defer t
-    :ghook ('js2-mode-hook)
-    :general
-    (my-local-leader-def 'js2-mode-map
-      "eb" 'skewer-eval-defun
-      "el" 'skewer-eval-last-expression))
-
   (which-key-add-major-mode-key-based-replacements 'clojure-mode "C-c e" "eval")
   (which-key-add-major-mode-key-based-replacements 'emacs-lisp-mode "C-c e" "eval")
   (which-key-add-major-mode-key-based-replacements 'hy-mode "C-c e" "eval")
@@ -1940,7 +1926,6 @@ Go.
     (add-hook 'before-save-hook 'gofmt-before-save))
 #+END_SRC
 
-
 *** Java
 Commenting this for now since its a real slow loader.  TODO possible candidate for ~:defer~?
 #+BEGIN_SRC emacs-lisp
@@ -1998,7 +1983,6 @@ TODO see how ~ensure-system-package~ works on windows.
 #+END_SRC
 
 *** Angular
-
 #+BEGIN_SRC emacs-lisp
 (use-package ng2-mode)
 #+END_SRC
@@ -2009,9 +1993,22 @@ TODO see how ~ensure-system-package~ works on windows.
 #+END_SRC
 
 
-
 #+BEGIN_SRC emacs-lisp
 (use-package dap-mode)
+#+END_SRC
+
+*** Docker
+[[https://github.com/spotify/dockerfile-mode][~dockerfile-mode~]] provides some conveniences for
+editing Dockerfiles.
+
+[[https://github.com/Silex/docker.el][~docker.el~]] allows Docker to be managed from within Emacs.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package dockerfile-mode
+    :defer t)
+
+  (use-package docker
+    :defer t)
 #+END_SRC
 
 ** Navigation
