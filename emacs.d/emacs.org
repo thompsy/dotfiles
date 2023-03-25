@@ -38,7 +38,7 @@ don't want to commit to Git.
   (provide 'local-setup)
 
   (setq user-full-name "Andrew Thompson"
-	user-mail-address "github@downthewire.co.uk")
+        user-mail-address "github@downthewire.co.uk")
 
   (defconst my/org-dir
     "~/notebook/")
@@ -84,15 +84,15 @@ Setup the [[https://github.com/radian-software/straight.el][~straight.el~]] pack
 
   (defvar bootstrap-version)
   (let ((bootstrap-file
-	 (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-	(bootstrap-version 5))
+         (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+        (bootstrap-version 5))
     (unless (file-exists-p bootstrap-file)
       (with-current-buffer
-	  (url-retrieve-synchronously
-	   "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-	   'silent 'inhibit-cookies)
-	(goto-char (point-max))
-	(eval-print-last-sexp)))
+          (url-retrieve-synchronously
+           "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+           'silent 'inhibit-cookies)
+        (goto-char (point-max))
+        (eval-print-last-sexp)))
     (load bootstrap-file nil 'nomessage))
 #+END_SRC
 
@@ -117,7 +117,7 @@ you explicitly override it with :straight nil.
 #+END_QUOTE
 
 #+BEGIN_SRC emacs-lisp
-  (setq	straight-use-package-by-default t)
+  (setq straight-use-package-by-default t)
 #+END_SRC
 
 Install ~use-package~ for easily installing other packages.
@@ -171,10 +171,11 @@ we include ~:straight nil~ so that our package manager doesn't try to fetch the 
     (defalias 'yes-or-no-p 'y-or-n-p)
     :config
     (setq indent-tabs-mode nil
-	  tab-width 4
-	  show-trailing-whitespace t
-	  fill-column 100)
-    (setq-default fill-column 100)
+          tab-width 4
+          show-trailing-whitespace t
+          fill-column 100)
+    (setq-default indent-tabs-mode nil
+                  fill-column 100)
     :custom
     ;; load new source files instead of stale elisp bytecode
     (load-prefer-newer t)
@@ -255,9 +256,9 @@ than spamming them in inconsistent places.
   (use-package no-littering
     :init
     (setq no-littering-etc-directory
-	  (expand-file-name "etc/" user-emacs-directory))
+          (expand-file-name "etc/" user-emacs-directory))
     (setq no-littering-var-directory
-	  (expand-file-name "var/" user-emacs-directory)))
+          (expand-file-name "var/" user-emacs-directory)))
 #+END_SRC
 
 Use a separate custom file to remove auto-generated code from ~init.el~. This should be loaded prior
@@ -269,7 +270,7 @@ to any themes so that they confirmation code gets stored in ~custom.el~.
     (custom-file (expand-file-name "custom.el" user-emacs-directory))
     :config
     (if (file-exists-p custom-file)
-	(load-file custom-file)))
+        (load-file custom-file)))
 #+END_SRC
 
 *** Asthetics
@@ -280,12 +281,12 @@ TODO: commentary
     :config
     (blink-cursor-mode -1)
     (setq initial-scratch-message ""
-	  inhibit-startup-message t
-	  visible-bell nil
-	  ring-bell-function 'ignore
-	  initial-frame-alist
-	  '((menu-bar-lines . 0)
-	    (tool-bar-lines . 0)))
+          inhibit-startup-message t
+          visible-bell nil
+          ring-bell-function 'ignore
+          initial-frame-alist
+          '((menu-bar-lines . 0)
+            (tool-bar-lines . 0)))
     (scroll-bar-mode 0)
     (tool-bar-mode 0)
     (menu-bar-mode 0)
@@ -451,65 +452,65 @@ TODO: commentary
 #+BEGIN_SRC emacs-lisp
   (my-leader-def "R" '(hydra-rectangle/body :wk "rectangle"))
   (defhydra hydra-rectangle (:body-pre (rectangle-mark-mode 1)
-				       :color pink
-				       :hint nil
-				       :post (deactivate-mark))
-	 "
+                                       :color pink
+                                       :hint nil
+                                       :post (deactivate-mark))
+         "
       ^_i_^       _w_ copy      _O_pen       _N_umber-lines
     _n_   _o_     _y_ank        _t_ype       _E_xchange-point
       ^_e_^       _d_ kill      _c_lear      _r_eset-region-mark
     ^^^^          _u_ndo        _g_ quit     ^ ^
     "
-	 ("i" rectangle-previous-line)
-	 ("e" rectangle-next-line)
-	 ("n" rectangle-backward-char)
-	 ("o" rectangle-forward-char)
-	 ("d" kill-rectangle)                    ;; C-x r k
-	 ("y" yank-rectangle)                    ;; C-x r y
-	 ("w" copy-rectangle-as-kill)            ;; C-x r M-w
-	 ("O" open-rectangle)                    ;; C-x r o
-	 ("t" string-rectangle)                  ;; C-x r t
-	 ("c" clear-rectangle)                   ;; C-x r c
-	 ("E" rectangle-exchange-point-and-mark) ;; C-x C-x
-	 ("N" rectangle-number-lines)            ;; C-x r N
-	 ("r" (if (region-active-p)
-		  (deactivate-mark)
-		(rectangle-mark-mode 1)))
-	 ("u" undo nil)
-	 ("g" nil))
+         ("i" rectangle-previous-line)
+         ("e" rectangle-next-line)
+         ("n" rectangle-backward-char)
+         ("o" rectangle-forward-char)
+         ("d" kill-rectangle)                    ;; C-x r k
+         ("y" yank-rectangle)                    ;; C-x r y
+         ("w" copy-rectangle-as-kill)            ;; C-x r M-w
+         ("O" open-rectangle)                    ;; C-x r o
+         ("t" string-rectangle)                  ;; C-x r t
+         ("c" clear-rectangle)                   ;; C-x r c
+         ("E" rectangle-exchange-point-and-mark) ;; C-x C-x
+         ("N" rectangle-number-lines)            ;; C-x r N
+         ("r" (if (region-active-p)
+                  (deactivate-mark)
+                (rectangle-mark-mode 1)))
+         ("u" undo nil)
+         ("g" nil))
 #+END_SRC
 
 TODO: commentary
 #+BEGIN_SRC emacs-lisp
   (my-leader-def "s" '(hydra-straight-helper/body :wk "pkgs"))
   (defhydra hydra-straight-helper (:hint nil :color green)
-	 "
-	_c_heck all       |_f_etch all     |_m_erge all      |_n_ormalize all   |p_u_sh all
-	_C_heck package   |_F_etch package |_M_erge package  |_N_ormlize package|p_U_sh package
-	----------------^^+--------------^^+---------------^^+----------------^^+------------||_q_uit||
-	_r_ebuild all     |_p_ull all      |_v_ersions freeze|_w_atcher start   |_g_et recipe
-	_R_ebuild package |_P_ull package  |_V_ersions thaw  |_W_atcher quit    |prun_e_ build"
-	 ("c" straight-check-all)
-	 ("C" straight-check-package)
-	 ("r" straight-rebuild-all)
-	 ("R" straight-rebuild-package)
-	 ("f" straight-fetch-all)
-	 ("F" straight-fetch-package)
-	 ("p" straight-pull-all)
-	 ("P" straight-pull-package)
-	 ("m" straight-merge-all)
-	 ("M" straight-merge-package)
-	 ("n" straight-normalize-all)
-	 ("N" straight-normalize-package)
-	 ("u" straight-push-all)
-	 ("U" straight-push-package)
-	 ("v" straight-freeze-versions)
-	 ("V" straight-thaw-versions)
-	 ("w" straight-watcher-start)
-	 ("W" straight-watcher-quit)
-	 ("g" straight-get-recipe)
-	 ("e" straight-prune-build)
-	 ("q" nil))
+         "
+        _c_heck all       |_f_etch all     |_m_erge all      |_n_ormalize all   |p_u_sh all
+        _C_heck package   |_F_etch package |_M_erge package  |_N_ormlize package|p_U_sh package
+        ----------------^^+--------------^^+---------------^^+----------------^^+------------||_q_uit||
+        _r_ebuild all     |_p_ull all      |_v_ersions freeze|_w_atcher start   |_g_et recipe
+        _R_ebuild package |_P_ull package  |_V_ersions thaw  |_W_atcher quit    |prun_e_ build"
+         ("c" straight-check-all)
+         ("C" straight-check-package)
+         ("r" straight-rebuild-all)
+         ("R" straight-rebuild-package)
+         ("f" straight-fetch-all)
+         ("F" straight-fetch-package)
+         ("p" straight-pull-all)
+         ("P" straight-pull-package)
+         ("m" straight-merge-all)
+         ("M" straight-merge-package)
+         ("n" straight-normalize-all)
+         ("N" straight-normalize-package)
+         ("u" straight-push-all)
+         ("U" straight-push-package)
+         ("v" straight-freeze-versions)
+         ("V" straight-thaw-versions)
+         ("w" straight-watcher-start)
+         ("W" straight-watcher-quit)
+         ("g" straight-get-recipe)
+         ("e" straight-prune-build)
+         ("q" nil))
 #+END_SRC
 
 TODO: commentary
@@ -521,11 +522,11 @@ TODO: commentary
   (my-leader-def "u" '(hydra-unicode/body :wk "unicode"))
   (defhydra hydra-unicode (:hint nil)
     "
-	  Unicode  _e_ €  _g_ £
-		   _f_ ♀  _r_ ♂
-		   _o_ °  _m_ µ  _z_ ë  _Z_ Ë
-		   _n_ ←  _e_ ↓  _i_ ↑  _o_ →
-	  "
+          Unicode  _e_ €  _g_ £
+                   _f_ ♀  _r_ ♂
+                   _o_ °  _m_ µ  _z_ ë  _Z_ Ë
+                   _n_ ←  _e_ ↓  _i_ ↑  _o_ →
+          "
     ("e" (my/insert-unicode "EURO SIGN"))
     ("g" (my/insert-unicode "POUND SIGN"))
 
@@ -564,30 +565,30 @@ TODO: commentary
     (helm-mode t)
     :config
     (setq helm-buffer-max-length 40
-	  ;; this stops helm trying to ping websites when it interprets text as a url
-	  ffap-machine-p-known 'reject
-	  helm-mini-default-sources '(helm-source-buffers-list
-				  helm-source-recentf
-				  helm-source-bookmarks
-				  helm-source-bookmark-set
-				  helm-source-buffer-not-found))
+          ;; this stops helm trying to ping websites when it interprets text as a url
+          ffap-machine-p-known 'reject
+          helm-mini-default-sources '(helm-source-buffers-list
+                                  helm-source-recentf
+                                  helm-source-bookmarks
+                                  helm-source-bookmark-set
+                                  helm-source-buffer-not-found))
     ;; TODO why not use general here?
     :bind (("M-x"     . helm-M-x)
-	   ("C-x C-f" . helm-find-files)
-	   ("C-x b"   . helm-mini)     ;; See buffers & recent files; more useful.
-	   ("C-x r b" . helm-filtered-bookmarks)
-	   ("C-x C-r" . helm-recentf)  ;; Search for recently edited files
-	   ("C-c i"   . helm-imenu)
-	   ("C-h a"   . helm-apropos)
-	   ;; Look at what was cut recently & paste it in.
-	   ("M-y" . helm-show-kill-ring)
+           ("C-x C-f" . helm-find-files)
+           ("C-x b"   . helm-mini)     ;; See buffers & recent files; more useful.
+           ("C-x r b" . helm-filtered-bookmarks)
+           ("C-x C-r" . helm-recentf)  ;; Search for recently edited files
+           ("C-c i"   . helm-imenu)
+           ("C-h a"   . helm-apropos)
+           ;; Look at what was cut recently & paste it in.
+           ("M-y" . helm-show-kill-ring)
 
-	   :map helm-map
-	   ;; We can list ‘actions’ on the currently selected item by C-z.
-	   ("C-z" . helm-select-action)
-	   ;; Let's keep tab-completetion anyhow.
-	   ("TAB"   . helm-execute-persistent-action)
-	   ("<tab>" . helm-execute-persistent-action)))
+           :map helm-map
+           ;; We can list ‘actions’ on the currently selected item by C-z.
+           ("C-z" . helm-select-action)
+           ;; Let's keep tab-completetion anyhow.
+           ("TAB"   . helm-execute-persistent-action)
+           ("<tab>" . helm-execute-persistent-action)))
 
 #+END_SRC
 
@@ -643,10 +644,10 @@ TODO try vundo instead https://github.com/casouri/vundo
     :config
       (global-undo-tree-mode 1)
       (setq undo-tree-visualizer-timestamps t
-	    undo-tree-visualizer-diff t
-	    undo-tree-show-minibuffer-help t
-	    undo-tree-minibuffer-help-dynamic t
-	    undo-tree-show-help-in-visualize-buffer t)
+            undo-tree-visualizer-diff t
+            undo-tree-show-minibuffer-help t
+            undo-tree-minibuffer-help-dynamic t
+            undo-tree-show-help-in-visualize-buffer t)
     :hydra (hydra-undo-tree (:hint nil)
   "
   _p_: undo  _n_: redo _s_: save _l_: load   "
@@ -674,15 +675,15 @@ TODO: commentary
     (dashboard-setup-startup-hook)
     (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
     (setq dashboard-items '((recents  . 5)
-			    (bookmarks . 5)
-			    (projects . 5)
-			    (registers . 5)))
+                            (bookmarks . 5)
+                            (projects . 5)
+                            (registers . 5)))
     (setq dashboard-set-heading-icons t)
     (setq dashboard-set-file-icons t)
     (setq dashboard-init-info (concat "Welcome "     user-full-name
-				      "! Emacs "      emacs-version
-				      "; System "     (system-name)
-				      "; Time "       (emacs-init-time))))
+                                      "! Emacs "      emacs-version
+                                      "; System "     (system-name)
+                                      "; Time "       (emacs-init-time))))
 #+END_SRC
 
 TODO: commentary
@@ -783,7 +784,7 @@ TODO: commentary
 
   (use-package dired-git-info
       :general ('dired-mode-map
-		"C-(" 'dired-git-info-mode))
+                "C-(" 'dired-git-info-mode))
 #+END_SRC
 
 TODO: commentary
@@ -797,7 +798,7 @@ TODO: commentary
     (projectile-mode +1)
     :hydra
     (hydra-projectile (:color teal
-			      :hint nil)
+                              :hint nil)
     "
        PROJECTILE: %(projectile-project-root)
 
@@ -869,12 +870,12 @@ TODO: commentary
 
   (defun my-org-prettify-settings ()
     (setq org-startup-indented nil
-	  org-src-fontify-natively nil
-	  org-hide-emphasis-markers t
-	  org-fontify-whole-heading-line t
-	  org-fontify-done-headline t
-	  org-fontify-quote-and-verse-blocks t
-	  line-spacing 0.2))
+          org-src-fontify-natively nil
+          org-hide-emphasis-markers t
+          org-fontify-whole-heading-line t
+          org-fontify-done-headline t
+          org-fontify-quote-and-verse-blocks t
+          line-spacing 0.2))
 #+END_SRC
 
 TODO: commentary
@@ -889,19 +890,19 @@ TODO: commentary
   (defun my-org-todo-setup ()
     (setq org-use-fast-todo-selection t)
     (setq org-todo-keywords
-	  '((sequence "TODO(t)" "NEXT(n)" "CURRENT(c)" "|" "DONE(d)")
-	    (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(a@/!)")
-	    (type "MEETING")))
+          '((sequence "TODO(t)" "NEXT(n)" "CURRENT(c)" "|" "DONE(d)")
+            (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(a@/!)")
+            (type "MEETING")))
     (setq org-log-done 'time)
     (setq org-todo-keyword-faces
-	  (quote (("TODO" :foreground "red" :weight bold)
-		  ("NEXT" :foreground "blue" :weight bold)
-		  ("DONE" :foreground "forest green" :weight bold)
-		  ("WAITING" :foreground "orange" :weight bold)
-		  ("HOLD" :foreground "magenta" :weight bold)
-		  ("CANCELLED" :foreground "forest green" :weight bold)
-		  ("MEETING" :foreground "forest green" :weight bold)
-		  ("PHONE" :foreground "forest green" :weight bold)))))
+          (quote (("TODO" :foreground "red" :weight bold)
+                  ("NEXT" :foreground "blue" :weight bold)
+                  ("DONE" :foreground "forest green" :weight bold)
+                  ("WAITING" :foreground "orange" :weight bold)
+                  ("HOLD" :foreground "magenta" :weight bold)
+                  ("CANCELLED" :foreground "forest green" :weight bold)
+                  ("MEETING" :foreground "forest green" :weight bold)
+                  ("PHONE" :foreground "forest green" :weight bold)))))
 #+END_SRC
 
 TODO: commentary
@@ -952,9 +953,9 @@ TODO: commentary
   prepended to the element after the #+HEADER: tag."
     (let (text)
       (when (region-active-p)
-	(setq text (buffer-substring (region-beginning) (region-end)))
-	(delete-region (region-beginning) (region-end))
-	(deactivate-mark))
+        (setq text (buffer-substring (region-beginning) (region-end)))
+        (delete-region (region-beginning) (region-end))
+        (deactivate-mark))
       (when header (insert "#+HEADER: " header) (forward-line))
       (insert str)
       (org-tempo-complete-tag)
@@ -966,9 +967,9 @@ TODO: commentary
    ;; disable this agenda key since I use it for avy
    "C-'" nil
    "<" '(lambda () (interactive)
-	  (if (or (region-active-p) (looking-back "^"))
-	      (hydra-org-template/body)
-	    (self-insert-command 1))))
+          (if (or (region-active-p) (looking-back "^"))
+              (hydra-org-template/body)
+            (self-insert-command 1))))
 
   (eval-after-load "org"
     '(cl-pushnew
@@ -985,50 +986,50 @@ TODO: commentary
       "C" 'org-capture)
     :config
     (setq org-capture-templates
-	  '(
-	    ("c" "Note on current task" plain (clock) "\n\n%T from: %a\n%i\n%?")
-	    ("s" "Standup" entry (file+olp+datetree (concat my/org-dir "todo.org") "Standup") "* Planned\n- %?\n %i\n %a")
-	    ("r" "To-Read" item (file+headline (lamdba () (concat my/org-dir "personal.org")) "To Read") "")
-	    ("t" "Tasks")
-	    ("tw" "Work Task" entry (file+headline (lambda () (concat my/org-dir "work/swrx.org")) "Tasks") "** TODO %?\n %i")
-	    ("tp" "Pesonal Task" entry (file+headline (lambda () (concat my/org-dir "personal.org")) "Tasks") "* TODO %?\n %i\n %a")
-	    ("th" "Household Task" entry (file+headline (lambda () (concat my/org-dir "household.org")) "Tasks") "* TODO %?\n %i\n %a")
-	    ("i" "Interruption")
-	    ("ii" "interruption" entry (file+olp+datetree (lambda () (concat my/org-dir "tracker.org"))) "* IN-PROGRESS %?  :interruption:work:\n%U\n- ref :: %a\n"
-	     :prepend t :tree-type week :clock-in t :clock-keep t)
-	    ("ic" "chat"         entry (file+olp+datetree (lambda () (concat my/org-dir "tracker.org"))) "* CHAT %?         :work:chat:\n%U\n- ref :: %a\n"
-	     :prepend t :tree-type week :clock-in t :clock-keep t)
-	    ("ie" "email"        entry (file+olp+datetree (lambda () (concat my/org-dir "tracker.org"))) "* EMAIL %?        :work:email:\n%U\n- ref :: %a\n"
-	     :prepend t :tree-type week :clock-in t :clock-keep t)
-	    ("im" "meeting"      entry (file+olp+datetree (lambda () (concat my/org-dir "tracker.org")))  "* MEETING %?      :work:meeting:\n%U\n- ref :: %a\n"
-	     :prepend t :tree-type week :clock-in t :clock-keep t)
-	    ("ir" "review"       entry (file+olp+datetree (lambda () (concat my/org-dir "tracker.org")))  "* REVIEW %?       :work:review:\n%U\n- ref :: %a\n"
-	     :prepend t :tree-type week :clock-in t :clock-keep t)
-	    ))
+          '(
+            ("c" "Note on current task" plain (clock) "\n\n%T from: %a\n%i\n%?")
+            ("s" "Standup" entry (file+olp+datetree (concat my/org-dir "todo.org") "Standup") "* Planned\n- %?\n %i\n %a")
+            ("r" "To-Read" item (file+headline (lamdba () (concat my/org-dir "personal.org")) "To Read") "")
+            ("t" "Tasks")
+            ("tw" "Work Task" entry (file+headline (lambda () (concat my/org-dir "work/swrx.org")) "Tasks") "** TODO %?\n %i")
+            ("tp" "Pesonal Task" entry (file+headline (lambda () (concat my/org-dir "personal.org")) "Tasks") "* TODO %?\n %i\n %a")
+            ("th" "Household Task" entry (file+headline (lambda () (concat my/org-dir "household.org")) "Tasks") "* TODO %?\n %i\n %a")
+            ("i" "Interruption")
+            ("ii" "interruption" entry (file+olp+datetree (lambda () (concat my/org-dir "tracker.org"))) "* IN-PROGRESS %?  :interruption:work:\n%U\n- ref :: %a\n"
+             :prepend t :tree-type week :clock-in t :clock-keep t)
+            ("ic" "chat"         entry (file+olp+datetree (lambda () (concat my/org-dir "tracker.org"))) "* CHAT %?         :work:chat:\n%U\n- ref :: %a\n"
+             :prepend t :tree-type week :clock-in t :clock-keep t)
+            ("ie" "email"        entry (file+olp+datetree (lambda () (concat my/org-dir "tracker.org"))) "* EMAIL %?        :work:email:\n%U\n- ref :: %a\n"
+             :prepend t :tree-type week :clock-in t :clock-keep t)
+            ("im" "meeting"      entry (file+olp+datetree (lambda () (concat my/org-dir "tracker.org")))  "* MEETING %?      :work:meeting:\n%U\n- ref :: %a\n"
+             :prepend t :tree-type week :clock-in t :clock-keep t)
+            ("ir" "review"       entry (file+olp+datetree (lambda () (concat my/org-dir "tracker.org")))  "* REVIEW %?       :work:review:\n%U\n- ref :: %a\n"
+             :prepend t :tree-type week :clock-in t :clock-keep t)
+            ))
 
     (defun org-hugo-new-subtree-post-capture-template ()
       "Returns `org-capture' template string for new Hugo post.
   See `org-capture-templates' for more information."
       (let* ((title (read-from-minibuffer "Post Title: ")) ;Prompt to enter the post title
-	     (fname (org-hugo-slug title)))
-	(mapconcat #'identity
-		   `(
-		     ,(concat "* TODO " title)
-		     ":PROPERTIES:"
-		     ,(concat ":EXPORT_FILE_NAME: " fname)
-		     ":END:"
-		     "%?\n")          ;Place the cursor here finally
-		   "\n")))
+             (fname (org-hugo-slug title)))
+        (mapconcat #'identity
+                   `(
+                     ,(concat "* TODO " title)
+                     ":PROPERTIES:"
+                     ,(concat ":EXPORT_FILE_NAME: " fname)
+                     ":END:"
+                     "%?\n")          ;Place the cursor here finally
+                   "\n")))
 
     (add-to-list 'org-capture-templates
-		 '("b"
-		   "Blog Post"
-		   entry
-		   ;; It is assumed that below file is present in `org-directory'
-		   ;; and that it has a "Blog Ideas" heading. It can even be a
-		   ;; symlink pointing to the actual location of all-posts.org!
-		   (file+olp "blog-posts.org" "Ideas")
-		   (function org-hugo-new-subtree-post-capture-template))))
+                 '("b"
+                   "Blog Post"
+                   entry
+                   ;; It is assumed that below file is present in `org-directory'
+                   ;; and that it has a "Blog Ideas" heading. It can even be a
+                   ;; symlink pointing to the actual location of all-posts.org!
+                   (file+olp "blog-posts.org" "Ideas")
+                   (function org-hugo-new-subtree-post-capture-template))))
   (add-hook 'org-mode-hook (lambda ()
      "Beautify Org Checkbox Symbol"
      (push '("[ ]" . "☐") prettify-symbols-alist)
@@ -1055,30 +1056,30 @@ TODO: straight should be t here
 
     :config
     (setq org-agenda-files my/org-agenda-files
-	  org-directory my/org-dir
-	  org-tags-column 75
-	  org-log-into-drawer t ;; hide the log state change history a bit better
-	  org-deadline-warning-days 7
-	  org-agenda-skip-scheduled-if-deadline-is-shown t
-	  org-habit-show-habits-only-for-today nil
-	  org-habit-graph-column 65
-	  org-duration-format 'h:mm ;; show hours at max, not days
-	  org-agenda-compact-blocks t
-	  org-cycle-separator-lines 0
-	  ;; hide empty agenda sections
-	  org-agenda-clockreport-parameter-plist '(:stepskip0 t :link t :maxlevel 2 :fileskip0 t)
-	  ;; default show today
-	  org-agenda-span 'day
-	  org-agenda-start-day "-0d"
-	  org-agenda-start-on-weekday 1
-	  org-agenda-custom-commands
-	  '(("d" "Done tasks" tags "/DONE|CANCELED")
-	    ("g" "Plan Today"
-	     ((agenda "" ((org-agenda-span 'day)))
-	      (org-agenda-skip-function '(org-agenda-skip-deadline-if-not-today))
-	      (org-agenda-entry-types '(:deadline))
-	      (org-agenda-overriding-header "Today's Deadlines "))))
-	  )
+          org-directory my/org-dir
+          org-tags-column 75
+          org-log-into-drawer t ;; hide the log state change history a bit better
+          org-deadline-warning-days 7
+          org-agenda-skip-scheduled-if-deadline-is-shown t
+          org-habit-show-habits-only-for-today nil
+          org-habit-graph-column 65
+          org-duration-format 'h:mm ;; show hours at max, not days
+          org-agenda-compact-blocks t
+          org-cycle-separator-lines 0
+          ;; hide empty agenda sections
+          org-agenda-clockreport-parameter-plist '(:stepskip0 t :link t :maxlevel 2 :fileskip0 t)
+          ;; default show today
+          org-agenda-span 'day
+          org-agenda-start-day "-0d"
+          org-agenda-start-on-weekday 1
+          org-agenda-custom-commands
+          '(("d" "Done tasks" tags "/DONE|CANCELED")
+            ("g" "Plan Today"
+             ((agenda "" ((org-agenda-span 'day)))
+              (org-agenda-skip-function '(org-agenda-skip-deadline-if-not-today))
+              (org-agenda-entry-types '(:deadline))
+              (org-agenda-overriding-header "Today's Deadlines "))))
+          )
     (my-org-prettify-settings)
     (my-org-todo-setup)
     (my-org-structure-templates))
@@ -1089,29 +1090,29 @@ TODO: commentary
   (use-package org-super-agenda
     :after org-agenda
     :custom (org-super-agenda-groups
-	     '( ;; Each group has an implicit boolean OR operator between its selectors.
-	       (:name "Overdue" :deadline past :order 0)
-	       (:name "Evening Habits" :and (:habit t :tag "evening") :order 8)
-	       (:name "Habits" :habit t :order 6)
-	       (:name "Today" ;; Optionally specify section name
-		      :time-grid t  ;; Items that appear on the time grid (scheduled/deadline with time)
-		      :order 3)     ;; capture the today first but show it in order 3
-	       (:name "Low Priority" :priority "C" :tag "maybe" :order 7)
-	       (:name "Due Today" :deadline today :order 1)
-	       (:name "Important"
-		      :and (:priority "A" :not (:todo ("DONE" "CANCELED")))
-		      :order 2)
-	       (:name "Due Soon" :deadline future :order 4)
-	       (:name "Todo" :not (:habit t) :order 5)
-	       (:name "Waiting" :todo ("WAITING" "HOLD") :order 9)))
+             '( ;; Each group has an implicit boolean OR operator between its selectors.
+               (:name "Overdue" :deadline past :order 0)
+               (:name "Evening Habits" :and (:habit t :tag "evening") :order 8)
+               (:name "Habits" :habit t :order 6)
+               (:name "Today" ;; Optionally specify section name
+                      :time-grid t  ;; Items that appear on the time grid (scheduled/deadline with time)
+                      :order 3)     ;; capture the today first but show it in order 3
+               (:name "Low Priority" :priority "C" :tag "maybe" :order 7)
+               (:name "Due Today" :deadline today :order 1)
+               (:name "Important"
+                      :and (:priority "A" :not (:todo ("DONE" "CANCELED")))
+                      :order 2)
+               (:name "Due Soon" :deadline future :order 4)
+               (:name "Todo" :not (:habit t) :order 5)
+               (:name "Waiting" :todo ("WAITING" "HOLD") :order 9)))
     :config
     (setq org-super-agenda-header-map nil
-	  org-super-agenda-mode t))
+          org-super-agenda-mode t))
 
 
   (defhydra hydra-org-agenda (:pre (setq which-key-inhibit t)
-				   :post (setq which-key-inhibit nil)
-				   :hint nil)
+                                   :post (setq which-key-inhibit nil)
+                                   :hint nil)
     "
   Org agenda (_q_uit)
 
@@ -1241,11 +1242,11 @@ TODO: commentary
     (my-leader-def
       "n" 'hydra-spelling/body) ;;oryx: just 'c' would be better here
     :hook ((prog-mode . flyspell-prog-mode)
-	 ((org-mode text-mode) . flyspell-mode))
+         ((org-mode text-mode) . flyspell-mode))
     :config
     (setq ispell-dictionary "english"
-	  ispell-silently-savep t
-	  ispell-personal-dictionary "~/.emacs.d/.aspell.en.pws")
+          ispell-silently-savep t
+          ispell-personal-dictionary "~/.emacs.d/.aspell.en.pws")
     :hydra (hydra-spelling (:color blue)
       "
   ^
@@ -1338,8 +1339,8 @@ TODO: commentary
      company-dabbrev-code-other-buffers t
      ;; Show candidates according to importance, then case, then in-buffer frequency
      company-transformers ;'(company-sort-by-backend-importance
-			  ;  company-sort-prefer-same-case-prefix
-			    '(company-sort-by-occurrence)
+                          ;  company-sort-prefer-same-case-prefix
+                            '(company-sort-by-occurrence)
      ;; Flushright any annotations for a compleition;
      ;; e.g., the description of what a snippet template word expands into.
      company-tooltip-align-annotations t
@@ -1369,9 +1370,9 @@ TODO: commentary
       "Enable yasnippet for all backends.")
     (defun company-mode/backend-with-yas (backend)
       (if (or (not company-mode/enable-yas) (and (listp backend) (member 'company-yasnippet backend)))
-	  backend
-	(append (if (consp backend) backend (list backend))
-		'(:with company-yasnippet))))
+          backend
+        (append (if (consp backend) backend (list backend))
+                '(:with company-yasnippet))))
     (setq company-backends (mapcar #'company-mode/backend-with-yas company-backends))
 
     ;; Bindings when the company list is active.
@@ -1398,35 +1399,35 @@ https://github.com/TheBB/dotemacs/blob/master/init.el#L527-L570
     (setq company-box-icons-alist 'company-box-icons-all-the-icons)
     :config
     (setq company-box-icons-alist 'company-box-icons-all-the-icons
-	  company-box-backends-colors nil
-	  company-box-icons-all-the-icons
-	  `((Unknown       . ,(all-the-icons-material "find_in_page"             :face 'all-the-icons-purple))
-	    (Text          . ,(all-the-icons-material "text_fields"              :face 'all-the-icons-green))
-	    (Method        . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
-	    (Function      . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
-	    (Constructor   . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
-	    (Field         . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
-	    (Variable      . ,(all-the-icons-material "adjust"                   :face 'all-the-icons-blue))
-	    (Class         . ,(all-the-icons-material "class"                    :face 'all-the-icons-red))
-	    (Interface     . ,(all-the-icons-material "settings_input_component" :face 'all-the-icons-red))
-	    (Module        . ,(all-the-icons-material "view_module"              :face 'all-the-icons-red))
-	    (Property      . ,(all-the-icons-material "settings"                 :face 'all-the-icons-red))
-	    (Unit          . ,(all-the-icons-material "straighten"               :face 'all-the-icons-red))
-	    (Value         . ,(all-the-icons-material "filter_1"                 :face 'all-the-icons-red))
-	    (Enum          . ,(all-the-icons-material "plus_one"                 :face 'all-the-icons-red))
-	    (Keyword       . ,(all-the-icons-material "filter_center_focus"      :face 'all-the-icons-red))
-	    (Snippet       . ,(all-the-icons-material "short_text"               :face 'all-the-icons-red))
-	    (Color         . ,(all-the-icons-material "color_lens"               :face 'all-the-icons-red))
-	    (File          . ,(all-the-icons-material "insert_drive_file"        :face 'all-the-icons-red))
-	    (Reference     . ,(all-the-icons-material "collections_bookmark"     :face 'all-the-icons-red))
-	    (Folder        . ,(all-the-icons-material "folder"                   :face 'all-the-icons-red))
-	    (EnumMember    . ,(all-the-icons-material "people"                   :face 'all-the-icons-red))
-	    (Constant      . ,(all-the-icons-material "pause_circle_filled"      :face 'all-the-icons-red))
-	    (Struct        . ,(all-the-icons-material "streetview"               :face 'all-the-icons-red))
-	    (Event         . ,(all-the-icons-material "event"                    :face 'all-the-icons-red))
-	    (Operator      . ,(all-the-icons-material "control_point"            :face 'all-the-icons-red))
-	    (TypeParameter . ,(all-the-icons-material "class"                    :face 'all-the-icons-red))
-	    (Template      . ,(all-the-icons-material "short_text"               :face 'all-the-icons-green))))
+          company-box-backends-colors nil
+          company-box-icons-all-the-icons
+          `((Unknown       . ,(all-the-icons-material "find_in_page"             :face 'all-the-icons-purple))
+            (Text          . ,(all-the-icons-material "text_fields"              :face 'all-the-icons-green))
+            (Method        . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
+            (Function      . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
+            (Constructor   . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
+            (Field         . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
+            (Variable      . ,(all-the-icons-material "adjust"                   :face 'all-the-icons-blue))
+            (Class         . ,(all-the-icons-material "class"                    :face 'all-the-icons-red))
+            (Interface     . ,(all-the-icons-material "settings_input_component" :face 'all-the-icons-red))
+            (Module        . ,(all-the-icons-material "view_module"              :face 'all-the-icons-red))
+            (Property      . ,(all-the-icons-material "settings"                 :face 'all-the-icons-red))
+            (Unit          . ,(all-the-icons-material "straighten"               :face 'all-the-icons-red))
+            (Value         . ,(all-the-icons-material "filter_1"                 :face 'all-the-icons-red))
+            (Enum          . ,(all-the-icons-material "plus_one"                 :face 'all-the-icons-red))
+            (Keyword       . ,(all-the-icons-material "filter_center_focus"      :face 'all-the-icons-red))
+            (Snippet       . ,(all-the-icons-material "short_text"               :face 'all-the-icons-red))
+            (Color         . ,(all-the-icons-material "color_lens"               :face 'all-the-icons-red))
+            (File          . ,(all-the-icons-material "insert_drive_file"        :face 'all-the-icons-red))
+            (Reference     . ,(all-the-icons-material "collections_bookmark"     :face 'all-the-icons-red))
+            (Folder        . ,(all-the-icons-material "folder"                   :face 'all-the-icons-red))
+            (EnumMember    . ,(all-the-icons-material "people"                   :face 'all-the-icons-red))
+            (Constant      . ,(all-the-icons-material "pause_circle_filled"      :face 'all-the-icons-red))
+            (Struct        . ,(all-the-icons-material "streetview"               :face 'all-the-icons-red))
+            (Event         . ,(all-the-icons-material "event"                    :face 'all-the-icons-red))
+            (Operator      . ,(all-the-icons-material "control_point"            :face 'all-the-icons-red))
+            (TypeParameter . ,(all-the-icons-material "class"                    :face 'all-the-icons-red))
+            (Template      . ,(all-the-icons-material "short_text"               :face 'all-the-icons-green))))
     )
 #+END_SRC
 
@@ -1444,9 +1445,9 @@ TODO: commentary
     (interactive  (list (read-from-minibuffer "Replacement for thing at point: " nil)))
     (save-excursion
       (let ((symbol (or (thing-at-point 'symbol) (error "No symbol at point!"))))
-	(beginning-of-buffer)
-	;; (query-replace-regexp symbol replacement)
-	(replace-regexp (format "\\b%s\\b" (regexp-quote symbol)) replacement))))
+        (beginning-of-buffer)
+        ;; (query-replace-regexp symbol replacement)
+        (replace-regexp (format "\\b%s\\b" (regexp-quote symbol)) replacement))))
 #+END_SRC
 
 TODO: what is this?
@@ -1480,10 +1481,10 @@ TODO: commentary
       "Show the current branch in the echo-area and add it to the `kill-ring'."
       (interactive)
       (let ((branch (magit-get-current-branch)))
-	(if branch
-	    (progn (kill-new branch)
-		   (message "%s" branch))
-	  (user-error "There is not current branch")))))
+        (if branch
+            (progn (kill-new branch)
+                   (message "%s" branch))
+          (user-error "There is not current branch")))))
 #+END_SRC
 TODO: commentary
 #+BEGIN_SRC emacs-lisp
@@ -1520,8 +1521,8 @@ TODO: commentary
       "glg" 'browse-at-remote))
 
   (defhydra hydra-my-git-menu (global-map "<f7>"
-					  :color blue
-					  :hint nil)
+                                          :color blue
+                                          :hint nil)
     "
   ^Navigate^        ^Action^               ^Info^
   ^^^^^^^^^^^^---------------------------------------------------
@@ -1570,7 +1571,7 @@ TODO: commentary
 
   (when (eq system-type 'darwin)
     (setq visible-bell nil
-	  ring-bell-function 'flash-mode-line)
+          ring-bell-function 'flash-mode-line)
     (defun flash-mode-line ()
       (invert-face 'mode-line)
       (run-with-timer 0.1 nil #'invert-face 'mode-line)))
@@ -1729,9 +1730,9 @@ TODO: commentary
     :hook (web-mode . my-web-mode-hook)
     :init
     (add-hook 'web-mode-before-auto-complete-hooks
-	      '(lambda ()
-		 (let ((web-mode-cur-language
-			(web-mode-language-at-pos))))))
+              '(lambda ()
+                 (let ((web-mode-cur-language
+                        (web-mode-language-at-pos))))))
     (add-to-list `auto-mode-alist '("\\.html?\\'" . web-mode))
     (add-to-list `auto-mode-alist '("\\.css\\'" . web-mode)))
 #+END_SRC
@@ -1770,15 +1771,15 @@ TODO: commentary
   `unwind-protect' form, so the advice will be removed even in the
   event of an error or nonlocal exit."
     (declare (debug ((&rest (&rest form)) body))
-	     (indent 1))
+             (indent 1))
     `(progn
        ,@(mapcar (lambda (adform)
-		   (cons 'advice-add adform))
-		 adlist)
+                   (cons 'advice-add adform))
+                 adlist)
        (unwind-protect (progn ,@body)
-	 ,@(mapcar (lambda (adform)
-		     `(advice-remove ,(car adform) ,(nth 2 adform)))
-		   adlist))))
+         ,@(mapcar (lambda (adform)
+                     `(advice-remove ,(car adform) ,(nth 2 adform)))
+                   adlist))))
 
   (defun my/call-logging-hooks (command &optional verbose)
     "Call COMMAND, reporting every hook run in the process.
@@ -1789,18 +1790,18 @@ TODO: commentary
   message listing the hooks."
     (interactive "CCommand to log hooks: \np")
     (let* ((log     nil)
-	   (logger (lambda (&rest hooks)
-		     (setq log (append log hooks nil)))))
+           (logger (lambda (&rest hooks)
+                     (setq log (append log hooks nil)))))
       (my/with-advice
-	  ((#'run-hooks :before logger))
-	(call-interactively command))
+          ((#'run-hooks :before logger))
+        (call-interactively command))
       (when verbose
-	(message
-	 (if log "Hooks run during execution of %s:"
-	   "No hooks run during execution of %s.")
-	 command)
-	(dolist (hook log)
-	  (message "> %s" hook)))
+        (message
+         (if log "Hooks run during execution of %s:"
+           "No hooks run during execution of %s.")
+         command)
+        (dolist (hook log)
+          (message "> %s" hook)))
       log))
 #+END_SRC
 
@@ -1873,10 +1874,10 @@ TODO: commentary
     :ensure t
     :commands lsp-ui-mode
     :config (setq lsp-ui-doc-enable t
-		  lsp-ui-peek-enable t
-		  lsp-ui-sideline-enable t
-		  lsp-ui-imenu-enable t
-		  lsp-ui-flycheck-enable t))
+                  lsp-ui-peek-enable t
+                  lsp-ui-sideline-enable t
+                  lsp-ui-imenu-enable t
+                  lsp-ui-flycheck-enable t))
 
   (use-package helm-lsp
     :commands (helm-lsp-workspace-symbol))
@@ -1912,7 +1913,7 @@ one.
     :hook (prog-mode . rainbow-delimiters-mode)
     :config
     (setq show-paren-delay  0
-	  show-paren-style 'mixed))
+          show-paren-style 'mixed))
 #+END_SRC
 
 *** Golang
@@ -2007,7 +2008,7 @@ TODO see how ~ensure-system-package~ works on windows.
 
   (use-package pipenv
     :hook ((python-mode . pipenv-mode)
-	   (hy-mode . pipenv-mode))
+           (hy-mode . pipenv-mode))
     :init
     (setq pipenv-projectile-after-switch-function #'pipenv-projectile-after-switch-extended))
 #+END_SRC
@@ -2039,7 +2040,7 @@ representation of your location in the ring.
     (back-button-mode 1)
     :hydra
     (hydra-back-button (:color red :hint nil)
-	"
+        "
     Local         Global
   --------------------------------
     _t_ forward   _e_ forward
@@ -2104,32 +2105,32 @@ These are various functions for manipulating window size.
     (interactive "p")
     (let ((windmove-wrap-around nil))
       (if (windmove-find-other-window 'right)
-	  (shrink-window-horizontally delta)
-	(enlarge-window-horizontally delta))))
+          (shrink-window-horizontally delta)
+        (enlarge-window-horizontally delta))))
 
   (defun hydra-move-splitter-right (delta)
     "Move window splitter right."
     (interactive "p")
     (let ((windmove-wrap-around nil))
       (if (windmove-find-other-window 'right)
-	  (enlarge-window-horizontally delta)
-	(shrink-window-horizontally delta))))
+          (enlarge-window-horizontally delta)
+        (shrink-window-horizontally delta))))
 
   (defun hydra-move-splitter-up (delta)
     "Move window splitter up."
     (interactive "p")
     (let ((windmove-wrap-around nil))
       (if (windmove-find-other-window 'up)
-	  (enlarge-window delta)
-	(shrink-window delta))))
+          (enlarge-window delta)
+        (shrink-window delta))))
 
   (defun hydra-move-splitter-down (delta)
     "Move window splitter down."
     (interactive "p")
     (let ((windmove-wrap-around nil))
       (if (windmove-find-other-window 'up)
-	  (shrink-window delta)
-	(enlarge-window delta))))
+          (shrink-window delta)
+        (enlarge-window delta))))
 #+END_SRC
 
 Now we've got a hydra to make the various window management functions easily accessible.
@@ -2162,37 +2163,37 @@ Now we've got a hydra to make the various window management functions easily acc
 
     ;; Split
     ("v" (lambda ()
-	   (interactive)
-	   (split-window-right)
-	   (windmove-right)))
+           (interactive)
+           (split-window-right)
+           (windmove-right)))
     ("h" (lambda ()
-	   (interactive)
-	   (split-window-below)
-	   (windmove-down)))
+           (interactive)
+           (split-window-below)
+           (windmove-down)))
     ("z" (progn
-	   (winner-undo)
-	   (setq this-command 'winner-undo)))
+           (winner-undo)
+           (setq this-command 'winner-undo)))
     ("Z" winner-redo)
     ("D" (lambda ()
-	   (interactive)
-	   (ace-window 16)
-	   (add-hook 'ace-window-end-once-hook
-		     'hydra-window/body)))
+           (interactive)
+           (ace-window 16)
+           (add-hook 'ace-window-end-once-hook
+                     'hydra-window/body)))
     ("O" delete-other-windows)
 
     ;; Switch
     ("b" helm-mini)
     ("f" helm-find-files)
     ("a" (lambda ()
-	   (interactive)
-	   (ace-window 1)
-	   (add-hook 'ace-window-end-once-hook
-		     'hydra-window/body)))
+           (interactive)
+           (ace-window 1)
+           (add-hook 'ace-window-end-once-hook
+                     'hydra-window/body)))
     ("s" (lambda ()
-	   (interactive)
-	   (ace-window 4)
-	   (add-hook 'ace-window-end-once-hook
-		     'hydra-window/body)))
+           (interactive)
+           (ace-window 4)
+           (add-hook 'ace-window-end-once-hook
+                     'hydra-window/body)))
     ("S" save-buffer)
     ("d" delete-window)
 
@@ -2219,32 +2220,32 @@ Now we've got a hydra to make the various window management functions easily acc
 TODO: commentary
 #+BEGIN_SRC emacs-lisp
   (setq ibuffer-saved-filter-groups
-	'(("home"
-	   ("system-config" (or (filename . "dotfiles")
-				(filename . "emacs-config")))
-	   ("Org" (or (mode . org-mode)
-		      (filename . "OrgMode")))
-	   ("code" (or (filename . "code")
-		       (filename . ".py")
-		       (filename . ".go")
-		       (filename . ".java")))
-	   ("Web Dev" (or (mode . html-mode)
-			  (mode . css-mode)))
-	   ("Directories" (mode . dired-mode))
-	   ("Help" (or (name . "\*Help\*")
-		       (name . "\*Apropos\*")
-		       (name . "\*info\*")))
-	   ("Builtin" (or (name . "\*Messages\*")
-			  (name . "\*Completions\*")
-			  (name . "\*Backtrace\*")
-			  (name . "\*Compile-Log\*")
-			  (name . "\*Calendar\*")
-			  (name . "\*Calculator\*")
-			  (name . "'*Scratch\*"))))))
+        '(("home"
+           ("system-config" (or (filename . "dotfiles")
+                                (filename . "emacs-config")))
+           ("Org" (or (mode . org-mode)
+                      (filename . "OrgMode")))
+           ("code" (or (filename . "code")
+                       (filename . ".py")
+                       (filename . ".go")
+                       (filename . ".java")))
+           ("Web Dev" (or (mode . html-mode)
+                          (mode . css-mode)))
+           ("Directories" (mode . dired-mode))
+           ("Help" (or (name . "\*Help\*")
+                       (name . "\*Apropos\*")
+                       (name . "\*info\*")))
+           ("Builtin" (or (name . "\*Messages\*")
+                          (name . "\*Completions\*")
+                          (name . "\*Backtrace\*")
+                          (name . "\*Compile-Log\*")
+                          (name . "\*Calendar\*")
+                          (name . "\*Calculator\*")
+                          (name . "'*Scratch\*"))))))
   (add-hook 'ibuffer-mode-hook
-	    '(lambda ()
-	       (ibuffer-auto-mode 1)
-	       (ibuffer-switch-to-saved-filter-groups "home")))
+            '(lambda ()
+               (ibuffer-auto-mode 1)
+               (ibuffer-switch-to-saved-filter-groups "home")))
   ; hide empty filter groups
   (setq ibuffer-show-empty-filter-groups nil)
 
@@ -2283,7 +2284,7 @@ TODO: commentary
     ("." nil :color blue))
 
   (defhydra hydra-ibuffer-mark (:color teal :columns 5
-				       :after-exit (hydra-ibuffer-main/body))
+                                       :after-exit (hydra-ibuffer-main/body))
     "Mark"
     ("*" ibuffer-unmark-all "unmark all")
     ("M" ibuffer-mark-by-mode "mode")
@@ -2298,9 +2299,9 @@ TODO: commentary
     ("b" hydra-ibuffer-main/body "back" :color blue))
 
   (defhydra hydra-ibuffer-action (:color teal :columns 4
-					 :after-exit
-					 (if (eq major-mode 'ibuffer-mode)
-					     (hydra-ibuffer-main/body)))
+                                         :after-exit
+                                         (if (eq major-mode 'ibuffer-mode)
+                                             (hydra-ibuffer-main/body)))
     "Action"
     ("A" ibuffer-do-view "view")
     ("E" ibuffer-do-eval "eval")
