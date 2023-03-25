@@ -680,13 +680,14 @@ TODO try vundo instead https://github.com/casouri/vundo
 #+END_SRC
 
 
-TODO: commentary
+[[https://github.com/victorhge/iedit][~iedit~]] allows you edit multiple occurrences of the same symbol at the same time. It's less useful
+now that ~lsp-mode~ can do the same thing across a project, but it is still useful for non-lsp enabled
+content.
 #+BEGIN_SRC emacs-lisp
   (use-package iedit)
 #+END_SRC
 
 [[https://github.com/emacs-dashboard/emacs-dashboard][~dashboard~]] is a nice little splash screen that shows some recent items on starting Emacs.
-
 #+BEGIN_SRC emacs-lisp
   (use-package dashboard
     :config
@@ -718,19 +719,6 @@ TODO: commentary
     (set-fontset-font t 'symbol (font-spec :family "Apple Symbols") nil 'prepend)
     (set-fontset-font t 'symbol (font-spec :family "Apple Color Emoji") nil 'prepend))
 #+END_SRC
-
-
-TODO: commentary
-#+BEGIN_SRC emacs-lisp
-  (use-package beacon
-    :diminish
-    :config
-    (setq beacon-color "#666600")
-    (beacon-mode 1))
-#+END_SRC
-
-
-
 
 TODO: commentary
 #+BEGIN_SRC emacs-lisp
@@ -805,12 +793,16 @@ TODO: commentary
                 "C-(" 'dired-git-info-mode))
 #+END_SRC
 
-TODO: commentary
+** Projectile
+[[https://projectile.mx/][~projectile~]] is a project interaction package that provides lots of handy commands for operating at
+a project level.
+
+TODO: I should probably trim down this hydra since I don't use some of it.
 #+BEGIN_SRC emacs-lisp
   (use-package projectile
     :general
     (my-leader-def
-      "H" '(hydra-projectile/body :wk "projectile-mode")) ;;oryx
+      "h" '(hydra-projectile/body :wk "projectile-mode")) ;;oryx
     (projectile-mode-map "C-c h" 'projectile-command-map)
     :config
     (projectile-mode +1)
@@ -881,6 +873,7 @@ TODO: commentary
     (setq ag-arguments (list "--smart-case" "--column")))
 #+END_SRC
 
+** Org
 TODO: commentary
 #+BEGIN_SRC emacs-lisp
   (defun my-org-prettify-hook ()
@@ -896,13 +889,12 @@ TODO: commentary
           line-spacing 0.2))
 #+END_SRC
 
-TODO: commentary
+[[https://github.com/hniksic/emacs-htmlize][~htmlize~]] converts a buffer to HTML.
 #+BEGIN_SRC emacs-lisp
   (use-package htmlize
     :defer t)
 #+END_SRC
 
-*** Org-Mode
 TODO: commentary
 #+BEGIN_SRC emacs-lisp
   (defun my-org-todo-setup ()
@@ -1233,17 +1225,26 @@ TODO: commentary
        (plantuml . t))))
 #+END_SRC
 
-*** Writing Modes
-TODO: commentary
+** Writing Modes
+
+[[https://github.com/rnkn/olivetti][~olivetti~]] formats a buffer for easy prose editing by providing nice margins and a sensibly sized
+column of text.
 #+BEGIN_SRC emacs-lisp
   (use-package olivetti
     :defer t
     :custom
     (olivetti-body-width 90))
+#+END_SRC
 
-  (use-package writegood-mode
+[[https://github.com/bnbeckwith/writegood-mode][~writegood-mode~]] provides a bunch of useful functions for better writing, like finding weasel words
+and scoring the reading ease of prose.
+#+BEGIN_SRC emacs-lisp
+(use-package writegood-mode
     :defer t)
+#+END_SRC
 
+This is a function to turn on all the various writing modes.
+#+BEGIN_SRC emacs-lisp
   (defun my/writing-modes ()
     (interactive)
     (flyspell-mode +1)
@@ -1737,73 +1738,6 @@ TODO: commentary
     (add-to-list `auto-mode-alist '("\\.css\\'" . web-mode)))
 #+END_SRC
 
-TODO: commentary
-#+BEGIN_SRC emacs-lisp
-  (use-package yaml-mode
-    :defer t)
-
-  (use-package markdown-mode
-    :mode ("README\\.md\\'" . gfm-mode)
-    :init (setq markdown-command "multimarkdown"))
-#+END_SRC
-
-TODO: commentary
-#+BEGIN_SRC emacs-lisp
-  (use-package terraform-mode
-    :ensure t)
-#+END_SRC
-
-TODO: commentary
-#+BEGIN_SRC emacs-lisp
-  (use-package sqlformat
-    :ensure t
-    :init
-    ;(add-hook 'sql-mode-hook 'sqlformat-on-save-mode)
-    :config
-    (setq sqlformat-command 'pgformatter))
-
-  (defmacro my/with-advice (adlist &rest body)
-    "Execute BODY with temporary advice in ADLIST.
-
-  Each element of ADLIST should be a list of the form
-    (SYMBOL WHERE FUNCTION [PROPS])
-  suitable for passing to `advice-add'.  The BODY is wrapped in an
-  `unwind-protect' form, so the advice will be removed even in the
-  event of an error or nonlocal exit."
-    (declare (debug ((&rest (&rest form)) body))
-             (indent 1))
-    `(progn
-       ,@(mapcar (lambda (adform)
-                   (cons 'advice-add adform))
-                 adlist)
-       (unwind-protect (progn ,@body)
-         ,@(mapcar (lambda (adform)
-                     `(advice-remove ,(car adform) ,(nth 2 adform)))
-                   adlist))))
-
-  (defun my/call-logging-hooks (command &optional verbose)
-    "Call COMMAND, reporting every hook run in the process.
-  Interactively, prompt for a command to execute.
-
-  Return a list of the hooks run, in the order they were run.
-  Interactively, or with optional argument VERBOSE, also print a
-  message listing the hooks."
-    (interactive "CCommand to log hooks: \np")
-    (let* ((log     nil)
-           (logger (lambda (&rest hooks)
-                     (setq log (append log hooks nil)))))
-      (my/with-advice
-          ((#'run-hooks :before logger))
-        (call-interactively command))
-      (when verbose
-        (message
-         (if log "Hooks run during execution of %s:"
-           "No hooks run during execution of %s.")
-         command)
-        (dolist (hook log)
-          (message "> %s" hook)))
-      log))
-#+END_SRC
 
 TODO: commentary
 #+BEGIN_SRC emacs-lisp
@@ -2007,6 +1941,37 @@ TODO see how ~ensure-system-package~ works on windows.
 (use-package dap-mode)
 #+END_SRC
 
+*** Yaml
+#+BEGIN_SRC emacs-lisp
+  (use-package yaml-mode
+    :defer t)
+#+END_SRC
+
+*** Markdown
+#+BEGIN_SRC emacs-lisp
+  (use-package markdown-mode
+    :mode ("README\\.md\\'" . gfm-mode)
+    :init (setq markdown-command "multimarkdown"))
+#+END_SRC
+
+*** Terraform
+#+BEGIN_SRC emacs-lisp
+  (use-package terraform-mode
+    :ensure t)
+#+END_SRC
+
+*** SQL
+
+#+BEGIN_SRC emacs-lisp
+  (use-package sqlformat
+    :ensure t
+    :init
+    ;(add-hook 'sql-mode-hook 'sqlformat-on-save-mode)
+    :config
+    (setq sqlformat-command 'pgformatter))
+#+END_SRC
+
+
 *** Docker
 [[https://github.com/spotify/dockerfile-mode][~dockerfile-mode~]] provides some conveniences for
 editing Dockerfiles.
@@ -2052,6 +2017,15 @@ representation of your location in the ring.
       ("n" back-button-global-backward)
       ("t" back-button-local-forward)
       ("s" back-button-local-backward)))
+#+END_SRC
+
+[[https://github.com/Malabarba/beacon][~beacon~]] highlights the cursor location when scrolling or switching buffers.
+#+BEGIN_SRC emacs-lisp
+  (use-package beacon
+    :diminish
+    :config
+    (setq beacon-color "#666600")
+    (beacon-mode 1))
 #+END_SRC
 
 ** Window Management
@@ -2355,4 +2329,50 @@ with a useful hydra.
     (:keymaps 'ibuffer-mode-map
               "." 'hydra-ibuffer-main/body)
     )
+#+END_SRC
+
+** Unknown
+I don't actually know what these snippets do! I should probably get rid of them in due course.
+#+BEGIN_SRC emacs-lisp
+  (defmacro my/with-advice (adlist &rest body)
+    "Execute BODY with temporary advice in ADLIST.
+
+  Each element of ADLIST should be a list of the form
+    (SYMBOL WHERE FUNCTION [PROPS])
+  suitable for passing to `advice-add'.  The BODY is wrapped in an
+  `unwind-protect' form, so the advice will be removed even in the
+  event of an error or nonlocal exit."
+    (declare (debug ((&rest (&rest form)) body))
+             (indent 1))
+    `(progn
+       ,@(mapcar (lambda (adform)
+                   (cons 'advice-add adform))
+                 adlist)
+       (unwind-protect (progn ,@body)
+         ,@(mapcar (lambda (adform)
+                     `(advice-remove ,(car adform) ,(nth 2 adform)))
+                   adlist))))
+
+  (defun my/call-logging-hooks (command &optional verbose)
+    "Call COMMAND, reporting every hook run in the process.
+  Interactively, prompt for a command to execute.
+
+  Return a list of the hooks run, in the order they were run.
+  Interactively, or with optional argument VERBOSE, also print a
+  message listing the hooks."
+    (interactive "CCommand to log hooks: \np")
+    (let* ((log     nil)
+           (logger (lambda (&rest hooks)
+                     (setq log (append log hooks nil)))))
+      (my/with-advice
+          ((#'run-hooks :before logger))
+        (call-interactively command))
+      (when verbose
+        (message
+         (if log "Hooks run during execution of %s:"
+           "No hooks run during execution of %s.")
+         command)
+        (dolist (hook log)
+          (message "> %s" hook)))
+      log))
 #+END_SRC
