@@ -2137,14 +2137,14 @@ Now we've got a hydra to make the various window management functions easily acc
 #+BEGIN_SRC emacs-lisp
   (defhydra hydra-window-delux (:hint nil)
     "
-      ^Movement^        ^Split^            ^Switch^            ^Resize^       ^Eyebrowse^
+      ^Movement^        ^Split^          ^Switch^            ^Resize^      ^Eyebrowse^
       -----------------------------------------------------------------------------
-      _n_ ←               _v_ertical       _b_uffer             _q_ X←        _c_lose config
-      _e_ ↓               _h_orizontal     _f_ind files         _w_ X↓        _r_ename config
-      _i_ ↑               _z_ undo         _a_ce 1              _f_ X↑        _1_ setup 1
-      _o_ →               _Z_ reset        _s_wap               _p_ X→        _2_ setup 2
-      _F_ollow            _D_lt Other      _S_ave               _m_aximize    _3_ setup 3
-      _SPC_ cancel        _O_nly this      _d_elete             _=_ balance   _4_ setup 4
+      _n_ ←             _v_ertical       _b_uffer            _l_ X←        _c_lose config
+      _e_ ↓             _h_orizontal     _f_ind files        _u_ X↓        _r_ename config
+      _i_ ↑             _z_ undo         _a_ce 1             _y_ X↑        _1_ setup 1
+      _o_ →             _Z_ reset        _s_wap              _'_ X→        _2_ setup 2
+      _F_ollow          _D_lt Other      _S_ave              _m_aximize    _3_ setup 3
+      _q_ quit          _O_nly this      _d_elete            _=_ balance   _4_ setup 4
       "
     ;; Movement
     ("n" windmove-left )
@@ -2154,10 +2154,10 @@ Now we've got a hydra to make the various window management functions easily acc
     ("F" follow-mode)
 
     ;; Resize
-    ("q" hydra-move-splitter-left)
-    ("w" hydra-move-splitter-down)
-    ("f" hydra-move-splitter-up)
-    ("p" hydra-move-splitter-right)
+    ("l" hydra-move-splitter-left)
+    ("u" hydra-move-splitter-down)
+    ("y" hydra-move-splitter-up)
+    ("'" hydra-move-splitter-right)
     ("m" ace-maximize-window)
     ("=" balance-windows)
 
@@ -2210,8 +2210,7 @@ Now we've got a hydra to make the various window management functions easily acc
     ("7" eyebrowse-switch-to-window-config-7)
     ("8" eyebrowse-switch-to-window-config-8)
     ("9" eyebrowse-switch-to-window-config-9)
-    ("SPC" nil)
-    )
+    ("q" nil))
   (my-leader-def
     "w" '(hydra-window-delux/body :wk "Window Management"))
 #+END_SRC
