@@ -874,7 +874,7 @@ TODO: commentary
 
   (defun my-org-prettify-settings ()
     (setq org-startup-indented nil
-          org-src-fontify-natively nil
+          org-src-fontify-natively t
           org-hide-emphasis-markers t
           org-fontify-whole-heading-line t
           org-fontify-done-headline t
