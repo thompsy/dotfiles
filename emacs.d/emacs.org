@@ -120,7 +120,7 @@ you explicitly override it with :straight nil.
   (setq straight-use-package-by-default t)
 #+END_SRC
 
-Install ~use-package~ for easily installing other packages.
+Install [[https://github.com/jwiegley/use-package][~use-package~]] for easily installing other packages.
 #+BEGIN_SRC emacs-lisp
   ;; Install use-package to use with straight.el
   (straight-use-package 'use-package)
@@ -1816,7 +1816,7 @@ TODO: commentary
 
 
 
-[[https://www.gnu.org/software/emacs/manual/html_node/emacs/Saving-Emacs-Sessions.html][~desktop~]] saves the state of Emacs and restores it on restart. 
+[[https://www.gnu.org/software/emacs/manual/html_node/emacs/Saving-Emacs-Sessions.html][~desktop~]] saves the state of Emacs and restores it on restart.
 #+BEGIN_SRC emacs-lisp
   (use-package desktop
     :straight nil
