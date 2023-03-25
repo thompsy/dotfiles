@@ -28,7 +28,6 @@ available. A few places that I've found particularly useful include:
   - something like this: ~(use-package use-package-ensure-system-package)~
   - see https://github.com/jwiegley/use-package#use-package-ensure-system-package
 - explore prescient.el to sort company-mode suggestions
-- try crux, it has some useful looking things
 - try other modelines in due course
 - have all hydras use q for quit
 - use ~:after~ to specify any dependencies
@@ -136,7 +135,7 @@ explicitly load it with straight early in the init process. See more details in 
   (straight-use-package 'org)
 #+END_SRC
 
-** Basic Configuration
+** Core Configuration
 Diminish hides or abbreviates the mode line displays of minor-modes. It basically de-clutters the
 mode line, keeping things minimal and focused.
 #+BEGIN_SRC emacs-lisp
@@ -276,6 +275,31 @@ to any themes so that they confirmation code gets stored in ~custom.el~.
     :config
     (if (file-exists-p custom-file)
         (load-file custom-file)))
+#+END_SRC
+
+** OS Specific
+Map some keys on MacOS.
+#+BEGIN_SRC emacs-lisp
+  (use-package emacs
+    :straight nil
+    :when *is-a-mac*
+    :config
+    (setq mac-command-modifier 'meta     ;; Mac atl/option to Control
+          mac-option-modifier 'control)  ;; Mac command to Meta
+    (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
+    (add-to-list 'default-frame-alist '(ns-appearance . dark))
+    (set-fontset-font t 'symbol (font-spec :family "Apple Symbols") nil 'prepend)
+    (set-fontset-font t 'symbol (font-spec :family "Apple Color Emoji") nil 'prepend))
+#+END_SRC
+
+** Editing
+
+[[https://github.com/bbatsov/crux][~crux~]] has a bunch of handy editing features that originated in Prelude Emacs.
+#+BEGIN_SRC emacs-lisp
+  (use-package crux
+    :general
+    ;; First kill to end of line, then kill the whole then.
+    ("C-k" 'crux-smart-kill-line))
 #+END_SRC
 
 ** Aesthetics
@@ -705,22 +729,8 @@ content.
                                       "; Time "       (emacs-init-time))))
 #+END_SRC
 
-TODO: commentary
-#+BEGIN_SRC emacs-lisp
-  ;; Some basic config
-  (use-package emacs
-    :straight nil
-    :when *is-a-mac*
-    :config
-    (setq mac-command-modifier 'meta) ;; Mac atl/option to Control
-    (setq mac-option-modifier 'control) ; Mac command to Meta
-    (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
-    (add-to-list 'default-frame-alist '(ns-appearance . dark))
-    (set-fontset-font t 'symbol (font-spec :family "Apple Symbols") nil 'prepend)
-    (set-fontset-font t 'symbol (font-spec :family "Apple Color Emoji") nil 'prepend))
-#+END_SRC
 
-TODO: commentary
+~dired~ is basically a file explorer.
 #+BEGIN_SRC emacs-lisp
   (use-package dired
     :straight nil
@@ -731,6 +741,7 @@ TODO: commentary
       "d" 'dired)
     (dired-mode-map "." 'hydra-dired/body)
     :hydra
+    ;; TODO map 'c' to copy, r to rename
     (hydra-dired (:hint nil :color pink)
     "
   _+_ mkdir          _v_iew           _m_ark             _(_ details        _i_nsert-subdir    wdired
