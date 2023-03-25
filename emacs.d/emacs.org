@@ -1831,26 +1831,33 @@ TODO: commentary
 ** LSP Mode
 #+BEGIN_SRC emacs-lisp
   (use-package lsp-mode
-    :hook (lsp-mode . lsp-enable-which-key-integration)
+    :hook
+    (lsp-mode . lsp-enable-which-key-integration)
     (go-mode . lsp-deferred)
     :commands lsp
     :custom
+    ;; This interferes with the existing company-mode setup if populated
     (lsp-completion-provider :none)
     :general
     (my-leader-def
-      "L" '(hydra-lsp/body :wk "lsp-mode"))
+      "p" '(hydra-lsp/body :wk "lsp-mode"))
     :config
     (setq lsp-file-watch-threshold 500)
-    ;;TODO this should use :hydra
-    (defhydra hydra-lsp (:exit t :hint nil)
+    :custom-face
+    (lsp-face-highlight-read ((t (:background "gray"))))
+    (lsp-face-highlight-textual ((t (:background "gray"))))
+    (lsp-face-highlight-write ((t (:background "SteelBlue1"))))
+    (lsp-ui-doc-background ((t (:background "black"))))
+    :hydra
+    (hydra-lsp (:exit t :hint nil)
       "
    Buffer^^               Server^^                   Symbol
   -------------------------------------------------------------------------------------
    [_f_] format           [_M-r_] restart            [_d_] declaration  [_i_] implementation  [_o_] documentation
-   [_m_] imenu            [_S_]   shutdown           [_D_] definition   [_t_] type            [_r_] rename
+   [_m_] imenu            [_S_]   shutdown           [_j_] definition   [_t_] type            [_r_] rename
    [_x_] execute action   [_M-s_] describe session   [_R_] references   [_s_] signature       [_a_] actions"
       ("d" lsp-find-declaration)
-      ("D" lsp-ui-peek-find-definitions)
+      ("j" lsp-ui-peek-find-definitions)
       ("R" lsp-ui-peek-find-references)
       ("i" lsp-ui-peek-find-implementation)
       ("t" lsp-find-type-definition)
@@ -1866,13 +1873,6 @@ TODO: commentary
       ("M-s" lsp-describe-session)
       ("M-r" lsp-restart-workspace)
       ("S" lsp-shutdown-workspace)))
-
-  ;; TODO this should be fdolded into the config above
-  (custom-set-faces
-   '(lsp-face-highlight-read ((t (:background "gray"))))
-   '(lsp-face-highlight-textual ((t (:background "gray"))))
-   '(lsp-face-highlight-write ((t (:background "SteelBlue1"))))
-   '(lsp-ui-doc-background ((t (:background "black")))))
 
   (use-package lsp-ui
     :ensure t
@@ -1930,36 +1930,12 @@ one.
       (add-hook 'before-save-hook #'lsp-organize-imports t t))
     (add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
     :config
-    (setq gofmt-command "goimports")
-    (add-hook 'before-save-hook 'gofmt-before-save)
-    :general
-    (my-leader-def
-      "p" '(hydra-go-mode/body :wk "go-mode")) ;;oryx - this could be better?
-    :hydra
-    (hydra-go-mode (:hint nil :color green)
-
-      "
-  Imports             Describe             GoTo
-  --------------------------------------------------------
-  _ig_ import go      _d_escribe           _ga_ arguments
-  _ia_ import add     _j_ump to definition _gd_ docstring
-  _ir_ import remove  ^ ^                  _gf_ function
-  ^ ^                 ^ ^                  _gn_ function name
-  ^ ^                 ^ ^                  _gr_ return values
-  "
-      ("ig" go-goto-imports)
-      ("ia" go-import-add)
-      ("ir" go-remove-unused-imports)
-      ("d" godef-describe)
-      ("j" godef-jump)
-      ("ga" go-goto-arguments)
-      ("gd" go-goto-docstring)
-      ("gf" go-goto-function)
-      ("gn" go-goto-function-name)
-      ("gr" go-goto-return-values)))
-  (setq lsp-go-env '((GOFLAGS . "-tags=integration")))
-
+    (setq
+     gofmt-command "goimports"
+     lsp-go-env '((GOFLAGS . "-tags=integration")))
+    (add-hook 'before-save-hook 'gofmt-before-save))
 #+END_SRC
+
 
 *** Java
 Commenting this for now since its a real slow loader.  TODO possible candidate for ~:defer~?
