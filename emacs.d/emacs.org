@@ -372,9 +372,7 @@ global leader key, ~my-leader-def~ and chain bindings from that.
       ;; bookmarks - TODO setup a Hydra for this
       "b" '(:ignore t :wk "bookmarks")
       "bs" 'bookmark-set
-      "bg" 'bookmark-jump
-      ;; TODO have this call helm-bookmarks
-      "bl" 'bookmark-bmenu-list
+      "bl" 'helm-bookmarks
       ;; quit / restart
       "q" '(:ignore t :wk "quit / restart")
       "qq" 'save-buffers-kill-terminal
