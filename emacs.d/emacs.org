@@ -2013,6 +2013,11 @@ TODO see how ~ensure-system-package~ works on windows.
     (setq pipenv-projectile-after-switch-function #'pipenv-projectile-after-switch-extended))
 #+END_SRC
 
+*** Rust
+#+BEGIN_SRC emacs-lisp
+(use-package rustic)
+#+END_SRC
+
 
 
 #+BEGIN_SRC emacs-lisp
@@ -2227,6 +2232,7 @@ TODO: commentary
            ("code" (or (filename . "code")
                        (filename . ".py")
                        (filename . ".go")
+                       (filename . ".rs")
                        (filename . ".java")))
            ("Web Dev" (or (mode . html-mode)
                           (mode . css-mode)))
