@@ -384,18 +384,22 @@ the available next keys along with their corresponding commands. This makes disc
 commands very easy.
 
 The only slight issue with this is that the size of the minibuffer expands a lot which can cause the
-view of the current buffer to change depending on where the point is. I've not been able to find a
-way around this yet.
+view of the current buffer to change depending on where the point is. ~which-key-posframe~ provides an
+improvement on this by popping up in a floating window. I'll try it for a while and see.
 
 #+BEGIN_SRC emacs-lisp
-    (use-package which-key
-      :custom
-      (which-key-idle-delay 0)
-      :config
-      (which-key-mode +1)
-      ;(which-key-setup-minibuffer)
-      (which-key-setup-side-window-bottom)
-      )
+  (use-package which-key
+    :custom
+    (which-key-idle-delay 0)
+    :config
+    (which-key-mode +1)
+    ;(which-key-setup-minibuffer)
+    (which-key-setup-side-window-bottom))
+
+  (use-package which-key-posframe
+    :config
+    (which-key-posframe-mode)
+    (setq which-key-posframe-poshandler 'posframe-poshandler-point-bottom-left-corner))
 #+END_SRC
 
 [[https://github.com/abo-abo/hydra][~hydra~]]
