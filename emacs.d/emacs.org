@@ -454,7 +454,6 @@ This is a hydra for working with the ~rectangle~ commands.
 
 TODO: I should understand how this works better.
 
-TODO: helm-mini should create buffer before bookmark.
 #+BEGIN_SRC emacs-lisp
   (my-leader-def "R" '(hydra-rectangle/body :wk "rectangle"))
   (defhydra hydra-rectangle (:body-pre (rectangle-mark-mode 1)
@@ -601,8 +600,8 @@ TODO: commentary
           helm-mini-default-sources '(helm-source-buffers-list
                                   helm-source-recentf
                                   helm-source-bookmarks
-                                  helm-source-bookmark-set
-                                  helm-source-buffer-not-found))
+                                  helm-source-buffer-not-found
+                                  helm-source-bookmark-set))
     ;; TODO why not use general here?
     :bind (("M-x"     . helm-M-x)
            ("C-x C-f" . helm-find-files)
