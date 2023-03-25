@@ -2026,7 +2026,8 @@ select from the list of options.
     :general ("C-'" 'avy-goto-char-timer))
 #+END_SRC
 
-TODO: commentary
+[[https://github.com/rolandwalker/back-button][~back-button~]] is an improvement on the existing ~pop-global-mark~ functionality by providing a visual
+representation of your location in the ring.
 #+BEGIN_SRC emacs-lisp
   (use-package back-button
     :straight (back-button :host github :repo "rolandwalker/back-button")
@@ -2055,29 +2056,39 @@ TODO: commentary
 #+BEGIN_SRC emacs-lisp
   (use-package ace-window
     :general
-    ("M-o" 'ace-window)
+    ("C-x o" 'ace-window)
     :config
     (setq aw-keys '(?a ?r ?s ?t ?n ?e ?i ?o)))
 #+END_SRC
 
 TODO: commentary
+[[https://github.com/dimitri/switch-window][~switch-window~]] allows for easy switching between windows within a frame.
 #+BEGIN_SRC emacs-lisp
   (use-package switch-window
     :general
-    ("C-x o" 'switch-window)
+    ("M-o" 'switch-window)
     :config
     (setq switch-window-shortcut-style 'qwerty))
 #+END_SRC
 
-TODO: commentary
+[[https://depp.brause.cc/eyebrowse/][~eyebrowse~]] is a tool for keeping track you window configurations. Use ~C-c C-w~ to see the bindings
+with ~which-key~.
 #+BEGIN_SRC emacs-lisp
   (use-package eyebrowse
     :ensure t
     :init
     (eyebrowse-mode t))
+
+  (use-package eyebrowse-restore
+    :ensure t
+    :config
+    (eyebrowse-restore-mode))
 #+END_SRC
 
 TODO: commentary
+
+[[https://www.gnu.org/software/emacs/manual/html_node/emacs/Window-Convenience.html#index-winner_002dmode][~winner-mode~]] tracks changes in window configuration for a frame so that they can be undone or
+redone.
 #+BEGIN_SRC emacs-lisp
   (use-package winner
     :commands winner-mode
