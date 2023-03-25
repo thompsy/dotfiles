@@ -366,8 +366,6 @@ global leader key, ~my-leader-def~ and chain bindings from that.
     ;; TODO some of these should probably live elsewhere
     (my-leader-def
       "a" 'org-agenda
-      "RET" 'make-frame-command
-      ;; bookmarks - TODO setup a Hydra for this
       "b" '(:ignore t :wk "bookmarks")
       "bs" 'bookmark-set
       "bl" 'helm-bookmarks
@@ -417,9 +415,7 @@ This is a simple hydra to scale the font of the current buffer.
 
 TODO: In future it would be good to improve this to apply the changes to the current frame so that
 the changes took affect in all buffers in that frame. There seem to be a few existing options to do
-this according to this
-[[https://stackoverflow.com/questions/24705984/increase-decrease-font-size-in-an-emacs-frame-not-just-buffer][stackoverflow
-question]].
+this according to this [[https://stackoverflow.com/questions/24705984/increase-decrease-font-size-in-an-emacs-frame-not-just-buffer][stackoverflow question]].
 #+BEGIN_SRC emacs-lisp
   ;; Add an easy zoom function
   (my-leader-def "z" '(hydra-zoom/body :wk "zoom"))
@@ -619,7 +615,6 @@ TODO: commentary
            ;; Let's keep tab-completetion anyhow.
            ("TAB"   . helm-execute-persistent-action)
            ("<tab>" . helm-execute-persistent-action)))
-
 #+END_SRC
 
 [[https://github.com/emacs-helm/helm-descbinds][~helm-descbinds~]] makes it easy to search the current active keybindings using ~helm~.
