@@ -582,8 +582,8 @@ when there's a keyboard shortcut to do something that you've just used the mouse
 #+END_SRC
 
 ** Helm
-TODO: commentary
-[[https://github.com/emacs-helm/helm][~helm~]]
+[[https://github.com/emacs-helm/helm][~helm~]] is a framework for incremental completions and
+narrowing selections. It makes it easy to find what you want by filtering as you type.
 #+BEGIN_SRC emacs-lisp
   (use-package helm
     :diminish
@@ -622,13 +622,6 @@ TODO: commentary
   (use-package helm-descbinds
     :config (helm-descbinds-mode))
 
-#+END_SRC
-
-[[https://github.com/abo-abo/helm-make][~helm-make~]] shows all the targets in a ~Makefile~ for easy searching and navigation.
-
-TODO: move this down to the programming section
-#+BEGIN_SRC emacs-lisp
-  (use-package helm-make)
 #+END_SRC
 
 [[https://github.com/emacsorphanage/helm-swoop][~helm-swoop~]] is a useful way to search a buffer using ~helm~.
