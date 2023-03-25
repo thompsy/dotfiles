@@ -32,7 +32,8 @@ available. A few places that I've found particularly useful include:
 - try other modelines in due course
 - experiment with C-t as the leader key
 - setup hydra for bookmarks, using helm
-- setup hydra for registers, using helm
+- have all hydras use q for quit
+- use ~:after~ to specify any dependencies
 * Emacs
 ** Local
 These are various, installation specific settings that might differ across machines, some of which I
@@ -488,7 +489,7 @@ TODO: helm-mini should create buffer before bookmark.
          ("g" nil))
 #+END_SRC
 
-TODO: commentary
+This hydra provides easy access to various package management commands.
 #+BEGIN_SRC emacs-lisp
   (my-leader-def "s" '(hydra-straight-helper/body :wk "pkgs"))
   (defhydra hydra-straight-helper (:hint nil :color green)
@@ -521,7 +522,7 @@ TODO: commentary
          ("q" nil))
 #+END_SRC
 
-TODO: commentary
+This hydra gives easy access to inserting various Unicode characters.
 #+BEGIN_SRC emacs-lisp
   (defun my/insert-unicode (unicode-name)
     "Same as C-x 8 enter UNICODE-NAME."
@@ -551,6 +552,31 @@ TODO: commentary
     ("e" (my/insert-unicode "DOWNWARDS ARROW"))
     ("i" (my/insert-unicode "UPWARDS ARROW"))
     ("o" (my/insert-unicode "RIGHTWARDS ARROW")))
+#+END_SRC
+
+This hydra provides easy access to ~register~ functions.
+#+BEGIN_SRC emacs-lisp
+  (my-leader-def "r" '(hydra-register-helper/body :wk "registers"))
+  (defhydra hydra-register-helper (:hint nil :color green)
+    "
+   Position                   Text
+  ----------------------------------------------------
+   _p_oint to register        _c_opy to register
+   _j_ump to point            _a_ppend to register
+                            _P_repend to register
+   _l_ist registers           _i_nsert from register"
+    ;; Position
+    ("p" point-to-register)
+    ("j" jump-to-register)
+    ("l" helm-register)
+
+    ;; Text
+    ("c" copy-to-register)
+    ("a" append-to-register)
+    ("P" prepend-to-register)
+    ("i" insert-register)
+
+    ("q" nil))
 #+END_SRC
 
 [[https://github.com/dacap/keyfreq][~keyfreq~]] tracks how many times you use various Emacs commands. This can be helpful to identify
@@ -1242,7 +1268,7 @@ TODO: commentary
 #+END_SRC
 
 *** Spelling
-TODO: commentary
+~flyspell~ is Emacs' spelling mode. I've added a decent hydra here for convenience.
 #+BEGIN_SRC emacs-lisp
   (setenv "LANG" "en_GB")
   (use-package flyspell
@@ -1251,12 +1277,12 @@ TODO: commentary
     (my-leader-def
       "n" 'hydra-spelling/body) ;;oryx: just 'c' would be better here
     :hook ((prog-mode . flyspell-prog-mode)
-         ((org-mode text-mode) . flyspell-mode))
+           ((org-mode text-mode) . flyspell-mode))
     :config
     (setq ispell-dictionary "english"
           ispell-silently-savep t
           ispell-personal-dictionary "~/.emacs.d/.aspell.en.pws")
-    :hydra (hydra-spelling (:color blue)
+    :hydra (hydra-spelling (:color blue :hint nil)
       "
   ^
   ^Spelling^          ^Errors^            ^Checker^
