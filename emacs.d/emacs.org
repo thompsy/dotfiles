@@ -2381,6 +2381,19 @@ with a useful hydra.
     )
 #+END_SRC
 
+~uniqify~ renames buffers with the same name so that they're easier to distinguish.
+#+BEGIN_SRC emacs-lisp
+  (use-package uniquify
+    :straight nil
+    :config
+    (setq uniquify-buffer-name-style 'forward
+          uniquify-separator "/"
+          ;; rename after killing uniquified
+          uniquify-after-kill-buffer-p t
+          ;; don't muck with special buffers
+          uniquify-ignore-buffers-re "^\\*"))
+#+END_SRC
+
 ** Unknown
 I don't actually know what these snippets do! I should probably get rid of them in due course.
 #+BEGIN_SRC emacs-lisp
