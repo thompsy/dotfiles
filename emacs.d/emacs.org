@@ -404,6 +404,8 @@ global leader key, ~my-leader-def~ and chain bindings from that.
      "C-c C-k" 'kill-region
      "C-x C-k" 'kill-region
      "C-x C-b" 'ibuffer
+     ;; C-z defaults to suspend-frame which isn't very useful
+     "C-z" 'undo
      "M-s" 'highlight-symbol-at-point
      "M-c" 'hi-lock-mode
      "M-z" 'pop-global-mark)
