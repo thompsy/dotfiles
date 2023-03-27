@@ -362,7 +362,6 @@ global leader key, ~my-leader-def~ and chain bindings from that.
      "C-w" 'backward-kill-word
      "C-c C-k" 'kill-region
      "C-x C-k" 'kill-region
-     "C-x C-b" 'ibuffer
      ;; C-z defaults to suspend-frame which isn't very useful
      "C-z" 'undo
      "M-s" 'highlight-symbol-at-point
@@ -894,14 +893,6 @@ TODO: I should probably trim down this hydra since I don't use some of it.
       ("q"   nil "cancel" :color blue)))
 #+END_SRC
 
-TODO: commentary
-#+BEGIN_SRC emacs-lisp
-  (use-package ibuffer-vc
-    :config
-    (add-hook 'ibuffer-hook #'ibuffer-vc-set-filter-groups-by-vc-root))
-
-  (use-package ibuffer-projectile)
-#+END_SRC
 
 TODO: commentary
 #+BEGIN_SRC emacs-lisp
@@ -2253,51 +2244,17 @@ with a useful hydra.
 #+BEGIN_SRC emacs-lisp
   (use-package ibuffer
     :straight nil
+    :init
+    (use-package ibuffer-projectile)
+    (use-package ibuffer-vc
+      :commands (ibuffer-vc-set-filter-groups-by-vc-root)
+      :custom
+      (ibuffer-vc-skip-if-remote 'nil))
     :config
     (setq
      ;; hide empty filter groups
      ibuffer-show-empty-filter-groups nil
-     ibuffer-formats
-     '((mark modified read-only vc-status-mini " "
-             (name 18 18 :left :elide)
-             " "
-             (size 9 -1 :right)
-             " "
-             (mode 16 16 :left :elide)
-             " "
-             (vc-status 16 16 :left)
-             " "
-             vc-relative-file))
-     ibuffer-saved-filter-groups
-     '(("home"
-        ("system-config" (or (filename . "dotfiles")
-                             (filename . "emacs-config")))
-        ("Org" (or (mode . org-mode)
-                   (filename . "OrgMode")))
-        ("code" (or (filename . "code")
-                    (filename . ".py")
-                    (filename . ".go")
-                    (filename . ".rs")
-                    (filename . ".java")))
-        ("Web Dev" (or (mode . html-mode)
-                       (mode . css-mode)))
-        ("Directories" (mode . dired-mode))
-        ("Help" (or (name . "\*Help\*")
-                    (name . "\*Apropos\*")
-                    (name . "\*info\*")))
-        ("Builtin" (or (name . "\*Messages\*")
-                       (name . "\*Completions\*")
-                       (name . "\*Backtrace\*")
-                       (name . "\*Compile-Log\*")
-                       (name . "\*Calendar\*")
-                       (name . "\*Calculator\*")
-                       (name . "'*Scratch\*"))))))
-    :hook
-    (ibuffer-mode .
-                  (lambda ()
-                    (ibuffer-auto-mode 1)
-                    (ibuffer-switch-to-saved-filter-groups "home")))
-
+     )
     :hydra (hydra-ibuffer-main (:color pink :hint nil)
                                "
     ^Mark^         ^Actions^         ^View^          ^Select^              ^Navigation^
@@ -2393,6 +2350,7 @@ with a useful hydra.
                                  ("/" ibuffer-filter-disable "disable")
                                  ("b" hydra-ibuffer-main/body "back" :color blue))
     :general
+    ("C-x C-b" 'ibuffer)
     (:keymaps 'ibuffer-mode-map
               "." 'hydra-ibuffer-main/body)
     )
