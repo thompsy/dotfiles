@@ -2412,3 +2412,17 @@ I don't actually know what these snippets do! I should probably get rid of them 
           (message "> %s" hook)))
       log))
 #+END_SRC
+
+** Help
+[[https://github.com/Wilfred/helpful][~helpful~]] provides a slightly nicer interface to the built-in help files.
+#+begin_src emacs-lisp
+  (use-package helpful
+    :general
+    ("C-h f" 'helpful-callable)
+    ("C-h F" 'helpful-function)
+    ("C-h M" 'helpful-macro)
+    ("C-h x" 'helpful-command)
+    ("C-h k" 'helpful-key)
+    ("C-h v" 'helpful-variable)
+    ("C-h C-d" 'helpful-at-point))
+#+end_src
