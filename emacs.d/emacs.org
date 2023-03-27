@@ -1440,6 +1440,7 @@ TODO: commentary
      "<tab>" 'company-complete-selection
      ;; Keep this as the global binding
      "C-w" 'backward-kill-word
+     "C-g" 'company-abort
      ;; Use C-n,p for navigation in addition to M-n,p
      ;;"C-n" '(lambda () (interactive) (company-complete-common-or-cycle 1))
      ;;"C-p" '(lambda () (interactive) (company-complete-common-or-cycle -1))
