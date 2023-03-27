@@ -735,6 +735,11 @@ TODO try vundo instead https://github.com/casouri/vundo
   (with-eval-after-load 'undo-tree (defun undo-tree-overridden-undo-bindings-p () nil))
 #+END_SRC
 
+[[https://github.com/waymondo/popup-kill-ring][~popup-kill-ring~]] displays the kill-ring in a popup at the point.
+#+begin_src emacs-lisp
+(use-package popup-kill-ring
+  :bind ("M-y" . popup-kill-ring))
+#+end_src
 
 [[https://github.com/victorhge/iedit][~iedit~]] allows you edit multiple occurrences of the same symbol at the same time. It's less useful
 now that ~lsp-mode~ can do the same thing across a project, but it is still useful for non-lsp enabled
