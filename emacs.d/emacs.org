@@ -1434,7 +1434,6 @@ TODO: commentary
 
     ;; Bindings when the company list is active.
     :general
-    ;; TODO add cancel binding
     (company-active-map
      "C-d" 'company-show-doc-buffer ;; In new temp buffer
      "<tab>" 'company-complete-selection
@@ -1780,6 +1779,7 @@ Go.
   (use-package go-mode
     :mode "\\.go\\'"
     :custom
+    ;; TODO move these into :hook
     (defun lsp-go-install-save-hooks ()
       (add-hook 'before-save-hook #'lsp-format-buffer t t)
       (add-hook 'before-save-hook #'lsp-organize-imports t t))
@@ -1788,7 +1788,8 @@ Go.
     (setq
      gofmt-command "goimports"
      lsp-go-env '((GOFLAGS . "-tags=integration")))
-    (add-hook 'before-save-hook 'gofmt-before-save))
+    (add-hook 'before-save-hook 'gofmt-before-save)
+    (add-hook 'go-mode-hook #'subword-mode))
 #+END_SRC
 
 *** Java
