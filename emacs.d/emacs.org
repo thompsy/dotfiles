@@ -1778,18 +1778,16 @@ Go.
 #+BEGIN_SRC emacs-lisp
   (use-package go-mode
     :mode "\\.go\\'"
-    :custom
-    ;; TODO move these into :hook
-    (defun lsp-go-install-save-hooks ()
-      (add-hook 'before-save-hook #'lsp-format-buffer t t)
-      (add-hook 'before-save-hook #'lsp-organize-imports t t))
-    (add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
     :config
     (setq
      gofmt-command "goimports"
      lsp-go-env '((GOFLAGS . "-tags=integration")))
+    ;; TODO still feels like these could live under :hook
     (add-hook 'before-save-hook 'gofmt-before-save)
-    (add-hook 'go-mode-hook #'subword-mode))
+    (add-hook 'go-mode-hook #'subword-mode)
+    (add-hook 'before-save-hook #'lsp-format-buffer t t)
+    (add-hook 'before-save-hook #'lsp-organize-imports t t)
+    (add-hook 'go-mode-hook #'lsp-go-install-save-hooks))
 #+END_SRC
 
 *** Java
