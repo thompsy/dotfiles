@@ -2030,6 +2030,18 @@ This is a scheme mode. I don't really use it much.
     (geiser-active-implementations '(guile mit racket)))
 #+END_SRC
 
+*** Tree Sitter
+[[https://emacs-tree-sitter.github.io][~tree-sitter~]] provides a much improved code highlighting and allows Emacs to understand the
+structure of code that I'm editing. Note that this part of core Emacs from v29 onwards.
+#+begin_src emacs-lisp
+  (use-package tree-sitter
+    :init
+    (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
+    (global-tree-sitter-mode))
+
+  (use-package tree-sitter-langs
+    :after tree-sitter)
+#+end_src
 ** Navigation
 [[https://github.com/abo-abo/avy][~avy~]] is an easy way to jump around any visible buffers. Hit ~C-'~ and hit a few characters, then
 select from the list of options.
