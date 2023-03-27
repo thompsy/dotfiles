@@ -284,8 +284,8 @@ Map some keys on MacOS.
     :straight nil
     :when *is-a-mac*
     :config
-    (setq mac-command-modifier 'meta     ;; Mac atl/option to Control
-          mac-option-modifier 'control)  ;; Mac command to Meta
+    (setq mac-command-modifier 'control ;; Mac command to Control
+          mac-option-modifier 'meta)    ;; Mac atl/option to Meta
     (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
     (add-to-list 'default-frame-alist '(ns-appearance . dark))
     (set-fontset-font t 'symbol (font-spec :family "Apple Symbols") nil 'prepend)
