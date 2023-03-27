@@ -334,11 +334,9 @@ available to Emacs.
 #+BEGIN_SRC emacs-lisp
   (use-package doom-modeline
     :demand t
-    :preface
-    (defun my-doom-modeline-setup ()
-      (column-number-mode +1)
-      (doom-modeline-mode +1))
-    :init (my-doom-modeline-setup)
+    :init
+    (column-number-mode +1)
+    (doom-modeline-mode +1)
     :config
     (setq doom-modeline-height 1)
     (set-face-attribute 'mode-line nil :height 150)
