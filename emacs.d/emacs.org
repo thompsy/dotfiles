@@ -625,6 +625,14 @@ https://github.com/syl20bnr/spacemacs/issues/1863#issuecomment-345057408
            ("TAB"   . helm-execute-persistent-action)
            ("<tab>" . helm-execute-persistent-action)))
 #+END_SRC
+[[https://github.com/PythonNut/helm-flx][~helm-flx~]] provides fuzzy sorting for helm.
+#+BEGIN_SRC emacs-lisp
+  (use-package helm-flx
+    :config
+    (setq helm-flx-for-helm-find-files t
+      helm-flx-for-helm-locate t)
+    (helm-flx-mode +1))
+#+END_SRC
 
 [[https://github.com/emacs-helm/helm-descbinds][~helm-descbinds~]] makes it easy to search the current active keybindings using ~helm~.
 #+BEGIN_SRC emacs-lisp
