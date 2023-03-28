@@ -1399,10 +1399,9 @@ TODO: commentary
   (add-hook 'org-mode-hook 'turn-on-auto-fill)
 #+END_SRC
 
-TODO: straight should be t here
+
 #+BEGIN_SRC emacs-lisp
   (use-package org
-    :straight nil
     :gfhook
     #'my-org-prettify-hook
     ('org-src-mode-hook #'my-disable-flycheck-for-elisp)
