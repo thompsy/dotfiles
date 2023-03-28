@@ -2554,6 +2554,8 @@ Now we've got a hydra to make the various window management functions easily acc
 ** IBuffer
 IBuffer is a useful way of viewing all open buffers. This config adds some sensible grouping along
 with a useful hydra.
+
+TODO: add icons https://github.com/seagle0128/all-the-icons-ibuffer
 #+BEGIN_SRC emacs-lisp
   (use-package ibuffer
     :straight nil
