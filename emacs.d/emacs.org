@@ -564,22 +564,14 @@ This hydra provides easy access to ~register~ functions.
   (my-leader-def "r" '(hydra-register-helper/body :wk "registers"))
   (defhydra hydra-register-helper (:hint nil :color green)
     "
-   Position                   Text
-  ----------------------------------------------------
-   _p_oint to register        _c_opy to register
-   _j_ump to point            _a_ppend to register
-                            _P_repend to register
-   _l_ist registers           _i_nsert from register"
-    ;; Position
-    ("p" point-to-register)
-    ("j" jump-to-register)
-    ("l" list-registers) ;;TODO replace with consult
-
-    ;; Text
-    ("c" copy-to-register)
-    ("a" append-to-register)
-    ("P" prepend-to-register)
-    ("i" insert-register)
+   Position
+  -------------------
+   _s_tore a register
+   _l_oad a register
+   _q_uit
+    "
+    ("s" consult-register-store)
+    ("l" consult-register-load)
 
     ("q" nil))
 #+END_SRC
