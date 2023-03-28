@@ -589,6 +589,9 @@ when there's a keyboard shortcut to do something that you've just used the mouse
 ** Helm
 [[https://github.com/emacs-helm/helm][~helm~]] is a framework for incremental completions and
 narrowing selections. It makes it easy to find what you want by filtering as you type.
+
+TODO: remove the directory listings from ~helm-find-files~: try something like this:
+https://github.com/syl20bnr/spacemacs/issues/1863#issuecomment-345057408
 #+BEGIN_SRC emacs-lisp
   (use-package helm
     :disabled
@@ -642,6 +645,10 @@ TODO: there's probably more useful options here I could explore
      ;; show syntax highlighting in swoop minibuffer
      helm-swoop-speed-or-color t
      ;; don't pre-populate the swoop minibuffer with the symbol at the point
+     ;;
+     ;; TODO it would be nice to populate this sometimes and not at others times and bind these to
+     ;; other keys
+     ;;
      ;;helm-swoop-pre-input-function (lambda () "")
      helm-swoop-use-fuzzy-matching t)
     :general
@@ -886,8 +893,7 @@ TODO: I should probably trim down this hydra since I don't use some of it.
       ("q"   nil "cancel" :color blue)))
 #+END_SRC
 
-
-TODO: commentary
+Various helm add-ons.
 #+BEGIN_SRC emacs-lisp
   (use-package helm-projectile
     :disabled
@@ -1231,7 +1237,7 @@ TODO: commentary
           line-spacing 0.2))
 #+END_SRC
 
-[[https://github.com/hniksic/emacs-htmlize][~htmlize~]] converts a buffer to HTML.
+[[https://github.com/hniksic/emacs-htmlize][~htmlize~]] converts a buffer to HTML with nice syntax highlighting.
 #+BEGIN_SRC emacs-lisp
   (use-package htmlize
     :defer t)
