@@ -2483,12 +2483,12 @@ Now we've got a hydra to make the various window management functions easily acc
     "
       ^Movement^        ^Split^          ^Switch^            ^Resize^      ^Eyebrowse^
       -----------------------------------------------------------------------------
-      _n_ ←             _v_ertical       _b_uffer            _l_ X←        _c_lose config
-      _e_ ↓             _h_orizontal     _f_ind files        _u_ X↓        _r_ename config
+      _n_ ←             _r_right         _b_uffer            _l_ X←        _C_lose config
+      _e_ ↓             _d_own           _f_ind files        _u_ X↓        _R_ename config
       _i_ ↑             _z_ undo         _a_ce 1             _y_ X↑        _1_ setup 1
       _o_ →             _Z_ reset        _s_wap              _'_ X→        _2_ setup 2
       _F_ollow          _D_lt Other      _S_ave              _m_aximize    _3_ setup 3
-      _q_ quit          _O_nly this      _d_elete            _=_ balance   _4_ setup 4
+      _q_ quit          _O_nly this      _c_lose             _=_ balance   _4_ setup 4
       "
     ;; Movement
     ("n" windmove-left )
@@ -2506,11 +2506,11 @@ Now we've got a hydra to make the various window management functions easily acc
     ("=" balance-windows)
 
     ;; Split
-    ("v" (lambda ()
+    ("r" (lambda ()
            (interactive)
            (split-window-right)
            (windmove-right)))
-    ("h" (lambda ()
+    ("d" (lambda ()
            (interactive)
            (split-window-below)
            (windmove-down)))
@@ -2539,11 +2539,11 @@ Now we've got a hydra to make the various window management functions easily acc
            (add-hook 'ace-window-end-once-hook
                      'hydra-window/body)))
     ("S" save-buffer)
-    ("d" delete-window)
+    ("c" delete-window)
 
     ;; Eyebrowse
-    ("c" eyebrowse-close-window-config)
-    ("r" eyebrowse-rename-window-config)
+    ("C" eyebrowse-close-window-config)
+    ("R" eyebrowse-rename-window-config)
     ("0" eyebrowse-switch-to-window-config-0)
     ("1" eyebrowse-switch-to-window-config-1)
     ("2" eyebrowse-switch-to-window-config-2)
