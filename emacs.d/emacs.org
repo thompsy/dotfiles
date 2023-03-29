@@ -1113,6 +1113,10 @@ TODO: commentary
 #+end_src
 
 #+begin_src emacs-lisp
+(use-package consult-dir)
+#+end_src
+
+#+begin_src emacs-lisp
   (use-package embark
     :demand t
     :ensure t
