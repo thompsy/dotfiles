@@ -2425,20 +2425,6 @@ worth keeping around for other functionality.
     (setq switch-window-shortcut-style 'qwerty))
 #+END_SRC
 
-[[https://depp.brause.cc/eyebrowse/][~eyebrowse~]] is a tool for keeping track you window configurations. Use ~C-c C-w~ to see the bindings
-with ~which-key~. ~eyebrowse-restore~ allows those window configurations to be persisted across
-sessions.
-#+BEGIN_SRC emacs-lisp
-  (use-package eyebrowse
-    :ensure t
-    :init
-    (eyebrowse-mode t))
-
-  (use-package eyebrowse-restore
-    :ensure t
-    :config
-    (eyebrowse-restore-mode))
-#+END_SRC
 
 [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Window-Convenience.html#index-winner_002dmode][~winner-mode~]] tracks changes in window configuration for a frame so that they can be undone or
 redone.
@@ -2487,14 +2473,14 @@ Now we've got a hydra to make the various window management functions easily acc
 #+BEGIN_SRC emacs-lisp
   (defhydra hydra-window-delux (:hint nil)
     "
-      ^Movement^        ^Split^          ^Switch^            ^Resize^      ^Eyebrowse^
+      ^Movement^        ^Split^          ^Switch^            ^Resize^      ^Tab bar^
       -----------------------------------------------------------------------------
-      _n_ ←             _r_right         _b_uffer            _l_ X←        _C_lose config
-      _e_ ↓             _d_own           _f_ind files        _u_ X↓        _R_ename config
-      _i_ ↑             _z_ undo         _a_ce 1             _y_ X↑        _1_ setup 1
-      _o_ →             _Z_ reset        _s_wap              _'_ X→        _2_ setup 2
-      _F_ollow          _D_lt Other      _S_ave              _m_aximize    _3_ setup 3
-      _q_ quit          _O_nly this      _c_lose             _=_ balance   _4_ setup 4
+      _n_ ←             _r_right         _b_uffer            _l_ X←        _C_lose tab
+      _e_ ↓             _d_own           _f_ind files        _u_ X↓        _R_ename tab
+      _i_ ↑             _z_ undo         _a_ce 1             _y_ X↑        _N_ew tab
+      _o_ →             _Z_ reset        _s_wap              _'_ X→        _S_witch tab
+      _F_ollow          _D_lt Other      ^ ^                 _m_aximize    _U_ndo tab
+      _q_ quit          _O_nly this      _c_lose             _=_ balance   ^ ^
       "
     ;; Movement
     ("n" windmove-left )
@@ -2544,22 +2530,14 @@ Now we've got a hydra to make the various window management functions easily acc
            (ace-window 4)
            (add-hook 'ace-window-end-once-hook
                      'hydra-window/body)))
-    ("S" save-buffer)
     ("c" delete-window)
 
-    ;; Eyebrowse
-    ("C" eyebrowse-close-window-config)
-    ("R" eyebrowse-rename-window-config)
-    ("0" eyebrowse-switch-to-window-config-0)
-    ("1" eyebrowse-switch-to-window-config-1)
-    ("2" eyebrowse-switch-to-window-config-2)
-    ("3" eyebrowse-switch-to-window-config-3)
-    ("4" eyebrowse-switch-to-window-config-4)
-    ("5" eyebrowse-switch-to-window-config-5)
-    ("6" eyebrowse-switch-to-window-config-6)
-    ("7" eyebrowse-switch-to-window-config-7)
-    ("8" eyebrowse-switch-to-window-config-8)
-    ("9" eyebrowse-switch-to-window-config-9)
+    ;; Tab bar
+    ("C" tab-close)
+    ("R" tab-rename)
+    ("N" tab-new)
+    ("S" tab-switch)
+    ("U" tab-undo)
     ("q" nil))
   (my-leader-def
     "w" '(hydra-window-delux/body :wk "Window Management"))
