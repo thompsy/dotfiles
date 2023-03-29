@@ -592,6 +592,11 @@ narrowing selections. It makes it easy to find what you want by filtering as you
 
 TODO: remove the directory listings from ~helm-find-files~: try something like this:
 https://github.com/syl20bnr/spacemacs/issues/1863#issuecomment-345057408
+
+TODO: sort the listing in helm-mini when I narrow. Without narrowing its ordered by recency which is
+good, but when I narrow it is ordered in another way, maybe length?
+
+TODO try the more modern https://github.com/minad/vertico
 #+BEGIN_SRC emacs-lisp
   (use-package helm
     :disabled
@@ -657,7 +662,7 @@ TODO: there's probably more useful options here I could explore
      ;; TODO it would be nice to populate this sometimes and not at others times and bind these to
      ;; other keys
      ;;
-     ;;helm-swoop-pre-input-function (lambda () "")
+     helm-swoop-pre-input-function (lambda () "")
      helm-swoop-use-fuzzy-matching t)
     :general
     ("C-s"   'helm-swoop)
@@ -2006,6 +2011,7 @@ Protocol implementations, giving Emacs an IDE like experience.
     :hook
     (lsp-mode . lsp-enable-which-key-integration)
     (go-mode . lsp-deferred)
+    (python-mode . lsp-deferred)
     :commands lsp
     :custom
     ;; This interferes with the existing company-mode setup if populated
