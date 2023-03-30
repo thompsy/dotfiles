@@ -285,13 +285,31 @@ Map some keys on MacOS.
     :when *is-a-mac*
     :config
     (setq mac-command-modifier 'control ;; Mac command to Control
-          mac-option-modifier 'meta)    ;; Mac atl/option to Meta
+          mac-option-modifier 'meta     ;; Mac atl/option to Meta
+          visible-bell nil
+          ring-bell-function 'flash-mode-line)
+    (defun flash-mode-line ()
+      (invert-face 'mode-line)
+      (run-with-timer 0.1 nil #'invert-face 'mode-line))
     (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
     (add-to-list 'default-frame-alist '(ns-appearance . dark))
     (set-fontset-font t 'symbol (font-spec :family "Apple Symbols") nil 'prepend)
     (set-fontset-font t 'symbol (font-spec :family "Apple Color Emoji") nil 'prepend))
 #+END_SRC
 
+[[https://github.com/purcell/exec-path-from-shell][~exec-path-from-shell~]] loads the ~PATH~ from your shell setup. This is useful when running Emacs from
+a non-shell environment like OSX.
+#+begin_src emacs-lisp
+  (use-package exec-path-from-shell
+    :ensure t
+    :when (or *is-a-mac* *is-linux*)
+    :config
+    (exec-path-from-shell-initialize))
+
+  ;; TODO this should probably live in python-mode
+  (when (eq system-type 'darwin)
+    (setq python-shell-interpreter "/usr/local/bin/python3"))
+#+end_src
 ** Aesthetics
 
 Turn off a bunch of frame related functionality for a more minimal experience.
@@ -1279,7 +1297,7 @@ Read more about embark: https://karthinks.com/software/fifteen-ways-to-use-embar
 #+end_src
 
 ** Org
-TODO: commentary
+Setup various aesthetic options.
 #+BEGIN_SRC emacs-lisp
   (defun my-org-prettify-hook ()
     (turn-on-visual-line-mode))
@@ -1300,7 +1318,7 @@ TODO: commentary
     :defer t)
 #+END_SRC
 
-TODO: commentary
+Setup various ~TODO~ related variables for ~org-mode~.
 #+BEGIN_SRC emacs-lisp
   (defun my-org-todo-setup ()
     (setq org-use-fast-todo-selection t)
@@ -1320,7 +1338,8 @@ TODO: commentary
                   ("PHONE" :foreground "forest green" :weight bold)))))
 #+END_SRC
 
-TODO: commentary
+Setup various ~org-mode~ structure templates. When typing ~<~ at the start of a line this will popup a
+menu of various types of blocks that you may want to insert.
 #+BEGIN_SRC emacs-lisp
   (defun my-org-structure-templates ()
     (require 'org-tempo)
@@ -1393,7 +1412,7 @@ TODO: commentary
       org-structure-template-alist))
 #+END_SRC
 
-TODO: commentary
+Various capture templates for ~org-mode~.
 #+BEGIN_SRC emacs-lisp
   (use-package org-capture
     :straight nil
@@ -1500,7 +1519,7 @@ TODO: commentary
     (my-org-structure-templates))
 #+END_SRC
 
-TODO: commentary
+[[https://github.com/alphapapa/org-super-agenda][~org-super-agenda~]] improves the existing ~org-agenda~ in various ways.
 #+BEGIN_SRC emacs-lisp
   (use-package org-super-agenda
     :after org-agenda
@@ -1691,13 +1710,13 @@ This is a function to turn on all the various writing modes.
 
   (use-package flyspell-correct
     :after flyspell)
-  ;;TODO am I using this?
+
   (use-package flyspell-correct-helm
     :disabled
     :after flyspell)
 #+END_SRC
 
-TODO: commentary
+[[https://github.com/magnars/expand-region.el][~expand-region~]] allows growing or shrinking the region by semantic units.
 #+BEGIN_SRC emacs-lisp
   (use-package expand-region
     :general
@@ -1705,7 +1724,7 @@ TODO: commentary
     ("C-<" 'er/contract-region))
 #+END_SRC
 
-TODO: commentary
+[[https://github.com/flycheck/flycheck][~flycheck~]] enables on-the-fly syntax checking.
 #+BEGIN_SRC emacs-lisp
   (use-package flycheck
     :general
@@ -1713,6 +1732,7 @@ TODO: commentary
       "f" '(hydra-flycheck-mode/body :wk "flycheck-mode"))
     :config
     (global-flycheck-mode +1)
+    ;; json-python-json was giving me issues for some reason
     (setq-default flycheck-disabled-checkers '(json-python-json))
     :hydra
     (hydra-flycheck-mode
@@ -1736,7 +1756,8 @@ TODO: commentary
       ("e" flycheck-explain-error-at-point)))
 #+END_SRC
 
-TODO: commentary
+[[https://github.com/joaotavora/yasnippet][~yasnippet~]] is a templating system that allows you to expand templates and fill them in. This is
+very useful for auto-inserting a bunch of programming related boilerplate.
 #+BEGIN_SRC emacs-lisp
   (use-package yasnippet
    :custom
@@ -1750,7 +1771,7 @@ TODO: commentary
 #+END_SRC
 
 ** Completion
-TODO: commentary
+[[https://github.com/company-mode/company-mode][~company-mode~]] is a popular text-completion framework for Emacs. The odd name comes from comp[lete] any[thing].
 #+BEGIN_SRC emacs-lisp
   (use-package company
     :disabled
@@ -1858,7 +1879,8 @@ https://github.com/TheBB/dotemacs/blob/master/init.el#L527-L570
     )
 #+END_SRC
 
-TODO: commentary
+[[https://github.com/mickeynp/smart-scan][~smart-scan~]] allows for easy jumping to other instances of the current symbol at the point. I don't
+use this much and ~lsp-mode~ probably supersedes these for my usecase.
 #+BEGIN_SRC emacs-lisp
   (use-package smartscan
     :hook ((prog-mode . smartscan-mode))
@@ -1877,7 +1899,8 @@ TODO: commentary
         (replace-regexp (format "\\b%s\\b" (regexp-quote symbol)) replacement))))
 #+END_SRC
 
-TODO: what is this?
+[[https://github.com/editorconfig/editorconfig-emacs][~editorconfig~]] is an editor-agnostic standard for various editor config settings. I don't actually
+use this very much so I should probably remove it.
 #+BEGIN_SRC emacs-lisp
   (use-package editorconfig
     :delight
@@ -1886,7 +1909,7 @@ TODO: what is this?
 #+END_SRC
 
 ** Git
-TODO: commentary
+[[https://magit.vc/][~magit~]] is an excellent interface for Git. It has basically replaced my command line usage.
 #+BEGIN_SRC emacs-lisp
   (use-package magit
     :defer t
@@ -1913,24 +1936,29 @@ TODO: commentary
                    (message "%s" branch))
           (user-error "There is not current branch")))))
 #+END_SRC
-TODO: commentary
+
+[[https://github.com/emacsmirror/git-timemachine][~git-timemachine~]] allows you to walk through Git revisions of a file to view changes over time.
 #+BEGIN_SRC emacs-lisp
   (use-package git-timemachine
     :defer t)
 #+END_SRC
-TODO: commentary
+
+[[https://github.com/emacsorphanage/git-messenger][~git-messenger~]] shows a popup containing the commit message that last affected the current line.
 #+BEGIN_SRC emacs-lisp
   (use-package git-messenger
     :defer t)
 #+END_SRC
-TODO: commentary
+
+[[https://github.com/emacsorphanage/git-gutter-fringe][~git-gutter-fringe~]] shows icons on the buffer fringe for lines that have been added, removed or
+modified.
 #+BEGIN_SRC emacs-lisp
   (use-package git-gutter-fringe
     :config
     (global-git-gutter-mode +1)
     (setq-default fringes-outside-margins t))
 #+END_SRC
-TODO: commentary
+
+
 #+BEGIN_SRC emacs-lisp
   (use-package git-link
     :general
@@ -1940,7 +1968,9 @@ TODO: commentary
       "glc" 'git-link-commit
       "glh" 'git-link-homepage))
 #+END_SRC
-TODO: commentary
+
+[[https://github.com/rmuslimov/browse-at-remote][~browse-at-remote~]] allows for quick jumping to the relevant Github (or whatever) page corresponding
+to the current file.
 #+BEGIN_SRC emacs-lisp
   (use-package browse-at-remote
     :general
@@ -1978,34 +2008,7 @@ TODO: commentary
     ("c" git-timemachine-show-current-revision "curr revision")
     ("<ESC>" git-timemachine-show-current-revision "quit" :exit t))
 #+END_SRC
-TODO: commentary
-#+BEGIN_SRC emacs-lisp
-  (setq exec-path (append exec-path '("/Users/andrew.thompson/go/bin/")))
-  (setq exec-path (append exec-path '("/opt/homebrew/bin/")))
 
-  ;; I can't quite get this to work for some reason
-  ;; (use-package exec-path-from-shell
-  ;;   :straight nil
-  ;;   :ensure t
-  ;;   :config
-  ;;   (exec-path-from-shell-initialize))
-
-  ;; (when (eq system-type 'darwin)
-  ;;   (mac-auto-operator-composition-mode))
-
-  (when (eq system-type 'darwin)
-    (setq python-shell-interpreter "/usr/local/bin/python3"))
-
-  (when (eq system-type 'darwin)
-    (setq visible-bell nil
-          ring-bell-function 'flash-mode-line)
-    (defun flash-mode-line ()
-      (invert-face 'mode-line)
-      (run-with-timer 0.1 nil #'invert-face 'mode-line)))
-
-  (when (eq system-type 'darwin)
-    (setq magit-git-executable "/usr/bin/git"))
-#+END_SRC
 
 TODO: commentary
 #+BEGIN_SRC emacs-lisp
