@@ -1203,6 +1203,7 @@ Useful documentation for getting started here:
   )
 #+end_src
 
+Read more about embark: https://karthinks.com/software/fifteen-ways-to-use-embark/
 #+begin_src emacs-lisp
 (use-package consult-dir)
 #+end_src
@@ -2405,6 +2406,11 @@ structure of code that I'm editing. Note that this part of core Emacs from v29 o
     :after tree-sitter)
 #+end_src
 ** Navigation
+
+Ripgrep
+#+begin_src emacs-lisp
+  (use-package rg)
+#+end_src
 [[https://github.com/abo-abo/avy][~avy~]] is an easy way to jump around any visible buffers. Hit ~C-'~ and hit a few characters, then
 select from the list of options.
 #+BEGIN_SRC emacs-lisp
