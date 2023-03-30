@@ -865,6 +865,8 @@ TODO: I should probably trim down this hydra since I don't use some of it.
     (my-leader-def
       "h" '(hydra-projectile/body :wk "projectile-mode")) ;;oryx
     (projectile-mode-map "C-c h" 'projectile-command-map)
+    ("C-x f" 'find-file)
+    ("C-x C-f" 'projectile-find-file)
     :config
     (projectile-mode +1)
     :hydra
