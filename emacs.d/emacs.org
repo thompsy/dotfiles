@@ -424,21 +424,6 @@ neat way. Note that ~:wk~ allows us to specify the text that is displayed by ~wh
     :ensure t)
 #+END_SRC
 
-This is a simple hydra to scale the font of the current buffer.
-
-TODO: In future it would be good to improve this to apply the changes to the current frame so that
-the changes took affect in all buffers in that frame. There seem to be a few existing options to do
-this according to this [[https://stackoverflow.com/questions/24705984/increase-decrease-font-size-in-an-emacs-frame-not-just-buffer][stackoverflow question]].
-#+BEGIN_SRC emacs-lisp
-  ;; Add an easy zoom function
-  (my-leader-def "z" '(hydra-zoom/body :wk "zoom"))
-  (defhydra hydra-zoom (:column 2)
-      ("n" text-scale-increase "Zoom in")
-      ("t" text-scale-decrease "Zoom out")
-      ("r" (text-scale-set 0) "Reset zoom")
-      ("0" (text-scale-set 0) :bind nil :exit t))
-#+END_SRC
-
 This is a basic movement hydra.
 #+BEGIN_SRC emacs-lisp
   (general-define-key "C-n" 'hydra-move/body)
@@ -574,6 +559,19 @@ This hydra provides easy access to ~register~ functions.
     ("l" consult-register-load)
 
     ("q" nil))
+#+END_SRC
+
+[[https://www.emacswiki.org/emacs/download/zoom-frm.el][~zoom-frm~]] is a nice way to zoom in and out on a frame basis. This is useful when switching from
+smaller to larger screens.
+#+begin_src emacs-lisp
+  (use-package zoom-frm
+    :general
+    (my-leader-def "z" '(hydra-zoom/body :wk "zoom"))
+    :hydra (hydra-zoom (:column 2)
+                       ("n" zoom-frm-in "Zoom in")
+                       ("t" zoom-frm-out "Zoom out")
+                       ("r" (text-scale-set 0) "Reset zoom")
+                       ("0" (text-scale-set 0) :bind nil :exit t)))
 #+END_SRC
 
 [[https://github.com/dacap/keyfreq][~keyfreq~]] tracks how many times you use various Emacs commands. This can be helpful to identify
