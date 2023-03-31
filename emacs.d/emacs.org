@@ -1056,11 +1056,12 @@ Useful documentation for getting started here:
     ;; enabled right away. Note that this forces loading the package.
     (marginalia-mode))
 
-  (use-package all-the-icons-completion
-  :after (marginalia all-the-icons)
-  :hook (marginalia-mode . all-the-icons-completion-marginalia-setup)
-  :init
-  (all-the-icons-completion-mode))
+  ;; This causes an error that I need to figure out
+  ;; (use-package all-the-icons-completion
+  ;; :after (marginalia all-the-icons)
+  ;; :hook (marginalia-mode . all-the-icons-completion-marginalia-setup)
+  ;; :init
+  ;; (all-the-icons-completion-mode))
 #+end_src
 
 
