@@ -31,6 +31,12 @@ available. A few places that I've found particularly useful include:
 - try other modelines in due course
 - have all hydras use q for quit
 - use ~:after~ to specify any dependencies
+- try [[https://github.com/minad/org-modern][~org-modern~]]
+- in LSP/go-mode, there's an ~lsp-lens~ labelled "Run test". I'd like to find what command this runs
+  and bind it to a key!
+- try [[https://github.com/Overdr0ne/holymotion][~holymotion~]]
+- explore [[https://github.com/rougier/nano-emacs][~nano-emacs~]]
+- try [[https://www.emacswiki.org/emacs/MultiTerm][~multi-term~]]
 * Emacs
 ** Local
 These are various, installation specific settings that might differ across machines, some of which I
