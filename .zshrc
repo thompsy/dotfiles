@@ -6,7 +6,7 @@ ZSH_THEME="robbyrussell"
 plugins=(history git common-aliases sudo tmux emacs docker docker-compose fasd you-should-use zsh-syntax-highlighting zsh-autosuggestions zsh-aliases-exa)
 source ${ZSH}/oh-my-zsh.sh 
 
-LAYERS="${HOME}/code/dotfiles/zsh-layers"
+LAYERS="${HOME}/dotfiles/zsh-layers"
 
 # Generic (ish) Layers
 source ${LAYERS}/gcloud.zsh
@@ -14,16 +14,18 @@ source ${LAYERS}/kubernetes.zsh
 source ${LAYERS}/aws.zsh
 source ${LAYERS}/golang.zsh
 
-export PATH=${PATH}:${GOPATH}bin:${GOROOT}bin
-
 ###############################################################################
 # History settings
 #
 HISTSIZE=5000
 HISTFILE=~/.zsh_history
 SAVEHIST=100000
+unsetopt share_history
+unsetopt inc_append_history
 setopt append_history
-setopt inc_append_history
+setopt inc_append_history_time
+setopt extended_history
+setopt longlistjobs
 
 ###############################################################################
 # fzf & fasd 
@@ -73,3 +75,33 @@ extract() {
     done
  fi
 }
+
+
+###############################################################################
+# Compatibility with Emacs vterm.
+# See: https://github.com/akermu/emacs-libvterm
+#
+vterm_printf() {
+    if [ -n "$TMUX" ] && ([ "${TERM%%-*}" = "tmux" ] || [ "${TERM%%-*}" = "screen" ]); then
+        # Tell tmux to pass the escape sequences through
+        printf "\ePtmux;\e\e]%s\007\e\\" "$1"
+    elif [ "${TERM%%-*}" = "screen" ]; then
+        # GNU screen (screen, screen-256color, screen-256color-bce)
+        printf "\eP\e]%s\007\e\\" "$1"
+    else
+        printf "\e]%s\e\\" "$1"
+    fi
+}
+
+vterm_cmd() {
+    local vterm_elisp
+    vterm_elisp=""
+    while [ $# -gt 0 ]; do
+        vterm_elisp="$vterm_elisp""$(printf '"%s" ' "$(printf "%s" "$1" | sed -e 's|\\|\\\\|g' -e 's|"|\\"|g')")"
+        shift
+    done
+    vterm_printf "51;E$vterm_elisp"
+}
+
+
+ZSH_THEME_TERM_TITLE_IDLE="%~"

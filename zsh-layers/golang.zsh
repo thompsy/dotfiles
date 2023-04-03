@@ -2,7 +2,7 @@
 # Go
 #
 export GOROOT=/usr/local/go/
-export GOPATH=/mnt/c/Dropbox/Andrew/code/go/
+export GOPATH=${HOME}/go/
 export GO111MODULE=on
 export PATH=${PATH}:${GOPATH}bin:${GOROOT}bin
 
