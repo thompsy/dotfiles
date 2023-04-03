@@ -37,6 +37,7 @@ available. A few places that I've found particularly useful include:
 - try [[https://github.com/Overdr0ne/holymotion][~holymotion~]]
 - explore [[https://github.com/rougier/nano-emacs][~nano-emacs~]]
 - try [[https://www.emacswiki.org/emacs/MultiTerm][~multi-term~]]
+- explore this config: https://old.reddit.com/r/emacs/comments/ehjcu2/screenshot_polishing_my_emacs_who_said_an_old/
 * Emacs
 ** Local
 These are various, installation specific settings that might differ across machines, some of which I
