@@ -3035,3 +3035,38 @@ I don't actually know what these snippets do! I should probably get rid of them 
     ("C-h v" 'helpful-variable)
     ("C-h C-d" 'helpful-at-point))
 #+end_src
+
+
+** Shells
+[[https://github.com/akermu/emacs-libvterm][~vterm~]] provides a terminal emulator within Emacs.
+
+TODO: get C-t excluded so that it triggers Emacs not the vterm.
+- try unbinding C-t from copy mode?
+- it seems like I could only get this to work by editing the actual package variable of the same name.
+
+Some interesting config options:
+- https://github.com/jeffyql/dotfiles/blob/4484469d36e716dfe9431f1b489015423b63a91f/init-vterm.el
+
+#+begin_src emacs-lisp
+  (use-package vterm
+    :ensure t
+    :general
+    (my-leader-def "x" 'vterm-toggle)
+    :config
+    (setq vterm-max-scrollback 100000
+          vterm-clear-scrollback t
+          vterm-keymap-exceptions
+          '("M-:" "C-c" "C-x" "C-u" "C-g" "C-h" "C-l" "M-x" "M-o" "C-y" "M-y" "C-t" "M-s")))
+#+end_src
+
+#+begin_src emacs-lisp
+  (use-package multi-vterm)
+#+end_src
+
+[[https://github.com/jixiuf/vterm-toggle][~vterm-toggle~]] allows for easy toggling of vterms.
+
+TODO: get this setup to toggle a vterm in the directory of the current buffer and name the buffer
+after the directory.
+#+begin_src emacs-lisp
+  (use-package vterm-toggle)
+#+end_src
