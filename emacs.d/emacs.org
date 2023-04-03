@@ -1945,6 +1945,11 @@ use this very much so I should probably remove it.
           (user-error "There is not current branch")))))
 #+END_SRC
 
+[[https://github.com/dandavison/magit-delta][~magit-delta~]] enables improved diffs for Magit using [[https://github.com/dandavison/delta][delta]].
+#+begin_src emacs-lisp
+  (use-package magit-delta
+    :hook (magit-mode . magit-delta-mode))
+#+end_src
 [[https://github.com/emacsmirror/git-timemachine][~git-timemachine~]] allows you to walk through Git revisions of a file to view changes over time.
 #+BEGIN_SRC emacs-lisp
   (use-package git-timemachine
@@ -2178,6 +2183,11 @@ Go.
     )
 #+END_SRC
 
+TODO: experiment with [[https://github.com/emacsmirror/godoctor][~godoctor~]] which provides some refactoring support for Go.
+#+begin_src emacs-lisp
+  (use-package godoctor
+    :disabled t)
+#+end_src
 *** Java
 Commenting this for now since its a real slow loader.  TODO possible candidate for ~:defer~?
 #+BEGIN_SRC emacs-lisp
