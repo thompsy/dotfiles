@@ -3112,6 +3112,7 @@ Some interesting config options:
     :config
     (setq vterm-max-scrollback 100000
           vterm-clear-scrollback t
+          vterm-buffer-name-string "vterm-%s"
           vterm-keymap-exceptions
           '("M-:" "C-c" "C-x" "C-u" "C-g" "C-h" "C-l" "M-x" "M-o" "C-y" "M-y" "C-t" "M-s")))
 #+end_src
