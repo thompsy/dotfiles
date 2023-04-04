@@ -429,13 +429,12 @@ improvement on this by popping up in a floating window. I'll try it for a while 
     (which-key-idle-delay 0)
     :config
     (which-key-mode +1)
-    ;(which-key-setup-minibuffer)
-    (which-key-setup-side-window-bottom))
+    )
 
   (use-package which-key-posframe
     :config
     (which-key-posframe-mode)
-    (setq which-key-posframe-poshandler 'posframe-poshandler-point-bottom-left-corner))
+    (setq which-key-posframe-poshandler 'posframe-poshandler-window-center))
 #+END_SRC
 
 [[https://github.com/abo-abo/hydra][~hydra~]] allows us to specify related keybindings together in a
@@ -1934,7 +1933,8 @@ use this very much so I should probably remove it.
       "gg" 'hydra-my-git-menu/body
       "gy" 'my/magit-yank-branch-name)
     :config
-    (setq magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
+    ;; This sets Magit to use the fullframe
+    ;;(setq magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
     (defun my/magit-yank-branch-name ()
       "Show the current branch in the echo-area and add it to the `kill-ring'."
       (interactive)
