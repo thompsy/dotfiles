@@ -32,12 +32,11 @@ available. A few places that I've found particularly useful include:
 - have all hydras use q for quit
 - use ~:after~ to specify any dependencies
 - try [[https://github.com/minad/org-modern][~org-modern~]]
-- in LSP/go-mode, there's an ~lsp-lens~ labelled "Run test". I'd like to find what command this runs
-  and bind it to a key!
 - try [[https://github.com/Overdr0ne/holymotion][~holymotion~]]
 - explore [[https://github.com/rougier/nano-emacs][~nano-emacs~]]
-- try [[https://www.emacswiki.org/emacs/MultiTerm][~multi-term~]]
-- explore this config: https://old.reddit.com/r/emacs/comments/ehjcu2/screenshot_polishing_my_emacs_who_said_an_old/
+- explore this config:
+  https://old.reddit.com/r/emacs/comments/ehjcu2/screenshot_polishing_my_emacs_who_said_an_old/
+  
 * Emacs
 ** Local
 These are various, installation specific settings that might differ across machines, some of which I
@@ -3097,9 +3096,9 @@ I don't actually know what these snippets do! I should probably get rid of them 
 ** Shells
 [[https://github.com/akermu/emacs-libvterm][~vterm~]] provides a terminal emulator within Emacs.
 
-TODO: get C-t excluded so that it triggers Emacs not the vterm.
-- try unbinding C-t from copy mode?
-- it seems like I could only get this to work by editing the actual package variable of the same name.
+There's a slight wrinkle here in that trying to add my prefix key, currently "C-t" to the list of
+exceptions doesn't actually work. To get this to work I've needed to edit the actual ~vterm.el~ source
+file and then rebuild the package and module.
 
 Some interesting config options:
 - https://github.com/jeffyql/dotfiles/blob/4484469d36e716dfe9431f1b489015423b63a91f/init-vterm.el
