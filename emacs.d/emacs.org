@@ -225,12 +225,15 @@ Setup some basic file hygiene. Keep some backup files around, but keep them out 
      backup-by-copying t
      backup-directory-alist '((".*" . "~/.emacs.d/backups/"))
      delete-old-versions t
+     delete-auto-save-files t
      kept-new-versions 6
      kept-old-versions 2
      version-control t
      vc-make-backup-files t
      recentf-max-menu-items 25
-     recentf-max-saved-items 500))
+     recentf-max-saved-items 500
+     auto-save-file-name-transforms
+     `((".*" "~/.emacs.d/auto-saves/" t))))
 #+END_SRC
 
 Use the system keyboard when killing and yanking.
