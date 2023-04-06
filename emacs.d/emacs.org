@@ -1950,6 +1950,7 @@ use this very much so I should probably remove it.
 [[https://github.com/dandavison/magit-delta][~magit-delta~]] enables improved diffs for Magit using [[https://github.com/dandavison/delta][delta]].
 #+begin_src emacs-lisp
   (use-package magit-delta
+    :disabled
     :hook (magit-mode . magit-delta-mode))
 #+end_src
 [[https://github.com/emacsmirror/git-timemachine][~git-timemachine~]] allows you to walk through Git revisions of a file to view changes over time.
