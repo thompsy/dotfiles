@@ -1528,6 +1528,12 @@ Various capture templates for ~org-mode~.
     (my-org-structure-templates))
 #+END_SRC
 
+[[https://github.com/minad/org-modern][~org-modern~]] gives ~org-mode~ a more modern style.
+#+begin_src emacs-lisp
+  (use-package org-modern
+    :config
+    (global-org-modern-mode))
+#+end_src
 [[https://github.com/alphapapa/org-super-agenda][~org-super-agenda~]] improves the existing ~org-agenda~ in various ways.
 #+BEGIN_SRC emacs-lisp
   (use-package org-super-agenda
