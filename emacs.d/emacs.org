@@ -2490,21 +2490,17 @@ select from the list of options.
 
 More details here: https://karthinks.com/software/avy-can-do-anything
 #+BEGIN_SRC emacs-lisp
-    (use-package avy
-      :demand
-      :config (setq avy-background t)
-      :general ("C-'" 'avy-goto-char-timer))
+  (use-package avy
+    :demand
+    :config (setq avy-background t
+                  avy-keys '(
+                   ?a ?r ?s ?t ?g ?m ?n ?e ?i ?o
+                      ?z ?x ?c ?d ?v ?k ?h ?, ?.
+                      ?q ?w ?f ?p ?b ?j ?l ?u ?'))
+    :general ("C-'" 'avy-goto-char-timer))
 
-    ;; Code used in the demos at https://karthinks.com/software/avy-can-do-anything
+  ;; Code used in the demos at https://karthinks.com/software/avy-can-do-anything
   ;; Tweak as desired.
-
-
-  (setq avy-keys '(?q ?e ?r ?y ?u ?o ?p
-                      ?a ?s ?d ?f ?g ?h ?j
-                      ?k ?l ?' ?x ?c ?v ?b
-                      ?n ?, ?/))
-
-
   (defun avy-show-dispatch-help ()
     (let* ((len (length "avy-action-"))
            (fw (frame-width))
