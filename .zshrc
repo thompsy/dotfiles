@@ -103,5 +103,10 @@ vterm_cmd() {
     vterm_printf "51;E$vterm_elisp"
 }
 
+vterm_prompt_end() {
+    vterm_printf "51;A$(whoami)@$(hostname):$(pwd)"
+}
+setopt PROMPT_SUBST
+PROMPT=$PROMPT'%{$(vterm_prompt_end)%}'
 
 ZSH_THEME_TERM_TITLE_IDLE="%~"
