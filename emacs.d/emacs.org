@@ -389,7 +389,12 @@ global leader key, ~my-leader-def~ and chain bindings from that.
      "C-z" 'undo
      ;;"M-s" 'highlight-symbol-at-point ;;TODO conflicted with consult
      "M-c" 'hi-lock-mode
-     "M-z" 'pop-global-mark)
+     "M-z" 'pop-global-mark
+     "C-x C-m" 'execute-extended-command
+     "C-x m" 'execute-extended-command
+     "C-c C-m" 'execute-extended-command
+     "C-c m" 'execute-extended-command
+     )
 
     ;; Make general's keybindings take precedence over keys bound to other minor mode keymaps.
     (general-override-mode)
@@ -403,6 +408,7 @@ global leader key, ~my-leader-def~ and chain bindings from that.
     ;; Setup some initial bindings.
     ;; TODO some of these should probably live elsewhere
     (my-leader-def
+      "m" 'execute-extended-command
       "a" 'org-agenda
       "b" '(:ignore t :wk "bookmarks")
       "bs" 'bookmark-set
