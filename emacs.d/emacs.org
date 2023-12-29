@@ -59,7 +59,31 @@ don't want to commit to Git.
 The ~early-init.el~ file is called very early in the initialisation process, so this is a good point
 to disable ~package.el~ in favour of ~straight.el~.
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/early-init.el" :eval no
-(setq package-enable-at-startup nil)
+  ;; Startup speed, annoyance suppression
+  (setq gc-cons-threshold 10000000)
+  (setq byte-compile-warnings '(not obsolete))
+  (setq warning-suppress-log-types '((comp) (bytecomp)))
+  (setq native-comp-async-report-warnings-errors 'silent)
+
+  ;; Silence stupid startup message
+  (setq inhibit-startup-echo-area-message (user-login-name))
+
+  ;; Default frame configuration: full screen, good-looking title bar on macOS
+  (setq frame-resize-pixelwise t)
+  (tool-bar-mode -1)                      ; All these tools are in the menu-bar anyway
+  (setq default-frame-alist '((fullscreen . maximized)
+
+			      ;; You can turn off scroll bars by uncommenting these lines:
+			      (vertical-scroll-bars . nil)
+			      (horizontal-scroll-bars . nil)
+
+			      ;; Setting the face in here prevents flashes of
+			      ;; color as the theme gets activated
+			      (background-color . "#000000")
+			      (ns-appearance . dark)
+			      (ns-transparent-titlebar . t)))
+
+  (setq package-enable-at-startup nil)
 #+END_SRC
 
 ** Preamble
@@ -76,11 +100,41 @@ keep it in a separate file.
 (require 'local-setup "~/.emacs.d/local.el")
 #+END_SRC
 
-Determine the operating system to tailor aspects of the config.
+** Bedrock Emacs
+All of this is new, minimal stuff from bedrock emacs:
 #+BEGIN_SRC emacs-lisp
-(setq *is-a-mac* (eq system-type 'darwin)
-      *is-linux* (eq system-type 'gnu/linux)
-      *is-windows* (eq system-type 'windows-nt))
+	  (setopt initial-major-mode 'fundamental-mode)  ; default mode for the *scratch* buffer
+	  (setopt display-time-default-load-average nil) ; this information is useless for most
+
+	  ;; Automatically reread from disk if the underlying file changes
+	  (setopt auto-revert-avoid-polling t)
+	  ;; Some systems don't do file notifications well; see
+	  ;; https://todo.sr.ht/~ashton314/emacs-bedrock/11
+	  (setopt auto-revert-interval 5)
+	  (setopt auto-revert-check-vc-info t)
+	  (global-auto-revert-mode)
+
+	  ;; Save history of minibuffer
+	  (savehist-mode)
+
+	  ;; Move through windows with Ctrl-<arrow keys>
+	  (windmove-default-keybindings 'control) ; You can use other modifiers here
+
+	  ;; Fix archaic defaults
+	  (setopt sentence-end-double-space nil)
+
+	  ;; Don't litter file system with *~ backup files; put them all inside
+	  ;; ~/.emacs.d/backup or wherever
+	  (defun bedrock--backup-file-name (fpath)
+	    "Return a new file path of a given file path.
+	  If the new path's directories does not exist, create them."
+	    (let* ((backupRootDir "~/.emacs.d/emacs-backup/")
+		   (filePath (replace-regexp-in-string "[A-Za-z]:" "" fpath )) ; remove Windows driver letter in path
+		   (backupFilePath (replace-regexp-in-string "//" "/" (concat backupRootDir filePath "~") )))
+	      (make-directory (file-name-directory backupFilePath) (file-name-directory backupFilePath))
+	      backupFilePath))
+	  (setopt make-backup-file-name-function 'bedrock--backup-file-name)
+
 #+END_SRC
 
 ** Straight Package Manager
@@ -139,238 +193,6 @@ explicitly load it with straight early in the init process. See more details in 
   (straight-use-package 'org)
 #+END_SRC
 
-** Core Configuration
-Diminish hides or abbreviates the mode line displays of minor-modes. It basically de-clutters the
-mode line, keeping things minimal and focused.
-#+BEGIN_SRC emacs-lisp
-  (use-package diminish)
-#+END_SRC
-
-The [[https://github.com/emacsmirror/gcmh][~gcmh~]] (Garbage Collector Magic Hack) package updates Emacs's GC strategy to minimise interference
-with user activity.
-#+BEGIN_SRC emacs-lisp
-  (use-package gcmh
-    :hook (after-init . gcmh-mode))
-#+END_SRC
-
-Emacs Start-up Profiler, [[https://github.com/jschaf/esup][esup]], enables profiling your Emacs startup time without leaving emacs.
-#+BEGIN_SRC emacs-lisp
-  ;; Emacs Start-up Profiler
-  (use-package esup
-    ;; This config is needed to fix a minor bug: https://github.com/jschaf/esup/issues/54
-    :config (setq esup-depth 0)
-    :commands (esup))
-#+END_SRC
-
-Allow Emacs to read larger chunks of data from subprocesses. Things like ~lsp-mode~ can generate
-responses from 800k to 3M, so the default of 4k is too small.
-#+BEGIN_SRC emacs-lisp
-  (setq read-process-output-max (* 1024 1024 3)) ;; 3mb
-#+END_SRC
-
-A few miscellaneous settings. Note that ~emacs~ is not really a package strictly speaking which is why
-we include ~:straight nil~ so that our package manager doesn't try to fetch the source.
-#+BEGIN_SRC emacs-lisp
-  (use-package emacs
-    :straight nil
-    :init
-    ;; answer with y/n instead of typing out yes/no
-    (defalias 'yes-or-no-p 'y-or-n-p)
-    :config
-    (setq indent-tabs-mode nil
-          tab-width 4
-          show-trailing-whitespace t
-          fill-column 100)
-    (setq-default indent-tabs-mode nil
-                  fill-column 100)
-    :custom
-    ;; load new source files instead of stale elisp bytecode
-    (load-prefer-newer t)
-    ;; allow emacs to be any size, removes black bars
-    (frame-resize-pixelwise t))
-#+END_SRC
-
-It's useful to have buffers auto-revert when files on disk change especially when using Git branches
-a lot!
-#+BEGIN_SRC emacs-lisp
-  (use-package autorevert
-    :straight nil
-    :custom
-    (global-revert-check-vc-info t)
-    :config
-    (global-auto-revert-mode +1))
-#+END_SRC
-
-Use UTF-8 everywhere.
-#+BEGIN_SRC emacs-lisp
-  (use-package mule
-    :straight nil
-    :config
-    (prefer-coding-system 'utf-8-unix)
-    (set-default-coding-systems 'utf-8-unix)
-    (set-language-environment 'utf-8)
-    (set-terminal-coding-system 'utf-8-unix)
-    (setq locale-coding-system 'utf-8-unix)
-    (set-selection-coding-system 'utf-8-unix))
-#+END_SRC
-
-Setup some basic file hygiene. Keep some backup files around, but keep them out of sight.
-#+BEGIN_SRC emacs-lisp
-  (use-package files
-    :straight nil
-    :config
-    (setq
-     backup-by-copying t
-     backup-directory-alist '((".*" . "~/.emacs.d/backups/"))
-     delete-old-versions t
-     delete-auto-save-files t
-     kept-new-versions 6
-     kept-old-versions 2
-     version-control t
-     vc-make-backup-files t
-     recentf-max-menu-items 25
-     recentf-max-saved-items 500
-     auto-save-file-name-transforms
-     `((".*" "~/.emacs.d/auto-saves/" t))))
-#+END_SRC
-
-Use the system keyboard when killing and yanking.
-#+BEGIN_SRC emacs-lisp
-  (use-package simple
-    :straight nil
-    :custom
-    ;; killing and yanking uses the system clipboard
-    (save-interprogram-paste-before-kill t))
-#+END_SRC
-
-~so-long~ is a built-in mode which deals with very long lines, like those in minified Javascript for
-example.
-#+BEGIN_SRC emacs-lisp
-  (use-package so-long
-    :straight nil
-    :config
-    (global-so-long-mode +1))
-#+END_SRC
-
-[[https://github.com/emacs-mirror/emacs/blob/master/lisp/saveplace.el][~saveplace~]] jumps back to
-the last when later visiting a file. This is handy to pick up where you left off.
-#+BEGIN_SRC emacs-lisp
-  (use-package saveplace
-    :straight nil
-    :config
-    (save-place-mode +1))
-#+END_SRC
-
-[[https://github.com/emacscollective/no-littering][~no-littering~]] keeps configuration files and
-other persistent data under ~user-emacs-directory~ rather than spamming them in inconsistent places.
-#+BEGIN_SRC emacs-lisp
-  (use-package no-littering
-    :init
-    (setq no-littering-etc-directory
-          (expand-file-name "etc/" user-emacs-directory))
-    (setq no-littering-var-directory
-          (expand-file-name "var/" user-emacs-directory)))
-#+END_SRC
-
-Use a separate custom file to remove auto-generated code from ~init.el~. This should be loaded prior
-to any themes so that they confirmation code gets stored in ~custom.el~.
-#+BEGIN_SRC emacs-lisp
-  (use-package cus-edit
-    :straight nil
-    :custom
-    (custom-file (expand-file-name "custom.el" user-emacs-directory))
-    :config
-    (if (file-exists-p custom-file)
-        (load-file custom-file)))
-#+END_SRC
-
-** OS Specific
-Map some keys on MacOS.
-#+BEGIN_SRC emacs-lisp
-  (use-package emacs
-    :straight nil
-    :when *is-a-mac*
-    :config
-    (setq mac-command-modifier 'control ;; Mac command to Control
-          mac-option-modifier 'meta     ;; Mac atl/option to Meta
-          visible-bell nil
-          ring-bell-function 'flash-mode-line)
-    (defun flash-mode-line ()
-      (invert-face 'mode-line)
-      (run-with-timer 0.1 nil #'invert-face 'mode-line))
-    (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
-    (add-to-list 'default-frame-alist '(ns-appearance . dark))
-    (set-fontset-font t 'symbol (font-spec :family "Apple Symbols") nil 'prepend)
-    (set-fontset-font t 'symbol (font-spec :family "Apple Color Emoji") nil 'prepend))
-#+END_SRC
-
-[[https://github.com/purcell/exec-path-from-shell][~exec-path-from-shell~]] loads the ~PATH~ from your shell setup. This is useful when running Emacs from
-a non-shell environment like OSX.
-#+begin_src emacs-lisp
-  (use-package exec-path-from-shell
-    :ensure t
-    :when (or *is-a-mac* *is-linux*)
-    :config
-    (exec-path-from-shell-initialize))
-
-  ;; TODO this should probably live in python-mode
-  (when (eq system-type 'darwin)
-    (setq python-shell-interpreter "/usr/local/bin/python3"))
-#+end_src
-** Aesthetics
-
-Turn off a bunch of frame related functionality for a more minimal experience.
-#+BEGIN_SRC emacs-lisp
-  (use-package frame
-    :straight nil
-    :config
-    (blink-cursor-mode -1)
-    (setq initial-scratch-message ""
-          inhibit-startup-message t
-          visible-bell nil
-          ring-bell-function 'ignore
-          initial-frame-alist
-          '((menu-bar-lines . 0)
-            (tool-bar-lines . 0)))
-    (scroll-bar-mode 0)
-    (tool-bar-mode 0)
-    (menu-bar-mode 0)
-    (global-hl-line-mode 1))
-#+END_SRC
-
-[[https://draculatheme.com/emacs][Dracula]] is a nice theme that's available for lots of apps.
-#+BEGIN_SRC emacs-lisp
-  (use-package dracula-theme
-    :config
-    (load-theme 'dracula))
-
-  ;; TODO this could live somewhere more tidy...
-  (add-to-list 'default-frame-alist '(font . "Fira Code-14"))
-#+END_SRC
-
-[[https://github.com/domtronn/all-the-icons.el][~all-the-icons.el~]] is a nice utility package that collects various icon fonts and makes them
-available to Emacs.
-#+BEGIN_SRC emacs-lisp
-  (use-package all-the-icons
-    :defer t)
-#+END_SRC
-
-[[https://github.com/seagle0128/doom-modeline][~doom-modeline~]] is a fancy, fast and minimal mode-line.
-#+BEGIN_SRC emacs-lisp
-  (use-package doom-modeline
-    :demand t
-    :init
-    (column-number-mode +1)
-    (doom-modeline-mode +1)
-    :config
-    (setq doom-modeline-height 1)
-    (set-face-attribute 'mode-line nil :height 150)
-    (set-face-attribute 'mode-line-inactive nil :height 150)
-    :custom
-    (doom-modeline-vcs-max-length 50)
-    (doom-modeline-buffer-file-name-style 'truncate-upto-project))
-#+END_SRC
-
 ** Keybindings
 [[https://github.com/noctuid/general.el][~general.el~]] provides a convenient method for binding
 keys. It also integrates well with ~use-package~. In particular, this allows us to easily setup a
@@ -420,6 +242,32 @@ global leader key, ~my-leader-def~ and chain bindings from that.
       "qr" 'restart-emacs))
 #+END_SRC
 
+** Files
+Setup some basic file hygiene. Keep some backup files around, but keep them out of sight.
+
+TODO verify that some of these aren't duplicated above
+#+BEGIN_SRC emacs-lisp
+  (use-package files
+    :straight nil
+    :init
+    (recentf-mode 1)
+    :config
+    (setq
+     backup-by-copying t
+     backup-directory-alist '((".*" . "~/.emacs.d/backups/"))
+     delete-old-versions t
+     delete-auto-save-files t
+     kept-new-versions 6
+     kept-old-versions 2
+     version-control t
+     vc-make-backup-files t
+     recentf-max-menu-items 25
+     recentf-max-saved-items 500
+     auto-save-file-name-transforms
+     `((".*" "~/.emacs.d/auto-saves/" t))))
+#+END_SRC
+
+
 [[https://github.com/justbur/emacs-which-key][~which-key~]] displays all of the available keybindings following a incompletely entered command. For
 example, pressing ~C-x~ and waiting a moment will cause ~which-key~ to populate the minibuffer with all
 the available next keys along with their corresponding commands. This makes discovery of new
@@ -434,2722 +282,410 @@ improvement on this by popping up in a floating window. I'll try it for a while 
     :custom
     (which-key-idle-delay 0)
     :config
-    (which-key-mode +1)
-    )
-
-  (use-package which-key-posframe
-    :config
-    (which-key-posframe-mode)
-    (setq which-key-posframe-poshandler 'posframe-poshandler-window-center))
+    (which-key-mode +1))
 #+END_SRC
 
-[[https://github.com/abo-abo/hydra][~hydra~]] allows us to specify related keybindings together in a
-neat way. Note that ~:wk~ allows us to specify the text that is displayed by ~which-key~ for this hydra.
+** Other
 #+BEGIN_SRC emacs-lisp
-  (use-package hydra
-    :defer t)
+      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+      ;;;
+      ;;;   Minibuffer/completion settings
+      ;;;
+      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-  ;; This allows us to use :hydra within use-package
-  (use-package use-package-hydra
+      ;; For help, see: https://www.masteringemacs.org/article/understanding-minibuffer-completion
+
+      (setopt enable-recursive-minibuffers t)                ; Use the minibuffer whilst in the minibuffer
+      (setopt completion-cycle-threshold 1)                  ; TAB cycles candidates
+      (setopt completions-detailed t)                        ; Show annotations
+      (setopt tab-always-indent 'complete)                   ; When I hit TAB, try to complete, otherwise, indent
+      (setopt completion-styles '(basic initials substring)) ; Different styles to match input to candidates
+
+      (setopt completion-auto-help 'always)                  ; Open completion always; `lazy' another option
+      (setopt completions-max-height 20)                     ; This is arbitrary
+      (setopt completions-detailed t)
+      (setopt completions-format 'one-column)
+      (setopt completions-group t)
+      (setopt completion-auto-select 'second-tab)            ; Much more eager
+      ;(setopt completion-auto-select t)                     ; See `C-h v completion-auto-select' for more possible values
+
+      (keymap-set minibuffer-mode-map "TAB" 'minibuffer-complete) ; TAB acts more like how it does in the shell
+
+      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ;;;
+    ;;;   Interface enhancements/defaults
+    ;;;
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+    ;; Mode line information
+    (setopt line-number-mode t)                        ; Show current line in modeline
+    (setopt column-number-mode t)                      ; Show column as well
+
+    (setopt x-underline-at-descent-line nil)           ; Prettier underlines
+    (setopt switch-to-buffer-obey-display-actions t)   ; Make switching buffers more consistent
+
+    (setopt show-trailing-whitespace nil)      ; By default, don't underline trailing spaces
+    (setopt indicate-buffer-boundaries 'left)  ; Show buffer top and bottom in the margin
+
+    ;; Enable horizontal scrolling
+    (setopt mouse-wheel-tilt-scroll t)
+    (setopt mouse-wheel-flip-direction t)
+
+    ;; We won't set these, but they're good to know about
+    ;;
+    ;; (setopt indent-tabs-mode nil)
+    ;; (setopt tab-width 4)
+
+    ;; Misc. UI tweaks
+    (blink-cursor-mode -1)                                ; Steady cursor
+    (pixel-scroll-precision-mode)                         ; Smooth scrolling
+
+    ;; Use common keystrokes by default
+    (cua-mode)
+
+    ;; Display line numbers in programming mode
+    (add-hook 'prog-mode-hook 'display-line-numbers-mode)
+    (setopt display-line-numbers-width 3)           ; Set a minimum width
+
+    ;; Nice line wrapping when working with text
+    (add-hook 'text-mode-hook 'visual-line-mode)
+
+    ;; Modes to highlight the current line with
+    (let ((hl-line-hooks '(text-mode-hook prog-mode-hook)))
+      (mapc (lambda (hook) (add-hook hook 'hl-line-mode)) hl-line-hooks))
+
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ;;;
+    ;;;   Tab-bar configuration
+    ;;;
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+    ;; Show the tab-bar as soon as tab-bar functions are invoked
+    (setopt tab-bar-show 1)
+
+    ;; Add the time to the tab-bar, if visible
+    (add-to-list 'tab-bar-format 'tab-bar-format-align-right 'append)
+    (add-to-list 'tab-bar-format 'tab-bar-format-global 'append)
+    (setopt display-time-format "%a %F %T")
+    (setopt display-time-interval 1)
+    (display-time-mode)
+
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ;;;
+    ;;;   Theme
+    ;;;
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  (use-package dracula-theme
+    :config
+    (load-theme 'dracula))
+
+  (add-to-list 'default-frame-alist '(font . "Fira Code-14"))
+#+END_SRC
+
+
+Base extras:
+#+BEGIN_SRC emacs-lisp
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;;;
+  ;;;   Motion aids
+  ;;;
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+  (use-package avy
+    :ensure t
+    :demand t
+    :bind (("C-c j" . avy-goto-line)
+	   ("s-j"   . avy-goto-char-timer)))
+
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;;;
+  ;;;   Power-ups: Embark and Consult
+  ;;;
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+  ;; Consult: Misc. enhanced commands
+  (use-package consult
+    :ensure t
+    :bind (
+	   ;; Drop-in replacements
+	   ("C-x b" . consult-buffer)     ; orig. switch-to-buffer
+	   ("M-y"   . consult-yank-pop)   ; orig. yank-pop
+	   ;; Searching
+	   ("M-s r" . consult-ripgrep)
+	   ("M-s l" . consult-line)       ; Alternative: rebind C-s to use
+	   ("M-s s" . consult-line)       ; consult-line instead of isearch, bind
+	   ("M-s L" . consult-line-multi) ; isearch to M-s s
+	   ("M-s o" . consult-outline)
+	   ;; Isearch integration
+	   :map isearch-mode-map
+	   ("M-e" . consult-isearch-history)   ; orig. isearch-edit-string
+	   ("M-s e" . consult-isearch-history) ; orig. isearch-edit-string
+	   ("M-s l" . consult-line)            ; needed by consult-line to detect isearch
+	   ("M-s L" . consult-line-multi)      ; needed by consult-line to detect isearch
+	   )
+    :config
+    ;; Narrowing lets you restrict results to certain groups of candidates
+    (setq consult-narrow-key "<"))
+
+  (use-package embark
+    :ensure t
+    :demand t
+    :after avy
+    :bind (("C-c a" . embark-act))        ; bind this to an easy key to hit
+    :init
+    ;; Add the option to run embark when using avy
+    (defun bedrock/avy-action-embark (pt)
+      (unwind-protect
+	  (save-excursion
+	    (goto-char pt)
+	    (embark-act))
+	(select-window
+	 (cdr (ring-ref avy-ring 0))))
+      t)
+
+    ;; After invoking avy-goto-char-timer, hit "." to run embark at the next
+    ;; candidate you select
+    (setf (alist-get ?. avy-dispatch-alist) 'bedrock/avy-action-embark))
+
+  (use-package embark-consult
     :ensure t)
-#+END_SRC
 
-This is a basic movement hydra.
-#+BEGIN_SRC emacs-lisp
-  (general-define-key "C-n" 'hydra-move/body)
-  (defhydra hydra-move
-    (:body-pre (next-line))
-    "navigation"
-    ("n" next-line)
-    ("p" previous-line)
-    ("f" forward-char)
-    ("b" backward-char)
-    ("a" beginning-of-line)
-    ("e" move-end-of-line)
-    ("v" scroll-up-command)
-    ;; Converting M-v to V here by analogy.
-    ("V" scroll-down-command)
-    ("l" recenter-top-bottom)
-    ("<" beginning-of-buffer)
-    (">" end-of-buffer))
-#+END_SRC
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;;;
+  ;;;   Minibuffer and completion
+  ;;;
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-This is a hydra for working with the ~rectangle~ commands.
-
-TODO: I should understand how this works better.
-
-#+BEGIN_SRC emacs-lisp
-  (my-leader-def "R" '(hydra-rectangle/body :wk "rectangle"))
-  (defhydra hydra-rectangle (:body-pre (rectangle-mark-mode 1)
-                                       :color pink
-                                       :hint nil
-                                       :post (deactivate-mark))
-         "
-      ^_i_^       _w_ copy      _O_pen       _N_umber-lines
-    _n_   _o_     _y_ank        _t_ype       _E_xchange-point
-      ^_e_^       _d_ kill      _c_lear      _r_eset-region-mark
-    ^^^^          _u_ndo        _g_ quit     ^ ^
-    "
-         ("i" rectangle-previous-line)
-         ("e" rectangle-next-line)
-         ("n" rectangle-backward-char)
-         ("o" rectangle-forward-char)
-         ("d" kill-rectangle)                    ;; C-x r k
-         ("y" yank-rectangle)                    ;; C-x r y
-         ("w" copy-rectangle-as-kill)            ;; C-x r M-w
-         ("O" open-rectangle)                    ;; C-x r o
-         ("t" string-rectangle)                  ;; C-x r t
-         ("c" clear-rectangle)                   ;; C-x r c
-         ("E" rectangle-exchange-point-and-mark) ;; C-x C-x
-         ("N" rectangle-number-lines)            ;; C-x r N
-         ("r" (if (region-active-p)
-                  (deactivate-mark)
-                (rectangle-mark-mode 1)))
-         ("u" undo nil)
-         ("g" nil))
-#+END_SRC
-
-This hydra provides easy access to various package management commands.
-#+BEGIN_SRC emacs-lisp
-  (my-leader-def "s" '(hydra-straight-helper/body :wk "pkgs"))
-  (defhydra hydra-straight-helper (:hint nil :color green)
-         "
-        _c_heck all       |_f_etch all     |_m_erge all      |_n_ormalize all   |p_u_sh all
-        _C_heck package   |_F_etch package |_M_erge package  |_N_ormlize package|p_U_sh package
-        ----------------^^+--------------^^+---------------^^+----------------^^+------------||_q_uit||
-        _r_ebuild all     |_p_ull all      |_v_ersions freeze|_w_atcher start   |_g_et recipe
-        _R_ebuild package |_P_ull package  |_V_ersions thaw  |_W_atcher quit    |prun_e_ build"
-         ("c" straight-check-all)
-         ("C" straight-check-package)
-         ("r" straight-rebuild-all)
-         ("R" straight-rebuild-package)
-         ("f" straight-fetch-all)
-         ("F" straight-fetch-package)
-         ("p" straight-pull-all)
-         ("P" straight-pull-package)
-         ("m" straight-merge-all)
-         ("M" straight-merge-package)
-         ("n" straight-normalize-all)
-         ("N" straight-normalize-package)
-         ("u" straight-push-all)
-         ("U" straight-push-package)
-         ("v" straight-freeze-versions)
-         ("V" straight-thaw-versions)
-         ("w" straight-watcher-start)
-         ("W" straight-watcher-quit)
-         ("g" straight-get-recipe)
-         ("e" straight-prune-build)
-         ("q" nil))
-#+END_SRC
-
-This hydra gives easy access to inserting various Unicode characters.
-#+BEGIN_SRC emacs-lisp
-  (defun my/insert-unicode (unicode-name)
-    "Same as C-x 8 enter UNICODE-NAME."
-    (insert-char (gethash unicode-name (ucs-names))))
-
-  (my-leader-def "u" '(hydra-unicode/body :wk "unicode"))
-  (defhydra hydra-unicode (:hint nil)
-    "
-          Unicode  _e_ €  _g_ £
-                   _f_ ♀  _r_ ♂
-                   _o_ °  _m_ µ  _z_ ë  _Z_ Ë
-                   _n_ ←  _e_ ↓  _i_ ↑  _o_ →
-          "
-    ("e" (my/insert-unicode "EURO SIGN"))
-    ("g" (my/insert-unicode "POUND SIGN"))
-
-    ("r" (my/insert-unicode "MALE SIGN"))
-    ("f" (my/insert-unicode "FEMALE SIGN"))
-
-    ("o" (my/insert-unicode "DEGREE SIGN"))
-    ("m" (my/insert-unicode "MICRO SIGN"))
-
-    ("z" (my/insert-unicode "LATIN SMALL LETTER E DIAERESIS"))
-    ("Z" (my/insert-unicode "LATIN CAPITAL LETTER E DIAERESIS"))
-
-    ("n" (my/insert-unicode "LEFTWARDS ARROW"))
-    ("e" (my/insert-unicode "DOWNWARDS ARROW"))
-    ("i" (my/insert-unicode "UPWARDS ARROW"))
-    ("o" (my/insert-unicode "RIGHTWARDS ARROW")))
-#+END_SRC
-
-This hydra provides easy access to ~register~ functions.
-#+BEGIN_SRC emacs-lisp
-  (my-leader-def "r" '(hydra-register-helper/body :wk "registers"))
-  (defhydra hydra-register-helper (:hint nil :color green)
-    "
-   Position
-  -------------------
-   _s_tore a register
-   _l_oad a register
-   _q_uit
-    "
-    ("s" consult-register-store)
-    ("l" consult-register-load)
-
-    ("q" nil))
-#+END_SRC
-
-[[https://www.emacswiki.org/emacs/download/zoom-frm.el][~zoom-frm~]] is a nice way to zoom in and out on a frame basis. This is useful when switching from
-smaller to larger screens.
-#+begin_src emacs-lisp
-  (use-package zoom-frm
-    :general
-    (my-leader-def "z" '(hydra-zoom/body :wk "zoom"))
-    :hydra (hydra-zoom (:column 2)
-                       ("n" zoom-frm-in "Zoom in")
-                       ("t" zoom-frm-out "Zoom out")
-                       ("r" (text-scale-set 0) "Reset zoom")
-                       ("0" (text-scale-set 0) :bind nil :exit t)))
-#+END_SRC
-
-[[https://github.com/dacap/keyfreq][~keyfreq~]] tracks how many times you use various Emacs commands. This can be helpful to identify
-commands that you're using a lot which could benefit from a better keybinding. This is really a
-manual way to emulate something like the great Key Promoter X plugin for IntelliJ which tells you
-when there's a keyboard shortcut to do something that you've just used the mouse for.
-#+BEGIN_SRC emacs-lisp
-  (use-package keyfreq
-    :init (keyfreq-mode 1)
-    :config (keyfreq-autosave-mode 1))
-#+END_SRC
-
-** Helm
-[[https://github.com/emacs-helm/helm][~helm~]] is a framework for incremental completions and
-narrowing selections. It makes it easy to find what you want by filtering as you type.
-
-TODO: remove the directory listings from ~helm-find-files~: try something like this:
-https://github.com/syl20bnr/spacemacs/issues/1863#issuecomment-345057408
-
-TODO: sort the listing in helm-mini when I narrow. Without narrowing its ordered by recency which is
-good, but when I narrow it is ordered in another way, maybe length?
-
-#+BEGIN_SRC emacs-lisp
-  (use-package helm
-    :disabled
-    :diminish
-    :init
-    (helm-mode t)
-    :config
-    (setq helm-buffer-max-length 40
-          ;; this stops helm trying to ping websites when it interprets text as a url
-          ffap-machine-p-known 'reject
-          helm-mini-default-sources '(helm-source-buffers-list
-                                  helm-source-recentf
-                                  helm-source-bookmarks
-                                  helm-source-buffer-not-found
-                                  helm-source-bookmark-set))
-    ;; TODO why not use general here?
-    :bind (("M-x"     . helm-M-x)
-           ("C-x C-f" . helm-find-files)
-           ("C-x b"   . helm-mini)     ;; See buffers & recent files; more useful.
-           ("C-x r b" . helm-filtered-bookmarks)
-           ("C-x C-r" . helm-recentf)  ;; Search for recently edited files
-           ("C-c i"   . helm-imenu)
-           ("C-h a"   . helm-apropos)
-           ;; Look at what was cut recently & paste it in.
-           ("M-y" . helm-show-kill-ring)
-
-           :map helm-map
-           ;; We can list ‘actions’ on the currently selected item by C-z.
-           ("C-z" . helm-select-action)
-           ;; Let's keep tab-completetion anyhow.
-           ("TAB"   . helm-execute-persistent-action)
-           ("<tab>" . helm-execute-persistent-action)))
-#+END_SRC
-[[https://github.com/PythonNut/helm-flx][~helm-flx~]] provides fuzzy sorting for helm.
-#+BEGIN_SRC emacs-lisp
-  (use-package helm-flx
-    :disabled
-    :config
-    (setq helm-flx-for-helm-find-files t
-      helm-flx-for-helm-locate t)
-    (helm-flx-mode +1))
-#+END_SRC
-
-[[https://github.com/emacs-helm/helm-descbinds][~helm-descbinds~]] makes it easy to search the current active keybindings using ~helm~.
-#+BEGIN_SRC emacs-lisp
-  (use-package helm-descbinds
-    :disabled
-    :config (helm-descbinds-mode))
-
-#+END_SRC
-
-[[https://github.com/emacsorphanage/helm-swoop][~helm-swoop~]] is a useful way to search a buffer using ~helm~.
-
-TODO: there's probably more useful options here I could explore
-#+BEGIN_SRC emacs-lisp
-  (use-package helm-swoop
-    :disabled
-    :config
-    (setq
-     ;; show syntax highlighting in swoop minibuffer
-     helm-swoop-speed-or-color t
-     ;; don't pre-populate the swoop minibuffer with the symbol at the point
-     ;;
-     ;; TODO it would be nice to populate this sometimes and not at others times and bind these to
-     ;; other keys
-     ;;
-     helm-swoop-pre-input-function (lambda () "")
-     helm-swoop-use-fuzzy-matching t)
-    :general
-    ("C-s"   'helm-swoop)
-    ("C-M-s" 'helm-multi-swoop-all)
-    ("C-S-s" 'helm-swoop-back-to-last-point)
-    ;; keep C-w mapped to backward-kill-word even when swooping
-    (helm-swoop-map "C-w" 'backward-kill-word)
-    :custom
-    (helm-swoop-split-with-multiple-windows t "Do not split window inside the current window."))
-#+END_SRC
-
-** Editing
-
-[[https://github.com/bbatsov/crux][~crux~]] has a bunch of handy editing features that originated in Prelude Emacs.
-#+BEGIN_SRC emacs-lisp
-  (use-package crux
-    :general
-    ;; First kill to end of line, then kill the whole then.
-    ("C-k" 'crux-smart-kill-line))
-#+END_SRC
-
-This snippet provides smarter moving to the beginning of the line.
-Copied from [[https://emacsredux.com/blog/2013/05/22/smarter-navigation-to-the-beginning-of-a-line/]].
-#+BEGIN_SRC emacs-lisp
-  (defun smarter-move-beginning-of-line (arg)
-    "Move point back to indentation of beginning of line.
-
-    Move point to the first non-whitespace character on this line.
-    If point is already there, move to the beginning of the line.
-    Effectively toggle between the first non-whitespace character and
-    the beginning of the line.
-
-    If ARG is not nil or 1, move forward ARG - 1 lines first.  If
-    point reaches the beginning or end of the buffer, stop there."
-    (interactive "^p")
-    (setq arg (or arg 1))
-
-    ;; Move lines first
-    (when (/= arg 1)
-      (let ((line-move-visual nil))
-        (forward-line (1- arg))))
-
-    (let ((orig-point (point)))
-      (back-to-indentation)
-      (when (= orig-point (point))
-        (move-beginning-of-line 1))))
-
-  ;; remap C-a to `smarter-move-beginning-of-line'
-  (general-define-key "C-a" 'smarter-move-beginning-of-line)
-#+END_SRC
-
-[[https://elpa.gnu.org/packages/undo-tree.html][~undo-tree~]] gives a nice undo visualisation.
-
-TODO this is a nice way to incorporate Hydras directly into the use-package setup.
-
-TODO this doesn't seem to be enabled by default, at least in org, or Go. Maybe add hooks
-
-TODO try vundo instead https://github.com/casouri/vundo
-#+BEGIN_SRC emacs-lisp
-  (use-package undo-tree
-    :ensure t
-    :diminish
-    :after hydra
-    :general ("C-x /" 'hydra-undo-tree/body)
-    :config
-      (global-undo-tree-mode 1)
-      (setq undo-tree-visualizer-timestamps t
-            undo-tree-visualizer-diff t
-            undo-tree-show-minibuffer-help t
-            undo-tree-minibuffer-help-dynamic t
-            undo-tree-show-help-in-visualize-buffer t)
-    :hydra (hydra-undo-tree (:hint nil)
-  "
-  _p_: undo  _n_: redo _s_: save _l_: load   "
-      ("p"   undo-tree-undo)
-      ("n"   undo-tree-redo)
-      ("s"   undo-tree-save-history)
-      ("l"   undo-tree-load-history)
-      ("u"   undo-tree-visualize "visualize" :color blue)
-      ("q"   nil "quit" :color blue)))
-  ; This helps undo-tree keep loading: https://github.com/syl20bnr/spacemacs/issues/14064
-  (with-eval-after-load 'undo-tree (defun undo-tree-overridden-undo-bindings-p () nil))
-#+END_SRC
-
-[[https://github.com/waymondo/popup-kill-ring][~popup-kill-ring~]] displays the kill-ring in a popup at the point.
-#+begin_src emacs-lisp
-(use-package popup-kill-ring
-  :bind ("M-y" . popup-kill-ring))
-#+end_src
-
-[[https://github.com/victorhge/iedit][~iedit~]] allows you edit multiple occurrences of the same symbol at the same time. It's less useful
-now that ~lsp-mode~ can do the same thing across a project, but it is still useful for non-lsp enabled
-content.
-#+BEGIN_SRC emacs-lisp
-  (use-package iedit)
-#+END_SRC
-
-[[https://github.com/emacs-dashboard/emacs-dashboard][~dashboard~]] is a nice little splash screen that shows some recent items on starting Emacs.
-#+BEGIN_SRC emacs-lisp
-  (use-package dashboard
-    :config
-    (dashboard-setup-startup-hook)
-    (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
-    (setq dashboard-items '((recents  . 5)
-                            (bookmarks . 5)
-                            (projects . 5)
-                            (registers . 5)))
-    (setq dashboard-set-heading-icons t)
-    (setq dashboard-set-file-icons t)
-    (setq dashboard-init-info (concat "Welcome "     user-full-name
-                                      "! Emacs "      emacs-version
-                                      "; System "     (system-name)
-                                      "; Time "       (emacs-init-time))))
-#+END_SRC
-
-
-~dired~ is basically a file explorer.
-#+BEGIN_SRC emacs-lisp
-  (use-package dired
-    :straight nil
-    :defer t
-    :hook (dired-mode . dired-hide-details-mode)
-    :general
-    (my-leader-def "d" 'dired)
-    (dired-mode-map "c" 'dired-do-copy)
-    (dired-mode-map "r" 'dired-do-rename)
-    (dired-mode-map "." 'hydra-dired/body)
-    :hydra
-    ;; TODO map 'c' to copy, r to rename
-    (hydra-dired (:hint nil :color pink)
-    "
-  _+_ mkdir          _v_iew           _m_ark             _(_ details        _i_nsert-subdir    wdired
-  _c_opy             _O_ view other   _U_nmark all       _)_ omit-mode      _$_ hide-subdir    C-x C-q : edit
-  _D_elete           _o_pen other     _u_nmark           _l_ redisplay      _w_ kill-subdir    C-c C-c : commit
-  _r_ename           _M_ chmod        _t_oggle           _g_ revert buf     _e_ ediff          C-c ESC : abort
-  _Y_ rel symlink    _G_ chgrp        _E_xtension mark   _s_ort             _=_ pdiff
-  _S_ymlink          ^ ^              _F_ind marked      _._ toggle hydra   \\ flyspell
-  _R_sync            ^ ^              ^ ^                ^ ^                _?_ summary
-  _z_ compress-file  _A_ find regexp
-  _Z_ compress       _Q_ repl regexp
-
-  T - tag prefix
-  "
-      ("\\" dired-do-ispell)
-      ("(" dired-hide-details-mode)
-      (")" dired-omit-mode)
-      ("+" dired-create-directory)
-      ("=" diredp-ediff)         ;; smart diff
-      ("?" dired-summary)
-      ("$" diredp-hide-subdir-nomove)
-      ("A" dired-do-find-regexp)
-      ("c" dired-do-copy)        ;; Copy all marked files
-      ("D" dired-do-delete)
-      ("E" dired-mark-extension)
-      ("e" dired-ediff-files)
-      ("F" dired-do-find-marked-files)
-      ("G" dired-do-chgrp)
-      ("g" revert-buffer)        ;; read all directories again (refresh)
-      ("i" dired-maybe-insert-subdir)
-      ("l" dired-do-redisplay)   ;; relist the marked or singel directory
-      ("M" dired-do-chmod)
-      ("m" dired-mark)
-      ("O" dired-display-file)
-      ("o" dired-find-file-other-window)
-      ("Q" dired-do-find-regexp-and-replace)
-      ("r" dired-do-rename)
-      ("R" dired-do-rsynch)
-      ("S" dired-do-symlink)
-      ("s" dired-sort-toggle-or-edit)
-      ("t" dired-toggle-marks)
-      ("U" dired-unmark-all-marks)
-      ("u" dired-unmark)
-      ("v" dired-view-file)      ;; q to exit, s to search, = gets line #
-      ("w" dired-kill-subdir)
-      ("Y" dired-do-relsymlink)
-      ("z" diredp-compress-this-file)
-      ("Z" dired-do-compress)
-      ("q" nil)
-      ("." nil :color blue)))
-
-  ;; Colourful columns.
-  (use-package diredfl
-    :after dired
-    :config
-    (diredfl-global-mode +1))
-
-  (use-package dired-git-info
-      :general ('dired-mode-map
-                "C-(" 'dired-git-info-mode))
-#+END_SRC
-
-** Projectile
-[[https://projectile.mx/][~projectile~]] is a project interaction package that provides lots of handy commands for operating at
-a project level.
-
-TODO: I should probably trim down this hydra since I don't use some of it.
-#+BEGIN_SRC emacs-lisp
-  (use-package projectile
-    :general
-    (my-leader-def
-      "h" '(hydra-projectile/body :wk "projectile-mode")) ;;oryx
-    (projectile-mode-map "C-c h" 'projectile-command-map)
-    ("C-x f" 'find-file)
-    ("C-x C-f" 'projectile-find-file)
-    :config
-    (projectile-mode +1)
-    :hydra
-    (hydra-projectile (:color teal
-                              :hint nil)
-    "
-       PROJECTILE: %(projectile-project-root)
-
-       Find File            Search/Tags          Buffers                Cache
-  ------------------------------------------------------------------------------------------
-  _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache clear
-   _ff_: file dwim       _g_: update gtags      _b_: switch to buffer  _x_: remove known project
-   _fd_: file curr dir   _o_: multi-occur     _s-k_: Kill all buffers  _X_: cleanup non-existing
-    _r_: recent file                                               ^^^^_z_: cache current
-    _d_: dir
-
-  "
-      ("a"   helm-rg)
-      ("b"   projectile-switch-to-buffer)
-      ("c"   projectile-invalidate-cache)
-      ("d"   projectile-find-dir)
-      ("s-f" projectile-find-file)
-      ("ff"  projectile-find-file-dwim)
-      ("fd"  projectile-find-file-in-directory)
-      ("g"   ggtags-update-tags)
-      ("s-g" ggtags-update-tags)
-      ("i"   projectile-ibuffer)
-      ("K"   projectile-kill-buffers)
-      ("s-k" projectile-kill-buffers)
-      ("m"   projectile-multi-occur)
-      ("o"   projectile-multi-occur)
-      ("s-p" projectile-switch-project "switch project")
-      ("p"   projectile-switch-project)
-      ("s"   projectile-switch-project)
-      ("r"   projectile-recentf)
-      ("x"   projectile-remove-known-project)
-      ("X"   projectile-cleanup-known-projects)
-      ("z"   projectile-cache-current-file)
-      ("`"   hydra-projectile-other-window/body "other window")
-      ("q"   nil "cancel" :color blue)))
-#+END_SRC
-
-Various helm add-ons.
-#+BEGIN_SRC emacs-lisp
-  (use-package helm-projectile
-    :disabled
-    :after projectile
-    :config
-    (helm-projectile-on))
-
-  (use-package helm-rg
-    :disabled
-    :ensure t
-    :config
-    (setq helm-rg-default-directory 'git-root))
-
-  (use-package helm-ag
-    :disabled
-    :ensure t
-    :config
-    (setq ag-arguments (list "--smart-case" "--column")))
-#+END_SRC
-
-** Vertico
-Useful documentation for getting started here:
-- https://kristofferbalintona.me/posts/202202211546/
-
-#+begin_src emacs-lisp
-  (straight-use-package '( vertico :files (:defaults "extensions/*")
-                                   :includes (vertico-buffer
-                                              vertico-directory
-                                              vertico-flat
-                                              vertico-indexed
-                                              vertico-mouse
-                                              vertico-quick
-                                              vertico-repeat
-                                              vertico-reverse)))
-  ;; Enable vertico
+  ;; Vertico: better vertical completion for minibuffer commands
   (use-package vertico
+    :ensure t
     :init
-    (vertico-mode)
-    :config
-    ;; Different scroll margin
-    (setq vertico-scroll-margin 0)
-    ;; Show more candidates
-    (setq vertico-count 20)
-    ;; Grow and shrink the Vertico minibuffer
-    (setq vertico-resize nil)
-
-    ;; Enable vertico-multiform
-    (vertico-multiform-mode)
-
-    ;; Configure the display per command.  Use a buffer with indices for imenu and a flat (Ido-like)
-    ;; menu for M-x.
-    (setq vertico-multiform-commands
-          '((consult-imenu buffer indexed)))
-
-    ;; Configure the display per completion category.  Use the grid display for files and a buffer for
-    ;; the consult-grep commands.
-    (setq vertico-multiform-categories
-          '((file grid)
-            (consult-grep buffer)))
-    )
+    ;; You'll want to make sure that e.g. fido-mode isn't enabled
+    (vertico-mode))
 
   (use-package vertico-directory
     :straight nil
+    :after vertico
     :bind (:map vertico-map
-                ("C-j" . vertico-directory-enter)
-                ("C-l" . vertico-directory-up)
-                ("DEL" . vertico-directory-delete-char)
-                ("M-DEL" . vertico-directory-delete-word)))
+		("M-DEL" . vertico-directory-delete-word)))
 
-  ;; Persist history over Emacs restarts. Vertico sorts by history position.
-  (use-package savehist
-    :init
-    (savehist-mode))
-
-  ;; A few more useful configurations...
-  (use-package emacs
-    :init
-    ;; Add prompt indicator to `completing-read-multiple'.
-    ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
-    (defun crm-indicator (args)
-      (cons (format "[CRM%s] %s"
-                    (replace-regexp-in-string
-                     "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
-                     crm-separator)
-                    (car args))
-            (cdr args)))
-    (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
-
-    ;; Do not allow the cursor in the minibuffer prompt
-    (setq minibuffer-prompt-properties
-          '(read-only t cursor-intangible t face minibuffer-prompt))
-    (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
-
-    ;; Emacs 28: Hide commands in M-x which do not work in the current mode.
-    ;; Vertico commands are hidden in normal buffers.
-    ;; (setq read-extended-command-predicate
-    ;;       #'command-completion-default-include-p)
-
-    ;; Enable recursive minibuffers
-    (setq enable-recursive-minibuffers t))
-#+end_src
-
-
-#+begin_src emacs-lisp
-;; Optionally use the `orderless' completion style.
-(use-package orderless
-  :init
-  ;; Configure a custom style dispatcher (see the Consult wiki)
-  ;; (setq orderless-style-dispatchers '(+orderless-consult-dispatch orderless-affix-dispatch)
-  ;;       orderless-component-separator #'orderless-escapable-split-on-space)
-  (setq completion-styles '(orderless basic)
-        completion-category-defaults nil
-        completion-category-overrides '((file (styles partial-completion)))))
-#+end_src
-
-#+begin_src emacs-lisp
-  ;; Enable rich annotations using the Marginalia package
+  ;; Marginalia: annotations for minibuffer
   (use-package marginalia
-    ;; Either bind `marginalia-cycle' globally or only in the minibuffer
-    :bind (("M-A" . marginalia-cycle)
-           :map minibuffer-local-map
-           ("M-A" . marginalia-cycle))
-
-    ;; The :init configuration is always executed (Not lazy!)
-    :init
-
-    ;; Must be in the :init section of use-package such that the mode gets
-    ;; enabled right away. Note that this forces loading the package.
+    :ensure t
+    :config
     (marginalia-mode))
 
-  ;; This causes an error that I need to figure out
-  ;; (use-package all-the-icons-completion
-  ;; :after (marginalia all-the-icons)
-  ;; :hook (marginalia-mode . all-the-icons-completion-marginalia-setup)
-  ;; :init
-  ;; (all-the-icons-completion-mode))
-#+end_src
-
-
-#+begin_src emacs-lisp
-  (use-package embark
-    :demand t
+  ;; Popup completion-at-point
+  (use-package corfu
+    :straight (:files (:defaults "extensions/*"))
     :ensure t
+    :init
+    (global-corfu-mode)
     :bind
-    (("C-." . embark-act)         ;; pick some comfortable binding
-     ("C-;" . embark-dwim)        ;; good alternative: M-.
-     ("C-h B" . embark-bindings)) ;; alternative for `describe-bindings'
+    (:map corfu-map
+	  ("SPC" . corfu-insert-separator)
+	  ("C-n" . corfu-next)
+	  ("C-p" . corfu-previous)))
 
-    :init
-
-    ;; Optionally replace the key help with a completing-read interface
-    (setq prefix-help-command #'embark-prefix-help-command)
-
-    ;; Show the Embark target at point via Eldoc.  You may adjust the Eldoc
-    ;; strategy, if you want to see the documentation from multiple providers.
-    ;; (add-hook 'eldoc-documentation-functions #'embark-eldoc-first-target) ;; this didn't work
-    ;; (setq eldoc-documentation-strategy #'eldoc-documentation-compose-eagerly)
-
-    :config
-
-    ;; Hide the mode line of the Embark live/completions buffers
-    (add-to-list 'display-buffer-alist
-                 '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
-                   nil
-                   (window-parameters (mode-line-format . none)))))
-
-  ;; Consult users will also want the embark-consult package.
-  (use-package embark-consult
-    :demand t
-    :ensure t ; only need to install it, embark loads it after consult if found
-    :hook
-    (embark-collect-mode . consult-preview-at-point-mode))
-#+end_src
-
-
-#+begin_src emacs-lisp
-  ;; Example configuration for Consult
-  (use-package consult
-    ;; Replace bindings. Lazily loaded due by `use-package'.
-    :bind (;; C-c bindings (mode-specific-map)
-
-           ("C-c M-x" . consult-mode-command)
-           ("C-c h" . consult-history)
-           ("C-c k" . consult-kmacro)
-           ("C-c m" . consult-man)
-           ("C-c i" . consult-info)
-           ([remap Info-search] . consult-info)
-           ;; C-x bindings (ctl-x-map)
-           ("C-x M-:" . consult-complex-command)     ;; orig. repeat-complex-command
-           ("C-x b" . consult-buffer)                ;; orig. switch-to-buffer
-           ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
-           ("C-x 5 b" . consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
-           ("C-x r b" . consult-bookmark)            ;; orig. bookmark-jump
-           ("C-x p b" . consult-project-buffer)      ;; orig. project-switch-to-buffer
-           ;; Custom M-# bindings for fast register access
-           ("M-#" . consult-register-load)
-           ("M-'" . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
-           ("C-M-#" . consult-register)
-           ;; Other custom bindings
-           ("M-y" . consult-yank-pop)                ;; orig. yank-pop
-           ;; M-g bindings (goto-map)
-           ("M-g e" . consult-compile-error)
-           ("M-g f" . consult-flymake)               ;; Alternative: consult-flycheck
-           ("M-g g" . consult-goto-line)             ;; orig. goto-line
-           ("M-g M-g" . consult-goto-line)           ;; orig. goto-line
-           ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
-           ("M-g m" . consult-mark)
-           ("M-g k" . consult-global-mark)
-           ("M-g i" . consult-imenu)
-           ("M-g I" . consult-imenu-multi)
-           ;; M-s bindings (search-map)
-           ("M-s d" . consult-find)
-           ("M-s D" . consult-locate)
-           ("M-s g" . consult-grep)
-           ("M-s G" . consult-git-grep)
-           ("M-s r" . consult-ripgrep)
-           ("M-s l" . consult-line)
-           ("M-s L" . consult-line-multi)
-           ("M-s k" . consult-keep-lines)
-           ("M-s u" . consult-focus-lines)
-           ;; Isearch integration
-           ("M-s e" . consult-isearch-history)
-           :map isearch-mode-map
-           ("M-e" . consult-isearch-history)         ;; orig. isearch-edit-string
-           ("M-s e" . consult-isearch-history)       ;; orig. isearch-edit-string
-           ("M-s l" . consult-line)                  ;; needed by consult-line to detect isearch
-           ("M-s L" . consult-line-multi)            ;; needed by consult-line to detect isearch
-           ;; Minibuffer history
-           :map minibuffer-local-map
-           ("M-s" . consult-history)                 ;; orig. next-matching-history-element
-           ("M-r" . consult-history))                ;; orig. previous-matching-history-element
-
-    ;; Enable automatic preview at point in the *Completions* buffer. This is
-    ;; relevant when you use the default completion UI.
-    :hook (completion-list-mode . consult-preview-at-point-mode)
-
-    ;; The :init configuration is always executed (Not lazy)
-    :init
-    ;; Optionally configure the register formatting. This improves the register
-    ;; preview for `consult-register', `consult-register-load',
-    ;; `consult-register-store' and the Emacs built-ins.
-    (setq register-preview-delay 0.5
-          register-preview-function #'consult-register-format)
-
-    ;; Optionally tweak the register preview window.
-    ;; This adds thin lines, sorting and hides the mode line of the window.
-    (advice-add #'register-preview :override #'consult-register-window)
-
-    ;; Use Consult to select xref locations with preview
-    (setq xref-show-xrefs-function #'consult-xref
-          xref-show-definitions-function #'consult-xref)
-
-    ;; Configure other variables and modes in the :config section,
-    ;; after lazily loading the package.
-    :config
-
-    ;; Optionally configure preview. The default value
-    ;; is 'any, such that any key triggers the preview.
-    ;; (setq consult-preview-key 'any)
-    ;; (setq consult-preview-key "M-.")
-    ;; (setq consult-preview-key '("S-<down>" "S-<up>"))
-    ;; For some commands and buffer sources it is useful to configure the
-    ;; :preview-key on a per-command basis using the `consult-customize' macro.
-    (consult-customize
-     consult-theme :preview-key '(:debounce 0.2 any)
-     consult-ripgrep consult-git-grep consult-grep
-     consult-bookmark consult-recent-file consult-xref
-     consult--source-bookmark consult--source-file-register
-     consult--source-recent-file consult--source-project-recent-file
-     ;; :preview-key "M-."
-     :preview-key '(:debounce 0.4 any))
-
-    ;; Optionally configure the narrowing key.
-    ;; Both < and C-+ work reasonably well.
-    (setq consult-narrow-key "<") ;; "C-+"
-
-    ;; Optionally make narrowing help available in the minibuffer.
-    ;; You may want to use `embark-prefix-help-command' or which-key instead.
-    ;; (define-key consult-narrow-map (vconcat consult-narrow-key "?") #'consult-narrow-help)
-
-    ;; By default `consult-project-function' uses `project-root' from project.el.
-    ;; Optionally configure a different project root function.
-    ;;;; 1. project.el (the default)
-    ;; (setq consult-project-function #'consult--default-project--function)
-    ;;;; 2. vc.el (vc-root-dir)
-    ;; (setq consult-project-function (lambda (_) (vc-root-dir)))
-    ;;;; 3. locate-dominating-file
-    ;; (setq consult-project-function (lambda (_) (locate-dominating-file "." ".git")))
-    ;;;; 4. projectile.el (projectile-project-root)
-    ;; (autoload 'projectile-project-root "projectile")
-    ;; (setq consult-project-function (lambda (_) (projectile-project-root)))
-    ;;;; 5. No project support
-    ;; (setq consult-project-function nil)
-  )
-#+end_src
-
-Read more about embark: https://karthinks.com/software/fifteen-ways-to-use-embark/
-#+begin_src emacs-lisp
-(use-package consult-dir)
-#+end_src
-
-
-#+begin_src emacs-lisp
-(use-package corfu
-  ;; Optional customizations
-  ;; :custom
-  ;; (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
-  ;; (corfu-auto t)                 ;; Enable auto completion
-  ;; (corfu-separator ?\s)          ;; Orderless field separator
-  ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
-  ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
-  ;; (corfu-preview-current nil)    ;; Disable current candidate preview
-  ;; (corfu-preselect 'prompt)      ;; Preselect the prompt
-  ;; (corfu-on-exact-match nil)     ;; Configure handling of exact matches
-  ;; (corfu-scroll-margin 5)        ;; Use scroll margin
-
-  ;; Enable Corfu only for certain modes.
-  ;; :hook ((prog-mode . corfu-mode)
-  ;;        (shell-mode . corfu-mode)
-  ;;        (eshell-mode . corfu-mode))
-
-  ;; Recommended: Enable Corfu globally.
-  ;; This is recommended since Dabbrev can be used globally (M-/).
-  ;; See also `corfu-exclude-modes'.
-  :init
-  (global-corfu-mode))
-
-;; A few more useful configurations...
-(use-package emacs
-  :init
-  ;; TAB cycle if there are only few candidates
-  (setq completion-cycle-threshold 3)
-
-  ;; Emacs 28: Hide commands in M-x which do not apply to the current mode.
-  ;; Corfu commands are hidden, since they are not supposed to be used via M-x.
-  ;; (setq read-extended-command-predicate
-  ;;       #'command-completion-default-include-p)
-
-  ;; Enable indentation+completion using the TAB key.
-  ;; `completion-at-point' is often bound to M-TAB.
-  (setq tab-always-indent 'complete))
-#+end_src
-
-
-#+begin_src emacs-lisp
-  (use-package kind-icon
+  ;; Part of corfu
+  (use-package corfu-popupinfo
+    :straight nil
     :after corfu
+    :hook (corfu-mode . corfu-popupinfo-mode)
     :custom
-    (kind-icon-use-icons t)
-    (kind-icon-default-face 'corfu-default) ; Have background color be the same as `corfu' face background
-    (kind-icon-blend-background nil)  ; Use midpoint color between foreground and background colors ("blended")?
-    (kind-icon-blend-frac 0.08)
-
-    ;; NOTE 2022-02-05: `kind-icon' depends `svg-lib' which creates a cache
-    ;; directory that defaults to the `user-emacs-directory'. Here, I change that
-    ;; directory to a location appropriate to `no-littering' conventions, a
-    ;; package which moves directories of other packages to sane locations.
-    (svg-lib-icons-dir (no-littering-expand-var-file-name "svg-lib/cache/")) ; Change cache dir
+    (corfu-popupinfo-delay '(0.25 . 0.1))
+    (corfu-popupinfo-hide nil)
     :config
-    (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter) ; Enable `kind-icon'
+    (corfu-popupinfo-mode))
 
-    ;; Add hook to reset cache so the icon colors match my theme
-    ;; NOTE 2022-02-05: This is a hook which resets the cache whenever I switch
-    ;; the theme using my custom defined command for switching themes. If I don't
-    ;; do this, then the backgound color will remain the same, meaning it will not
-    ;; match the background color corresponding to the current theme. Important
-    ;; since I have a light theme and dark theme I switch between. This has no
-    ;; function unless you use something similar
-    (add-hook 'kb/themes-hooks #'(lambda () (interactive) (kind-icon-reset-cache))))
-#+end_src
-
-** Org
-Setup various aesthetic options.
-#+BEGIN_SRC emacs-lisp
-  (defun my-org-prettify-hook ()
-    (turn-on-visual-line-mode))
-
-  (defun my-org-prettify-settings ()
-    (setq org-startup-indented nil
-          org-src-fontify-natively t
-          org-hide-emphasis-markers t
-          org-fontify-whole-heading-line t
-          org-fontify-done-headline t
-          org-fontify-quote-and-verse-blocks t
-          line-spacing 0.2))
-#+END_SRC
-
-[[https://github.com/hniksic/emacs-htmlize][~htmlize~]] converts a buffer to HTML with nice syntax highlighting.
-#+BEGIN_SRC emacs-lisp
-  (use-package htmlize
-    :defer t)
-#+END_SRC
-
-Setup various ~TODO~ related variables for ~org-mode~.
-#+BEGIN_SRC emacs-lisp
-  (defun my-org-todo-setup ()
-    (setq org-use-fast-todo-selection t)
-    (setq org-todo-keywords
-          '((sequence "TODO(t)" "NEXT(n)" "CURRENT(c)" "|" "DONE(d)")
-            (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(a@/!)")
-            (type "MEETING")))
-    (setq org-log-done 'time)
-    (setq org-todo-keyword-faces
-          (quote (("TODO" :foreground "red" :weight bold)
-                  ("NEXT" :foreground "blue" :weight bold)
-                  ("DONE" :foreground "forest green" :weight bold)
-                  ("WAITING" :foreground "orange" :weight bold)
-                  ("HOLD" :foreground "magenta" :weight bold)
-                  ("CANCELLED" :foreground "forest green" :weight bold)
-                  ("MEETING" :foreground "forest green" :weight bold)
-                  ("PHONE" :foreground "forest green" :weight bold)))))
-#+END_SRC
-
-Setup various ~org-mode~ structure templates. When typing ~<~ at the start of a line this will popup a
-menu of various types of blocks that you may want to insert.
-#+BEGIN_SRC emacs-lisp
-  (defun my-org-structure-templates ()
-    (require 'org-tempo)
-    (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
-    (add-to-list 'org-structure-template-alist '("sh" . "src sh")))
-
-  ;; todo this shuold be part of the org setup
-  (defhydra hydra-org-template (:color blue :hint nil)
-    "
-   _c_enter  _q_uote     _e_macs-lisp    _L_aTeX:
-   _l_ink    _E_xample   _p_erl          _i_ndex:
-   _a_scii   _v_erse     _P_erl tangled  _I_NCLUDE:
-   _s_rc     _n_ote      plant_u_ml      _H_TML:
-   _h_tml    ^ ^         ^ ^             _A_SCII:
-  "
-    ("s" (hot-expand "<s"))
-    ("E" (hot-expand "<e"))
-    ("q" (hot-expand "<q"))
-    ("v" (hot-expand "<v"))
-    ("n" (hot-expand "<not"))
-    ("c" (hot-expand "<c"))
-    ("l" (hot-expand "<li"))
-    ("h" (hot-expand "<h"))
-    ("a" (hot-expand "<a"))
-    ("L" (hot-expand "<L"))
-    ("i" (hot-expand "<i"))
-    ("e" (hot-expand "<s" "emacs-lisp"))
-    ("p" (hot-expand "<s" "perl"))
-    ("u" (hot-expand "<s" "plantuml :file CHANGE.png"))
-    ("P" (hot-expand "<s" "perl" ":results output :exports both :shebang \"#!/usr/bin/env perl\"\n"))
-    ("I" (hot-expand "<I"))
-    ("H" (hot-expand "<H"))
-    ("A" (hot-expand "<A"))
-    ("<" self-insert-command "ins")
-    ("o" nil "quit"))
-
-  (require 'org-tempo) ; Required from org 9 onwards for old template expansion
-  ;; Reset the org-template expnsion system, this is need after upgrading to org 9 for some reason
-  (setq org-structure-template-alist (eval (car (get 'org-structure-template-alist 'standard-value))))
-  (defun hot-expand (str &optional mod header)
-    "Expand org template.
-
-  STR is a structure template string recognised by org like <s. MOD is a
-  string with additional parameters to add the begin line of the
-  structure element. HEADER string includes more parameters that are
-  prepended to the element after the #+HEADER: tag."
-    (let (text)
-      (when (region-active-p)
-        (setq text (buffer-substring (region-beginning) (region-end)))
-        (delete-region (region-beginning) (region-end))
-        (deactivate-mark))
-      (when header (insert "#+HEADER: " header) (forward-line))
-      (insert str)
-      (org-tempo-complete-tag)
-      (when mod (insert mod) (forward-line))
-      (when text (insert text))))
-
-  (general-define-key
-   :keymaps 'org-mode-map
-   ;; disable this agenda key since I use it for avy
-   "C-'" nil
-   "<" '(lambda () (interactive)
-          (if (or (region-active-p) (looking-back "^"))
-              (hydra-org-template/body)
-            (self-insert-command 1))))
-
-  (eval-after-load "org"
-    '(cl-pushnew
-      '("not" . "note")
-      org-structure-template-alist))
-#+END_SRC
-
-Various capture templates for ~org-mode~.
-#+BEGIN_SRC emacs-lisp
-  (use-package org-capture
-    :straight nil
-    :general
-    (my-leader-def
-      "C" 'org-capture)
-    :config
-    (setq org-capture-templates
-          '(
-            ("c" "Note on current task" plain (clock) "\n\n%T from: %a\n%i\n%?")
-            ("s" "Standup" entry (file+olp+datetree (concat my/org-dir "todo.org") "Standup") "* Planned\n- %?\n %i\n %a")
-            ("r" "To-Read" item (file+headline (lamdba () (concat my/org-dir "personal.org")) "To Read") "")
-            ("t" "Tasks")
-            ("tw" "Work Task" entry (file+headline (lambda () (concat my/org-dir "work/swrx.org")) "Tasks") "** TODO %?\n %i")
-            ("tp" "Pesonal Task" entry (file+headline (lambda () (concat my/org-dir "personal.org")) "Tasks") "* TODO %?\n %i\n %a")
-            ("th" "Household Task" entry (file+headline (lambda () (concat my/org-dir "household.org")) "Tasks") "* TODO %?\n %i\n %a")
-            ("i" "Interruption")
-            ("ii" "interruption" entry (file+olp+datetree (lambda () (concat my/org-dir "tracker.org"))) "* IN-PROGRESS %?  :interruption:work:\n%U\n- ref :: %a\n"
-             :prepend t :tree-type week :clock-in t :clock-keep t)
-            ("ic" "chat"         entry (file+olp+datetree (lambda () (concat my/org-dir "tracker.org"))) "* CHAT %?         :work:chat:\n%U\n- ref :: %a\n"
-             :prepend t :tree-type week :clock-in t :clock-keep t)
-            ("ie" "email"        entry (file+olp+datetree (lambda () (concat my/org-dir "tracker.org"))) "* EMAIL %?        :work:email:\n%U\n- ref :: %a\n"
-             :prepend t :tree-type week :clock-in t :clock-keep t)
-            ("im" "meeting"      entry (file+olp+datetree (lambda () (concat my/org-dir "tracker.org")))  "* MEETING %?      :work:meeting:\n%U\n- ref :: %a\n"
-             :prepend t :tree-type week :clock-in t :clock-keep t)
-            ("ir" "review"       entry (file+olp+datetree (lambda () (concat my/org-dir "tracker.org")))  "* REVIEW %?       :work:review:\n%U\n- ref :: %a\n"
-             :prepend t :tree-type week :clock-in t :clock-keep t)
-            ))
-
-    (defun org-hugo-new-subtree-post-capture-template ()
-      "Returns `org-capture' template string for new Hugo post.
-  See `org-capture-templates' for more information."
-      (let* ((title (read-from-minibuffer "Post Title: ")) ;Prompt to enter the post title
-             (fname (org-hugo-slug title)))
-        (mapconcat #'identity
-                   `(
-                     ,(concat "* TODO " title)
-                     ":PROPERTIES:"
-                     ,(concat ":EXPORT_FILE_NAME: " fname)
-                     ":END:"
-                     "%?\n")          ;Place the cursor here finally
-                   "\n")))
-
-    (add-to-list 'org-capture-templates
-                 '("b"
-                   "Blog Post"
-                   entry
-                   ;; It is assumed that below file is present in `org-directory'
-                   ;; and that it has a "Blog Ideas" heading. It can even be a
-                   ;; symlink pointing to the actual location of all-posts.org!
-                   (file+olp "blog-posts.org" "Ideas")
-                   (function org-hugo-new-subtree-post-capture-template))))
-  (add-hook 'org-mode-hook (lambda ()
-     "Beautify Org Checkbox Symbol"
-     (push '("[ ]" . "☐") prettify-symbols-alist)
-     (push '("[X]" . "☑" ) prettify-symbols-alist)
-     (push '("[-]" . "❍" ) prettify-symbols-alist)
-     (prettify-symbols-mode)))
-
-  (add-hook 'org-mode-hook 'turn-on-auto-fill)
-#+END_SRC
-
-
-#+BEGIN_SRC emacs-lisp
-  (use-package org
-    :gfhook
-    #'my-org-prettify-hook
-    ('org-src-mode-hook #'my-disable-flycheck-for-elisp)
-    :preface
-    (defun my-disable-flycheck-for-elisp ()
-      (setq flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
-    :general
-    ("C-c l" 'org-store-link)
-    (org-mode-map "C-'" nil)
-
-    :config
-    (setq org-agenda-files my/org-agenda-files
-          org-directory my/org-dir
-          org-tags-column 75
-          org-log-into-drawer t ;; hide the log state change history a bit better
-          org-deadline-warning-days 7
-          org-agenda-skip-scheduled-if-deadline-is-shown t
-          org-habit-show-habits-only-for-today nil
-          org-habit-graph-column 65
-          org-duration-format 'h:mm ;; show hours at max, not days
-          org-agenda-compact-blocks t
-          org-cycle-separator-lines 0
-          ;; hide empty agenda sections
-          org-agenda-clockreport-parameter-plist '(:stepskip0 t :link t :maxlevel 2 :fileskip0 t)
-          ;; default show today
-          org-agenda-span 'day
-          org-agenda-start-day "-0d"
-          org-agenda-start-on-weekday 1
-          org-agenda-custom-commands
-          '(("d" "Done tasks" tags "/DONE|CANCELED")
-            ("g" "Plan Today"
-             ((agenda "" ((org-agenda-span 'day)))
-              (org-agenda-skip-function '(org-agenda-skip-deadline-if-not-today))
-              (org-agenda-entry-types '(:deadline))
-              (org-agenda-overriding-header "Today's Deadlines "))))
-          )
-    (my-org-prettify-settings)
-    (my-org-todo-setup)
-    (my-org-structure-templates))
-#+END_SRC
-
-[[https://github.com/minad/org-modern][~org-modern~]] gives ~org-mode~ a more modern style.
-#+begin_src emacs-lisp
-  (use-package org-modern
-    :config
-    (global-org-modern-mode))
-#+end_src
-[[https://github.com/alphapapa/org-super-agenda][~org-super-agenda~]] improves the existing ~org-agenda~ in various ways.
-#+BEGIN_SRC emacs-lisp
-  (use-package org-super-agenda
-    :after org-agenda
-    :custom (org-super-agenda-groups
-             '( ;; Each group has an implicit boolean OR operator between its selectors.
-               (:name "Overdue" :deadline past :order 0)
-               (:name "Evening Habits" :and (:habit t :tag "evening") :order 8)
-               (:name "Habits" :habit t :order 6)
-               (:name "Today" ;; Optionally specify section name
-                      :time-grid t  ;; Items that appear on the time grid (scheduled/deadline with time)
-                      :order 3)     ;; capture the today first but show it in order 3
-               (:name "Low Priority" :priority "C" :tag "maybe" :order 7)
-               (:name "Due Today" :deadline today :order 1)
-               (:name "Important"
-                      :and (:priority "A" :not (:todo ("DONE" "CANCELED")))
-                      :order 2)
-               (:name "Due Soon" :deadline future :order 4)
-               (:name "Todo" :not (:habit t) :order 5)
-               (:name "Waiting" :todo ("WAITING" "HOLD") :order 9)))
-    :config
-    (setq org-super-agenda-header-map nil
-          org-super-agenda-mode t))
-
-
-  (defhydra hydra-org-agenda (:pre (setq which-key-inhibit t)
-                                   :post (setq which-key-inhibit nil)
-                                   :hint nil)
-    "
-  Org agenda (_q_uit)
-
-  ^Clock^      ^Visit entry^              ^Date^             ^Other^
-  ^-----^----  ^-----------^------------  ^----^-----------  ^-----^---------
-  _ci_ in      _SPC_ in other window      _ds_ schedule      _gr_ reload
-  _co_ out     _TAB_ & go to location     _dd_ set deadline  _._  go to today
-  _cq_ cancel  _RET_ & del other windows  _dt_ timestamp     _gd_ go to date
-  _cj_ jump    _o_   link                 _+_  do later      ^^
-  ^^           ^^                         _-_  do earlier    ^^
-  ^^           ^^                         ^^                 ^^
-  ^View^          ^Filter^                 ^Headline^         ^Toggle mode^
-  ^----^--------  ^------^---------------  ^--------^-------  ^-----------^----
-  _vd_ day        _ft_ by tag              _ht_ set status    _tf_ follow
-  _vw_ week       _fr_ refine by tag       _hk_ kill          _tl_ log
-  _vt_ fortnight  _fc_ by category         _hr_ refile        _ta_ archive trees
-  _vm_ month      _fh_ by top headline     _hA_ archive       _tA_ archive files
-  _vy_ year       _fx_ by regexp           _h:_ set tags      _tr_ clock report
-  _vn_ next span  _fd_ delete all filters  _hp_ set priority  _td_ diaries
-  _vp_ prev span  ^^                       ^^                 ^^
-  _vr_ reset      ^^                       ^^                 ^^
-  ^^              ^^                       ^^                 ^^
-  "
-    ;; Entry
-    ("hA" org-agenda-archive-default)
-    ("hk" org-agenda-kill)
-    ("hp" org-agenda-priority)
-    ("hr" org-agenda-refile)
-    ("h:" org-agenda-set-tags)
-    ("ht" org-agenda-todo)
-    ;; Visit entry
-    ("o"   link-hint-open-link :exit t)
-    ("<tab>" org-agenda-goto :exit t)
-    ("TAB" org-agenda-goto :exit t)
-    ("SPC" org-agenda-show-and-scroll-up)
-    ("RET" org-agenda-switch-to :exit t)
-    ;; Date
-    ("dt" org-agenda-date-prompt)
-    ("dd" org-agenda-deadline)
-    ("+" org-agenda-do-date-later)
-    ("-" org-agenda-do-date-earlier)
-    ("ds" org-agenda-schedule)
-    ;; View
-    ("vd" org-agenda-day-view)
-    ("vw" org-agenda-week-view)
-    ("vt" org-agenda-fortnight-view)
-    ("vm" org-agenda-month-view)
-    ("vy" org-agenda-year-view)
-    ("vn" org-agenda-later)
-    ("vp" org-agenda-earlier)
-    ("vr" org-agenda-reset-view)
-    ;; Toggle mode
-    ("ta" org-agenda-archives-mode)
-    ("tA" (org-agenda-archives-mode 'files))
-    ("tr" org-agenda-clockreport-mode)
-    ("tf" org-agenda-follow-mode)
-    ("tl" org-agenda-log-mode)
-    ("td" org-agenda-toggle-diary)
-    ;; Filter
-    ("fc" org-agenda-filter-by-category)
-    ("fx" org-agenda-filter-by-regexp)
-    ("ft" org-agenda-filter-by-tag)
-    ("fr" org-agenda-filter-by-tag-refine)
-    ("fh" org-agenda-filter-by-top-headline)
-    ("fd" org-agenda-filter-remove-all)
-    ;; Clock
-    ("cq" org-agenda-clock-cancel)
-    ("cj" org-agenda-clock-goto :exit t)
-    ("ci" org-agenda-clock-in :exit t)
-    ("co" org-agenda-clock-out)
-    ;; Other
-    ("q" nil :exit t)
-    ("gd" org-agenda-goto-date)
-    ("." org-agenda-goto-today)
-    ("gr" org-agenda-redo))
-  ;; TODO: This doesn't seem to load automatically
-  (general-define-key
-    :keymaps 'org-agenda-mode-map
-    "." 'hydra-org-agenda/body)
-
-  (use-package org-journal
-    :defer t
-    :config
-    (setq org-journal-dir (concat my/org-dir "journal"))
-    (setq org-journal-date-format "%A %d %B %Y")
-    (setq org-journal-time-format "%H:%M")
-    (setq org-journal-enable-agenda-integration t)
-    (setq org-journal-file-format "%Y%m%d.org")
-    :general ("C-x C-j" 'org-journal-new-entry))
-
-  (use-package org-babel
-    :no-require
-    :straight nil
-    :config
-    (org-babel-do-load-languages
-     'org-babel-load-languages
-     '((python . t)
-       (shell . t)
-       (plantuml . t))))
-#+END_SRC
-
-** Writing Modes
-
-[[https://github.com/rnkn/olivetti][~olivetti~]] formats a buffer for easy prose editing by providing nice margins and a sensibly sized
-column of text.
-#+BEGIN_SRC emacs-lisp
-  (use-package olivetti
-    :defer t
-    :custom
-    (olivetti-body-width 90))
-#+END_SRC
-
-[[https://github.com/bnbeckwith/writegood-mode][~writegood-mode~]] provides a bunch of useful functions for better writing, like finding weasel words
-and scoring the reading ease of prose.
-#+BEGIN_SRC emacs-lisp
-(use-package writegood-mode
-    :defer t)
-#+END_SRC
-
-This is a function to turn on all the various writing modes.
-#+BEGIN_SRC emacs-lisp
-  (defun my/writing-modes ()
-    (interactive)
-    (flyspell-mode +1)
-    (olivetti-mode +1)
-    (writegood-mode +1))
-#+END_SRC
-
-*** Spelling
-~flyspell~ is Emacs' spelling mode. I've added a decent hydra here for convenience.
-#+BEGIN_SRC emacs-lisp
-  (setenv "LANG" "en_GB")
-  (use-package flyspell
-    :diminish
-    :general
-    (my-leader-def
-      "n" 'hydra-spelling/body) ;;oryx: just 'c' would be better here
-    :hook ((prog-mode . flyspell-prog-mode)
-           ((org-mode text-mode) . flyspell-mode))
-    :config
-    (setq ispell-dictionary "english"
-          ispell-silently-savep t
-          ispell-personal-dictionary "~/.emacs.d/.aspell.en.pws")
-    :hydra (hydra-spelling (:color blue :hint nil)
-      "
-  ^
-  ^Spelling^          ^Errors^            ^Checker^
-  ^────────^──────────^──────^────────────^───────^───────
-  _q_ quit            _<_ previous        _c_ correction
-  ^^                  _>_ next            _d_ dictionary
-  ^^                  _f_ check           _m_ mode
-  ^^                  ^^                  ^^
-  "
-      ("q" nil)
-      ("<" flyspell-correct-previous :color pink)
-      (">" flyspell-correct-next :color pink)
-      ("c" ispell)
-      ("d" ispell-change-dictionary)
-      ("f" flyspell-buffer)
-      ("m" flyspell-mode)))
-
-  (use-package flyspell-correct
-    :after flyspell)
-
-  (use-package flyspell-correct-helm
-    :disabled
-    :after flyspell)
-#+END_SRC
-
-[[https://github.com/magnars/expand-region.el][~expand-region~]] allows growing or shrinking the region by semantic units.
-#+BEGIN_SRC emacs-lisp
-  (use-package expand-region
-    :general
-    ("C->" 'er/expand-region)
-    ("C-<" 'er/contract-region))
-#+END_SRC
-
-[[https://github.com/flycheck/flycheck][~flycheck~]] enables on-the-fly syntax checking.
-#+BEGIN_SRC emacs-lisp
-  (use-package flycheck
-    :general
-    (my-leader-def
-      "f" '(hydra-flycheck-mode/body :wk "flycheck-mode"))
-    :config
-    (global-flycheck-mode +1)
-    ;; json-python-json was giving me issues for some reason
-    (setq-default flycheck-disabled-checkers '(json-python-json))
-    :hydra
-    (hydra-flycheck-mode
-      (:hint nil
-       :color green
-       :pre (flycheck-list-errors)
-       :post (quit-windows-on "*Flycheck errors*"))
-      "
-  Find Errors        Describe Errors
-  -----------------------------------
-  _f_irst error      _s_how error
-  _n_ext error       _e_xplain error
-  _p_rev error       ^ ^
-  _l_ist errors      ^ ^
-  "
-      ("f" flycheck-first-error)
-      ("n" flycheck-next-error)
-      ("p" flycheck-previous-error)
-      ("l" flycheck-list-errors)
-      ("s" flycheck-display-error-at-point)
-      ("e" flycheck-explain-error-at-point)))
-#+END_SRC
-
-[[https://github.com/joaotavora/yasnippet][~yasnippet~]] is a templating system that allows you to expand templates and fill them in. This is
-very useful for auto-inserting a bunch of programming related boilerplate.
-#+BEGIN_SRC emacs-lisp
-  (use-package yasnippet
-   :custom
-   (yas-snippet-dirs
-    '("~/.emacs.d/snippets"))
-   :config
-   (yas-global-mode +1))
-
-  (use-package yasnippet-snippets
-    :after yasnippet)
-#+END_SRC
-
-** Completion
-[[https://github.com/company-mode/company-mode][~company-mode~]] is a popular text-completion framework for Emacs. The odd name comes from comp[lete] any[thing].
-#+BEGIN_SRC emacs-lisp
-  (use-package company
-    :disabled
-    :diminish
+  ;; Make corfu popup come up in terminal overlay
+  (use-package corfu-terminal
+    :if (not (display-graphic-p))
     :ensure t
     :config
-    (global-company-mode 1)
-    (setq ;; Only 1 letters required for completion to activate.
-     company-minimum-prefix-length 1
-     ;; Search other buffers for compleition candidates
-     company-dabbrev-other-buffers t
-     company-dabbrev-code-other-buffers t
-     ;; Show candidates according to importance, then case, then in-buffer frequency
-     company-transformers ;'(company-sort-by-backend-importance
-                          ;  company-sort-prefer-same-case-prefix
-                            '(company-sort-by-occurrence)
-     ;; Flushright any annotations for a compleition;
-     ;; e.g., the description of what a snippet template word expands into.
-     company-tooltip-align-annotations t
-     ;; Allow (lengthy) numbers to be eligible for completion.
-     company-complete-number nil
-     ;; M-⟪num⟫ to select an option according to its number.
-     company-show-numbers t
-     ;; Show 10 items in a tooltip; scrollbar otherwise or C-s ^_^
-     company-tooltip-limit 10
-     ;; Edge of the completion list cycles around.
-     company-selection-wrap-around t
-     ;; Do not downcase completions by default.
-     company-dabbrev-downcase nil
-     ;; Even if I write something with the ‘wrong’ case,
-     ;; provide the ‘correct’ casing.
-     company-dabbrev-ignore-case nil
-     ;; Immediately activate completion.
-     company-idle-delay 0
-     ;;company-backends (mapcar #'company-mode/backend-with-yas company-backends)
-     ;;company-backends '((:separate company-capf company-yasnippet))
-     ;; don't try to complete numbers
-     company-dabbrev-char-regexp "[A-z:-]"
-     )
+    (corfu-terminal-mode))
 
-    ;; Added from https://emacs.stackexchange.com/questions/10431/get-company-to-show-suggestions-for-yasnippet-names
-    (defvar company-mode/enable-yas t
-      "Enable yasnippet for all backends.")
-    (defun company-mode/backend-with-yas (backend)
-      (if (or (not company-mode/enable-yas) (and (listp backend) (member 'company-yasnippet backend)))
-          backend
-        (append (if (consp backend) backend (list backend))
-                '(:with company-yasnippet))))
-    (setq company-backends (mapcar #'company-mode/backend-with-yas company-backends))
-
-    ;; Bindings when the company list is active.
-    :general
-    (company-active-map
-     "C-d" 'company-show-doc-buffer ;; In new temp buffer
-     "<tab>" 'company-complete-selection
-     ;; Keep this as the global binding
-     "C-w" 'backward-kill-word
-     "C-g" 'company-abort
-     ;; Use C-n,p for navigation in addition to M-n,p
-     ;;"C-n" '(lambda () (interactive) (company-complete-common-or-cycle 1))
-     ;;"C-p" '(lambda () (interactive) (company-complete-common-or-cycle -1))
-     ))
-#+END_SRC
-
-Nice icons for company-mode. These are the Doom Emacs defaults, taken from:
-https://github.com/TheBB/dotemacs/blob/master/init.el#L527-L570
-#+BEGIN_SRC emacs-lisp
-  (use-package company-box
-    :disabled
-    :diminish company-box-mode
-    :hook (company-mode . company-box-mode)
+  ;; Fancy completion-at-point functions; there's too much in the cape package to
+  ;; configure here; dive in when you're comfortable!
+  (use-package cape
+    :ensure t
     :init
-    (setq company-box-icons-alist 'company-box-icons-all-the-icons)
-    :config
-    (setq company-box-icons-alist 'company-box-icons-all-the-icons
-          company-box-backends-colors nil
-          company-box-icons-all-the-icons
-          `((Unknown       . ,(all-the-icons-material "find_in_page"             :face 'all-the-icons-purple))
-            (Text          . ,(all-the-icons-material "text_fields"              :face 'all-the-icons-green))
-            (Method        . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
-            (Function      . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
-            (Constructor   . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
-            (Field         . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
-            (Variable      . ,(all-the-icons-material "adjust"                   :face 'all-the-icons-blue))
-            (Class         . ,(all-the-icons-material "class"                    :face 'all-the-icons-red))
-            (Interface     . ,(all-the-icons-material "settings_input_component" :face 'all-the-icons-red))
-            (Module        . ,(all-the-icons-material "view_module"              :face 'all-the-icons-red))
-            (Property      . ,(all-the-icons-material "settings"                 :face 'all-the-icons-red))
-            (Unit          . ,(all-the-icons-material "straighten"               :face 'all-the-icons-red))
-            (Value         . ,(all-the-icons-material "filter_1"                 :face 'all-the-icons-red))
-            (Enum          . ,(all-the-icons-material "plus_one"                 :face 'all-the-icons-red))
-            (Keyword       . ,(all-the-icons-material "filter_center_focus"      :face 'all-the-icons-red))
-            (Snippet       . ,(all-the-icons-material "short_text"               :face 'all-the-icons-red))
-            (Color         . ,(all-the-icons-material "color_lens"               :face 'all-the-icons-red))
-            (File          . ,(all-the-icons-material "insert_drive_file"        :face 'all-the-icons-red))
-            (Reference     . ,(all-the-icons-material "collections_bookmark"     :face 'all-the-icons-red))
-            (Folder        . ,(all-the-icons-material "folder"                   :face 'all-the-icons-red))
-            (EnumMember    . ,(all-the-icons-material "people"                   :face 'all-the-icons-red))
-            (Constant      . ,(all-the-icons-material "pause_circle_filled"      :face 'all-the-icons-red))
-            (Struct        . ,(all-the-icons-material "streetview"               :face 'all-the-icons-red))
-            (Event         . ,(all-the-icons-material "event"                    :face 'all-the-icons-red))
-            (Operator      . ,(all-the-icons-material "control_point"            :face 'all-the-icons-red))
-            (TypeParameter . ,(all-the-icons-material "class"                    :face 'all-the-icons-red))
-            (Template      . ,(all-the-icons-material "short_text"               :face 'all-the-icons-green))))
-    )
-#+END_SRC
+    (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+    (add-to-list 'completion-at-point-functions #'cape-file))
 
-[[https://github.com/mickeynp/smart-scan][~smart-scan~]] allows for easy jumping to other instances of the current symbol at the point. I don't
-use this much and ~lsp-mode~ probably supersedes these for my usecase.
-#+BEGIN_SRC emacs-lisp
-  (use-package smartscan
-    :hook ((prog-mode . smartscan-mode))
-    :general
-    ("M-n" 'smartscan-symbol-go-forward)
-    ("M-p" 'smartscan-symbol-go-backward)
-    ("M-'" 'my/symbol-replace))
-
-  (defun my/symbol-replace (replacement)
-    "Replace all standalone symbols in the buffer matching the one at point."
-    (interactive  (list (read-from-minibuffer "Replacement for thing at point: " nil)))
-    (save-excursion
-      (let ((symbol (or (thing-at-point 'symbol) (error "No symbol at point!"))))
-        (beginning-of-buffer)
-        ;; (query-replace-regexp symbol replacement)
-        (replace-regexp (format "\\b%s\\b" (regexp-quote symbol)) replacement))))
-#+END_SRC
-
-[[https://github.com/editorconfig/editorconfig-emacs][~editorconfig~]] is an editor-agnostic standard for various editor config settings. I don't actually
-use this very much so I should probably remove it.
-#+BEGIN_SRC emacs-lisp
-  (use-package editorconfig
-    :delight
-    :config
-    (editorconfig-mode +1))
-#+END_SRC
-
-** Git
-[[https://magit.vc/][~magit~]] is an excellent interface for Git. It has basically replaced my command line usage.
-#+BEGIN_SRC emacs-lisp
-  (use-package magit
-    :defer t
-    :general
-    ("C-x g" 'magit-status)
-    (my-leader-def
-      "g" '(:ignore t :wk "git")
-      "gs" 'magit-status
-      "gc" 'magit-checkout
-      "gC" 'magit-commit
-      "gb" 'magit-blame
-      "gS" 'magit-stage-file
-      "gU" 'magit-unstage-file
-      "gg" 'hydra-my-git-menu/body
-      "gy" 'my/magit-yank-branch-name)
-    :config
-    ;; This sets Magit to use the fullframe
-    ;;(setq magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
-    (defun my/magit-yank-branch-name ()
-      "Show the current branch in the echo-area and add it to the `kill-ring'."
-      (interactive)
-      (let ((branch (magit-get-current-branch)))
-        (if branch
-            (progn (kill-new branch)
-                   (message "%s" branch))
-          (user-error "There is not current branch")))))
-#+END_SRC
-
-[[https://github.com/dandavison/magit-delta][~magit-delta~]] enables improved diffs for Magit using [[https://github.com/dandavison/delta][delta]].
-#+begin_src emacs-lisp
-  (use-package magit-delta
-    :disabled
-    :hook (magit-mode . magit-delta-mode))
-#+end_src
-[[https://github.com/emacsmirror/git-timemachine][~git-timemachine~]] allows you to walk through Git revisions of a file to view changes over time.
-#+BEGIN_SRC emacs-lisp
-  (use-package git-timemachine
-    :defer t)
-#+END_SRC
-
-[[https://github.com/emacsorphanage/git-messenger][~git-messenger~]] shows a popup containing the commit message that last affected the current line.
-#+BEGIN_SRC emacs-lisp
-  (use-package git-messenger
-    :defer t)
-#+END_SRC
-
-[[https://github.com/emacsorphanage/git-gutter-fringe][~git-gutter-fringe~]] shows icons on the buffer fringe for lines that have been added, removed or
-modified.
-#+BEGIN_SRC emacs-lisp
-  (use-package git-gutter-fringe
-    :config
-    (global-git-gutter-mode +1)
-    (setq-default fringes-outside-margins t))
-#+END_SRC
-
-
-#+BEGIN_SRC emacs-lisp
-  (use-package git-link
-    :general
-    (my-leader-def
-      "gl" '(:ignore t :wk "git link")
-      "gll" 'git-link
-      "glc" 'git-link-commit
-      "glh" 'git-link-homepage))
-#+END_SRC
-
-[[https://github.com/rmuslimov/browse-at-remote][~browse-at-remote~]] allows for quick jumping to the relevant Github (or whatever) page corresponding
-to the current file.
-#+BEGIN_SRC emacs-lisp
-  (use-package browse-at-remote
-    :general
-    (my-leader-def
-      "glg" 'browse-at-remote))
-
-  (defhydra hydra-my-git-menu (global-map "<f7>"
-                                          :color blue
-                                          :hint nil)
-    "
-  ^Navigate^        ^Action^               ^Info^
-  ^^^^^^^^^^^^---------------------------------------------------
-  _j_: next hunk    _s_: stage hunk        _d_: diff
-  _k_: prev hunk    _S_: stage file        _c_: show commit
-  ^ ^               _U_: unstage file      _g_: magit status
-  ^ ^               ^ ^                    _t_: git timemachine
-  ^ ^               ^ ^                    ^ ^
-  "
-    ("j" git-gutter:next-hunk)
-    ("k" git-gutter:previous-hunk)
-    ("s" git-gutter:stage-hunk)
-    ("S" magit-stage-file)
-    ("U" magit-unstage-file)
-    ("c" git-messenger:popup-show)
-    ("g" magit-status :exit t)
-    ("d" magit-diff-buffer-file)
-    ("t" git-timemachine :exit t)
-    ("q" quit-window "quit-window")
-    ("<ESC>" git-gutter:update-all-windows "quit" :exit t))
-
-  (defhydra hydra-my-git-timemachine-menu (:color blue)
-    ("s" git-timemachine "start")
-    ("j" git-timemachine-show-next-revision "next revision")
-    ("k" git-timemachine-show-previous-revision "prev revision")
-    ("c" git-timemachine-show-current-revision "curr revision")
-    ("<ESC>" git-timemachine-show-current-revision "quit" :exit t))
-#+END_SRC
-
-
-TODO: commentary
-#+BEGIN_SRC emacs-lisp
-  (use-package restart-emacs
-    :defer t)
-#+END_SRC
-
-TODO: commentary
-#+BEGIN_SRC emacs-lisp
-  (use-package restclient
-    :defer  t)
-
-  (use-package company-restclient
-    :disabled
-    :defer t)
-
-  (use-package ob-restclient
-    :defer t)
-#+END_SRC
-
-
-
-
-
-This is just a little function to open today's journal file.
-#+BEGIN_SRC emacs-lisp
-  (defun my/today ()
-    "Create Org file from skeleton with current time as name."
-    (interactive)
-    (find-file (format-time-string (concat my/org-dir "journal/%Y-%m-%d.org"))))
-  ;  (insert "Skeleton contents"))
-#+END_SRC
-
-[[https://www.gnu.org/software/emacs/manual/html_node/emacs/Saving-Emacs-Sessions.html][~desktop~]] saves the state of Emacs and restores it on restart.
-#+BEGIN_SRC emacs-lisp
-  ;; (use-package desktop
-  ;;   :straight nil
-  ;;   :init
-  ;;   (desktop-save-mode 1))
-#+END_SRC
-
-** LSP Mode
-[[https://emacs-lsp.github.io/lsp-mode/][~lsp-mode~]] is an integration with various Language Server
-Protocol implementations, giving Emacs an IDE like experience.
-#+BEGIN_SRC emacs-lisp
-  (use-package lsp-mode
-    :hook
-    (lsp-mode . lsp-enable-which-key-integration)
-    (go-mode . lsp)
-    (python-mode . lsp-deferred)
-    :commands lsp
-    :custom
-    ;; This interferes with the existing company-mode setup if populated
-    (lsp-completion-provider :none)
-     ;; what to use when checking on-save. "check" is default, I prefer clippy
-    (lsp-rust-analyzer-cargo-watch-command "clippy")
-    (lsp-eldoc-render-all t)
-    (lsp-idle-delay 0.6)
-    ;; enable / disable the hints as you prefer:
-    (lsp-rust-analyzer-server-display-inlay-hints t)
-    (lsp-rust-analyzer-display-lifetime-elision-hints-enable "skip_trivial")
-    (lsp-rust-analyzer-display-chaining-hints t)
-    (lsp-rust-analyzer-display-lifetime-elision-hints-use-parameter-names nil)
-    (lsp-rust-analyzer-display-closure-return-type-hints t)
-    (lsp-rust-analyzer-display-parameter-hints nil)
-    (lsp-rust-analyzer-display-reborrow-hints nil)
-    :general
-    (my-leader-def
-      "p" '(hydra-lsp/body :wk "lsp-mode"))
-    :config
-    (setq lsp-file-watch-threshold 500)
-    (add-hook 'lsp-mode-hook 'lsp-ui-mode)
-    :custom-face
-    (lsp-face-highlight-read ((t (:background "gray"))))
-    (lsp-face-highlight-textual ((t (:background "gray"))))
-    (lsp-face-highlight-write ((t (:background "SteelBlue1"))))
-    (lsp-ui-doc-background ((t (:background "black"))))
-    :hydra
-    (hydra-lsp (:exit t :hint nil)
-      "
-   Buffer^^               Server^^                   Symbol
-  -------------------------------------------------------------------------------------
-   [_f_] format           [_M-r_] restart            [_d_] declaration  [_i_] implementation  [_o_] documentation
-   [_m_] imenu            [_S_]   shutdown           [_j_] definition   [_t_] type            [_r_] rename
-   [_x_] execute action   [_M-S_] describe session   [_R_] references   [_s_] signature       [_a_] actions
-   [_v_] run test
-  "
-      ("d" lsp-find-declaration)
-      ("j" lsp-ui-peek-find-definitions)
-      ("R" lsp-ui-peek-find-references)
-      ("i" lsp-ui-peek-find-implementation)
-      ("t" lsp-find-type-definition)
-      ("s" lsp-signature-help)
-      ("o" lsp-describe-thing-at-point)
-      ("r" lsp-rename)
-      ("a" helm-lsp-code-actions)
-
-      ("f" lsp-format-buffer)
-      ("m" lsp-ui-imenu)
-      ("x" lsp-execute-code-action)
-      ("v" lsp-avy-lens)
-
-      ("M-S" lsp-describe-session)
-      ("M-r" lsp-restart-workspace)
-      ("S" lsp-shutdown-workspace)))
-
-  (use-package lsp-ui
+  ;; Pretty icons for corfu
+  (use-package kind-icon
+    :if (display-graphic-p)
     :ensure t
-    :commands lsp-ui-mode
-    :config (setq lsp-ui-doc-enable t
-                  lsp-ui-peek-enable t
-                  lsp-ui-sideline-enable t
-                  lsp-ui-imenu-enable t
-                  lsp-ui-flycheck-enable t))
-
-  (use-package helm-lsp
-    :disabled
-    :commands (helm-lsp-workspace-symbol))
-#+END_SRC
-
-** Other Programming Modes
-*** General Programming Utilities
-
-Line numbers are useful to have in various programming modes.
-#+BEGIN_SRC emacs-lisp
-  (use-package display-line-numbers
-    :straight nil
-    :ghook
-    ('prog-mode-hook #'display-line-numbers-mode))
-#+END_SRC
-
-We're using the ~paren~ package here to specify some default options when interacting with
-parentheses.
-#+BEGIN_SRC emacs-lisp
-  (use-package paren
-    :straight nil
-    :custom
-    ;; show matching paren without delay
-    (show-paren-delay 0)
+    :after corfu
     :config
-    ;; show matching parens by default
-    (show-paren-mode +1))
-#+END_SRC
+    (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 
-[[https://github.com/Fanael/rainbow-delimiters][~rainbow-delimiters~]] highlights delimiters, like parentheses, brackets, or braces, according to
-their depth. It makes it much easier to visually identify which closing braces matches which opening
-one.
-#+BEGIN_SRC emacs-lisp
-  (use-package rainbow-delimiters
-    :hook (prog-mode . rainbow-delimiters-mode)
+  (use-package eshell
+    :init
+    (defun bedrock/setup-eshell ()
+      ;; Something funny is going on with how Eshell sets up its keymaps; this is
+      ;; a work-around to make C-r bound in the keymap
+      (keymap-set eshell-mode-map "C-r" 'consult-history))
+    :hook ((eshell-mode . bedrock/setup-eshell)))
+
+  ;; Orderless: powerful completion style
+  (use-package orderless
+    :ensure t
     :config
-    (setq show-paren-delay  0
-          show-paren-style 'mixed))
-#+END_SRC
+    (setq completion-styles '(orderless)))
 
-*** Golang
-[[https://github.com/dominikh/go-mode.el][~go-mode~]] adds some useful commands when working with
-Go.
-#+BEGIN_SRC emacs-lisp
-  (use-package go-mode
-    :mode "\\.go\\'"
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;;;
+  ;;;   Misc. editing enhancements
+  ;;;
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+  ;; Modify search results en masse
+  (use-package wgrep
+    :ensure t
     :config
-    (setq
-     gofmt-command "goimports"
-     lsp-go-env '((GOFLAGS . "-tags=integration")))
-    ;; TODO still feels like these could live under :hook
-    (add-hook 'before-save-hook 'gofmt-before-save)
-    (add-hook 'go-mode-hook #'subword-mode)
-    (add-hook 'before-save-hook #'lsp-format-buffer t t)
-    (add-hook 'before-save-hook #'lsp-organize-imports t t)
-    ;;(add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
-    )
+    (setq wgrep-auto-save-buffer t))
+
 #+END_SRC
 
-TODO: experiment with [[https://github.com/emacsmirror/godoctor][~godoctor~]] which provides some refactoring support for Go.
-#+begin_src emacs-lisp
-  (use-package godoctor
-    :disabled t)
-#+end_src
-*** Java
-Commenting this for now since its a real slow loader.  TODO possible candidate for ~:defer~?
-#+BEGIN_SRC emacs-lisp
-  ;; (use-package lsp-java
-  ;;   :config (add-hook 'java-mode-hook 'lsp))
-#+END_SRC
 
-Gradle is one of the several build systems available for Java projects.
+Development stuff:
 #+BEGIN_SRC emacs-lisp
-  (use-package gradle-mode
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;;;
+  ;;;   Built-in config for developers
+  ;;;
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+  (use-package emacs
+    :config
+    ;; Treesitter config
+
+    ;; Tell Emacs to prefer the treesitter mode
+    ;; You'll want to run the command `M-x treesit-install-language-grammar' before editing.
+    (setq major-mode-remap-alist
+	  '((yaml-mode . yaml-ts-mode)
+	    (bash-mode . bash-ts-mode)
+	    (go-mode . go-ts-mode)
+	    (js2-mode . js-ts-mode)
+	    (typescript-mode . typescript-ts-mode)
+	    (json-mode . json-ts-mode)
+	    (css-mode . css-ts-mode)
+	    (python-mode . python-ts-mode)))
+    :hook
+    ;; Auto parenthesis matching
+    ((prog-mode . electric-pair-mode)))
+
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;;;
+  ;;;   Version Control
+  ;;;
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+  ;; Magit: best Git client to ever exist
+  (use-package magit
+    :ensure t
+    :bind (("C-x g" . magit-status)))
+
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;;;
+  ;;;   Common file types
+  ;;;
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+  (use-package markdown-mode
+    :hook ((markdown-mode . visual-line-mode)))
+
+  (use-package yaml-mode
     :ensure t)
-#+END_SRC
-
-*** Javascript
-
-TODO see how ~ensure-system-package~ works on windows.
-#+BEGIN_SRC emacs-lisp
-  (use-package js2-mode
-    :mode "\\.js$"
-    :hook (js2-mode . lsp)
-    :interpreter "node"
-    ;; commenting below line since I've removed this functionality for now
-    ;; :ensure-system-package ((typescript-language-server . "npm i -g typescript-language-server")
-    ;; (eslint_d . "npm i -g eslint_d"))
-    :custom
-    ;; set the indent level to 2
-    (js2-basic-offset 2)
-    (js-chain-indent t)
-    (js-indent-level 2)
-    ;; use eslint_d instead of eslint for faster linting
-    (flycheck-javascript-eslint-executable "eslint_d"))
 
   (use-package json-mode
-    :mode "\\.json\\'")
-#+END_SRC
-
-[[https://web-mode.org/][~web-mode~]] is a package for editing HTML.
-#+BEGIN_SRC emacs-lisp
-  (use-package web-mode
-    :defer t
-    :preface
-    (defun my-web-mode-hook ()
-      ;; set the html indent to 2
-      (setq web-mode-markup-indent-offset 2)
-      ;; highlight matching elements in html
-      (setq web-mode-enable-current-element-highlight 1))
-    :hook (web-mode . my-web-mode-hook)
-    :init
-    (add-hook 'web-mode-before-auto-complete-hooks
-              '(lambda ()
-                 (let ((web-mode-cur-language
-                        (web-mode-language-at-pos))))))
-    (add-to-list `auto-mode-alist '("\\.html?\\'" . web-mode))
-    (add-to-list `auto-mode-alist '("\\.css\\'" . web-mode)))
-#+END_SRC
-
-*** Python
-#+BEGIN_SRC emacs-lisp
-  (use-package python
-    :mode "\\.py\\'"
-    :ghook
-    ('python-mode-hook #'lsp)
-    :general
-    (my-local-leader-def 'python-mode-map
-      "er" 'python-shell-send-region
-      "eb" 'python-shell-send-buffer
-      "ef" 'python-shell-send-file
-      "es" 'python-shell-send-string))
-
-  (use-package pipenv
-    :hook ((python-mode . pipenv-mode)
-           (hy-mode . pipenv-mode))
-    :init
-    (setq pipenv-projectile-after-switch-function #'pipenv-projectile-after-switch-extended))
-#+END_SRC
-
-*** Angular
-#+BEGIN_SRC emacs-lisp
-(use-package ng2-mode)
-#+END_SRC
-
-*** Rust
-[[https://github.com/brotzeit/rustic][~rustic~]] is a mode for programming Rust.
-
-See more details about getting Emacs setup with Rust here: https://robert.kra.hn/posts/rust-emacs-setup/
-#+BEGIN_SRC emacs-lisp
-(use-package rustic)
-#+END_SRC
-
-
-#+BEGIN_SRC emacs-lisp
-  (use-package dap-mode
-    :commands (dap-debug)
-    :hook
-    ((lsp-mode . dap-mode)
-     (dap-mode . dap-ui-mode)
-     (dap-mode . dap-tooltip-mode)
-     (go-mode . (lambda() (require 'dap-dlv-go))))
-    :init
-    (add-hook 'dap-stopped-hook (lambda (arg) (call-interactively #'hydra-dap/body)))
-    :config
-    (require 'dap-dlv-go)
-    ;; Enabling only some features
-    (setq dap-auto-configure-features '(sessions locals breakpoints expressions controls tooltip))
-    ;; (setq dap-auto-configure-features '(sessions locals controls tooltip))
-    (dap-mode 1)
-    (dap-ui-mode 1)
-    ;; enables mouse hover support
-    (dap-tooltip-mode 1)
-    ;; use tooltips for mouse hover
-    ;; if it is not enabled `dap-mode' will use the minibuffer.
-    (tooltip-mode 1)
-    ;; displays floating panel with debug buttons
-    ;; requies emacs 26+
-    (dap-ui-controls-mode 1)
-    :general
-    (my-leader-def
-      "'" '(hydra-dap/body :wk "debugging"))
-    :bind
-    (:map dap-mode-map
-          ("M-g" . hydra-dap/body))
-    :hydra (hydra-dap (:color pink :hint nil :foreign-keys run)
-                      "
-   _n_: Next       _c_: Continue _g_: goroutines      _i_: break log
-   _s_: Step in    _o_: Step out _k_: break condition _h_: break hit condition
-   _Q_: Disconnect _q_: quit     _l_: locals
-   "
-                      ("n" dap-next)
-                      ("c" dap-continue)
-                      ("s" dap-step-in)
-                      ("o" dap-step-out)
-                      ("g" dap-ui-sessions)
-                      ("l" dap-ui-locals)
-                      ("e" dap-eval-thing-at-point)
-                      ("h" dap-breakpoint-hit-condition)
-                      ("k" dap-breakpoint-condition)
-                      ("i" dap-breakpoint-log-message)
-                      ("q" nil "quit" :color blue)
-                      ("Q" dap-disconnect :color red)))
-#+END_SRC
-
-*** Yaml
-#+BEGIN_SRC emacs-lisp
-  (use-package yaml-mode
-    :defer t)
-#+END_SRC
-
-*** Markdown
-#+BEGIN_SRC emacs-lisp
-  (use-package markdown-mode
-    :mode ("README\\.md\\'" . gfm-mode)
-    :init (setq markdown-command "multimarkdown"))
-#+END_SRC
-
-*** Terraform
-#+BEGIN_SRC emacs-lisp
-  (use-package terraform-mode
     :ensure t)
-#+END_SRC
 
-*** SQL
+  ;; Emacs ships with a lot of popular programming language modes. If it's not
+  ;; built in, you're almost certain to find a mode for the language you're
+  ;; looking for with a quick Internet search.
 
-#+BEGIN_SRC emacs-lisp
-  (use-package sqlformat
-    :ensure t
-    :init
-    ;(add-hook 'sql-mode-hook 'sqlformat-on-save-mode)
-    :config
-    (setq sqlformat-command 'pgformatter))
-#+END_SRC
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;;;
+  ;;;   Eglot, the built-in LSP client for Emacs
+  ;;;
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+  ;; Helpful resources:
+  ;;
+  ;;  - https://www.masteringemacs.org/article/seamlessly-merge-multiple-documentation-sources-eldoc
 
-*** Docker
-[[https://github.com/spotify/dockerfile-mode][~dockerfile-mode~]] provides some conveniences for
-editing Dockerfiles.
+  (use-package eglot
+    ;; no :ensure t here because it's built-in
 
-[[https://github.com/Silex/docker.el][~docker.el~]] allows Docker to be managed from within Emacs.
+    ;; Configure hooks to automatically turn-on eglot for selected modes
+    :hook
+    (((python-mode ruby-mode elixir-mode go-mode) . eglot))
 
-#+BEGIN_SRC emacs-lisp
-  (use-package dockerfile-mode
-    :defer t)
-
-  (use-package docker
-    :defer t)
-#+END_SRC
-
-*** Lisp
-There's a bunch of Lispy stuff here that I don't use much. I should consider getting rid of it in
-due course. Or I should consider writing more lisp...
-#+BEGIN_SRC emacs-lisp
-  (which-key-add-major-mode-key-based-replacements 'clojure-mode "C-c e" "eval")
-  (which-key-add-major-mode-key-based-replacements 'emacs-lisp-mode "C-c e" "eval")
-  (which-key-add-major-mode-key-based-replacements 'hy-mode "C-c e" "eval")
-  (which-key-add-major-mode-key-based-replacements 'lisp-interaction-mode "C-c e" "eval")
-  (which-key-add-major-mode-key-based-replacements 'scheme-mode "C-c e" "eval")
-#+END_SRC
-
-#+BEGIN_SRC emacs-lisp
-  (defconst my-lisp-mode-hooks
-    '(lisp-mode-hook
-      sly-mrepl-mode-hook
-      emacs-lisp-mode-hook
-      scheme-mode-hook
-      geiser-repl-mode-hook
-      hy-mode-hook
-      inferior-hy-mode-hook
-      clojure-mode-hook
-      cider-repl-mode-hook))
-
-  (defun my-lisp-setup ()
-    (electric-pair-mode -1))
-
-  (my-leader-def
-    :keymaps 'emacs-lisp-mode-map
-    "eb" 'eval-buffer
-    "el" 'eval-last-sexp
-    "ed" 'eval-defun
-    "er" 'eval-region)
-
-  (my-leader-def
-    :keymaps 'lisp-interaction-mode-map
-    "eb" 'eval-buffer
-    "el" 'eval-last-sexp
-    "ed" 'eval-defun
-    "er" 'eval-region)
-
-  (add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
-  (add-hook 'lisp-interaction-mode-hook 'turn-on-eldoc-mode)
-  (add-hook 'ielm-mode-hook 'turn-on-eldoc-mode)
-
-
-  (use-package sly
-    :defer t
-    :hook (sly-mrepl-mode . rainbow-delimiters-mode)
-    :general
-    (my-local-leader-def
-      :keymaps 'lisp-mode-map
-      "eb" 'sly-eval-buffer
-      "el" 'sly-eval-last-expression
-      "ed" 'sly-eval-defun
-      "er" 'sly-eval-region)
-    :config
-    (setq inferior-lisp-program "/usr/bin/sbcl"))
-
-  (use-package sly-quicklisp
-    :after sly)
-
-  (use-package sly-asdf
-    :after sly)
-
-  (use-package hy-mode
-    :mode "\\.hy\\'"
-    :general
-    (my-local-leader-def 'hy-mode-map
-      "er" 'hy-shell-eval-region
-      "eb" 'hy-shell-eval-buffer
-      "el" 'hy-shell-eval-last-sexp
-      "ed" 'hy-shell-eval-current-form))
-#+END_SRC
-
-This is a scheme mode. I don't really use it much.
-#+BEGIN_SRC emacs-lisp
-  (use-package geiser
-    :defer t
-    :general
-    (my-local-leader-def
-      :keymaps 'scheme-mode-map
-      "r" 'run-geiser
-      "er" 'geiser-eval-region
-      "eR" 'geiser-eval-region-and-go
-      "eb" 'geiser-eval-buffer
-      "eB" 'geiser-eval-buffer-and-go
-      "ed" 'geiser-eval-definition
-      "eD" 'geiser-eval-definition-and-go
-      "el" 'geiser-eval-eval-sexp)
     :custom
-    (geiser-active-implementations '(guile mit racket)))
-#+END_SRC
+    (eglot-send-changes-idle-time 0.1)
+    (eglot-extend-to-xref t)              ; activate Eglot in referenced non-project files
 
-*** Tree Sitter
-[[https://emacs-tree-sitter.github.io][~tree-sitter~]] provides a much improved code highlighting and allows Emacs to understand the
-structure of code that I'm editing. Note that this part of core Emacs from v29 onwards.
-#+begin_src emacs-lisp
-  (use-package tree-sitter
-    :init
-    (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
-    (global-tree-sitter-mode))
-
-  (use-package tree-sitter-langs
-    :after tree-sitter)
-#+end_src
-** Navigation
-
-Ripgrep
-#+begin_src emacs-lisp
-  (use-package rg)
-#+end_src
-[[https://github.com/abo-abo/avy][~avy~]] is an easy way to jump around any visible buffers. Hit ~C-'~ and hit a few characters, then
-select from the list of options.
-
-More details here: https://karthinks.com/software/avy-can-do-anything
-#+BEGIN_SRC emacs-lisp
-  (use-package avy
-    :demand
-    :config (setq avy-background t
-                  avy-keys '(
-                   ?a ?r ?s ?t ?g ?m ?n ?e ?i ?o
-                      ?z ?x ?c ?d ?v ?k ?h ?, ?.
-                      ?q ?w ?f ?p ?b ?j ?l ?u ?'))
-    :general ("C-'" 'avy-goto-char-timer))
-
-  ;; Code used in the demos at https://karthinks.com/software/avy-can-do-anything
-  ;; Tweak as desired.
-  (defun avy-show-dispatch-help ()
-    (let* ((len (length "avy-action-"))
-           (fw (frame-width))
-           (raw-strings (mapcar
-                     (lambda (x)
-                       (format "%2s: %-19s"
-                               (propertize
-                                (char-to-string (car x))
-                                'face 'aw-key-face)
-                               (substring (symbol-name (cdr x)) len)))
-                     avy-dispatch-alist))
-           (max-len (1+ (apply #'max (mapcar #'length raw-strings))))
-           (strings-len (length raw-strings))
-           (per-row (floor fw max-len))
-           display-strings)
-      (cl-loop for string in raw-strings
-               for N from 1 to strings-len do
-               (push (concat string " ") display-strings)
-               (when (= (mod N per-row) 0) (push "\n" display-strings)))
-      (message "%s" (apply #'concat (nreverse display-strings)))))
-
-  ;; Avy command
-  ;;(global-set-key (kbd "M-j") 'avy-goto-char-timer)
-
-  ;; Kill text
-  (defun avy-action-kill-whole-line (pt)
-    (save-excursion
-      (goto-char pt)
-      (kill-whole-line))
-    (select-window
-     (cdr
-      (ring-ref avy-ring 0)))
-    t)
-
-  (setf (alist-get ?k avy-dispatch-alist) 'avy-action-kill-stay
-        (alist-get ?K avy-dispatch-alist) 'avy-action-kill-whole-line)
-
-  ;; Copy text
-  (defun avy-action-copy-whole-line (pt)
-    (save-excursion
-      (goto-char pt)
-      (cl-destructuring-bind (start . end)
-          (bounds-of-thing-at-point 'line)
-        (copy-region-as-kill start end)))
-    (select-window
-     (cdr
-      (ring-ref avy-ring 0)))
-    t)
-
-  (setf (alist-get ?w avy-dispatch-alist) 'avy-action-copy
-        (alist-get ?W avy-dispatch-alist) 'avy-action-copy-whole-line)
-
-  ;; Yank text
-  (defun avy-action-yank-whole-line (pt)
-    (avy-action-copy-whole-line pt)
-    (save-excursion (yank))
-    t)
-
-  (setf (alist-get ?y avy-dispatch-alist) 'avy-action-yank
-        (alist-get ?Y avy-dispatch-alist) 'avy-action-yank-whole-line)
-
-  ;; Transpose/Move text
-  (defun avy-action-teleport-whole-line (pt)
-    (avy-action-kill-whole-line pt)
-    (save-excursion (yank)) t)
-
-  (setf (alist-get ?t avy-dispatch-alist) 'avy-action-teleport
-        (alist-get ?T avy-dispatch-alist) 'avy-action-teleport-whole-line)
-
-  ;; Mark text
-  (defun avy-action-mark-to-char (pt)
-    (activate-mark)
-    (goto-char pt))
-
-  (setf (alist-get ?  avy-dispatch-alist) 'avy-action-mark-to-char)
-
-  ;; Flyspell words
-  (defun avy-action-flyspell (pt)
-    (save-excursion
-      (goto-char pt)
-      (when (require 'flyspell nil t)
-        (flyspell-auto-correct-word)))
-    (select-window
-     (cdr (ring-ref avy-ring 0)))
-    t)
-
-  ;; Bind to semicolon (flyspell uses C-;)
-  (setf (alist-get ?\; avy-dispatch-alist) 'avy-action-flyspell)
-
-  ;; Dictionary: define words
-  ;; Replace your package manager or preferred dict package
-  ;;(package-install 'dictionary)
-
-  (defun dictionary-search-dwim (&optional arg)
-    "Search for definition of word at point. If region is active,
-  search for contents of region instead. If called with a prefix
-  argument, query for word to search."
-    (interactive "P")
-    (if arg
-        (dictionary-search nil)
-      (if (use-region-p)
-          (dictionary-search (buffer-substring-no-properties
-                              (region-beginning)
-                              (region-end)))
-        (if (thing-at-point 'word)
-            (dictionary-lookup-definition)
-          (dictionary-search-dwim '(4))))))
-
-  (defun avy-action-define (pt)
-    (save-excursion
-      (goto-char pt)
-      (dictionary-search-dwim))
-    (select-window
-     (cdr (ring-ref avy-ring 0)))
-    t)
-
-  (setf (alist-get ?= avy-dispatch-alist) 'dictionary-search-dwim)
-
-  ;; Get Elisp Help
-  ;; Replace with your package manager or help library of choice
-  ;;(package-install 'helpful)
-
-  (defun avy-action-helpful (pt)
-    (save-excursion
-      (goto-char pt)
-      (helpful-at-point))
-    (select-window
-     (cdr (ring-ref avy-ring 0)))
-    t)
-
-  (setf (alist-get ?H avy-dispatch-alist) 'avy-action-helpful)
-
-  ;; Embark
-  ;;(package-install 'embark)
-
-  (defun avy-action-embark (pt)
-      (unwind-protect
-          (save-excursion
-            (goto-char pt)
-            (embark-act))
-        (select-window
-         (cdr (ring-ref avy-ring 0))))
-      t)
-
-  (setf (alist-get ?. avy-dispatch-alist) 'avy-action-embark)
-
-  ;; Avy + Isearch
-  (define-key isearch-mode-map (kbd "M-j") 'avy-isearch)
-
-  ;; Isearch in other windows
-  (defun isearch-forward-other-window (prefix)
-    "Function to isearch-forward in other-window."
-    (interactive "P")
-    (unless (one-window-p)
-      (save-excursion
-        (let ((next (if prefix -1 1)))
-          (other-window next)
-          (isearch-forward)
-          (other-window (- next))))))
-
-  (defun isearch-backward-other-window (prefix)
-    "Function to isearch-backward in other-window."
-    (interactive "P")
-    (unless (one-window-p)
-      (save-excursion
-        (let ((next (if prefix 1 -1)))
-          (other-window next)
-          (isearch-backward)
-          (other-window (- next))))))
-
-  (define-key global-map (kbd "C-M-s") 'isearch-forward-other-window)
-  (define-key global-map (kbd "C-M-r") 'isearch-backward-other-window)
-
-  ;; Google search: requires executable Tuxi
-  (defvar google-search-history nil
-    "List of queries to google-search-string.")
-  (defun google-search-string (search-string)
-    "Read SEARCH-STRING from the minibuffer and call the shell
-  command tuxi on it."
-    (interactive (list (read-string "Google: " nil
-                                    google-search-history
-                                    (thing-at-point 'sexp))))
-    (unless (executable-find "tuxi")
-      (user-error "Cannot find shell command: tuxi"))
-    (let ((search-output (string-trim-right
-                          (shell-command-to-string
-                           (concat
-                            "tuxi -r "
-                            (shell-quote-argument search-string))))))
-      (with-current-buffer (get-buffer-create "*Tuxi Output*")
-        (erase-buffer)
-        (insert search-output)
-        ;; (fill-region (point-min) (point-max))
-        (if (<= (count-lines (point-min) (point-max)) 1)
-            (message search-output)
-          (goto-char (point-min))
-          (display-buffer (current-buffer))
-          (goto-address-mode 1)))))
-  (defun google-search-at-point (&optional beg end)
-    "Call the shell command tuxi on the symbol at point. With an
-  active region use it instead."
-    (interactive "r")
-    (if-let ((search-string (if (use-region-p)
-                                (buffer-substring-no-properties beg end)
-                              (thing-at-point 'symbol))))
-        (google-search-string search-string)
-      ;; (message "No symbol to search for at point!")
-      (call-interactively #'google-search-string)))
-
-  (defun avy-action-tuxi (pt)
-    (cl-letf (((symbol-function 'keyboard-quit)
-               #'abort-recursive-edit))
-      (save-excursion
-        (goto-char pt)
-        (google-search-at-point))
-      (select-window
-       (cdr (ring-ref avy-ring 0))))
-    t)
-
-  (setf (alist-get ?G avy-dispatch-alist) 'avy-action-tuxi)
-
-
-#+END_SRC
-
-[[https://github.com/rolandwalker/back-button][~back-button~]] is an improvement on the existing ~pop-global-mark~ functionality by providing a visual
-representation of your location in the ring.
-#+BEGIN_SRC emacs-lisp
-  (use-package back-button
-    :straight (back-button :host github :repo "rolandwalker/back-button")
-    :general
-    (my-leader-def
-      "k" '(hydra-back-button/body :wk "back-button"))
     :config
-    (back-button-mode 1)
-    :hydra
-    (hydra-back-button (:color red :hint nil)
-        "
-    Local         Global
-  --------------------------------
-    _t_ forward   _e_ forward
-    _s_ backward  _n_ backward
-    "
-      ("e" back-button-global-forward)
-      ("n" back-button-global-backward)
-      ("t" back-button-local-forward)
-      ("s" back-button-local-backward)))
-#+END_SRC
-
-[[https://github.com/Malabarba/beacon][~beacon~]] highlights the cursor location when scrolling or switching buffers.
-#+BEGIN_SRC emacs-lisp
-  (use-package beacon
-    :diminish
-    :config
-    (setq beacon-color "#666600")
-    (beacon-mode 1))
-#+END_SRC
-
-** Window Management
-
-[[https://github.com/abo-abo/ace-window][~ace-window~]] allows for easy switching between windows within a frame, splitting windows and moving and
-copying windows.
-#+BEGIN_SRC emacs-lisp
-  (use-package ace-window
-    :general
-    ("C-x o" 'ace-window)
-    :config
-    (setq aw-keys '(?a ?r ?s ?t ?n ?e ?i ?o)))
-#+END_SRC
-
-[[https://github.com/dimitri/switch-window][~switch-window~]] allows for easy switching between windows within a frame. It's slightly better than
-~ace-window~ for that basic task as the labels for the windows are larger. However, ~ace-window~ is
-worth keeping around for other functionality.
-#+BEGIN_SRC emacs-lisp
-  (use-package switch-window
-    :general
-    ("M-o" 'switch-window)
-    :config
-    (setq switch-window-shortcut-style 'qwerty))
-#+END_SRC
-
-
-[[https://www.gnu.org/software/emacs/manual/html_node/emacs/Window-Convenience.html#index-winner_002dmode][~winner-mode~]] tracks changes in window configuration for a frame so that they can be undone or
-redone.
-#+BEGIN_SRC emacs-lisp
-  (use-package winner
-    :commands winner-mode
-    :init (winner-mode t))
-#+END_SRC
-
-These are various functions for manipulating window size.
-#+BEGIN_SRC emacs-lisp
-  (defun hydra-move-splitter-left (delta)
-    "Move window splitter left."
-    (interactive "p")
-    (let ((windmove-wrap-around nil))
-      (if (windmove-find-other-window 'right)
-          (shrink-window-horizontally delta)
-        (enlarge-window-horizontally delta))))
-
-  (defun hydra-move-splitter-right (delta)
-    "Move window splitter right."
-    (interactive "p")
-    (let ((windmove-wrap-around nil))
-      (if (windmove-find-other-window 'right)
-          (enlarge-window-horizontally delta)
-        (shrink-window-horizontally delta))))
-
-  (defun hydra-move-splitter-up (delta)
-    "Move window splitter up."
-    (interactive "p")
-    (let ((windmove-wrap-around nil))
-      (if (windmove-find-other-window 'up)
-          (enlarge-window delta)
-        (shrink-window delta))))
-
-  (defun hydra-move-splitter-down (delta)
-    "Move window splitter down."
-    (interactive "p")
-    (let ((windmove-wrap-around nil))
-      (if (windmove-find-other-window 'up)
-          (shrink-window delta)
-        (enlarge-window delta))))
-#+END_SRC
-
-Now we've got a hydra to make the various window management functions easily accessible.
-#+BEGIN_SRC emacs-lisp
-  (defhydra hydra-window-delux (:hint nil)
-    "
-      ^Movement^        ^Split^          ^Switch^            ^Resize^      ^Tab bar^
-      -----------------------------------------------------------------------------
-      _n_ ←             _r_right         _b_uffer            _l_ X←        _C_lose tab
-      _e_ ↓             _d_own           _f_ind files        _u_ X↓        _R_ename tab
-      _i_ ↑             _z_ undo         _a_ce 1             _y_ X↑        _N_ew tab
-      _o_ →             _Z_ reset        _s_wap              _'_ X→        _S_witch tab
-      _F_ollow          _D_lt Other      ^ ^                 _m_aximize    _U_ndo tab
-      _q_ quit          _O_nly this      _c_lose             _=_ balance   ^ ^
-      "
-    ;; Movement
-    ("n" windmove-left )
-    ("e" windmove-down )
-    ("i" windmove-up )
-    ("o" windmove-right )
-    ("F" follow-mode)
-
-    ;; Resize
-    ("l" hydra-move-splitter-left)
-    ("u" hydra-move-splitter-down)
-    ("y" hydra-move-splitter-up)
-    ("'" hydra-move-splitter-right)
-    ("m" ace-maximize-window)
-    ("=" balance-windows)
-
-    ;; Split
-    ("r" (lambda ()
-           (interactive)
-           (split-window-right)
-           (windmove-right)))
-    ("d" (lambda ()
-           (interactive)
-           (split-window-below)
-           (windmove-down)))
-    ("z" (progn
-           (winner-undo)
-           (setq this-command 'winner-undo)))
-    ("Z" winner-redo)
-    ("D" (lambda ()
-           (interactive)
-           (ace-window 16)
-           (add-hook 'ace-window-end-once-hook
-                     'hydra-window/body)))
-    ("O" delete-other-windows)
-
-    ;; Switch
-    ("b" consult-buffer) ;; or helm-mini
-    ("f" helm-find-files)
-    ("a" (lambda ()
-           (interactive)
-           (ace-window 1)
-           (add-hook 'ace-window-end-once-hook
-                     'hydra-window/body)))
-    ("s" (lambda ()
-           (interactive)
-           (ace-window 4)
-           (add-hook 'ace-window-end-once-hook
-                     'hydra-window/body)))
-    ("c" delete-window)
-
-    ;; Tab bar
-    ("C" tab-close)
-    ("R" tab-rename)
-    ("N" tab-new)
-    ("S" tab-switch)
-    ("U" tab-undo)
-    ("q" nil))
-  (my-leader-def
-    "w" '(hydra-window-delux/body :wk "Window Management"))
-#+END_SRC
-
-** IBuffer
-IBuffer is a useful way of viewing all open buffers. This config adds some sensible grouping along
-with a useful hydra.
-
-TODO: add icons https://github.com/seagle0128/all-the-icons-ibuffer
-#+BEGIN_SRC emacs-lisp
-  (use-package ibuffer
-    :straight nil
-    :init
-    (use-package ibuffer-projectile)
-    (use-package ibuffer-vc
-      :commands (ibuffer-vc-set-filter-groups-by-vc-root)
-      :custom
-      (ibuffer-vc-skip-if-remote 'nil))
-    :config
-    (setq
-     ;; hide empty filter groups
-     ibuffer-show-empty-filter-groups nil
-     )
-    :hydra (hydra-ibuffer-main (:color pink :hint nil)
-                               "
-    ^Mark^         ^Actions^         ^View^          ^Select^              ^Navigation^
-    _m_: mark      _D_: delete       _g_: refresh    _q_: quit             _i_:   ↑    _n_
-    _u_: unmark    _s_: save marked  _S_: sort       _TAB_: toggle         _RET_: visit
-    _*_: specific  _a_: all actions  _/_: filter     _o_: other window     _e_:   ↓    _o_
-    _t_: toggle    _._: toggle hydra _H_: help       C-o other win no-select
-    "
-                               ("m" ibuffer-mark-forward)
-                               ("u" ibuffer-unmark-forward)
-                               ("*" hydra-ibuffer-mark/body :color blue)
-                               ("t" ibuffer-toggle-marks)
-
-                               ("D" ibuffer-do-delete)
-                               ("s" ibuffer-do-save)
-                               ("a" hydra-ibuffer-action/body :color blue)
-
-                               ("g" ibuffer-update)
-                               ("S" hydra-ibuffer-sort/body :color blue)
-                               ("/" hydra-ibuffer-filter/body :color blue)
-                               ("H" describe-mode :color blue)
-
-                               ("n" ibuffer-backward-filter-group)
-                               ("i" ibuffer-backward-line)
-                               ("o" ibuffer-forward-filter-group)
-                               ("e" ibuffer-forward-line)
-                               ("RET" ibuffer-visit-buffer :color blue)
-
-                               ("TAB" ibuffer-toggle-filter-group)
-
-                               ("O" ibuffer-visit-buffer-other-window :color blue)
-                               ("q" quit-window :color blue)
-                               ("." nil :color blue))
-
-    :hydra (hydra-ibuffer-mark (:color teal :columns 5
-                                       :after-exit (hydra-ibuffer-main/body))
-                               "Mark"
-                               ("*" ibuffer-unmark-all "unmark all")
-                               ("M" ibuffer-mark-by-mode "mode")
-                               ("m" ibuffer-mark-modified-buffers "modified")
-                               ("u" ibuffer-mark-unsaved-buffers "unsaved")
-                               ("s" ibuffer-mark-special-buffers "special")
-                               ("r" ibuffer-mark-read-only-buffers "read-only")
-                               ("/" ibuffer-mark-dired-buffers "dired")
-                               ("e" ibuffer-mark-dissociated-buffers "dissociated")
-                               ("h" ibuffer-mark-help-buffers "help")
-                               ("z" ibuffer-mark-compressed-file-buffers "compressed")
-                               ("b" hydra-ibuffer-main/body "back" :color blue))
-
-    :hydra (hydra-ibuffer-action (:color teal :columns 4
-                                         :after-exit
-                                         (if (eq major-mode 'ibuffer-mode)
-                                             (hydra-ibuffer-main/body)))
-                                 "Action"
-                                 ("A" ibuffer-do-view "view")
-                                 ("E" ibuffer-do-eval "eval")
-                                 ("F" ibuffer-do-shell-command-file "shell-command-file")
-                                 ("I" ibuffer-do-query-replace-regexp "query-replace-regexp")
-                                 ("H" ibuffer-do-view-other-frame "view-other-frame")
-                                 ("N" ibuffer-do-shell-command-pipe-replace "shell-cmd-pipe-replace")
-                                 ("M" ibuffer-do-toggle-modified "toggle-modified")
-                                 ("O" ibuffer-do-occur "occur")
-                                 ("P" ibuffer-do-print "print")
-                                 ("Q" ibuffer-do-query-replace "query-replace")
-                                 ("R" ibuffer-do-rename-uniquely "rename-uniquely")
-                                 ("T" ibuffer-do-toggle-read-only "toggle-read-only")
-                                 ("U" ibuffer-do-replace-regexp "replace-regexp")
-                                 ("V" ibuffer-do-revert "revert")
-                                 ("W" ibuffer-do-view-and-eval "view-and-eval")
-                                 ("X" ibuffer-do-shell-command-pipe "shell-command-pipe")
-                                 ("b" nil "back"))
-
-    :hydra (hydra-ibuffer-sort (:color amaranth :columns 3)
-                               "Sort"
-                               ("i" ibuffer-invert-sorting "invert")
-                               ("a" ibuffer-do-sort-by-alphabetic "alphabetic")
-                               ("v" ibuffer-do-sort-by-recency "recently used")
-                               ("s" ibuffer-do-sort-by-size "size")
-                               ("f" ibuffer-do-sort-by-filename/process "filename")
-                               ("m" ibuffer-do-sort-by-major-mode "mode")
-                               ("b" hydra-ibuffer-main/body "back" :color blue))
-
-    :hydra (hydra-ibuffer-filter (:color amaranth :columns 4)
-                                 "Filter"
-                                 ("m" ibuffer-filter-by-used-mode "mode")
-                                 ("M" ibuffer-filter-by-derived-mode "derived mode")
-                                 ("n" ibuffer-filter-by-name "name")
-                                 ("c" ibuffer-filter-by-content "content")
-                                 ("e" ibuffer-filter-by-predicate "predicate")
-                                 ("f" ibuffer-filter-by-filename "filename")
-                                 (">" ibuffer-filter-by-size-gt "size")
-                                 ("<" ibuffer-filter-by-size-lt "size")
-                                 ("/" ibuffer-filter-disable "disable")
-                                 ("b" hydra-ibuffer-main/body "back" :color blue))
-    :general
-    ("C-x C-b" 'ibuffer)
-    (:keymaps 'ibuffer-mode-map
-              "." 'hydra-ibuffer-main/body)
+    (fset #'jsonrpc--log-event #'ignore)  ; massive perf boost---don't log every event
+    ;; Sometimes you need to tell Eglot where to find the language server
+    ; (add-to-list 'eglot-server-programs
+    ;              '(haskell-mode . ("haskell-language-server-wrapper" "--lsp")))
     )
+
 #+END_SRC
 
-~uniqify~ renames buffers with the same name so that they're easier to distinguish.
 #+BEGIN_SRC emacs-lisp
-  (use-package uniquify
-    :straight nil
-    :config
-    (setq uniquify-buffer-name-style 'forward
-          uniquify-separator "/"
-          ;; rename after killing uniquified
-          uniquify-after-kill-buffer-p t
-          ;; don't muck with special buffers
-          uniquify-ignore-buffers-re "^\\*"))
-#+END_SRC
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;;;
+  ;;;   Optional extras
+  ;;;
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-** Unknown
-I don't actually know what these snippets do! I should probably get rid of them in due course.
-#+BEGIN_SRC emacs-lisp
-  (defmacro my/with-advice (adlist &rest body)
-    "Execute BODY with temporary advice in ADLIST.
+  ;; Uncomment the (load-file ) lines or copy code from the extras/ elisp files
+  ;; as desired
 
-  Each element of ADLIST should be a list of the form
-    (SYMBOL WHERE FUNCTION [PROPS])
-  suitable for passing to `advice-add'.  The BODY is wrapped in an
-  `unwind-protect' form, so the advice will be removed even in the
-  event of an error or nonlocal exit."
-    (declare (debug ((&rest (&rest form)) body))
-             (indent 1))
-    `(progn
-       ,@(mapcar (lambda (adform)
-                   (cons 'advice-add adform))
-                 adlist)
-       (unwind-protect (progn ,@body)
-         ,@(mapcar (lambda (adform)
-                     `(advice-remove ,(car adform) ,(nth 2 adform)))
-                   adlist))))
+  ;; UI/UX enhancements mostly focused on minibuffer and autocompletion interfaces
+  ;; These ones are *strongly* recommended!
+  ;(load-file (expand-file-name "extras/base.el" user-emacs-directory))
 
-  (defun my/call-logging-hooks (command &optional verbose)
-    "Call COMMAND, reporting every hook run in the process.
-  Interactively, prompt for a command to execute.
+  ;; Packages for software development
+  ;(load-file (expand-file-name "extras/dev.el" user-emacs-directory))
 
-  Return a list of the hooks run, in the order they were run.
-  Interactively, or with optional argument VERBOSE, also print a
-  message listing the hooks."
-    (interactive "CCommand to log hooks: \np")
-    (let* ((log     nil)
-           (logger (lambda (&rest hooks)
-                     (setq log (append log hooks nil)))))
-      (my/with-advice
-          ((#'run-hooks :before logger))
-        (call-interactively command))
-      (when verbose
-        (message
-         (if log "Hooks run during execution of %s:"
-           "No hooks run during execution of %s.")
-         command)
-        (dolist (hook log)
-          (message "> %s" hook)))
-      log))
-#+END_SRC
+  ;; Org-mode configuration
+  ;; WARNING: need to customize things inside the elisp file before use! See
+  ;; the file extras/org-intro.txt for help.
+  ;(load-file (expand-file-name "extras/org.el" user-emacs-directory))
 
-** Help
-[[https://github.com/Wilfred/helpful][~helpful~]] provides a slightly nicer interface to the built-in help files.
-#+begin_src emacs-lisp
-  (use-package helpful
-    :general
-    ("C-h f" 'helpful-callable)
-    ("C-h F" 'helpful-function)
-    ("C-h M" 'helpful-macro)
-    ("C-h x" 'helpful-command)
-    ("C-h k" 'helpful-key)
-    ("C-h v" 'helpful-variable)
-    ("C-h C-d" 'helpful-at-point))
-#+end_src
+  ;; Email configuration in Emacs
+  ;; WARNING: needs the `mu' program installed; see the elisp file for more
+  ;; details.
+  ;(load-file (expand-file-name "extras/email.el" user-emacs-directory))
 
+  ;; Tools for academic researchers
+  ;(load-file (expand-file-name "extras/researcher.el" user-emacs-directory))
 
-** Shells
-[[https://github.com/akermu/emacs-libvterm][~vterm~]] provides a terminal emulator within Emacs.
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;;;
+  ;;;   Built-in customization framework
+  ;;;
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-There's a slight wrinkle here in that trying to add my prefix key, currently "C-t" to the list of
-exceptions doesn't actually work. To get this to work I've needed to edit the actual ~vterm.el~ source
-file and then rebuild the package and module.
-
-Some interesting config options:
-- https://github.com/jeffyql/dotfiles/blob/4484469d36e716dfe9431f1b489015423b63a91f/init-vterm.el
-
-#+begin_src emacs-lisp
-  (use-package vterm
-    :ensure t
-    :general
-    (my-leader-def "x" 'vterm-toggle)
-    :config
-    (setq vterm-max-scrollback 100000
-          vterm-clear-scrollback t
-          vterm-buffer-name-string "vterm-%s"
-          vterm-keymap-exceptions
-          '("M-:" "C-c" "C-x" "C-u" "C-g" "C-h" "C-l" "M-x" "M-o" "C-y" "M-y" "C-t" "M-s")))
-#+end_src
-
-#+begin_src emacs-lisp
-  (use-package multi-vterm)
-#+end_src
-
-[[https://github.com/jixiuf/vterm-toggle][~vterm-toggle~]] allows for easy toggling of vterms.
-
-TODO: get this setup to toggle a vterm in the directory of the current buffer and name the buffer
-after the directory.
-#+begin_src emacs-lisp
-  (use-package vterm-toggle)
-#+end_src
+  (custom-set-variables
+   ;; custom-set-variables was added by Custom.
+   ;; If you edit it by hand, you could mess it up, so be careful.
+   ;; Your init file should contain only one such instance.
+   ;; If there is more than one, they won't work right.
+   '(package-selected-packages '(which-key))
+   '(custom-safe-themes
+     '("79730342933b4b15c8c78b6ef92f28ddef9c40b720fcb1fd4ca8396cebe323ca" "2dff5f0b44a9e6c8644b2159414af72261e38686072e063aa66ee98a2faecf0e" default))
+   )
+  (custom-set-faces
+   ;; custom-set-faces was added by Custom.
+   ;; If you edit it by hand, you could mess it up, so be careful.
+   ;; Your init file should contain only one such instance.
+   ;; If there is more than one, they won't work right.
+   )
+  #+END_SRC
