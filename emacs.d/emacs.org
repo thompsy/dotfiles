@@ -410,10 +410,10 @@ Base extras:
     :ensure t
     :demand t
     :config (setq avy-background t
-		  avy-keys '(
-		   ?a ?r ?s ?t ?g ?m ?n ?e ?i ?o
-		      ?z ?x ?c ?d ?v ?k ?h ?, ?.
-		      ?q ?w ?f ?p ?b ?j ?l ?u ?'))
+  		  avy-keys '(
+  		   ?a ?r ?s ?t ?g ?m ?n ?e ?i ?o
+  		      ?z ?x ?c ?d ?v ?k ?h ?, ?.
+  		      ?q ?w ?f ?p ?b ?j ?l ?u ?'))
     :general ("C-'" 'avy-goto-char-timer))
 
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -427,51 +427,51 @@ Base extras:
     (use-package consult
       :ensure t
       :bind (
-	     ("C-c M-x" . consult-mode-command)
-	     ("C-c h" . consult-history)
-	     ("C-c k" . consult-kmacro)
-	     ("C-c m" . consult-man)
-	     ("C-c i" . consult-info)
-	     ;; Drop-in replacements
-	     ("M-y"   . consult-yank-from-kill-ring)   ; orig. yank-pop
-	     ("M-g g" . consult-goto-line)
+  	     ("C-c M-x" . consult-mode-command)
+  	     ("C-c h" . consult-history)
+  	     ("C-c k" . consult-kmacro)
+  	     ("C-c m" . consult-man)
+  	     ("C-c i" . consult-info)
+  	     ;; Drop-in replacements
+  	     ("M-y"   . consult-yank-from-kill-ring)   ; orig. yank-pop
+  	     ("M-g g" . consult-goto-line)
 
-	     ("C-x b" . consult-buffer)     ; orig. switch-to-buffer
-	     ("C-x r b" . consult-bookmark)            ;; orig. bookmark-jump
-	     ("C-x p b" . consult-project-buffer)      ;; orig. project-switch-to-buffer
+  	     ("C-x b" . consult-buffer)     ; orig. switch-to-buffer
+  	     ("C-x r b" . consult-bookmark)            ;; orig. bookmark-jump
+  	     ("C-x p b" . consult-project-buffer)      ;; orig. project-switch-to-buffer
 
-	     ;; M-g bindings in `goto-map'
-	     ("M-g e" . consult-compile-error)
-	     ("M-g f" . consult-flymake)               ;; Alternative: consult-flycheck
-	     ("M-g g" . consult-goto-line)             ;; orig. goto-line
-	     ("M-g M-g" . consult-goto-line)           ;; orig. goto-line
-	     ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
-	     ("M-g m" . consult-mark)
-	     ("M-g k" . consult-global-mark)
-	     ("M-g i" . consult-imenu)
-	     ("M-g I" . consult-imenu-multi)
-	     ;; M-s bindings in `search-map'
-	     ("M-s d" . consult-find)                  ;; Alternative: consult-fd
-	     ("M-s c" . consult-locate)
-	     ("M-s g" . consult-grep)
-	     ("M-s G" . consult-git-grep)
-	     ("M-s r" . consult-ripgrep)
-	     ("M-s l" . consult-line)
-	     ("M-s L" . consult-line-multi)
-	     ("M-s k" . consult-keep-lines)
-	     ("M-s u" . consult-focus-lines)
-	     ;; Isearch integration
-	     ("M-s e" . consult-isearch-history)
-	     :map isearch-mode-map
-	     ("M-e" . consult-isearch-history)         ;; orig. isearch-edit-string
-	     ("M-s e" . consult-isearch-history)       ;; orig. isearch-edit-string
-	     ("M-s l" . consult-line)                  ;; needed by consult-line to detect isearch
-	     ("M-s L" . consult-line-multi)            ;; needed by consult-line to detect isearch
-	     ;; Minibuffer history
-	     :map minibuffer-local-map
-	     ("M-s" . consult-history)                 ;; orig. next-matching-history-element
-	     ("M-r" . consult-history)                ;; orig. previous-matching-history-element
-	     )
+  	     ;; M-g bindings in `goto-map'
+  	     ("M-g e" . consult-compile-error)
+  	     ("M-g f" . consult-flymake)               ;; Alternative: consult-flycheck
+  	     ("M-g g" . consult-goto-line)             ;; orig. goto-line
+  	     ("M-g M-g" . consult-goto-line)           ;; orig. goto-line
+  	     ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
+  	     ("M-g m" . consult-mark)
+  	     ("M-g k" . consult-global-mark)
+  	     ("M-g i" . consult-imenu)
+  	     ("M-g I" . consult-imenu-multi)
+  	     ;; M-s bindings in `search-map'
+  	     ("M-s d" . consult-find)                  ;; Alternative: consult-fd
+  	     ("M-s c" . consult-locate)
+  	     ("M-s g" . consult-grep)
+  	     ("M-s G" . consult-git-grep)
+  	     ("M-s r" . consult-ripgrep)
+  	     ("M-s l" . consult-line)
+  	     ("M-s L" . consult-line-multi)
+  	     ("M-s k" . consult-keep-lines)
+  	     ("M-s u" . consult-focus-lines)
+  	     ;; Isearch integration
+  	     ("M-s e" . consult-isearch-history)
+  	     :map isearch-mode-map
+  	     ("M-e" . consult-isearch-history)         ;; orig. isearch-edit-string
+  	     ("M-s e" . consult-isearch-history)       ;; orig. isearch-edit-string
+  	     ("M-s l" . consult-line)                  ;; needed by consult-line to detect isearch
+  	     ("M-s L" . consult-line-multi)            ;; needed by consult-line to detect isearch
+  	     ;; Minibuffer history
+  	     :map minibuffer-local-map
+  	     ("M-s" . consult-history)                 ;; orig. next-matching-history-element
+  	     ("M-r" . consult-history)                ;; orig. previous-matching-history-element
+  	     )
       :config
       ;; Narrowing lets you restrict results to certain groups of candidates
       (setq consult-narrow-key "<"))
@@ -484,13 +484,13 @@ Base extras:
       :init
       ;; Add the option to run embark when using avy
       (defun bedrock/avy-action-embark (pt)
-	(unwind-protect
-	    (save-excursion
-	      (goto-char pt)
-	      (embark-act))
-	  (select-window
-	   (cdr (ring-ref avy-ring 0))))
-	t)
+  	(unwind-protect
+  	    (save-excursion
+  	      (goto-char pt)
+  	      (embark-act))
+  	  (select-window
+  	   (cdr (ring-ref avy-ring 0))))
+  	t)
 
       ;; After invoking avy-goto-char-timer, hit "." to run embark at the next
       ;; candidate you select
@@ -516,7 +516,7 @@ Base extras:
       :straight nil
       :after vertico
       :bind (:map vertico-map
-		  ("M-DEL" . vertico-directory-delete-word)))
+  		  ("M-DEL" . vertico-directory-delete-word)))
 
     ;; Marginalia: annotations for minibuffer
     (use-package marginalia
@@ -532,9 +532,9 @@ Base extras:
       (global-corfu-mode)
       :bind
       (:map corfu-map
-	    ("SPC" . corfu-insert-separator)
-	    ("C-n" . corfu-next)
-	    ("C-p" . corfu-previous)))
+  	    ("SPC" . corfu-insert-separator)
+  	    ("C-n" . corfu-next)
+  	    ("C-p" . corfu-previous)))
 
     ;; Part of corfu
     (use-package corfu-popupinfo
@@ -573,9 +573,9 @@ Base extras:
     (use-package eshell
       :init
       (defun bedrock/setup-eshell ()
-	;; Something funny is going on with how Eshell sets up its keymaps; this is
-	;; a work-around to make C-r bound in the keymap
-	(keymap-set eshell-mode-map "C-r" 'consult-history))
+  	;; Something funny is going on with how Eshell sets up its keymaps; this is
+  	;; a work-around to make C-r bound in the keymap
+  	(keymap-set eshell-mode-map "C-r" 'consult-history))
       :hook ((eshell-mode . bedrock/setup-eshell)))
 
     ;; Orderless: powerful completion style
@@ -601,99 +601,109 @@ Base extras:
 
 Development stuff:
 #+BEGIN_SRC emacs-lisp
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  ;;;
-  ;;;   Built-in config for developers
-  ;;;
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  (use-package emacs
-    :config
-    ;; Treesitter config
-    (setq treesit-language-source-alist
-  	'((bash "https://github.com/tree-sitter/tree-sitter-bash")
-  	  (cmake "https://github.com/uyha/tree-sitter-cmake")
-  	  (css "https://github.com/tree-sitter/tree-sitter-css")
-  	  (elisp "https://github.com/Wilfred/tree-sitter-elisp")
-  	  (go "https://github.com/tree-sitter/tree-sitter-go")
-  	  (gomod "https://github.com/camdencheek/tree-sitter-go-mod")
-  	  (dockerfile "https://github.com/camdencheek/tree-sitter-dockerfile")
-  	  (html "https://github.com/tree-sitter/tree-sitter-html")
-  	  (javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
-  	  (json "https://github.com/tree-sitter/tree-sitter-json")
-  	  (make "https://github.com/alemuller/tree-sitter-make")
-  	  (markdown "https://github.com/ikatyang/tree-sitter-markdown")
-  	  (python "https://github.com/tree-sitter/tree-sitter-python")
-  	  (toml "https://github.com/tree-sitter/tree-sitter-toml")
-  	  (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
-  	  (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
-  	  (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
-    ;; Tell Emacs to prefer the treesitter mode
-    ;; You'll want to run the command `M-x treesit-install-language-grammar' before editing.
-    (setq major-mode-remap-alist
-  	'((yaml-mode . yaml-ts-mode)
-  	  (bash-mode . bash-ts-mode)
-  	  (go-mode . go-ts-mode)
-  	  (js2-mode . js-ts-mode)
-  	  (typescript-mode . typescript-ts-mode)
-  	  (json-mode . json-ts-mode)
-  	  (css-mode . css-ts-mode)
-  	  (python-mode . python-ts-mode)))
-    :hook
-    ;; Auto parenthesis matching
-    ((prog-mode . electric-pair-mode)))
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ;;;
+    ;;;   Built-in config for developers
+    ;;;
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    (use-package emacs
+      :config
+      ;; Treesitter config
+      (setq treesit-language-source-alist
+    	'((bash "https://github.com/tree-sitter/tree-sitter-bash")
+    	  (cmake "https://github.com/uyha/tree-sitter-cmake")
+    	  (css "https://github.com/tree-sitter/tree-sitter-css")
+    	  (elisp "https://github.com/Wilfred/tree-sitter-elisp")
+    	  (go "https://github.com/tree-sitter/tree-sitter-go")
+    	  (gomod "https://github.com/camdencheek/tree-sitter-go-mod")
+    	  (dockerfile "https://github.com/camdencheek/tree-sitter-dockerfile")
+    	  (html "https://github.com/tree-sitter/tree-sitter-html")
+    	  (javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
+    	  (json "https://github.com/tree-sitter/tree-sitter-json")
+    	  (make "https://github.com/alemuller/tree-sitter-make")
+    	  (markdown "https://github.com/ikatyang/tree-sitter-markdown")
+    	  (python "https://github.com/tree-sitter/tree-sitter-python")
+    	  (toml "https://github.com/tree-sitter/tree-sitter-toml")
+    	  (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
+    	  (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
+    	  (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
+      ;; Tell Emacs to prefer the treesitter mode
+      ;; You'll want to run the command `M-x treesit-install-language-grammar' before editing.
+      (setq major-mode-remap-alist
+    	'((yaml-mode . yaml-ts-mode)
+    	  (bash-mode . bash-ts-mode)
+    	  (go-mode . go-ts-mode)
+    	  (js2-mode . js-ts-mode)
+    	  (typescript-mode . typescript-ts-mode)
+    	  (json-mode . json-ts-mode)
+    	  (css-mode . css-ts-mode)
+    	  (python-mode . python-ts-mode)))
+      :hook
+      ;; Auto parenthesis matching
+      ((prog-mode . electric-pair-mode)))
 
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  ;;;
-  ;;;   Version Control
-  ;;;
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ;;;
+    ;;;   Version Control
+    ;;;
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-  ;; Magit: best Git client to ever exist
-  (use-package magit
-    :ensure t
-    :bind (("C-x g" . magit-status)))
+    ;; Magit: best Git client to ever exist
+    (use-package magit
+      :ensure t
+      :bind (("C-x g" . magit-status)))
 
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  ;;;
-  ;;;   Common file types
-  ;;;
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ;;;
+    ;;;   Common file types
+    ;;;
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-  (use-package markdown-mode
-    :hook ((markdown-mode . visual-line-mode)))
+    (use-package markdown-mode
+      :hook ((markdown-mode . visual-line-mode)))
 
-  (use-package yaml-mode
-    :ensure t)
+    (use-package yaml-mode
+      :ensure t)
 
-  (use-package json-mode
-    :ensure t)
+    (use-package json-mode
+      :ensure t)
 
-  (use-package go-ts-mode
-    :ensure t)
+    (use-package go-ts-mode
+      :ensure t)
 
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  ;;;
-  ;;;   Eglot, the built-in LSP client for Emacs
-  ;;;
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  ;; Helpful resources:
-  ;;
-  ;;  - https://www.masteringemacs.org/article/seamlessly-merge-multiple-documentation-sources-eldoc
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ;;;
+    ;;;   Eglot, the built-in LSP client for Emacs
+    ;;;
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ;; Helpful resources:
+    ;;
+    ;;  - https://www.masteringemacs.org/article/seamlessly-merge-multiple-documentation-sources-eldoc
 
-  (use-package eglot
-    :straight nil
-    ;; no :ensure t here because it's built-in
+    (use-package eglot
+      :straight nil
+      ;; no :ensure t here because it's built-in
 
-    ;; Configure hooks to automatically turn-on eglot for selected modes
-    :hook
-    ((go-ts-mode . eglot-ensure))
+      ;; Configure hooks to automatically turn-on eglot for selected modes
+      :hook
+      ((go-ts-mode . eglot-ensure))
 
-    :custom
-    (eglot-send-changes-idle-time 0.1)
-    (eglot-extend-to-xref t)              ; activate Eglot in referenced non-project files
+      :custom
+      (eglot-send-changes-idle-time 0.1)
+      (eglot-extend-to-xref t)              ; activate Eglot in referenced non-project files
 
-    :config
-    (fset #'jsonrpc--log-event #'ignore)  ; massive perf boost---don't log every event
-    )
+      :config
+      (fset #'jsonrpc--log-event #'ignore)  ; massive perf boost---don't log every event
+      )
 
+
+  ;; Taken fromhttps://github.com/minad/corfu/wiki#making-a-cape-super-capf-for-eglot
+  (defun my/eglot-capf ()
+    (setq-local completion-at-point-functions
+                (list (cape-capf-super
+                       #'eglot-completion-at-point
+                       #'tempel-expand
+                       #'cape-file))))
+
+  (add-hook 'eglot-managed-mode-hook #'my/eglot-capf)
 #+END_SRC
