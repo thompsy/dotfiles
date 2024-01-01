@@ -265,55 +265,6 @@ to any themes so that they confirmation code gets stored in ~custom.el~.
         (load-file custom-file)))
 #+END_SRC
 
-** Keybindings
-[[https://github.com/noctuid/general.el][~general.el~]] provides a convenient method for binding
-keys. It also integrates well with ~use-package~. In particular, this allows us to easily setup a
-global leader key, ~my-leader-def~ and chain bindings from that.
-#+BEGIN_SRC emacs-lisp
-  (use-package general
-    :demand t
-    :custom
-    (general-override-states '(insert emacs hybrid normal visual motion operator replace))
-    :config
-    (general-define-key
-     "C-w" 'backward-kill-word
-     "C-c C-k" 'kill-region
-     "C-x C-k" 'kill-region
-     ;; C-z defaults to suspend-frame which isn't very useful
-     "C-z" 'undo
-     ;;"M-s" 'highlight-symbol-at-point ;;TODO conflicted with consult
-     "M-c" 'hi-lock-mode
-     "M-z" 'pop-global-mark
-     "C-x C-m" 'execute-extended-command
-     "C-x m" 'execute-extended-command
-     "C-c C-m" 'execute-extended-command
-     "C-c m" 'execute-extended-command
-     )
-
-    ;; Make general's keybindings take precedence over keys bound to other minor mode keymaps.
-    (general-override-mode)
-
-    ;; We need to call this so that we can allocate C-t as a prefix key. See
-    ;; https://github.com/noctuid/general.el#automatic-key-unbinding for details.
-    (general-auto-unbind-keys)
-    ;; Create a definer where most of my commands will live under
-    (general-create-definer my-leader-def
-      :prefix "C-t")
-    ;; Setup some initial bindings.
-    ;; TODO some of these should probably live elsewhere
-    (my-leader-def
-      "m" 'execute-extended-command
-      "a" 'org-agenda
-      "b" '(:ignore t :wk "bookmarks")
-      "bs" 'bookmark-set
-      "bl" 'consult-bookmark
-      ;; quit / restart
-      "q" '(:ignore t :wk "quit / restart")
-      "qq" 'save-buffers-kill-terminal
-      "qQ" 'save-buffers-kill-emacs
-      "qr" 'restart-emacs))
-#+END_SRC
-
 ** Files
 Setup some basic file hygiene. Keep some backup files around, but keep them out of sight.
 
@@ -451,7 +402,27 @@ improvement on this by popping up in a floating window. I'll try it for a while 
     (mapc (lambda (hook) (add-hook hook 'hl-line-mode)) hl-line-hooks))
 #+END_SRC
 
-** Theme
+** Aesthetics
+Turn off a bunch of frame related functionality for a more minimal experience.
+#+BEGIN_SRC emacs-lisp
+  (use-package frame
+    :straight nil
+    :config
+    (blink-cursor-mode -1)
+    (setq initial-scratch-message ""
+          inhibit-startup-message t
+          visible-bell nil
+          ring-bell-function 'ignore
+          initial-frame-alist
+          '((menu-bar-lines . 0)
+            (tool-bar-lines . 0)))
+    (scroll-bar-mode 0)
+    (tool-bar-mode 0)
+    (menu-bar-mode 0)
+    (global-hl-line-mode 1))
+#+END_SRC
+
+[[https://draculatheme.com/emacs][Dracula]] is a nice theme that's available for lots of apps.
 #+BEGIN_SRC emacs-lisp  
   (use-package dracula-theme
     :config
@@ -465,6 +436,55 @@ improvement on this by popping up in a floating window. I'll try it for a while 
     :ensure t
     :init
     (all-the-icons-completion-mode))
+#+END_SRC
+
+** Keybindings
+[[https://github.com/noctuid/general.el][~general.el~]] provides a convenient method for binding
+keys. It also integrates well with ~use-package~. In particular, this allows us to easily setup a
+global leader key, ~my-leader-def~ and chain bindings from that.
+#+BEGIN_SRC emacs-lisp
+  (use-package general
+    :demand t
+    :custom
+    (general-override-states '(insert emacs hybrid normal visual motion operator replace))
+    :config
+    (general-define-key
+     "C-w" 'backward-kill-word
+     "C-c C-k" 'kill-region
+     "C-x C-k" 'kill-region
+     ;; C-z defaults to suspend-frame which isn't very useful
+     "C-z" 'undo
+     ;;"M-s" 'highlight-symbol-at-point ;;TODO conflicted with consult
+     "M-c" 'hi-lock-mode
+     "M-z" 'pop-global-mark
+     "C-x C-m" 'execute-extended-command
+     "C-x m" 'execute-extended-command
+     "C-c C-m" 'execute-extended-command
+     "C-c m" 'execute-extended-command
+     )
+
+    ;; Make general's keybindings take precedence over keys bound to other minor mode keymaps.
+    (general-override-mode)
+
+    ;; We need to call this so that we can allocate C-t as a prefix key. See
+    ;; https://github.com/noctuid/general.el#automatic-key-unbinding for details.
+    (general-auto-unbind-keys)
+    ;; Create a definer where most of my commands will live under
+    (general-create-definer my-leader-def
+      :prefix "C-t")
+    ;; Setup some initial bindings.
+    ;; TODO some of these should probably live elsewhere
+    (my-leader-def
+      "m" 'execute-extended-command
+      "a" 'org-agenda
+      "b" '(:ignore t :wk "bookmarks")
+      "bs" 'bookmark-set
+      "bl" 'consult-bookmark
+      ;; quit / restart
+      "q" '(:ignore t :wk "quit / restart")
+      "qq" 'save-buffers-kill-terminal
+      "qQ" 'save-buffers-kill-emacs
+      "qr" 'restart-emacs))
 #+END_SRC
 
 ** Motion Aids
