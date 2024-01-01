@@ -172,7 +172,7 @@ you explicitly override it with :straight nil.
   (setq straight-use-package-by-default t)
 #+END_SRC
 
-Install [[https://github.com/jwiegley/use-package][~use-package~]] for easily installing other packages.
+Install ~[[https://github.com/jwiegley/use-package][use-package]~ for easily installing other packages.
 #+BEGIN_SRC emacs-lisp
   ;; Install use-package to use with straight.el
   (straight-use-package 'use-package)
@@ -183,6 +183,28 @@ straight to pull down the latest version. To avoid the built-in version getting 
 explicitly load it with straight early in the init process. See more details in the [[https://github.com/radian-software/straight.el#the-wrong-version-of-my-package-was-loaded][README.md]].
 #+BEGIN_SRC emacs-lisp
   (straight-use-package 'org)
+#+END_SRC
+
+** Core Configuration
+A few miscellaneous settings. Note that emacs is not really a package strictly speaking which is why we include ~:straight nil~ so that our package manager doesn't try to fetch the source.
+#+BEGIN_SRC emacs-lisp
+  (use-package emacs
+  :straight nil
+  :init
+  ;; answer with y/n instead of typing out yes/no
+  (defalias 'yes-or-no-p 'y-or-n-p)
+  :config
+  (setq indent-tabs-mode nil
+        tab-width 4
+        show-trailing-whitespace t
+        fill-column 100)
+  (setq-default indent-tabs-mode nil
+                fill-column 100)
+  :custom
+  ;; load new source files instead of stale elisp bytecode
+  (load-prefer-newer t)
+  ;; allow emacs to be any size, removes black bars
+  (frame-resize-pixelwise t))
 #+END_SRC
 
 It's useful to have buffers auto-revert when files on disk change especially when using Git branches a lot!
