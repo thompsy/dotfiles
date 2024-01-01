@@ -223,6 +223,48 @@ It's useful to have buffers auto-revert when files on disk change especially whe
     (setopt auto-revert-check-vc-info t)
     )
 #+END_SRC
+
+Use the system keyboard when killing and yanking.
+#+BEGIN_SRC emacs-lisp
+  (use-package simple
+    :straight nil
+    :custom
+    ;; killing and yanking uses the system clipboard
+    (save-interprogram-paste-before-kill t))
+#+END_SRC
+
+~[[https://github.com/emacs-mirror/emacs/blob/master/lisp/saveplace.el][saveplace]~ jumps back to
+the last when later visiting a file. This is handy to pick up where you left off.
+#+BEGIN_SRC emacs-lisp
+  (use-package saveplace
+    :straight nil
+    :config
+    (save-place-mode +1))
+#+END_SRC
+
+~[[https://github.com/emacscollective/no-littering][no-littering]~ keeps configuration files and
+other persistent data under ~user-emacs-directory~ rather than spamming them in inconsistent places.
+#+BEGIN_SRC emacs-lisp
+  (use-package no-littering
+    :init
+    (setq no-littering-etc-directory
+          (expand-file-name "etc/" user-emacs-directory))
+    (setq no-littering-var-directory
+          (expand-file-name "var/" user-emacs-directory)))
+#+END_SRC
+
+Use a separate custom file to remove auto-generated code from ~init.el~. This should be loaded prior
+to any themes so that they confirmation code gets stored in ~custom.el~.
+#+BEGIN_SRC emacs-lisp
+  (use-package cus-edit
+    :straight nil
+    :custom
+    (custom-file (expand-file-name "custom.el" user-emacs-directory))
+    :config
+    (if (file-exists-p custom-file)
+        (load-file custom-file)))
+#+END_SRC
+
 ** Keybindings
 [[https://github.com/noctuid/general.el][~general.el~]] provides a convenient method for binding
 keys. It also integrates well with ~use-package~. In particular, this allows us to easily setup a
@@ -296,6 +338,40 @@ TODO verify that some of these aren't duplicated above
      auto-save-file-name-transforms
      `((".*" "~/.emacs.d/auto-saves/" t))))
 #+END_SRC
+
+Use UTF-8 everywhere.
+#+BEGIN_SRC emacs-lisp
+(use-package mule
+  :straight nil
+  :config
+  (prefer-coding-system 'utf-8-unix)
+  (set-default-coding-systems 'utf-8-unix)
+  (set-language-environment 'utf-8)
+  (set-terminal-coding-system 'utf-8-unix)
+  (setq locale-coding-system 'utf-8-unix)
+  (set-selection-coding-system 'utf-8-unix))
+#+END_SRC
+
+Setup some basic file hygiene. Keep some backup files around, but keep them out of sight.
+#+BEGIN_SRC emacs-lisp
+  (use-package files
+    :straight nil
+    :config
+    (setq
+     backup-by-copying t
+     backup-directory-alist '((".*" . "~/.emacs.d/backups/"))
+     delete-old-versions t
+     delete-auto-save-files t
+     kept-new-versions 6
+     kept-old-versions 2
+     version-control t
+     vc-make-backup-files t
+     recentf-max-menu-items 25
+     recentf-max-saved-items 500
+     auto-save-file-name-transforms
+     `((".*" "~/.emacs.d/auto-saves/" t))))
+#+END_SRC
+
 
 ** Discoverability
 [[https://github.com/justbur/emacs-which-key][~which-key~]] displays all of the available keybindings following a incompletely entered command. For
@@ -377,21 +453,6 @@ improvement on this by popping up in a floating window. I'll try it for a while 
 
 ** Theme
 #+BEGIN_SRC emacs-lisp  
-  (custom-set-variables
-   ;; custom-set-variables was added by Custom.
-   ;; If you edit it by hand, you could mess it up, so be careful.
-   ;; Your init file should contain only one such instance.
-   ;; If there is more than one, they won't work right.
-   '(custom-safe-themes
-     '("603a831e0f2e466480cdc633ba37a0b1ae3c3e9a4e90183833bc4def3421a961" default))
-   '(package-selected-packages '(which-key)))
-  (custom-set-faces
-   ;; custom-set-faces was added by Custom.
-   ;; If you edit it by hand, you could mess it up, so be careful.
-   ;; Your init file should contain only one such instance.
-   ;; If there is more than one, they won't work right.
-   )
-
   (use-package dracula-theme
     :config
     (load-theme 'dracula))
