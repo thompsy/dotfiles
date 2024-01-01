@@ -73,15 +73,15 @@ to disable ~package.el~ in favour of ~straight.el~.
   (tool-bar-mode -1)                      ; All these tools are in the menu-bar anyway
   (setq default-frame-alist '((fullscreen . maximized)
 
-			      ;; You can turn off scroll bars by uncommenting these lines:
-			      (vertical-scroll-bars . nil)
-			      (horizontal-scroll-bars . nil)
+  			    ;; You can turn off scroll bars by uncommenting these lines:
+  			    (vertical-scroll-bars . nil)
+  			    (horizontal-scroll-bars . nil)
 
-			      ;; Setting the face in here prevents flashes of
-			      ;; color as the theme gets activated
-			      (background-color . "#000000")
-			      (ns-appearance . dark)
-			      (ns-transparent-titlebar . t)))
+  			    ;; Setting the face in here prevents flashes of
+  			    ;; color as the theme gets activated
+  			    (background-color . "#000000")
+  			    (ns-appearance . dark)
+  			    (ns-transparent-titlebar . t)))
 
   (setq package-enable-at-startup nil)
 #+END_SRC
@@ -97,43 +97,43 @@ Some initial comment blurb.
 Load some local setup. As noted above, this is generally installation specific, so its easiest to
 keep it in a separate file.
 #+BEGIN_SRC emacs-lisp
-(require 'local-setup "~/.emacs.d/local.el")
+  (require 'local-setup "~/.emacs.d/local.el")
 #+END_SRC
 
 ** Bedrock Emacs
 All of this is new, minimal stuff from bedrock emacs:
 #+BEGIN_SRC emacs-lisp
-	  (setopt initial-major-mode 'fundamental-mode)  ; default mode for the *scratch* buffer
-	  (setopt display-time-default-load-average nil) ; this information is useless for most
+  (setopt initial-major-mode 'fundamental-mode)  ; default mode for the *scratch* buffer
+  (setopt display-time-default-load-average nil) ; this information is useless for most
 
-	  ;; Automatically reread from disk if the underlying file changes
-	  (setopt auto-revert-avoid-polling t)
-	  ;; Some systems don't do file notifications well; see
-	  ;; https://todo.sr.ht/~ashton314/emacs-bedrock/11
-	  (setopt auto-revert-interval 5)
-	  (setopt auto-revert-check-vc-info t)
-	  (global-auto-revert-mode)
+  ;; Automatically reread from disk if the underlying file changes
+  (setopt auto-revert-avoid-polling t)
+  ;; Some systems don't do file notifications well; see
+  ;; https://todo.sr.ht/~ashton314/emacs-bedrock/11
+  (setopt auto-revert-interval 5)
+  (setopt auto-revert-check-vc-info t)
+  (global-auto-revert-mode)
 
-	  ;; Save history of minibuffer
-	  (savehist-mode)
+  ;; Save history of minibuffer
+  (savehist-mode)
 
-	  ;; Move through windows with Ctrl-<arrow keys>
-	  (windmove-default-keybindings 'control) ; You can use other modifiers here
+  ;; Move through windows with Ctrl-<arrow keys>
+  (windmove-default-keybindings 'control) ; You can use other modifiers here
 
-	  ;; Fix archaic defaults
-	  (setopt sentence-end-double-space nil)
+  ;; Fix archaic defaults
+  (setopt sentence-end-double-space nil)
 
-	  ;; Don't litter file system with *~ backup files; put them all inside
-	  ;; ~/.emacs.d/backup or wherever
-	  (defun bedrock--backup-file-name (fpath)
-	    "Return a new file path of a given file path.
-	  If the new path's directories does not exist, create them."
-	    (let* ((backupRootDir "~/.emacs.d/emacs-backup/")
-		   (filePath (replace-regexp-in-string "[A-Za-z]:" "" fpath )) ; remove Windows driver letter in path
-		   (backupFilePath (replace-regexp-in-string "//" "/" (concat backupRootDir filePath "~") )))
-	      (make-directory (file-name-directory backupFilePath) (file-name-directory backupFilePath))
-	      backupFilePath))
-	  (setopt make-backup-file-name-function 'bedrock--backup-file-name)
+  ;; Don't litter file system with *~ backup files; put them all inside
+  ;; ~/.emacs.d/backup or wherever
+  (defun bedrock--backup-file-name (fpath)
+    "Return a new file path of a given file path.
+  If the new path's directories does not exist, create them."
+    (let* ((backupRootDir "~/.emacs.d/emacs-backup/")
+  	 (filePath (replace-regexp-in-string "[A-Za-z]:" "" fpath )) ; remove Windows driver letter in path
+  	 (backupFilePath (replace-regexp-in-string "//" "/" (concat backupRootDir filePath "~") )))
+      (make-directory (file-name-directory backupFilePath) (file-name-directory backupFilePath))
+      backupFilePath))
+  (setopt make-backup-file-name-function 'bedrock--backup-file-name)
 
 #+END_SRC
 
@@ -267,7 +267,7 @@ TODO verify that some of these aren't duplicated above
      `((".*" "~/.emacs.d/auto-saves/" t))))
 #+END_SRC
 
-
+** Discoverability
 [[https://github.com/justbur/emacs-which-key][~which-key~]] displays all of the available keybindings following a incompletely entered command. For
 example, pressing ~C-x~ and waiting a moment will cause ~which-key~ to populate the minibuffer with all
 the available next keys along with their corresponding commands. This makes discovery of new
@@ -285,16 +285,9 @@ improvement on this by popping up in a floating window. I'll try it for a while 
     (which-key-mode +1))
 #+END_SRC
 
-** Other
+** Minibuffer/Completion settings
 #+BEGIN_SRC emacs-lisp
-    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    ;;;
-    ;;;   Minibuffer/completion settings
-    ;;;
-    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
   ;; For help, see: https://www.masteringemacs.org/article/understanding-minibuffer-completion
-
   (setopt enable-recursive-minibuffers t)                ; Use the minibuffer whilst in the minibuffer
   (setopt completion-cycle-threshold 1)                  ; TAB cycles candidates
   (setopt completions-detailed t)                        ; Show annotations
@@ -310,13 +303,10 @@ improvement on this by popping up in a floating window. I'll try it for a while 
   					;(setopt completion-auto-select t)                     ; See `C-h v completion-auto-select' for more possible values
 
   (keymap-set minibuffer-mode-map "TAB" 'minibuffer-complete) ; TAB acts more like how it does in the shell
+#+END_SRC
 
-    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    ;;;
-    ;;;   Interface enhancements/defaults
-    ;;;
-    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
+** Inteface Enhancements
+#+BEGIN_SRC emacs-lisp
   ;; Mode line information
   (setopt line-number-mode t)                        ; Show current line in modeline
   (setopt column-number-mode t)                      ; Show column as well
@@ -353,13 +343,10 @@ improvement on this by popping up in a floating window. I'll try it for a while 
   ;; Modes to highlight the current line with
   (let ((hl-line-hooks '(text-mode-hook prog-mode-hook)))
     (mapc (lambda (hook) (add-hook hook 'hl-line-mode)) hl-line-hooks))
+#+END_SRC
 
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  ;;;
-  ;;;   Theme
-  ;;;
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
+** Theme
+#+BEGIN_SRC emacs-lisp  
   (custom-set-variables
    ;; custom-set-variables was added by Custom.
    ;; If you edit it by hand, you could mess it up, so be careful.
@@ -389,14 +376,9 @@ improvement on this by popping up in a floating window. I'll try it for a while 
     (all-the-icons-completion-mode))
 #+END_SRC
 
-
+** Motion Aids
 Base extras:
 #+BEGIN_SRC emacs-lisp
-    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    ;;;
-    ;;;   Motion aids
-    ;;;
-    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   (use-package avy
     :ensure t
     :demand t
@@ -407,13 +389,10 @@ Base extras:
       			   ?q ?w ?f ?p ?b ?j ?l ?u ?'))
     :general ("C-'" 'avy-goto-char-timer))
 
-        ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-        ;;;
-        ;;;   Power-ups: Embark and Consult
-        ;;;
-        ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+#+END_SRC
 
-
+** Consult and Embark
+#+BEGIN_SRC emacs-lisp  
   ;; Consult: Misc. enhanced commands
   (use-package consult
     :ensure t
@@ -501,12 +480,9 @@ Base extras:
   (use-package embark-consult
     :ensure t)
 
-        ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-        ;;;
-        ;;;   Minibuffer and completion
-        ;;;
-        ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
+#+END_SRC
+** Minibuffer and Completion
+#+BEGIN_SRC emacs-lisp  
   ;; Vertico: better vertical completion for minibuffer commands
   (use-package vertico
     :ensure t
@@ -529,6 +505,9 @@ Base extras:
     :config
     (marginalia-mode))
 
+#+END_SRC
+** Completion
+#+BEGIN_SRC emacs-lisp  
   ;; Popup completion-at-point
   (use-package corfu
     :straight (:files (:defaults "extensions/*"))
@@ -588,121 +567,86 @@ Base extras:
     :ensure t
     :config
     (setq completion-styles '(orderless)))
-
-        ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-        ;;;
-        ;;;   Misc. editing enhancements
-        ;;;
-        ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-  ;; Modify search results en masse
-  (use-package wgrep
-    :ensure t
-    :config
-    (setq wgrep-auto-save-buffer t))
-
 #+END_SRC
 
 
-Development stuff:
+** Software Development
 #+BEGIN_SRC emacs-lisp
-    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    ;;;
-    ;;;   Built-in config for developers
-    ;;;
-    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    (use-package emacs
-      :config
-      ;; Treesitter config
-      (setq treesit-language-source-alist
-    	'((bash "https://github.com/tree-sitter/tree-sitter-bash")
-    	  (cmake "https://github.com/uyha/tree-sitter-cmake")
-    	  (css "https://github.com/tree-sitter/tree-sitter-css")
-    	  (elisp "https://github.com/Wilfred/tree-sitter-elisp")
-    	  (go "https://github.com/tree-sitter/tree-sitter-go")
-    	  (gomod "https://github.com/camdencheek/tree-sitter-go-mod")
-    	  (dockerfile "https://github.com/camdencheek/tree-sitter-dockerfile")
-    	  (html "https://github.com/tree-sitter/tree-sitter-html")
-    	  (javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
-    	  (json "https://github.com/tree-sitter/tree-sitter-json")
-    	  (make "https://github.com/alemuller/tree-sitter-make")
-    	  (markdown "https://github.com/ikatyang/tree-sitter-markdown")
-    	  (python "https://github.com/tree-sitter/tree-sitter-python")
-    	  (toml "https://github.com/tree-sitter/tree-sitter-toml")
-    	  (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
-    	  (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
-    	  (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
-      ;; Tell Emacs to prefer the treesitter mode
-      ;; You'll want to run the command `M-x treesit-install-language-grammar' before editing.
-      (setq major-mode-remap-alist
-    	'((yaml-mode . yaml-ts-mode)
-    	  (bash-mode . bash-ts-mode)
-    	  (go-mode . go-ts-mode)
-    	  (js2-mode . js-ts-mode)
-    	  (typescript-mode . typescript-ts-mode)
-    	  (json-mode . json-ts-mode)
-    	  (css-mode . css-ts-mode)
-    	  (python-mode . python-ts-mode)))
-      :hook
-      ;; Auto parenthesis matching
-      ((prog-mode . electric-pair-mode)))
+  (use-package emacs
+    :config
+    ;; Treesitter config
+    (setq treesit-language-source-alist
+  	'((bash "https://github.com/tree-sitter/tree-sitter-bash")
+  	  (cmake "https://github.com/uyha/tree-sitter-cmake")
+  	  (css "https://github.com/tree-sitter/tree-sitter-css")
+  	  (elisp "https://github.com/Wilfred/tree-sitter-elisp")
+  	  (go "https://github.com/tree-sitter/tree-sitter-go")
+  	  (gomod "https://github.com/camdencheek/tree-sitter-go-mod")
+  	  (dockerfile "https://github.com/camdencheek/tree-sitter-dockerfile")
+  	  (html "https://github.com/tree-sitter/tree-sitter-html")
+  	  (javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
+  	  (json "https://github.com/tree-sitter/tree-sitter-json")
+  	  (make "https://github.com/alemuller/tree-sitter-make")
+  	  (markdown "https://github.com/ikatyang/tree-sitter-markdown")
+  	  (python "https://github.com/tree-sitter/tree-sitter-python")
+  	  (toml "https://github.com/tree-sitter/tree-sitter-toml")
+  	  (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
+  	  (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
+  	  (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
+    ;; Tell Emacs to prefer the treesitter mode
+    ;; You'll want to run the command `M-x treesit-install-language-grammar' before editing.
+    (setq major-mode-remap-alist
+  	'((yaml-mode . yaml-ts-mode)
+  	  (bash-mode . bash-ts-mode)
+  	  (go-mode . go-ts-mode)
+  	  (js2-mode . js-ts-mode)
+  	  (typescript-mode . typescript-ts-mode)
+  	  (json-mode . json-ts-mode)
+  	  (css-mode . css-ts-mode)
+  	  (python-mode . python-ts-mode)))
+    :hook
+    ;; Auto parenthesis matching
+    ((prog-mode . electric-pair-mode)))
 
-    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    ;;;
-    ;;;   Version Control
-    ;;;
-    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+#+END_SRC
+** Git
+#+BEGIN_SRC emacs-lisp  
+  ;; Magit: best Git client to ever exist
+  (use-package magit
+    :ensure t
+    :bind (("C-x g" . magit-status)))
+#+END_SRC
 
-    ;; Magit: best Git client to ever exist
-    (use-package magit
-      :ensure t
-      :bind (("C-x g" . magit-status)))
+** Particular Programming modes
+#+BEGIN_SRC emacs-lisp  
+  (use-package markdown-mode
+    :hook ((markdown-mode . visual-line-mode)))
 
-    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    ;;;
-    ;;;   Common file types
-    ;;;
-    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  (use-package yaml-mode
+    :ensure t)
 
-    (use-package markdown-mode
-      :hook ((markdown-mode . visual-line-mode)))
+  (use-package json-mode
+    :ensure t)
 
-    (use-package yaml-mode
-      :ensure t)
+  (use-package go-ts-mode
+    :ensure t)
+#+END_SRC
 
-    (use-package json-mode
-      :ensure t)
+** LSP Servers
+#+BEGIN_SRC emacs-lisp  
+  (use-package eglot
+    :straight nil
+    :hook
+    ((go-ts-mode . eglot-ensure))
+    :custom
+    (eglot-send-changes-idle-time 0.1)
+    (eglot-extend-to-xref t)              ; activate Eglot in referenced non-project files
+    :config
+    (fset #'jsonrpc--log-event #'ignore)  ; massive perf boost---don't log every event
+    )
 
-    (use-package go-ts-mode
-      :ensure t)
-
-    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    ;;;
-    ;;;   Eglot, the built-in LSP client for Emacs
-    ;;;
-    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    ;; Helpful resources:
-    ;;
-    ;;  - https://www.masteringemacs.org/article/seamlessly-merge-multiple-documentation-sources-eldoc
-
-    (use-package eglot
-      :straight nil
-      ;; no :ensure t here because it's built-in
-
-      ;; Configure hooks to automatically turn-on eglot for selected modes
-      :hook
-      ((go-ts-mode . eglot-ensure))
-
-      :custom
-      (eglot-send-changes-idle-time 0.1)
-      (eglot-extend-to-xref t)              ; activate Eglot in referenced non-project files
-
-      :config
-      (fset #'jsonrpc--log-event #'ignore)  ; massive perf boost---don't log every event
-      )
-
-
-  ;; Taken fromhttps://github.com/minad/corfu/wiki#making-a-cape-super-capf-for-eglot
+  ;; TODO I can remove this
+  ;; Taken from: https://github.com/minad/corfu/wiki#making-a-cape-super-capf-for-eglot
   (defun my/eglot-capf ()
     (setq-local completion-at-point-functions
                 (list (cape-capf-super
@@ -713,22 +657,23 @@ Development stuff:
   (add-hook 'eglot-managed-mode-hook #'my/eglot-capf)
 #+END_SRC
 
-Yasnippets:
+** Yasnippets
 #+BEGIN_SRC emacs-lisp
   (use-package yasnippet
-   :custom
-   (yas-snippet-dirs
-    '("~/.emacs.d/snippets"))
-   :config
-   (yas-global-mode +1)
-   (setq yas-snippet-dirs (append yas-snippet-dirs
-  				'("~/.emacs.d/snippets/"))))
+    :custom
+    (yas-snippet-dirs
+     '("~/.emacs.d/snippets"))
+    :config
+    (yas-global-mode +1)
+    (setq yas-snippet-dirs (append yas-snippet-dirs
+  				 '("~/.emacs.d/snippets/"))))
 
   (use-package yasnippet-snippets
     :after yasnippet)
 #+END_SRC
 
 ** Snippets
+These are various snippets for use with Yasnippet.
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/snippets/go-mode/ifen" :eval no :mkdirp yes
 # -*- mode: snippet -*-
 # name: if error nil
@@ -739,5 +684,3 @@ if err != nil {
 }
 
 #+END_SRC
-
-
