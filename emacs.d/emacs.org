@@ -106,14 +106,6 @@ All of this is new, minimal stuff from bedrock emacs:
   (setopt initial-major-mode 'fundamental-mode)  ; default mode for the *scratch* buffer
   (setopt display-time-default-load-average nil) ; this information is useless for most
 
-  ;; Automatically reread from disk if the underlying file changes
-  (setopt auto-revert-avoid-polling t)
-  ;; Some systems don't do file notifications well; see
-  ;; https://todo.sr.ht/~ashton314/emacs-bedrock/11
-  (setopt auto-revert-interval 5)
-  (setopt auto-revert-check-vc-info t)
-  (global-auto-revert-mode)
-
   ;; Save history of minibuffer
   (savehist-mode)
 
@@ -193,6 +185,22 @@ explicitly load it with straight early in the init process. See more details in 
   (straight-use-package 'org)
 #+END_SRC
 
+It's useful to have buffers auto-revert when files on disk change especially when using Git branches a lot!
+#+BEGIN_SRC emacs-lisp
+  (use-package autorevert
+    :straight nil
+    :custom
+    (global-revert-check-vc-info t)
+    :config
+    (global-auto-revert-mode +1)
+    ;; Automatically reread from disk if the underlying file changes
+    (setopt auto-revert-avoid-polling t)
+    ;; Some systems don't do file notifications well; see
+    ;; https://todo.sr.ht/~ashton314/emacs-bedrock/11
+    (setopt auto-revert-interval 5)
+    (setopt auto-revert-check-vc-info t)
+    )
+#+END_SRC
 ** Keybindings
 [[https://github.com/noctuid/general.el][~general.el~]] provides a convenient method for binding
 keys. It also integrates well with ~use-package~. In particular, this allows us to easily setup a
