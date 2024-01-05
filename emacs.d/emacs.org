@@ -433,7 +433,6 @@ Turn off a bunch of frame related functionality for a more minimal experience.
   (use-package all-the-icons)
 
   (use-package all-the-icons-completion
-    :ensure t
     :init
     (all-the-icons-completion-mode))
 #+END_SRC
@@ -491,7 +490,6 @@ global leader key, ~my-leader-def~ and chain bindings from that.
 Base extras:
 #+BEGIN_SRC emacs-lisp
   (use-package avy
-    :ensure t
     :demand t
     :config (setq avy-background t
       		avy-keys '(
@@ -506,7 +504,6 @@ Base extras:
 #+BEGIN_SRC emacs-lisp  
   ;; Consult: Misc. enhanced commands
   (use-package consult
-    :ensure t
     ;; TODO consider using general here
     :bind (
       	 ("C-c M-x" . consult-mode-command)
@@ -569,7 +566,6 @@ Base extras:
     )
 
   (use-package embark
-    :ensure t
     :demand t
     :after avy
     :bind (("C-c a" . embark-act))        ; bind this to an easy key to hit
@@ -588,15 +584,13 @@ Base extras:
     ;; candidate you select
     (setf (alist-get ?. avy-dispatch-alist) 'bedrock/avy-action-embark))
 
-  (use-package embark-consult
-    :ensure t)
+  (use-package embark-consult)
 
 #+END_SRC
 ** Minibuffer and Completion
 #+BEGIN_SRC emacs-lisp  
   ;; Vertico: better vertical completion for minibuffer commands
   (use-package vertico
-    :ensure t
     :init
     ;; You'll want to make sure that e.g. fido-mode isn't enabled
     (vertico-mode))
@@ -612,7 +606,6 @@ Base extras:
 
   ;; Marginalia: annotations for minibuffer
   (use-package marginalia
-    :ensure t
     :config
     (marginalia-mode))
 
@@ -622,7 +615,6 @@ Base extras:
   ;; Popup completion-at-point
   (use-package corfu
     :straight (:files (:defaults "extensions/*"))
-    :ensure t
     :init
     (global-corfu-mode)
     :bind
@@ -645,14 +637,12 @@ Base extras:
   ;; Make corfu popup come up in terminal overlay
   (use-package corfu-terminal
     :if (not (display-graphic-p))
-    :ensure t
     :config
     (corfu-terminal-mode))
 
   ;; Fancy completion-at-point functions; there's too much in the cape package to
   ;; configure here; dive in when you're comfortable!
   (use-package cape
-    :ensure t
     :init
     (add-to-list 'completion-at-point-functions #'cape-dabbrev)
     (add-to-list 'completion-at-point-functions #'cape-file))
@@ -660,7 +650,6 @@ Base extras:
   ;; Pretty icons for corfu
   (use-package kind-icon
     :if (display-graphic-p)
-    :ensure t
     :after corfu
     :config
     (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
@@ -675,7 +664,6 @@ Base extras:
 
   ;; Orderless: powerful completion style
   (use-package orderless
-    :ensure t
     :config
     (setq completion-styles '(orderless)))
 #+END_SRC
@@ -724,7 +712,6 @@ Base extras:
 #+BEGIN_SRC emacs-lisp  
   ;; Magit: best Git client to ever exist
   (use-package magit
-    :ensure t
     :bind (("C-x g" . magit-status)))
 #+END_SRC
 
@@ -733,14 +720,11 @@ Base extras:
   (use-package markdown-mode
     :hook ((markdown-mode . visual-line-mode)))
 
-  (use-package yaml-mode
-    :ensure t)
+  (use-package yaml-mode)
 
-  (use-package json-mode
-    :ensure t)
+  (use-package json-mode)
 
-  (use-package go-ts-mode
-    :ensure t)
+  (use-package go-ts-mode)
 #+END_SRC
 
 ** LSP Servers
