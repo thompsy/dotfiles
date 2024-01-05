@@ -15,6 +15,7 @@ source ${LAYERS}/aws.zsh
 source ${LAYERS}/golang.zsh
 
 alias gs='git switch'
+alias gt='go test ./...'
 alias kx="kubectx"
 alias kns="kubens"
 
@@ -114,3 +115,16 @@ setopt PROMPT_SUBST
 PROMPT=$PROMPT'%{$(vterm_prompt_end)%}'
 
 ZSH_THEME_TERM_TITLE_IDLE="%~"
+
+
+################################################################################
+#
+# Setup SSH tunnels and aliases
+#
+#this is Addepar sepecific so it shouldn't live here.
+# ideally it could also be leveraged by the rest of the team.
+# a set of aliases would be the easiest way to do this
+# here's some aliases that would be useful:
+# - start all tunnels
+# - stop all tunnels
+# - start/stop specific tunnel

@@ -180,6 +180,7 @@ we include ~:straight nil~ so that our package manager doesn't try to fetch the 
     (setq indent-tabs-mode nil
           tab-width 4
           show-trailing-whitespace t
+          auto-save-default nil
           fill-column 100)
     (setq-default indent-tabs-mode nil
                   fill-column 100)
@@ -231,7 +232,9 @@ Setup some basic file hygiene. Keep some backup files around, but keep them out 
      recentf-max-menu-items 25
      recentf-max-saved-items 500
      auto-save-file-name-transforms
-     `((".*" "~/.emacs.d/auto-saves/" t))))
+     `((".*" "~/.emacs.d/auto-saves/" t))
+     lock-file-name-transforms
+     '(("\\`/.*/\\([^/]+\\)\\'" "/var/tmp/\\1" t))))
 #+END_SRC
 
 Use the system keyboard when killing and yanking.
@@ -345,7 +348,7 @@ Turn off a bunch of frame related functionality for a more minimal experience.
     (load-theme 'dracula))
 
   ;; TODO this could live somewhere more tidy...
-  (add-to-list 'default-frame-alist '(font . "Fira Code-14"))
+  (add-to-list 'default-frame-alist '(font . "Fira Code-12"))
 #+END_SRC
 
 [[https://github.com/domtronn/all-the-icons.el][~all-the-icons.el~]] is a nice utility package that collects various icon fonts and makes them
@@ -363,9 +366,9 @@ available to Emacs.
     (column-number-mode +1)
     (doom-modeline-mode +1)
     :config
-    (setq doom-modeline-height 1)
-    (set-face-attribute 'mode-line nil :height 150)
-    (set-face-attribute 'mode-line-inactive nil :height 150)
+    (setq doom-modeline-height 1.0)
+    (set-face-attribute 'mode-line nil :height 100)
+    (set-face-attribute 'mode-line-inactive nil :height 100)
     :custom
     (doom-modeline-vcs-max-length 50)
     (doom-modeline-buffer-file-name-style 'truncate-upto-project))
@@ -625,8 +628,9 @@ TODO: sort the listing in helm-mini when I narrow. Without narrowing its ordered
 good, but when I narrow it is ordered in another way, maybe length?
 
 #+BEGIN_SRC emacs-lisp
+  (define-key minibuffer-local-map (kbd "C-w") #'backward-kill-word)
   (use-package helm
-    :disabled
+    ;;:disabled
     :diminish
     :init
     (helm-mode t)
@@ -651,6 +655,8 @@ good, but when I narrow it is ordered in another way, maybe length?
            ("M-y" . helm-show-kill-ring)
 
            :map helm-map
+           ;; Keep using C-w as backword kill word
+           ("C-w" . backward-kill-word)
            ;; We can list ‘actions’ on the currently selected item by C-z.
            ("C-z" . helm-select-action)
            ;; Let's keep tab-completetion anyhow.
@@ -660,7 +666,7 @@ good, but when I narrow it is ordered in another way, maybe length?
 [[https://github.com/PythonNut/helm-flx][~helm-flx~]] provides fuzzy sorting for helm.
 #+BEGIN_SRC emacs-lisp
   (use-package helm-flx
-    :disabled
+    ;;:disabled
     :config
     (setq helm-flx-for-helm-find-files t
       helm-flx-for-helm-locate t)
@@ -670,7 +676,7 @@ good, but when I narrow it is ordered in another way, maybe length?
 [[https://github.com/emacs-helm/helm-descbinds][~helm-descbinds~]] makes it easy to search the current active keybindings using ~helm~.
 #+BEGIN_SRC emacs-lisp
   (use-package helm-descbinds
-    :disabled
+    ;;:disabled
     :config (helm-descbinds-mode))
 
 #+END_SRC
@@ -680,7 +686,7 @@ good, but when I narrow it is ordered in another way, maybe length?
 TODO: there's probably more useful options here I could explore
 #+BEGIN_SRC emacs-lisp
   (use-package helm-swoop
-    :disabled
+    ;;:disabled
     :config
     (setq
      ;; show syntax highlighting in swoop minibuffer
@@ -777,8 +783,9 @@ TODO try vundo instead https://github.com/casouri/vundo
 
 [[https://github.com/waymondo/popup-kill-ring][~popup-kill-ring~]] displays the kill-ring in a popup at the point.
 #+begin_src emacs-lisp
-(use-package popup-kill-ring
-  :bind ("M-y" . popup-kill-ring))
+  (use-package popup-kill-ring
+    :disabled
+    :bind ("M-y" . popup-kill-ring))
 #+end_src
 
 [[https://github.com/victorhge/iedit][~iedit~]] allows you edit multiple occurrences of the same symbol at the same time. It's less useful
@@ -894,7 +901,7 @@ TODO: I should probably trim down this hydra since I don't use some of it.
       "h" '(hydra-projectile/body :wk "projectile-mode")) ;;oryx
     (projectile-mode-map "C-c h" 'projectile-command-map)
     ("C-x f" 'find-file)
-    ("C-x C-f" 'projectile-find-file)
+    ;("C-x C-f" 'projectile-find-file)
     :config
     (projectile-mode +1)
     :hydra
@@ -938,21 +945,23 @@ TODO: I should probably trim down this hydra since I don't use some of it.
 #+END_SRC
 
 Various helm add-ons.
+
+~helm-rg~ is quite useful and has a bunch of useful keys.
 #+BEGIN_SRC emacs-lisp
   (use-package helm-projectile
-    :disabled
+    ;;:disabled
     :after projectile
     :config
     (helm-projectile-on))
 
   (use-package helm-rg
-    :disabled
+    ;;:disabled
     :ensure t
     :config
     (setq helm-rg-default-directory 'git-root))
 
   (use-package helm-ag
-    :disabled
+    ;;:disabled
     :ensure t
     :config
     (setq ag-arguments (list "--smart-case" "--column")))
@@ -974,6 +983,7 @@ Useful documentation for getting started here:
                                               vertico-reverse)))
   ;; Enable vertico
   (use-package vertico
+    :disabled
     :init
     (vertico-mode)
     :config
@@ -1000,6 +1010,7 @@ Useful documentation for getting started here:
     )
 
   (use-package vertico-directory
+    :disabled
     :straight nil
     :bind (:map vertico-map
                 ("C-j" . vertico-directory-enter)
@@ -1014,6 +1025,7 @@ Useful documentation for getting started here:
 
   ;; A few more useful configurations...
   (use-package emacs
+    :disabled
     :init
     ;; Add prompt indicator to `completing-read-multiple'.
     ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
@@ -1042,20 +1054,22 @@ Useful documentation for getting started here:
 
 
 #+begin_src emacs-lisp
-;; Optionally use the `orderless' completion style.
-(use-package orderless
-  :init
-  ;; Configure a custom style dispatcher (see the Consult wiki)
-  ;; (setq orderless-style-dispatchers '(+orderless-consult-dispatch orderless-affix-dispatch)
-  ;;       orderless-component-separator #'orderless-escapable-split-on-space)
-  (setq completion-styles '(orderless basic)
-        completion-category-defaults nil
-        completion-category-overrides '((file (styles partial-completion)))))
+  ;; Optionally use the `orderless' completion style.
+  (use-package orderless
+    :disabled
+    :init
+    ;; Configure a custom style dispatcher (see the Consult wiki)
+    ;; (setq orderless-style-dispatchers '(+orderless-consult-dispatch orderless-affix-dispatch)
+    ;;       orderless-component-separator #'orderless-escapable-split-on-space)
+    (setq completion-styles '(orderless basic)
+          completion-category-defaults nil
+          completion-category-overrides '((file (styles partial-completion)))))
 #+end_src
 
 #+begin_src emacs-lisp
   ;; Enable rich annotations using the Marginalia package
   (use-package marginalia
+    :disabled
     ;; Either bind `marginalia-cycle' globally or only in the minibuffer
     :bind (("M-A" . marginalia-cycle)
            :map minibuffer-local-map
@@ -1079,6 +1093,7 @@ Useful documentation for getting started here:
 
 #+begin_src emacs-lisp
   (use-package embark
+    :disabled
     :demand t
     :ensure t
     :bind
@@ -1106,6 +1121,7 @@ Useful documentation for getting started here:
 
   ;; Consult users will also want the embark-consult package.
   (use-package embark-consult
+    :disabled
     :demand t
     :ensure t ; only need to install it, embark loads it after consult if found
     :hook
@@ -1116,6 +1132,7 @@ Useful documentation for getting started here:
 #+begin_src emacs-lisp
   ;; Example configuration for Consult
   (use-package consult
+    :disabled
     ;; Replace bindings. Lazily loaded due by `use-package'.
     :bind (;; C-c bindings (mode-specific-map)
 
@@ -1236,54 +1253,58 @@ Useful documentation for getting started here:
 
 Read more about embark: https://karthinks.com/software/fifteen-ways-to-use-embark/
 #+begin_src emacs-lisp
-(use-package consult-dir)
+  (use-package consult-dir
+    :disabled)
 #+end_src
 
 
 #+begin_src emacs-lisp
-(use-package corfu
-  ;; Optional customizations
-  ;; :custom
-  ;; (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
-  ;; (corfu-auto t)                 ;; Enable auto completion
-  ;; (corfu-separator ?\s)          ;; Orderless field separator
-  ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
-  ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
-  ;; (corfu-preview-current nil)    ;; Disable current candidate preview
-  ;; (corfu-preselect 'prompt)      ;; Preselect the prompt
-  ;; (corfu-on-exact-match nil)     ;; Configure handling of exact matches
-  ;; (corfu-scroll-margin 5)        ;; Use scroll margin
+  (use-package corfu
+    :disabled
+    ;; Optional customizations
+    ;; :custom
+    ;; (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
+    ;; (corfu-auto t)                 ;; Enable auto completion
+    ;; (corfu-separator ?\s)          ;; Orderless field separator
+    ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
+    ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
+    ;; (corfu-preview-current nil)    ;; Disable current candidate preview
+    ;; (corfu-preselect 'prompt)      ;; Preselect the prompt
+    ;; (corfu-on-exact-match nil)     ;; Configure handling of exact matches
+    ;; (corfu-scroll-margin 5)        ;; Use scroll margin
 
-  ;; Enable Corfu only for certain modes.
-  ;; :hook ((prog-mode . corfu-mode)
-  ;;        (shell-mode . corfu-mode)
-  ;;        (eshell-mode . corfu-mode))
+    ;; Enable Corfu only for certain modes.
+    ;; :hook ((prog-mode . corfu-mode)
+    ;;        (shell-mode . corfu-mode)
+    ;;        (eshell-mode . corfu-mode))
 
-  ;; Recommended: Enable Corfu globally.
-  ;; This is recommended since Dabbrev can be used globally (M-/).
-  ;; See also `corfu-exclude-modes'.
-  :init
-  (global-corfu-mode))
+    ;; Recommended: Enable Corfu globally.
+    ;; This is recommended since Dabbrev can be used globally (M-/).
+    ;; See also `corfu-exclude-modes'.
+    :init
+    (global-corfu-mode))
 
-;; A few more useful configurations...
-(use-package emacs
-  :init
-  ;; TAB cycle if there are only few candidates
-  (setq completion-cycle-threshold 3)
+  ;; A few more useful configurations...
+  (use-package emacs
+    :disabled
+    :init
+    ;; TAB cycle if there are only few candidates
+    (setq completion-cycle-threshold 3)
 
-  ;; Emacs 28: Hide commands in M-x which do not apply to the current mode.
-  ;; Corfu commands are hidden, since they are not supposed to be used via M-x.
-  ;; (setq read-extended-command-predicate
-  ;;       #'command-completion-default-include-p)
+    ;; Emacs 28: Hide commands in M-x which do not apply to the current mode.
+    ;; Corfu commands are hidden, since they are not supposed to be used via M-x.
+    ;; (setq read-extended-command-predicate
+    ;;       #'command-completion-default-include-p)
 
-  ;; Enable indentation+completion using the TAB key.
-  ;; `completion-at-point' is often bound to M-TAB.
-  (setq tab-always-indent 'complete))
+    ;; Enable indentation+completion using the TAB key.
+    ;; `completion-at-point' is often bound to M-TAB.
+    (setq tab-always-indent 'complete))
 #+end_src
 
 
 #+begin_src emacs-lisp
   (use-package kind-icon
+    :disabled
     :after corfu
     :custom
     (kind-icon-use-icons t)
@@ -1431,17 +1452,12 @@ Various capture templates for ~org-mode~.
     :straight nil
     :general
     (my-leader-def
-      "C" 'org-capture)
+      "c" 'org-capture)
     :config
     (setq org-capture-templates
           '(
             ("c" "Note on current task" plain (clock) "\n\n%T from: %a\n%i\n%?")
-            ("s" "Standup" entry (file+olp+datetree (concat my/org-dir "todo.org") "Standup") "* Planned\n- %?\n %i\n %a")
-            ("r" "To-Read" item (file+headline (lamdba () (concat my/org-dir "personal.org")) "To Read") "")
-            ("t" "Tasks")
-            ("tw" "Work Task" entry (file+headline (lambda () (concat my/org-dir "work/swrx.org")) "Tasks") "** TODO %?\n %i")
-            ("tp" "Pesonal Task" entry (file+headline (lambda () (concat my/org-dir "personal.org")) "Tasks") "* TODO %?\n %i\n %a")
-            ("th" "Household Task" entry (file+headline (lambda () (concat my/org-dir "household.org")) "Tasks") "* TODO %?\n %i\n %a")
+            ("t" "Task" entry (file+headline (lambda () (concat my/org-dir "worklog.org")) "Tasks") "** TODO %^{Todo} %(org-set-tags-command) \n %i")
             ("i" "Interruption")
             ("ii" "interruption" entry (file+olp+datetree (lambda () (concat my/org-dir "tracker.org"))) "* IN-PROGRESS %?  :interruption:work:\n%U\n- ref :: %a\n"
              :prepend t :tree-type week :clock-in t :clock-keep t)
@@ -1468,16 +1484,9 @@ Various capture templates for ~org-mode~.
                      ":END:"
                      "%?\n")          ;Place the cursor here finally
                    "\n")))
+    )
 
-    (add-to-list 'org-capture-templates
-                 '("b"
-                   "Blog Post"
-                   entry
-                   ;; It is assumed that below file is present in `org-directory'
-                   ;; and that it has a "Blog Ideas" heading. It can even be a
-                   ;; symlink pointing to the actual location of all-posts.org!
-                   (file+olp "blog-posts.org" "Ideas")
-                   (function org-hugo-new-subtree-post-capture-template))))
+
   (add-hook 'org-mode-hook (lambda ()
      "Beautify Org Checkbox Symbol"
      (push '("[ ]" . "☐") prettify-symbols-alist)
@@ -1503,6 +1512,16 @@ Various capture templates for ~org-mode~.
 
     :config
     (setq org-agenda-files my/org-agenda-files
+          org-tag-persistent-alist '(("HSBC_UK" . ?h)
+                                     ("Gabler" . ?g)
+                                     ("Brandywine" . ?b)
+                                     ("AddeConf" . ?a)
+                                     ("prop_feeds" . ?p)
+                                     ("meeting" . ?m)
+                                     ("email" . ?e)
+                                     ("onboarding" . ?o)
+                                     ("setup" . ?S))
+          org-refile-targets '((org-agenda-files :maxlevel . 3))
           org-directory my/org-dir
           org-tags-column 75
           org-log-into-drawer t ;; hide the log state change history a bit better
@@ -1731,7 +1750,7 @@ This is a function to turn on all the various writing modes.
     :after flyspell)
 
   (use-package flyspell-correct-helm
-    :disabled
+    ;;:disabled
     :after flyspell)
 #+END_SRC
 
@@ -1793,7 +1812,7 @@ very useful for auto-inserting a bunch of programming related boilerplate.
 [[https://github.com/company-mode/company-mode][~company-mode~]] is a popular text-completion framework for Emacs. The odd name comes from comp[lete] any[thing].
 #+BEGIN_SRC emacs-lisp
   (use-package company
-    :disabled
+    ;;:disabled
     :diminish
     :ensure t
     :config
@@ -1824,7 +1843,7 @@ very useful for auto-inserting a bunch of programming related boilerplate.
      ;; provide the ‘correct’ casing.
      company-dabbrev-ignore-case nil
      ;; Immediately activate completion.
-     company-idle-delay 0
+     company-idle-delay 1
      ;;company-backends (mapcar #'company-mode/backend-with-yas company-backends)
      ;;company-backends '((:separate company-capf company-yasnippet))
      ;; don't try to complete numbers
@@ -1859,7 +1878,7 @@ Nice icons for company-mode. These are the Doom Emacs defaults, taken from:
 https://github.com/TheBB/dotemacs/blob/master/init.el#L527-L570
 #+BEGIN_SRC emacs-lisp
   (use-package company-box
-    :disabled
+    ;;:disabled
     :diminish company-box-mode
     :hook (company-mode . company-box-mode)
     :init
@@ -2084,7 +2103,7 @@ Protocol implementations, giving Emacs an IDE like experience.
     :hook
     (lsp-mode . lsp-enable-which-key-integration)
     (go-mode . lsp)
-    (python-mode . lsp-deferred)
+    ;(python-mode . lsp-deferred)
     :commands lsp
     :custom
     ;; This interferes with the existing company-mode setup if populated
@@ -2151,7 +2170,7 @@ Protocol implementations, giving Emacs an IDE like experience.
                   lsp-ui-flycheck-enable t))
 
   (use-package helm-lsp
-    :disabled
+    ;;:disabled
     :commands (helm-lsp-workspace-symbol))
 #+END_SRC
 
@@ -2272,22 +2291,40 @@ TODO see how ~ensure-system-package~ works on windows.
 
 *** Python
 #+BEGIN_SRC emacs-lisp
-  (use-package python
+
+  (setenv "PYTHONIOENCODING" "utf-8")
+  (setenv "LANG" "en_US.UTF-8")
+  (use-package python-mode
     :mode "\\.py\\'"
-    :ghook
-    ('python-mode-hook #'lsp)
+    ;:ghook
+    ;('python-mode-hook #'lsp)
     :general
     (my-local-leader-def 'python-mode-map
-      "er" 'python-shell-send-region
-      "eb" 'python-shell-send-buffer
-      "ef" 'python-shell-send-file
-      "es" 'python-shell-send-string))
+                         "er" 'python-shell-send-region
+                         "eb" 'python-shell-send-buffer
+                         "ef" 'python-shell-send-file
+                         "es" 'python-shell-send-string))
 
-  (use-package pipenv
-    :hook ((python-mode . pipenv-mode)
-           (hy-mode . pipenv-mode))
-    :init
-    (setq pipenv-projectile-after-switch-function #'pipenv-projectile-after-switch-extended))
+  ;; (use-package pipenv
+  ;;    :hook ((python-mode . pipenv-mode)
+  ;;           (hy-mode . pipenv-mode))
+  ;;    :init
+  ;;    (setq pipenv-projectile-after-switch-function #'pipenv-projectile-after-switch-extended))
+
+  ;; (use-package pyvenv
+  ;;   :hook ((python-mode . pipenv-mode)))
+
+  (use-package 
+    lsp-pyright
+    :ensure t
+    ;:quelpa (lsp-pyright :fetcher git :url "https://github.com/emacs-lsp/lsp-pyright")
+    :hook (python-mode . (lambda () (require 'lsp-pyright)))
+    :init (when (executable-find "python3") (setq lsp-pyright-python-executable-cmd "python3")))
+
+  ;; (use-package lsp-pyright
+  ;; :ensure t
+  ;; :hook (python-mode . (lambda ()
+  ;;                         (require 'lsp-pyright))))
 #+END_SRC
 
 *** Angular
@@ -2900,7 +2937,7 @@ Now we've got a hydra to make the various window management functions easily acc
     ("O" delete-other-windows)
 
     ;; Switch
-    ("b" consult-buffer) ;; or helm-mini
+    ("b" helm-mini) ;; or helm-mini or consult-buffer
     ("f" helm-find-files)
     ("a" (lambda ()
            (interactive)
