@@ -28,9 +28,9 @@ available. A few places that I've found particularly useful include:
 - try other modelines in due course
 - have all hydras use q for quit
 - use ~:after~ to specify any dependencies
-- try ~[[https://github.com/minad/org-modern][org-modern]]~
-- try ~[[https://github.com/Overdr0ne/holymotion][holymotion]]~
-- explore ~[[https://github.com/rougier/nano-emacs][nano-emacs]]~
+- try [[https://github.com/minad/org-modern][~org-modern~]]
+- try [[https://github.com/Overdr0ne/holymotion][~holymotion~]]
+- explore [[https://github.com/rougier/nano-emacs][~nano-emacs~]]
 - explore this config:
   https://old.reddit.com/r/emacs/comments/ehjcu2/screenshot_polishing_my_emacs_who_said_an_old/
   
@@ -127,7 +127,7 @@ All of this is new, minimal stuff from bedrock emacs:
 #+END_SRC
 
 ** Straight Package Manager
-Setup the ~[[https://github.com/radian-software/straight.el][straight.el]]~ package manager.
+Setup the [[https://github.com/radian-software/straight.el][~straight.el~]] package manager.
 #+BEGIN_SRC emacs-lisp
   (setq straight-repository-branch "develop")
 
@@ -169,7 +169,8 @@ you explicitly override it with :straight nil.
   (setq straight-use-package-by-default t)
 #+END_SRC
 
-Install ~[[https://github.com/jwiegley/use-package][use-package]]~ for easily installing other packages.
+todo: update this link
+Install [[https://github.com/jwiegley/use-package][~use-package~]] for easily installing other packages.
 #+BEGIN_SRC emacs-lisp
   ;; Install use-package to use with straight.el
   (straight-use-package 'use-package)
@@ -177,7 +178,7 @@ Install ~[[https://github.com/jwiegley/use-package][use-package]]~ for easily in
 
 I don't want to use the built-in version of org-mode since it's usually pretty old. Instead I want
 straight to pull down the latest version. To avoid the built-in version getting loaded we need to
-explicitly load it with straight early in the init process. See more details in the [[https://github.com/radian-software/straight.el#the-wrong-version-of-my-package-was-loaded][README.md]].
+explicitly load it with straight early in the init process. See more details in the [[https://github.com/radian-software/straight.el#the-wrong-version-of-my-package-was-loaded][~README.md~]].
 #+BEGIN_SRC emacs-lisp
   (straight-use-package 'org)
 #+END_SRC
@@ -230,7 +231,7 @@ Use the system keyboard when killing and yanking.
     (save-interprogram-paste-before-kill t))
 #+END_SRC
 
-~[[https://github.com/emacs-mirror/emacs/blob/master/lisp/saveplace.el][saveplace]]~ jumps back to
+[[https://github.com/emacs-mirror/emacs/blob/master/lisp/saveplace.el][~saveplace~]] jumps back to
 the last when later visiting a file. This is handy to pick up where you left off.
 #+BEGIN_SRC emacs-lisp
   (use-package saveplace
@@ -239,7 +240,7 @@ the last when later visiting a file. This is handy to pick up where you left off
     (save-place-mode +1))
 #+END_SRC
 
-~[[https://github.com/emacscollective/no-littering][no-littering]]~ keeps configuration files and
+[[https://github.com/emacscollective/no-littering][~no-littering~]] keeps configuration files and
 other persistent data under ~user-emacs-directory~ rather than spamming them in inconsistent places.
 #+BEGIN_SRC emacs-lisp
   (use-package no-littering
@@ -322,7 +323,7 @@ Setup some basic file hygiene. Keep some backup files around, but keep them out 
 
 
 ** Discoverability
-~[[https://github.com/justbur/emacs-which-key][which-key]]~ displays all of the available keybindings following a incompletely entered command. For
+[[https://github.com/justbur/emacs-which-key][~which-key~]] displays all of the available keybindings following a incompletely entered command. For
 example, pressing ~C-x~ and waiting a moment will cause ~which-key~ to populate the minibuffer with all
 the available next keys along with their corresponding commands. This makes discovery of new
 commands very easy.
@@ -435,7 +436,7 @@ Turn off a bunch of frame related functionality for a more minimal experience.
 #+END_SRC
 
 ** Keybindings
-[[https://github.com/noctuid/general.el][general.el]] provides a convenient method for binding
+[[https://github.com/noctuid/general.el][~general.el~]] provides a convenient method for binding
 keys. It also integrates well with ~use-package~. In particular, this allows us to easily setup a
 global leader key, ~my-leader-def~ and chain bindings from that.
 #+BEGIN_SRC emacs-lisp
