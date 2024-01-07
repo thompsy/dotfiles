@@ -449,6 +449,22 @@ Turn off a bunch of frame related functionality for a more minimal experience.
     (all-the-icons-completion-mode))
 #+END_SRC
 
+[[https://github.com/seagle0128/doom-modeline][~doom-modeline~]] is a fancy, fast and minimal mode-line. This required running ~M-x nerd-icons-install-fonts~ to install the required icon font.
+#+BEGIN_SRC emacs-lisp
+  (use-package doom-modeline
+    :demand t
+    :init
+    (column-number-mode +1)
+    (doom-modeline-mode +1)
+    :config
+    (setq doom-modeline-height 1)
+    (set-face-attribute 'mode-line nil :height 150)
+    (set-face-attribute 'mode-line-inactive nil :height 150)
+    :custom
+    (doom-modeline-vcs-max-length 50)
+    (doom-modeline-buffer-file-name-style 'truncate-upto-project))
+#+END_SRC
+
 ** Keybindings
 [[https://github.com/noctuid/general.el][~general.el~]] provides a convenient method for binding
 keys. It also integrates well with ~use-package~. In particular, this allows us to easily setup a
