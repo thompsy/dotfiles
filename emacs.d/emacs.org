@@ -403,17 +403,6 @@ improvement on this by popping up in a floating window. I'll try it for a while 
     (mapc (lambda (hook) (add-hook hook 'hl-line-mode)) hl-line-hooks))
 #+END_SRC
 
-** Hydra
-[[https://github.com/abo-abo/hydra][~hydra~]] allows us to specify related keybindings together in a
-neat way. Note that ~:wk~ allows us to specify the text that is displayed by ~which-key~ for this hydra.
-#+BEGIN_SRC emacs-lisp
-  (use-package hydra
-    :defer t)
-
-  ;; This allows us to use :hydra within use-package
-  (use-package use-package-hydra)
-#+END_SRC
-
 * Aesthetics
 Turn off a bunch of frame related functionality for a more minimal experience.
 #+BEGIN_SRC emacs-lisp
@@ -512,6 +501,96 @@ global leader key, ~my-leader-def~ and chain bindings from that.
       "qq" 'save-buffers-kill-terminal
       "qQ" 'save-buffers-kill-emacs
       "qr" 'restart-emacs))
+#+END_SRC
+
+** Hydra
+[[https://github.com/abo-abo/hydra][~hydra~]] allows us to specify related keybindings together in a
+neat way. Note that ~:wk~ allows us to specify the text that is displayed by ~which-key~ for this hydra.
+#+BEGIN_SRC emacs-lisp
+  (use-package hydra
+    :defer t)
+
+  ;; This allows us to use :hydra within use-package
+  (use-package use-package-hydra)
+#+END_SRC
+
+This hydra provides easy access to various package management commands.
+#+BEGIN_SRC emacs-lisp
+  (my-leader-def "s" '(hydra-straight-helper/body :wk "pkgs"))
+  (defhydra hydra-straight-helper (:hint nil :color green)
+         "
+        _c_heck all       |_f_etch all     |_m_erge all      |_n_ormalize all   |p_u_sh all
+        _C_heck package   |_F_etch package |_M_erge package  |_N_ormlize package|p_U_sh package
+        ----------------^^+--------------^^+---------------^^+----------------^^+------------||_q_uit||
+        _r_ebuild all     |_p_ull all      |_v_ersions freeze|_w_atcher start   |_g_et recipe
+        _R_ebuild package |_P_ull package  |_V_ersions thaw  |_W_atcher quit    |prun_e_ build"
+         ("c" straight-check-all)
+         ("C" straight-check-package)
+         ("r" straight-rebuild-all)
+         ("R" straight-rebuild-package)
+         ("f" straight-fetch-all)
+         ("F" straight-fetch-package)
+         ("p" straight-pull-all)
+         ("P" straight-pull-package)
+         ("m" straight-merge-all)
+         ("M" straight-merge-package)
+         ("n" straight-normalize-all)
+         ("N" straight-normalize-package)
+         ("u" straight-push-all)
+         ("U" straight-push-package)
+         ("v" straight-freeze-versions)
+         ("V" straight-thaw-versions)
+         ("w" straight-watcher-start)
+         ("W" straight-watcher-quit)
+         ("g" straight-get-recipe)
+         ("e" straight-prune-build)
+         ("q" nil))
+#+END_SRC
+
+This hydra gives easy access to inserting various Unicode characters.
+#+BEGIN_SRC emacs-lisp
+  (defun my/insert-unicode (unicode-name)
+    "Same as C-x 8 enter UNICODE-NAME."
+    (insert-char (gethash unicode-name (ucs-names))))
+
+  (my-leader-def "u" '(hydra-unicode/body :wk "unicode"))
+  (defhydra hydra-unicode (:hint nil)
+    "
+          Unicode  _e_ €  _g_ £
+                   _f_ ♀  _r_ ♂
+                   _o_ °  _m_ µ  _z_ ë  _Z_ Ë
+                   _n_ ←  _e_ ↓  _i_ ↑  _o_ →
+          "
+    ("e" (my/insert-unicode "EURO SIGN"))
+    ("g" (my/insert-unicode "POUND SIGN"))
+
+    ("r" (my/insert-unicode "MALE SIGN"))
+    ("f" (my/insert-unicode "FEMALE SIGN"))
+
+    ("o" (my/insert-unicode "DEGREE SIGN"))
+    ("m" (my/insert-unicode "MICRO SIGN"))
+
+    ("z" (my/insert-unicode "LATIN SMALL LETTER E DIAERESIS"))
+    ("Z" (my/insert-unicode "LATIN CAPITAL LETTER E DIAERESIS"))
+
+    ("n" (my/insert-unicode "LEFTWARDS ARROW"))
+    ("e" (my/insert-unicode "DOWNWARDS ARROW"))
+    ("i" (my/insert-unicode "UPWARDS ARROW"))
+    ("o" (my/insert-unicode "RIGHTWARDS ARROW")))
+#+END_SRC
+
+[[https://www.emacswiki.org/emacs/download/zoom-frm.el][~zoom-frm~]] is a nice way to zoom in and out on a frame basis. This is useful when switching from
+smaller to larger screens.
+#+begin_src emacs-lisp
+    (use-package zoom-frm
+      :general
+      (my-leader-def "z" '(hydra-zoom/body :wk "zoom"))
+      :hydra (hydra-zoom (:column 2)
+                         ("n" zoom-frm-in "Zoom in")
+                         ("t" zoom-frm-out "Zoom out")
+                         ("r" (text-scale-set 0) "Reset zoom")
+                         ("0" (text-scale-set 0) :bind nil :exit t)
+                         ("q" nil "quit")))
 #+END_SRC
 
 * Motion Aids
