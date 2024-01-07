@@ -435,7 +435,7 @@ Turn off a bunch of frame related functionality for a more minimal experience.
 #+END_SRC
 
 ** Keybindings
-[[https://github.com/noctuid/general.el][general.el]]~ provides a convenient method for binding
+[[https://github.com/noctuid/general.el][general.el]] provides a convenient method for binding
 keys. It also integrates well with ~use-package~. In particular, this allows us to easily setup a
 global leader key, ~my-leader-def~ and chain bindings from that.
 #+BEGIN_SRC emacs-lisp
