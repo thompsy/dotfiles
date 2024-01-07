@@ -468,8 +468,6 @@ global leader key, ~my-leader-def~ and chain bindings from that.
      "C-w" 'backward-kill-word
      "C-c C-k" 'kill-region
      "C-x C-k" 'kill-region
-     ;; C-z defaults to suspend-frame which isn't very useful
-     "C-z" 'undo
      ;;"M-s" 'highlight-symbol-at-point ;;TODO conflicted with consult
      "M-c" 'hi-lock-mode
      "M-z" 'pop-global-mark
@@ -856,6 +854,24 @@ Base extras:
     (add-hook 'dired-mode-hook 'all-the-icons-dired-mode))
 #+END_SRC
 * Editting
+** Undo
+[[https://github.com/emacsmirror/undo-fu][~undo-fu~]] improves the default undo experience.
+#+BEGIN_SRC emacs-lisp
+  (use-package undo-fu
+    :general
+    ("C-z" 'undo-fu-only-undo)
+    ("C-S-z" 'undo-fu-only-redo))
+#+END_SRC
+
+[[https://github.com/casouri/vundo][~vundo~]] displays a nice braching undo tree built on top of the default undo system.
+#+BEGIN_SRC emacs-lisp
+  (use-package vundo
+    :config
+    ;; use a nicer unicode font to display the tree
+    (setq vundo-glyph-alist vundo-unicode-symbols))
+#+END_SRC
+
+
 ** Rectangles
 This is a hydra for working with the ~rectangle~ commands.
 
