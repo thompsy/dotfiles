@@ -818,10 +818,7 @@ TODO: I should understand how this works better.
 ** Yasnippets
 #+BEGIN_SRC emacs-lisp
   (use-package yasnippet
-    :custom
-    (yas-snippet-dirs
-     '("~/.emacs.d/snippets"))
-    :config
+     :config
     (yas-global-mode +1)
     (setq yas-snippet-dirs (append yas-snippet-dirs
   				 '("~/.emacs.d/snippets/"))))
@@ -832,7 +829,7 @@ TODO: I should understand how this works better.
 
 ** Snippets
 These are various snippets for use with Yasnippet.
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/snippets/go-mode/ifen" :eval no :mkdirp yes
+#+BEGIN_SRC :tangle "~/.emacs.d/snippets/go-mode/ifen" :eval no :mkdirp yes
 # -*- mode: snippet -*-
 # name: if error nil
 # key: ifen
