@@ -257,6 +257,15 @@ to any themes so that they confirmation code gets stored in ~custom.el~.
         (load-file custom-file)))
 #+END_SRC
 
+*** Exec Path Setup
+[[https://github.com/purcell/exec-path-from-shell][~exec-path-from-shell~]] loads the ~PATH~ from your shell setup. This is useful when running Emacs from
+a non-shell environment like OSX.
+#+begin_src emacs-lisp
+  (use-package exec-path-from-shell
+    :config
+    (exec-path-from-shell-initialize))
+#+end_src
+
 ** Files
 Setup some basic file hygiene. Keep some backup files around, but keep them out of sight.
 
