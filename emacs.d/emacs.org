@@ -403,6 +403,17 @@ improvement on this by popping up in a floating window. I'll try it for a while 
     (mapc (lambda (hook) (add-hook hook 'hl-line-mode)) hl-line-hooks))
 #+END_SRC
 
+** Hydra
+[[https://github.com/abo-abo/hydra][~hydra~]] allows us to specify related keybindings together in a
+neat way. Note that ~:wk~ allows us to specify the text that is displayed by ~which-key~ for this hydra.
+#+BEGIN_SRC emacs-lisp
+  (use-package hydra
+    :defer t)
+
+  ;; This allows us to use :hydra within use-package
+  (use-package use-package-hydra)
+#+END_SRC
+
 ** Aesthetics
 Turn off a bunch of frame related functionality for a more minimal experience.
 #+BEGIN_SRC emacs-lisp
@@ -669,6 +680,42 @@ Base extras:
     (setq completion-styles '(orderless)))
 #+END_SRC
 
+** Editting
+*** Rectangles
+This is a hydra for working with the ~rectangle~ commands.
+
+TODO: I should understand how this works better.
+
+#+BEGIN_SRC emacs-lisp
+  (my-leader-def "R" '(hydra-rectangle/body :wk "rectangle"))
+  (defhydra hydra-rectangle (:body-pre (rectangle-mark-mode 1)
+                                       :color pink
+                                       :hint nil
+                                       :post (deactivate-mark))
+         "
+      ^_i_^       _w_ copy      _O_pen       _N_umber-lines
+    _n_   _o_     _y_ank        _t_ype       _E_xchange-point
+      ^_e_^       _d_ kill      _c_lear      _r_eset-region-mark
+    ^^^^          _u_ndo        _q_uit       ^ ^
+    "
+         ("i" rectangle-previous-line)
+         ("e" rectangle-next-line)
+         ("n" rectangle-backward-char)
+         ("o" rectangle-forward-char)
+         ("d" kill-rectangle)                    ;; C-x r k
+         ("y" yank-rectangle)                    ;; C-x r y
+         ("w" copy-rectangle-as-kill)            ;; C-x r M-w
+         ("O" open-rectangle)                    ;; C-x r o
+         ("t" string-rectangle)                  ;; C-x r t
+         ("c" clear-rectangle)                   ;; C-x r c
+         ("E" rectangle-exchange-point-and-mark) ;; C-x C-x
+         ("N" rectangle-number-lines)            ;; C-x r N
+         ("r" (if (region-active-p)
+                  (deactivate-mark)
+                (rectangle-mark-mode 1)))
+         ("u" undo nil)
+         ("q" nil))
+#+END_SRC
 
 ** Software Development
 #+BEGIN_SRC emacs-lisp
