@@ -468,9 +468,6 @@ global leader key, ~my-leader-def~ and chain bindings from that.
      "C-w" 'backward-kill-word
      "C-c C-k" 'kill-region
      "C-x C-k" 'kill-region
-     ;;"M-s" 'highlight-symbol-at-point ;;TODO conflicted with consult
-     "M-c" 'hi-lock-mode
-     "M-z" 'pop-global-mark
      "C-x C-m" 'execute-extended-command
      "C-x m" 'execute-extended-command
      "C-c C-m" 'execute-extended-command
