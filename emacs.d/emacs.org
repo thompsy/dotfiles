@@ -28,8 +28,8 @@ available. A few places that I've found particularly useful include:
 - explore this config:
   https://old.reddit.com/r/emacs/comments/ehjcu2/screenshot_polishing_my_emacs_who_said_an_old/
 - have ~project.el~ run the correct make target as compile command
-* Emacs
-** Local
+
+* Local
 These are various, installation specific settings that might differ across machines, some of which I
 don't want to commit to Git.
 
@@ -46,7 +46,7 @@ don't want to commit to Git.
     (list my/org-dir))
 #+END_SRC
 
-** Early Init
+* Early Init
 The ~early-init.el~ file is called very early in the initialisation process, so this is a good point
 to disable ~package.el~ in favour of ~straight.el~.
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/early-init.el" :eval no
@@ -77,7 +77,7 @@ to disable ~package.el~ in favour of ~straight.el~.
   (setq package-enable-at-startup nil)
 #+END_SRC
 
-** Preamble
+* Preamble
 Some initial comment blurb.
 #+BEGIN_SRC emacs-lisp
   ;;; init.el --- Initialization file for Emacs
@@ -91,7 +91,7 @@ keep it in a separate file.
   (require 'local-setup "~/.emacs.d/local.el")
 #+END_SRC
 
-** Bedrock Emacs
+* Bedrock Emacs
 All of this is new, minimal stuff from bedrock emacs:
 #+BEGIN_SRC emacs-lisp
   (setopt initial-major-mode 'fundamental-mode)  ; default mode for the *scratch* buffer
@@ -120,7 +120,7 @@ All of this is new, minimal stuff from bedrock emacs:
 
 #+END_SRC
 
-** Straight Package Manager
+* Package Manager
 Setup the [[https://github.com/radian-software/straight.el][~straight.el~]] package manager.
 #+BEGIN_SRC emacs-lisp
   (setq straight-repository-branch "develop")
@@ -177,7 +177,7 @@ explicitly load it with straight early in the init process. See more details in 
   (straight-use-package 'org)
 #+END_SRC
 
-** Core Configuration
+* Core Configuration
 A few miscellaneous settings. Note that emacs is not really a package strictly speaking which is why we include ~:straight nil~ so that our package manager doesn't try to fetch the source.
 #+BEGIN_SRC emacs-lisp
   (use-package emacs
@@ -257,7 +257,7 @@ to any themes so that they confirmation code gets stored in ~custom.el~.
         (load-file custom-file)))
 #+END_SRC
 
-*** Exec Path Setup
+** Exec Path Setup
 [[https://github.com/purcell/exec-path-from-shell][~exec-path-from-shell~]] loads the ~PATH~ from your shell setup. This is useful when running Emacs from
 a non-shell environment like OSX.
 #+begin_src emacs-lisp
@@ -414,7 +414,7 @@ neat way. Note that ~:wk~ allows us to specify the text that is displayed by ~wh
   (use-package use-package-hydra)
 #+END_SRC
 
-** Aesthetics
+* Aesthetics
 Turn off a bunch of frame related functionality for a more minimal experience.
 #+BEGIN_SRC emacs-lisp
   (use-package frame
@@ -465,7 +465,7 @@ Turn off a bunch of frame related functionality for a more minimal experience.
     (doom-modeline-buffer-file-name-style 'truncate-upto-project))
 #+END_SRC
 
-** Keybindings
+* Keybindings
 [[https://github.com/noctuid/general.el][~general.el~]] provides a convenient method for binding
 keys. It also integrates well with ~use-package~. In particular, this allows us to easily setup a
 global leader key, ~my-leader-def~ and chain bindings from that.
@@ -514,7 +514,7 @@ global leader key, ~my-leader-def~ and chain bindings from that.
       "qr" 'restart-emacs))
 #+END_SRC
 
-** Motion Aids
+* Motion Aids
 Base extras:
 #+BEGIN_SRC emacs-lisp
   (use-package avy
@@ -528,7 +528,7 @@ Base extras:
 
 #+END_SRC
 
-** Consult and Embark
+* Consult and Embark
 #+BEGIN_SRC emacs-lisp  
   ;; Consult: Misc. enhanced commands
   (use-package consult
@@ -696,8 +696,8 @@ Base extras:
     (setq completion-styles '(orderless)))
 #+END_SRC
 
-** Editting
-*** Rectangles
+* Editting
+** Rectangles
 This is a hydra for working with the ~rectangle~ commands.
 
 TODO: I should understand how this works better.
@@ -733,7 +733,7 @@ TODO: I should understand how this works better.
          ("q" nil))
 #+END_SRC
 
-*** Whitespace Removal
+** Whitespace Removal
 [[https://github.com/lewang/ws-butler][~ws-butler~]] automatically removes trailing whitespace from lines that have been editted.
 
 #+BEGIN_SRC emacs-lisp
@@ -743,7 +743,8 @@ TODO: I should understand how this works better.
     (ws-butler-global-mode))
 #+END_SRC
 
-** Software Development
+* Software Development
+** Treesitter Setup
 #+BEGIN_SRC emacs-lisp
   (use-package emacs
     :config
@@ -784,9 +785,30 @@ TODO: I should understand how this works better.
 #+END_SRC
 ** Git
 #+BEGIN_SRC emacs-lisp  
-  ;; Magit: best Git client to ever exist
   (use-package magit
     :bind (("C-x g" . magit-status)))
+#+END_SRC
+
+** Flymake
+#+BEGIN_SRC emacs-lisp
+  (use-package flymake
+    ;; TODO include this in project hydra
+    :bind (("H-e" . flymake-show-project-diagnostics)))
+#+END_SRC
+
+** LSP Servers
+#+BEGIN_SRC emacs-lisp
+  (use-package eglot
+    :straight nil
+    :hook
+    ((go-ts-mode . eglot-ensure))
+    :custom
+    (eglot-send-changes-idle-time 0.1)
+    ;; activate Eglot in referenced non-project files
+    (eglot-extend-to-xref t)
+    :config
+    ;; massive perf boost---don't log every event
+    (fset #'jsonrpc--log-event #'ignore))
 #+END_SRC
 
 ** Particular Programming modes
@@ -799,23 +821,12 @@ TODO: I should understand how this works better.
   (use-package json-mode)
 
   (use-package go-ts-mode)
+
+  (use-package sh-script
+    :hook (sh-mode . flymake-mode))
 #+END_SRC
 
-** LSP Servers
-#+BEGIN_SRC emacs-lisp  
-  (use-package eglot
-    :straight nil
-    :hook
-    ((go-ts-mode . eglot-ensure))
-    :custom
-    (eglot-send-changes-idle-time 0.1)
-    (eglot-extend-to-xref t)              ; activate Eglot in referenced non-project files
-    :config
-    (fset #'jsonrpc--log-event #'ignore)  ; massive perf boost---don't log every event
-    )
-#+END_SRC
-
-** Yasnippets
+* Yasnippets
 #+BEGIN_SRC emacs-lisp
   (use-package yasnippet
      :config
@@ -837,5 +848,4 @@ These are various snippets for use with Yasnippet.
 if err != nil {
   $1
 }
-
 #+END_SRC
