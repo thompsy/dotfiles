@@ -733,6 +733,16 @@ TODO: I should understand how this works better.
          ("q" nil))
 #+END_SRC
 
+*** Whitespace Removal
+[[https://github.com/lewang/ws-butler][~ws-butler~]] automatically removes trailing whitespace from lines that have been editted.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package ws-butler
+    :demand t
+    :config
+    (ws-butler-global-mode))
+#+END_SRC
+
 ** Software Development
 #+BEGIN_SRC emacs-lisp
   (use-package emacs
