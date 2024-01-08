@@ -20,14 +20,77 @@ available. A few places that I've found particularly useful include:
 - [[https://framagit.org/steckerhalter/steckemacs.el/-/tree/master][steckemacs]]
 
 * TODO
-- rationalise Hydra config across packages
-- rationalise General config across packages
-- have all hydras use q for quit
-- use ~:after~ to specify any dependencies
-- try [[https://github.com/minad/org-modern][~org-modern~]]
-- explore this config:
-  https://old.reddit.com/r/emacs/comments/ehjcu2/screenshot_polishing_my_emacs_who_said_an_old/
-- have ~project.el~ run the correct make target as compile command
+** Disable ~create-lockfiles~
+** Install ~consult-project-extra~
+** Try Yegge's keybindings
+Take from [[https://www.irreal.org/blog/?p=10424]]:
+- ~C-x t~ -> ~beginning-of-buffer~
+- ~C-x e~ -> ~end-of-buffer~
+
+** Experiment with ~treesit-font-lock-level~
+** Explore ~transient-mark-mode~
+See [[https://www.masteringemacs.org/article/fixing-mark-commands-transient-mark-mode]]
+** Get Python up and running
+** Figure out a way to autoload treesitter grammars
+It would also be good to keep these up to date.
+** Add format on save with ~eglot~
+** Rationalise Hydra config across packages
+** Rationalise General config across packages
+** Have all hydras use q for quit
+** Use ~:after~ to specify any dependencies
+** DONE Try [[https://github.com/minad/org-modern][~org-modern~]]
+:LOGBOOK:
+- State "DONE"       from              [2024-01-08 Mon 12:38]
+:END:
+
+** Have ~project.el~ run the correct make target as compile command
+** Corfu popup without hitting tab
+- it might be nice to have this always popup with suggestions bars on the context e.g. Go, org etc. This might be Cape rather then Corfu
+- this might be helpful https://emacs.stackexchange.com/questions/78237/automatic-popup-of-words-from-the-buffer-using-corfu-and-dabbrev
+- this is useful context too https://www.reddit.com/r/emacs/comments/td0nth/sample_usage_of_cape_completion_at_point/
+** Expore buffer placement options
+See [[https://www.masteringemacs.org/article/demystifying-emacs-window-manager]]
+
+* Org-mode
+** Document tangling from the command line
+See [[https://emacs.stackexchange.com/questions/27126/is-it-possible-to-org-bable-tangle-an-org-file-from-the-command-line]]
+** Tags
+Ideas here:
+- [[https://karl-voit.at/2022/01/29/How-to-Use-Tags/]]
+- [[https://takeonrules.com/2024/01/06/leveraging-denotes-signature-for-multiple-purposes//]]
+** Workflows
+Meetings:
+- [[https://github.com/james-stoup/emacs-org-mode-tutorial]]
+
+Other useful ideas here:
+- [[https://dehora.net/journal/how-i-use-org-mode]]
+
+* Packages to try
+** ~urgrep~
+** ~bookmarks+~
+- we can bookmark buffers that aren't backed by files e.g. scratch
+** ~wrep~
+** ~tresitter-context~
+** ~diff-hl~
+How does this compare with the git gutter one?
+** ~explain-pause-mode~
+** ~visible-mark-mode~
+** ~hyperbole~
+** ~jinx~ for spelling
+** ~expreg~
+This is like ~expand-region~ but uses treesitter.
+** Debugging with ~dape~
+** ~org-autolist~
+** ~org-sticky-header~
+* Future Ideas
+** Explore these configs
+  - [[https://old.reddit.com/r/emacs/comments/ehjcu2/screenshot_polishing_my_emacs_who_said_an_old/]]
+  - [[https://kristofferbalintona.me/posts/202202211546/]]
+    - good ideas with Vertico etc here
+  - [[https://kristofferbalintona.me/posts/202202270056/]]
+    - Corfu related config
+  - [[https://protesilaos.com/emacs/dotemacs]]
+** Explore ~embark~ more
 
 * Local
 These are various, installation specific settings that might differ across machines, some of which I
