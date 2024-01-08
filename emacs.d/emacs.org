@@ -1182,6 +1182,8 @@ A nice Hydra menu to make things more accessible.
 
   (use-package sh-script
     :hook (sh-mode . flymake-mode))
+
+  (use-package terraform-mode)
 #+END_SRC
 
 These packages need to be installed in the Python environment too.
