@@ -1058,8 +1058,92 @@ This snippet provides smarter moving to the beginning of the line. Copied from [
 ** Git
 #+BEGIN_SRC emacs-lisp  
   (use-package magit
-    :bind (("C-x g" . magit-status)))
+      :defer t
+      :general
+      ("C-x g" 'magit-status)
+      (my-leader-def
+        "g" 'hydra-my-git-menu/body)
+      :config
+      ;; This sets Magit to use the fullframe
+      ;;(setq magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
+      (defun my/magit-yank-branch-name ()
+        "Show the current branch in the echo-area and add it to the `kill-ring'."
+        (interactive)
+        (let ((branch (magit-get-current-branch)))
+          (if branch
+              (progn (kill-new branch)
+                     (message "%s" branch))
+            (user-error "There is not current branch")))))
 #+END_SRC
+
+[[https://github.com/dandavison/magit-delta][~magit-delta~]] enables improved diffs for Magit using [[https://github.com/dandavison/delta][delta]].
+
+I've disabled this for now since it seemed a bit slow.
+#+begin_src emacs-lisp
+  (use-package magit-delta
+    :disabled
+    :hook (magit-mode . magit-delta-mode))
+#+end_src
+[[https://github.com/emacsmirror/git-timemachine][~git-timemachine~]] allows you to walk through Git revisions of a file to view changes over time.
+#+BEGIN_SRC emacs-lisp
+  (use-package git-timemachine
+    :defer t)
+#+END_SRC
+
+[[https://github.com/redguardtoo/vc-msg][~vc-msg~]] shows a popup containing the commit message that last affected the current line.
+#+BEGIN_SRC emacs-lisp
+  (use-package vc-msg
+    :defer t)
+#+END_SRC
+
+[[https://github.com/dgutov/diff-hl][~diff-hl~]] shows icons on the buffer fringe for lines that have been added, removed or
+modified.
+#+BEGIN_SRC emacs-lisp
+  (use-package diff-hl
+    :config
+    (global-diff-hl-mode))
+    #+END_SRC
+
+[[https://github.com/rmuslimov/browse-at-remote][~browse-at-remote~]] allows for quick jumping to the relevant Github (or whatever) page corresponding
+to the current file.
+#+BEGIN_SRC emacs-lisp
+    (use-package browse-at-remote)
+ #+END_SRC
+
+A nice Hydra menu to make things more accessible.
+  #+BEGIN_SRC emacs-lisp
+    (defhydra hydra-my-git-menu (:color blue
+                                        :hint nil)
+      "
+    ^Navigate^        ^Action^               ^Info^
+    ^^^^^^^^^^^^---------------------------------------------------
+    _n_: next hunk    _s_: stage hunk        _d_: diff
+    _p_: prev hunk    _S_: stage file        _c_: show commit
+    ^ ^               _U_: unstage file      _g_: magit status
+    ^ ^               ^ ^                    _t_: git timemachine
+    _r_: browse at remote                  _b_: yank branch name
+    "
+      ("n" diff-hl-next-hunk :color red)
+      ("p" diff-hl-previous-hunk :color red)
+      ("s" diff-hl-stage-current-hunk)
+      ("S" magit-stage-file)
+      ("U" magit-unstage-file)
+      ("c" vc-msg-show :color red)
+      ("g" magit-status :exit t)
+      ("d" magit-diff-buffer-file)
+      ("t" git-timemachine :exit t)
+      ("b" my/magit-yank-branch-name :exit t)
+      ("r" browse-at-remote)
+      ("q" nil :exit t))
+
+    (defhydra hydra-my-git-timemachine-menu (:color blue)
+      ("s" git-timemachine "start")
+      ("j" git-timemachine-show-next-revision "next revision")
+      ("k" git-timemachine-show-previous-revision "prev revision")
+      ("c" git-timemachine-show-current-revision "curr revision")
+      ("<ESC>" git-timemachine-show-current-revision "quit" :exit t))
+#+END_SRC
+
 
 ** Flymake
 #+BEGIN_SRC emacs-lisp
