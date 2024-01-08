@@ -387,6 +387,18 @@ Setup some basic file hygiene. Keep some backup files around, but keep them out 
      `((".*" "~/.emacs.d/auto-saves/" t))))
 #+END_SRC
 
+~uniqify~ renames buffers with the same name so that they're easier to distinguish.
+#+BEGIN_SRC emacs-lisp
+  (use-package uniquify
+    :straight nil
+    :config
+    (setq uniquify-buffer-name-style 'forward
+          uniquify-separator "/"
+          ;; rename after killing uniquified
+          uniquify-after-kill-buffer-p t
+          ;; don't muck with special buffers
+          uniquify-ignore-buffers-re "^\\*"))
+#+END_SRC
 
 ** Discoverability
 [[https://github.com/justbur/emacs-which-key][~which-key~]] displays all of the available keybindings following a incompletely entered command. For
