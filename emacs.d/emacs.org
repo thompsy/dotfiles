@@ -1153,11 +1153,13 @@ A nice Hydra menu to make things more accessible.
 #+END_SRC
 
 ** LSP Servers
+
 #+BEGIN_SRC emacs-lisp
   (use-package eglot
     :straight nil
     :hook
-    ((go-ts-mode . eglot-ensure))
+    ((go-ts-mode . eglot-ensure)
+     (python-ts-mode . eglot-ensure))
     :custom
     (eglot-send-changes-idle-time 0.1)
     ;; activate Eglot in referenced non-project files
@@ -1180,6 +1182,15 @@ A nice Hydra menu to make things more accessible.
 
   (use-package sh-script
     :hook (sh-mode . flymake-mode))
+#+END_SRC
+
+These packages need to be installed in the Python environment too.
+#+BEGIN_SRC sh
+ pip install "python-lsp-server[all]" pylsp-mypy pylsp-rope python-lsp-ruff python-lsp-black
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+  (use-package pyvenv)
 #+END_SRC
 
 * Yasnippets
