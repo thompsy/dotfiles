@@ -1371,3 +1371,57 @@ if err != nil {
   $1
 }
 #+END_SRC
+
+* Org
+See helpful examples at:
+- http://doc.norang.ca/org-mode.html
+
+** Setup
+#+BEGIN_SRC emacs-lisp
+  (use-package org
+      :general
+    ("C-c l" 'org-store-link)
+    ;; This conflicts with Avy
+    (org-mode-map "C-'" nil)
+
+    :config
+    (setq org-agenda-files my/org-agenda-files
+          org-directory my/org-dir
+          org-tags-column 75
+          org-log-into-drawer t ;; hide the log state change history a bit better
+          org-deadline-warning-days 7
+          org-agenda-skip-scheduled-if-deadline-is-shown t
+          org-habit-graph-column 65
+          org-duration-format 'h:mm ;; show hours at max, not days
+          org-agenda-compact-blocks t
+          org-cycle-separator-lines 0
+          ;; hide empty agenda sections
+          org-agenda-clockreport-parameter-plist '(:stepskip0 t :link t :maxlevel 2 :fileskip0 t)
+          ;; default show today
+          org-agenda-span 'day
+          org-agenda-start-day "-0d"
+          org-agenda-start-on-weekday 1
+          org-agenda-custom-commands
+          '(("d" "Done tasks" tags "/DONE|CANCELED")
+            ("g" "Plan Today"
+             ((agenda "" ((org-agenda-span 'day)))
+              (org-agenda-skip-function '(org-agenda-skip-deadline-if-not-today))
+              (org-agenda-entry-types '(:deadline))
+              (org-agenda-overriding-header "Today's Deadlines "))))
+          ))
+
+#+END_SRC
+
+[[https://github.com/minad/org-modern][~org-modern~]] gives ~org-mode~ a more modern style.
+#+begin_src emacs-lisp
+  (use-package org-modern
+    :config
+    (global-org-modern-mode))
+#+end_src
+
+** Export Options
+[[https://github.com/hniksic/emacs-htmlize][~htmlize~]] converts a buffer to HTML with nice syntax highlighting.
+#+BEGIN_SRC emacs-lisp
+  (use-package htmlize
+    :defer t)
+#+END_SRC
