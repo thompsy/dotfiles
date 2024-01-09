@@ -679,7 +679,12 @@ Base extras:
 
 * Navigation
 ** Consult
-#+BEGIN_SRC emacs-lisp  
+#+BEGIN_SRC emacs-lisp
+
+
+  (use-package embark-consult
+    :after (embark consult))
+
   ;; Consult: Misc. enhanced commands
   (use-package consult
     ;; TODO consider using general here
@@ -775,7 +780,6 @@ Base extras:
     ;; candidate you select
     (setf (alist-get ?. avy-dispatch-alist) 'bedrock/avy-action-embark))
 
-  (use-package embark-consult)
 
 #+END_SRC
 ** Minibuffer
