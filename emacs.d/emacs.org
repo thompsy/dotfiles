@@ -20,7 +20,6 @@ available. A few places that I've found particularly useful include:
 - [[https://framagit.org/steckerhalter/steckemacs.el/-/tree/master][steckemacs]]
 
 * TODO
-** Disable ~create-lockfiles~
 ** Try Yegge's keybindings
 Take from [[https://www.irreal.org/blog/?p=10424]]:
 - ~C-x t~ -> ~beginning-of-buffer~
@@ -349,6 +348,7 @@ TODO verify that some of these aren't duplicated above
      vc-make-backup-files t
      recentf-max-menu-items 25
      recentf-max-saved-items 500
+     create-lockfiles nil
      auto-save-file-name-transforms
      `((".*" "~/.emacs.d/auto-saves/" t))))
 #+END_SRC
