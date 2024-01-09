@@ -21,7 +21,6 @@ available. A few places that I've found particularly useful include:
 
 * TODO
 ** Disable ~create-lockfiles~
-** Install ~consult-project-extra~
 ** Try Yegge's keybindings
 Take from [[https://www.irreal.org/blog/?p=10424]]:
 - ~C-x t~ -> ~beginning-of-buffer~
@@ -741,6 +740,12 @@ Base extras:
      ;; :preview-key '(:debounce 0.4 any) ;; Option 1: Delay preview
      :preview-key "M-.")            ;; Option 2: Manual preview
     )
+
+  (use-package consult-project-extra
+  :straight t
+  :bind
+  (("C-x p f" . consult-project-extra-find)
+   ("C-x p o" . consult-project-extra-find-other-window)))
 
   (use-package consult-dir
     :bind (("C-x C-d" . consult-dir)
