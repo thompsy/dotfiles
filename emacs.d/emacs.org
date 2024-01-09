@@ -676,7 +676,8 @@ Base extras:
 
 #+END_SRC
 
-* Consult and Embark
+* Navigation
+** Consult
 #+BEGIN_SRC emacs-lisp  
   ;; Consult: Misc. enhanced commands
   (use-package consult
@@ -775,7 +776,7 @@ Base extras:
   (use-package embark-consult)
 
 #+END_SRC
-** Minibuffer and Completion
+** Minibuffer
 #+BEGIN_SRC emacs-lisp  
   ;; Vertico: better vertical completion for minibuffer commands
   (use-package vertico
