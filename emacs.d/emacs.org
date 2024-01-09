@@ -78,12 +78,12 @@ This is like ~expand-region~ but uses treesitter.
 ** ~org-sticky-header~
 * Future Ideas
 ** Explore these configs
-  - [[https://old.reddit.com/r/emacs/comments/ehjcu2/screenshot_polishing_my_emacs_who_said_an_old/]]
-  - [[https://kristofferbalintona.me/posts/202202211546/]]
-    - good ideas with Vertico etc here
-  - [[https://kristofferbalintona.me/posts/202202270056/]]
-    - Corfu related config
-  - [[https://protesilaos.com/emacs/dotemacs]]
+- [[https://old.reddit.com/r/emacs/comments/ehjcu2/screenshot_polishing_my_emacs_who_said_an_old/]]
+- [[https://kristofferbalintona.me/posts/202202211546/]]
+  - good ideas with Vertico etc here
+- [[https://kristofferbalintona.me/posts/202202270056/]]
+  - Corfu related config
+- [[https://protesilaos.com/emacs/dotemacs]]
 ** Explore ~embark~ more
 
 * Local
@@ -241,22 +241,22 @@ explicitly load it with straight early in the init process. See more details in 
 A few miscellaneous settings. Note that emacs is not really a package strictly speaking which is why we include ~:straight nil~ so that our package manager doesn't try to fetch the source.
 #+BEGIN_SRC emacs-lisp
   (use-package emacs
-  :straight nil
-  :init
-  ;; answer with y/n instead of typing out yes/no
-  (defalias 'yes-or-no-p 'y-or-n-p)
-  :config
-  (setq indent-tabs-mode nil
-        tab-width 4
-        show-trailing-whitespace t
-        fill-column 100)
-  (setq-default indent-tabs-mode nil
-                fill-column 100)
-  :custom
-  ;; load new source files instead of stale elisp bytecode
-  (load-prefer-newer t)
-  ;; allow emacs to be any size, removes black bars
-  (frame-resize-pixelwise t))
+    :straight nil
+    :init
+    ;; answer with y/n instead of typing out yes/no
+    (defalias 'yes-or-no-p 'y-or-n-p)
+    :config
+    (setq indent-tabs-mode nil
+          tab-width 4
+          show-trailing-whitespace t
+          fill-column 100)
+    (setq-default indent-tabs-mode nil
+                  fill-column 100)
+    :custom
+    ;; load new source files instead of stale elisp bytecode
+    (load-prefer-newer t)
+    ;; allow emacs to be any size, removes black bars
+    (frame-resize-pixelwise t))
 #+END_SRC
 
 It's useful to have buffers auto-revert when files on disk change especially when using Git branches a lot!
@@ -272,8 +272,7 @@ It's useful to have buffers auto-revert when files on disk change especially whe
     ;; Some systems don't do file notifications well; see
     ;; https://todo.sr.ht/~ashton314/emacs-bedrock/11
     (setopt auto-revert-interval 5)
-    (setopt auto-revert-check-vc-info t)
-    )
+    (setopt auto-revert-check-vc-info t))
 #+END_SRC
 
 Use the system keyboard when killing and yanking.
@@ -300,8 +299,8 @@ other persistent data under ~user-emacs-directory~ rather than spamming them in 
   (use-package no-littering
     :init
     (setq no-littering-etc-directory
-          (expand-file-name "etc/" user-emacs-directory))
-    (setq no-littering-var-directory
+          (expand-file-name "etc/" user-emacs-directory)
+          no-littering-var-directory
           (expand-file-name "var/" user-emacs-directory)))
 #+END_SRC
 
@@ -336,33 +335,32 @@ TODO verify that some of these aren't duplicated above
     :init
     (recentf-mode 1)
     :config
-    (setq
-     backup-by-copying t
-     backup-directory-alist '((".*" . "~/.emacs.d/backups/"))
-     delete-old-versions t
-     delete-auto-save-files t
-     kept-new-versions 6
-     kept-old-versions 2
-     version-control t
-     vc-make-backup-files t
-     recentf-max-menu-items 25
-     recentf-max-saved-items 500
-     create-lockfiles nil
-     auto-save-file-name-transforms
-     `((".*" "~/.emacs.d/auto-saves/" t))))
+    (setq backup-by-copying t
+          backup-directory-alist '((".*" . "~/.emacs.d/backups/"))
+          delete-old-versions t
+          delete-auto-save-files t
+          kept-new-versions 6
+          kept-old-versions 2
+          version-control t
+          vc-make-backup-files t
+          recentf-max-menu-items 25
+          recentf-max-saved-items 500
+          create-lockfiles nil
+          auto-save-file-name-transforms
+          `((".*" "~/.emacs.d/auto-saves/" t))))
 #+END_SRC
 
 Use UTF-8 everywhere.
 #+BEGIN_SRC emacs-lisp
-(use-package mule
-  :straight nil
-  :config
-  (prefer-coding-system 'utf-8-unix)
-  (set-default-coding-systems 'utf-8-unix)
-  (set-language-environment 'utf-8)
-  (set-terminal-coding-system 'utf-8-unix)
-  (setq locale-coding-system 'utf-8-unix)
-  (set-selection-coding-system 'utf-8-unix))
+  (use-package mule
+    :straight nil
+    :config
+    (prefer-coding-system 'utf-8-unix)
+    (set-default-coding-systems 'utf-8-unix)
+    (set-language-environment 'utf-8)
+    (set-terminal-coding-system 'utf-8-unix)
+    (setq locale-coding-system 'utf-8-unix)
+    (set-selection-coding-system 'utf-8-unix))
 #+END_SRC
 
 Setup some basic file hygiene. Keep some backup files around, but keep them out of sight.
@@ -370,19 +368,18 @@ Setup some basic file hygiene. Keep some backup files around, but keep them out 
   (use-package files
     :straight nil
     :config
-    (setq
-     backup-by-copying t
-     backup-directory-alist '((".*" . "~/.emacs.d/backups/"))
-     delete-old-versions t
-     delete-auto-save-files t
-     kept-new-versions 6
-     kept-old-versions 2
-     version-control t
-     vc-make-backup-files t
-     recentf-max-menu-items 25
-     recentf-max-saved-items 500
-     auto-save-file-name-transforms
-     `((".*" "~/.emacs.d/auto-saves/" t))))
+    (setq backup-by-copying t
+          backup-directory-alist '((".*" . "~/.emacs.d/backups/"))
+          delete-old-versions t
+          delete-auto-save-files t
+          kept-new-versions 6
+          kept-old-versions 2
+          version-control t
+          vc-make-backup-files t
+          recentf-max-menu-items 25
+          recentf-max-saved-items 500
+          auto-save-file-name-transforms
+          `((".*" "~/.emacs.d/auto-saves/" t))))
 #+END_SRC
 
 ~uniqify~ renames buffers with the same name so that they're easier to distinguish.
@@ -584,33 +581,33 @@ This hydra provides easy access to various package management commands.
 #+BEGIN_SRC emacs-lisp
   (my-leader-def "s" '(hydra-straight-helper/body :wk "pkgs"))
   (defhydra hydra-straight-helper (:hint nil :color green)
-         "
+    "
         _c_heck all       |_f_etch all     |_m_erge all      |_n_ormalize all   |p_u_sh all
         _C_heck package   |_F_etch package |_M_erge package  |_N_ormlize package|p_U_sh package
         ----------------^^+--------------^^+---------------^^+----------------^^+------------||_q_uit||
         _r_ebuild all     |_p_ull all      |_v_ersions freeze|_w_atcher start   |_g_et recipe
         _R_ebuild package |_P_ull package  |_V_ersions thaw  |_W_atcher quit    |prun_e_ build"
-         ("c" straight-check-all)
-         ("C" straight-check-package)
-         ("r" straight-rebuild-all)
-         ("R" straight-rebuild-package)
-         ("f" straight-fetch-all)
-         ("F" straight-fetch-package)
-         ("p" straight-pull-all)
-         ("P" straight-pull-package)
-         ("m" straight-merge-all)
-         ("M" straight-merge-package)
-         ("n" straight-normalize-all)
-         ("N" straight-normalize-package)
-         ("u" straight-push-all)
-         ("U" straight-push-package)
-         ("v" straight-freeze-versions)
-         ("V" straight-thaw-versions)
-         ("w" straight-watcher-start)
-         ("W" straight-watcher-quit)
-         ("g" straight-get-recipe)
-         ("e" straight-prune-build)
-         ("q" nil))
+    ("c" straight-check-all)
+    ("C" straight-check-package)
+    ("r" straight-rebuild-all)
+    ("R" straight-rebuild-package)
+    ("f" straight-fetch-all)
+    ("F" straight-fetch-package)
+    ("p" straight-pull-all)
+    ("P" straight-pull-package)
+    ("m" straight-merge-all)
+    ("M" straight-merge-package)
+    ("n" straight-normalize-all)
+    ("N" straight-normalize-package)
+    ("u" straight-push-all)
+    ("U" straight-push-package)
+    ("v" straight-freeze-versions)
+    ("V" straight-thaw-versions)
+    ("w" straight-watcher-start)
+    ("W" straight-watcher-quit)
+    ("g" straight-get-recipe)
+    ("e" straight-prune-build)
+    ("q" nil))
 #+END_SRC
 
 This hydra gives easy access to inserting various Unicode characters.
@@ -648,15 +645,15 @@ This hydra gives easy access to inserting various Unicode characters.
 [[https://www.emacswiki.org/emacs/download/zoom-frm.el][~zoom-frm~]] is a nice way to zoom in and out on a frame basis. This is useful when switching from
 smaller to larger screens.
 #+begin_src emacs-lisp
-    (use-package zoom-frm
-      :general
-      (my-leader-def "z" '(hydra-zoom/body :wk "zoom"))
-      :hydra (hydra-zoom (:column 2)
-                         ("n" zoom-frm-in "Zoom in")
-                         ("t" zoom-frm-out "Zoom out")
-                         ("r" (text-scale-set 0) "Reset zoom")
-                         ("0" (text-scale-set 0) :bind nil :exit t)
-                         ("q" nil "quit")))
+  (use-package zoom-frm
+    :general
+    (my-leader-def "z" '(hydra-zoom/body :wk "zoom"))
+    :hydra (hydra-zoom (:column 2)
+                       ("n" zoom-frm-in "Zoom in")
+                       ("t" zoom-frm-out "Zoom out")
+                       ("r" (text-scale-set 0) "Reset zoom")
+                       ("0" (text-scale-set 0) :bind nil :exit t)
+                       ("q" nil "quit")))
 #+END_SRC
 
 * Motion Aids
@@ -676,8 +673,6 @@ Base extras:
 * Navigation
 ** Consult
 #+BEGIN_SRC emacs-lisp
-
-
   (use-package embark-consult
     :after (embark consult))
 
@@ -745,17 +740,17 @@ Base extras:
     )
 
   (use-package consult-project-extra
-  :straight t
-  :bind
-  (("C-x p f" . consult-project-extra-find)
-   ("C-x p o" . consult-project-extra-find-other-window)))
+    :straight t
+    :bind
+    (("C-x p f" . consult-project-extra-find)
+     ("C-x p o" . consult-project-extra-find-other-window)))
 
   (use-package consult-dir
     :after vertico
     :bind (("C-x C-d" . consult-dir)
-         :map vertico-map
-         ("C-x C-d" . consult-dir)
-         ("C-x C-j" . consult-dir-jump-file)))
+           :map vertico-map
+           ("C-x C-d" . consult-dir)
+           ("C-x C-j" . consult-dir-jump-file)))
 
   (use-package embark
     :demand t
@@ -775,9 +770,8 @@ Base extras:
     ;; After invoking avy-goto-char-timer, hit "." to run embark at the next
     ;; candidate you select
     (setf (alist-get ?. avy-dispatch-alist) 'bedrock/avy-action-embark))
-
-
 #+END_SRC
+
 ** Minibuffer
 #+BEGIN_SRC emacs-lisp  
   ;; Vertico: better vertical completion for minibuffer commands
@@ -799,8 +793,8 @@ Base extras:
   (use-package marginalia
     :config
     (marginalia-mode))
-
 #+END_SRC
+
 ** Completion
 #+BEGIN_SRC emacs-lisp  
   ;; Popup completion-at-point
@@ -872,8 +866,8 @@ Base extras:
     (dired-mode-map "r" 'dired-do-rename)
     (dired-mode-map "." 'hydra-dired/body)
     :hydra
-        (hydra-dired (:hint nil :color pink)
-    "
+    (hydra-dired (:hint nil :color pink)
+                 "
   _+_ mkdir          _v_iew           _m_ark             _(_ details        _i_nsert-subdir    wdired
   _c_opy             _O_ view other   _U_nmark all       _)_ omit-mode      _$_ hide-subdir    C-x C-q : edit
   _D_elete           _o_pen other     _u_nmark           _l_ redisplay      _w_ kill-subdir    C-c C-c : commit
@@ -886,42 +880,42 @@ Base extras:
 
   T - tag prefix
   "
-      ("\\" dired-do-ispell)
-      ("(" dired-hide-details-mode)
-      (")" dired-omit-mode)
-      ("+" dired-create-directory)
-      ("=" diredp-ediff)         ;; smart diff
-      ("?" dired-summary)
-      ("$" diredp-hide-subdir-nomove)
-      ("A" dired-do-find-regexp)
-      ("c" dired-do-copy)        ;; Copy all marked files
-      ("D" dired-do-delete)
-      ("E" dired-mark-extension)
-      ("e" dired-ediff-files)
-      ("F" dired-do-find-marked-files)
-      ("G" dired-do-chgrp)
-      ("g" revert-buffer)        ;; read all directories again (refresh)
-      ("i" dired-maybe-insert-subdir)
-      ("l" dired-do-redisplay)   ;; relist the marked or singel directory
-      ("M" dired-do-chmod)
-      ("m" dired-mark)
-      ("O" dired-display-file)
-      ("o" dired-find-file-other-window)
-      ("Q" dired-do-find-regexp-and-replace)
-      ("r" dired-do-rename)
-      ("R" dired-do-rsynch)
-      ("S" dired-do-symlink)
-      ("s" dired-sort-toggle-or-edit)
-      ("t" dired-toggle-marks)
-      ("U" dired-unmark-all-marks)
-      ("u" dired-unmark)
-      ("v" dired-view-file)      ;; q to exit, s to search, = gets line #
-      ("w" dired-kill-subdir)
-      ("Y" dired-do-relsymlink)
-      ("z" diredp-compress-this-file)
-      ("Z" dired-do-compress)
-      ("q" nil)
-      ("." nil :color blue)))
+                 ("\\" dired-do-ispell)
+                 ("(" dired-hide-details-mode)
+                 (")" dired-omit-mode)
+                 ("+" dired-create-directory)
+                 ("=" diredp-ediff)         ;; smart diff
+                 ("?" dired-summary)
+                 ("$" diredp-hide-subdir-nomove)
+                 ("A" dired-do-find-regexp)
+                 ("c" dired-do-copy)        ;; Copy all marked files
+                 ("D" dired-do-delete)
+                 ("E" dired-mark-extension)
+                 ("e" dired-ediff-files)
+                 ("F" dired-do-find-marked-files)
+                 ("G" dired-do-chgrp)
+                 ("g" revert-buffer)        ;; read all directories again (refresh)
+                 ("i" dired-maybe-insert-subdir)
+                 ("l" dired-do-redisplay)   ;; relist the marked or singel directory
+                 ("M" dired-do-chmod)
+                 ("m" dired-mark)
+                 ("O" dired-display-file)
+                 ("o" dired-find-file-other-window)
+                 ("Q" dired-do-find-regexp-and-replace)
+                 ("r" dired-do-rename)
+                 ("R" dired-do-rsynch)
+                 ("S" dired-do-symlink)
+                 ("s" dired-sort-toggle-or-edit)
+                 ("t" dired-toggle-marks)
+                 ("U" dired-unmark-all-marks)
+                 ("u" dired-unmark)
+                 ("v" dired-view-file)      ;; q to exit, s to search, = gets line #
+                 ("w" dired-kill-subdir)
+                 ("Y" dired-do-relsymlink)
+                 ("z" diredp-compress-this-file)
+                 ("Z" dired-do-compress)
+                 ("q" nil)
+                 ("." nil :color blue)))
 
   ;; Colourful columns.
   (use-package diredfl
@@ -969,29 +963,29 @@ TODO: I should understand how this works better.
                                        :color pink
                                        :hint nil
                                        :post (deactivate-mark))
-         "
+    "
       ^_i_^       _w_ copy      _O_pen       _N_umber-lines
     _n_   _o_     _y_ank        _t_ype       _E_xchange-point
       ^_e_^       _d_ kill      _c_lear      _r_eset-region-mark
     ^^^^          _u_ndo        _q_uit       ^ ^
     "
-         ("i" rectangle-previous-line)
-         ("e" rectangle-next-line)
-         ("n" rectangle-backward-char)
-         ("o" rectangle-forward-char)
-         ("d" kill-rectangle)                    ;; C-x r k
-         ("y" yank-rectangle)                    ;; C-x r y
-         ("w" copy-rectangle-as-kill)            ;; C-x r M-w
-         ("O" open-rectangle)                    ;; C-x r o
-         ("t" string-rectangle)                  ;; C-x r t
-         ("c" clear-rectangle)                   ;; C-x r c
-         ("E" rectangle-exchange-point-and-mark) ;; C-x C-x
-         ("N" rectangle-number-lines)            ;; C-x r N
-         ("r" (if (region-active-p)
-                  (deactivate-mark)
-                (rectangle-mark-mode 1)))
-         ("u" undo nil)
-         ("q" nil))
+    ("i" rectangle-previous-line)
+    ("e" rectangle-next-line)
+    ("n" rectangle-backward-char)
+    ("o" rectangle-forward-char)
+    ("d" kill-rectangle)                    ;; C-x r k
+    ("y" yank-rectangle)                    ;; C-x r y
+    ("w" copy-rectangle-as-kill)            ;; C-x r M-w
+    ("O" open-rectangle)                    ;; C-x r o
+    ("t" string-rectangle)                  ;; C-x r t
+    ("c" clear-rectangle)                   ;; C-x r c
+    ("E" rectangle-exchange-point-and-mark) ;; C-x C-x
+    ("N" rectangle-number-lines)            ;; C-x r N
+    ("r" (if (region-active-p)
+             (deactivate-mark)
+           (rectangle-mark-mode 1)))
+    ("u" undo nil)
+    ("q" nil))
 #+END_SRC
 
 ** Whitespace Removal
@@ -999,7 +993,6 @@ TODO: I should understand how this works better.
 
 #+BEGIN_SRC emacs-lisp
   (use-package ws-butler
-    :demand t
     :config
     (ws-butler-global-mode))
 #+END_SRC
@@ -1226,7 +1219,7 @@ Now we've got a hydra to make the various window management functions easily acc
       (let ((branch (magit-get-current-branch)))
         (if branch
             (progn (kill-new branch)
-                     (message "%s" branch))
+                   (message "%s" branch))
           (user-error "There is not current branch")))))
 #+END_SRC
 
@@ -1261,7 +1254,7 @@ modified.
 [[https://github.com/rmuslimov/browse-at-remote][~browse-at-remote~]] allows for quick jumping to the relevant Github (or whatever) page corresponding
 to the current file.
 #+BEGIN_SRC emacs-lisp
-    (use-package browse-at-remote)
+  (use-package browse-at-remote)
  #+END_SRC
 
 A nice Hydra menu to make things more accessible.
@@ -1269,14 +1262,14 @@ A nice Hydra menu to make things more accessible.
     (defhydra hydra-my-git-menu (:color blue
                                         :hint nil)
       "
-    ^Navigate^        ^Action^               ^Info^
-    ^^^^^^^^^^^^---------------------------------------------------
-    _n_: next hunk    _s_: stage hunk        _d_: diff
-    _p_: prev hunk    _S_: stage file        _c_: show commit
-    ^ ^               _U_: unstage file      _g_: magit status
-    ^ ^               ^ ^                    _t_: git timemachine
-    _r_: browse at remote                  _b_: yank branch name
-    "
+              ^Navigate^        ^Action^               ^Info^
+              ^^^^^^^^^^^^---------------------------------------------------
+              _n_: next hunk    _s_: stage hunk        _d_: diff
+              _p_: prev hunk    _S_: stage file        _c_: show commit
+              ^ ^               _U_: unstage file      _g_: magit status
+              ^ ^               ^ ^                    _t_: git timemachine
+              _r_: browse at remote                  _b_: yank branch name
+              "
       ("n" diff-hl-next-hunk :color red)
       ("p" diff-hl-previous-hunk :color red)
       ("s" diff-hl-stage-current-hunk)
@@ -1352,7 +1345,7 @@ These packages need to be installed in the Python environment too.
 * Yasnippets
 #+BEGIN_SRC emacs-lisp
   (use-package yasnippet
-     :config
+    :config
     (yas-global-mode +1)
     (setq yas-snippet-dirs (append yas-snippet-dirs
   				 '("~/.emacs.d/snippets/"))))
@@ -1380,7 +1373,7 @@ See helpful examples at:
 ** Setup
 #+BEGIN_SRC emacs-lisp
   (use-package org
-      :general
+    :general
     ("C-c l" 'org-store-link)
     ;; This conflicts with Avy
     (org-mode-map "C-'" nil)
