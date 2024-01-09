@@ -184,7 +184,7 @@ All of this is new, minimal stuff from bedrock emacs:
 * Package Manager
 Setup the [[https://github.com/radian-software/straight.el][~straight.el~]] package manager.
 #+BEGIN_SRC emacs-lisp
-  (setq straight-repository-branch "develop")
+  (setq straight-repository-branch "master")
 
   (defvar bootstrap-version)
   (let ((bootstrap-file
@@ -238,6 +238,9 @@ explicitly load it with straight early in the init process. See more details in 
   (straight-use-package 'org)
 #+END_SRC
 
+#+BEGIN_SRC emacs-lisp
+  (setq use-package-always-demand t)
+#+END_SRC
 * Core Configuration
 A few miscellaneous settings. Note that emacs is not really a package strictly speaking which is why we include ~:straight nil~ so that our package manager doesn't try to fetch the source.
 #+BEGIN_SRC emacs-lisp
@@ -534,7 +537,6 @@ keys. It also integrates well with ~use-package~. In particular, this allows us 
 global leader key, ~my-leader-def~ and chain bindings from that.
 #+BEGIN_SRC emacs-lisp
   (use-package general
-    :demand t
     :custom
     (general-override-states '(insert emacs hybrid normal visual motion operator replace))
     :config
@@ -576,8 +578,7 @@ global leader key, ~my-leader-def~ and chain bindings from that.
 [[https://github.com/abo-abo/hydra][~hydra~]] allows us to specify related keybindings together in a
 neat way. Note that ~:wk~ allows us to specify the text that is displayed by ~which-key~ for this hydra.
 #+BEGIN_SRC emacs-lisp
-  (use-package hydra
-    :defer t)
+  (use-package hydra)
 
   ;; This allows us to use :hydra within use-package
   (use-package use-package-hydra)
@@ -749,6 +750,7 @@ Base extras:
    ("C-x p o" . consult-project-extra-find-other-window)))
 
   (use-package consult-dir
+    :after vertico
     :bind (("C-x C-d" . consult-dir)
          :map vertico-map
          ("C-x C-d" . consult-dir)
@@ -1211,22 +1213,21 @@ Now we've got a hydra to make the various window management functions easily acc
 ** Git
 #+BEGIN_SRC emacs-lisp  
   (use-package magit
-      :defer t
-      :general
-      ("C-x g" 'magit-status)
-      (my-leader-def
-        "g" 'hydra-my-git-menu/body)
-      :config
-      ;; This sets Magit to use the fullframe
-      ;;(setq magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
-      (defun my/magit-yank-branch-name ()
-        "Show the current branch in the echo-area and add it to the `kill-ring'."
-        (interactive)
-        (let ((branch (magit-get-current-branch)))
-          (if branch
-              (progn (kill-new branch)
+    :general
+    ("C-x g" 'magit-status)
+    (my-leader-def
+      "g" 'hydra-my-git-menu/body)
+    :config
+    ;; This sets Magit to use the fullframe
+    ;;(setq magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
+    (defun my/magit-yank-branch-name ()
+      "Show the current branch in the echo-area and add it to the `kill-ring'."
+      (interactive)
+      (let ((branch (magit-get-current-branch)))
+        (if branch
+            (progn (kill-new branch)
                      (message "%s" branch))
-            (user-error "There is not current branch")))))
+          (user-error "There is not current branch")))))
 #+END_SRC
 
 [[https://github.com/dandavison/magit-delta][~magit-delta~]] enables improved diffs for Magit using [[https://github.com/dandavison/delta][delta]].
