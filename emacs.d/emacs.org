@@ -1248,6 +1248,7 @@ modified.
 #+BEGIN_SRC emacs-lisp
   (use-package diff-hl
     :config
+    (diff-hl-flydiff-mode)
     (global-diff-hl-mode))
     #+END_SRC
 
