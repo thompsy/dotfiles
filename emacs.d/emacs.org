@@ -36,11 +36,6 @@ It would also be good to keep these up to date.
 ** Rationalise General config across packages
 ** Have all hydras use q for quit
 ** Use ~:after~ to specify any dependencies
-** DONE Try [[https://github.com/minad/org-modern][~org-modern~]]
-:LOGBOOK:
-- State "DONE"       from              [2024-01-08 Mon 12:38]
-:END:
-
 ** Have ~project.el~ run the correct make target as compile command
 ** Corfu popup without hitting tab
 - it might be nice to have this always popup with suggestions bars on the context e.g. Go, org etc. This might be Cape rather then Corfu
@@ -64,6 +59,7 @@ Other useful ideas here:
 - [[https://dehora.net/journal/how-i-use-org-mode]]
 
 * Packages to try
+** ~dogears~
 ** ~urgrep~
 ** ~bookmarks+~
 - we can bookmark buffers that aren't backed by files e.g. scratch
