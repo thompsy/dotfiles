@@ -20,11 +20,6 @@ available. A few places that I've found particularly useful include:
 - [[https://framagit.org/steckerhalter/steckemacs.el/-/tree/master][steckemacs]]
 
 * TODO
-** Try Yegge's keybindings
-Take from [[https://www.irreal.org/blog/?p=10424]]:
-- ~C-x t~ -> ~beginning-of-buffer~
-- ~C-x e~ -> ~end-of-buffer~
-
 ** Experiment with ~treesit-font-lock-level~
 ** Explore ~transient-mark-mode~
 See [[https://www.masteringemacs.org/article/fixing-mark-commands-transient-mark-mode]]
@@ -538,6 +533,9 @@ global leader key, ~my-leader-def~ and chain bindings from that.
      "C-x m" 'execute-extended-command
      "C-c C-m" 'execute-extended-command
      "C-c m" 'execute-extended-command
+     ;; Taken from https://www.irreal.org/blog/?p=10424:
+     "C-x t" 'beginning-of-buffer
+     "C-x e" 'end-of-buffer
      )
 
     ;; Make general's keybindings take precedence over keys bound to other minor mode keymaps.
