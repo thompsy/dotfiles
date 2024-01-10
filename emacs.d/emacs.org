@@ -1765,3 +1765,9 @@ This is an example of how I process regular meetings like 1 to 1s:
   (use-package htmlize
     :defer t)
 #+END_SRC
+
+* Site Local
+Various setup like sensitive tags and functions that deal with them are stored elsewhere and loaded here.
+#+begin_src emacs-lisp
+  (load "~/notebook/site-local.el")
+#+end_src
