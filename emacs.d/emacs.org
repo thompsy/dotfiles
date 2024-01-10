@@ -1413,6 +1413,56 @@ See helpful examples at:
     (global-org-modern-mode))
 #+end_src
 
+** Task States
+#+BEGIN_SRC emacs-lisp
+  (setq org-todo-keywords
+      '((sequence "TODO(t)"
+                  "PLANNING(p)"
+                  "IN-PROGRESS(i@/!)"
+                  "VERIFYING(v!)"
+                  "BLOCKED(b@)"
+                  "WAITING(w@)"
+                  "|"
+                  "DONE(d!)"
+                  "CANCELLED(c@)"
+                  "OBE(o@)"
+                  "WONT-DO(n@/!)")))
+#+END_SRC
+
+** Tags
+#+BEGIN_SRC emacs-lisp
+  (setq org-tag-alist '(
+                        ;; Task types
+                        (:startgroup . nil)
+                        ("email" . ?e)
+                        ("design" . ?d)
+                        ("implementation" . ?M)
+                        ("improvement" . ?r)
+                        ("investigation" . ?v)
+                        (:endgroup . nil)
+
+                        ;; Meeting types
+                        (:startgroup . nil)
+                        ("weekly_setup" . ?S)
+                        ("weekly_wrap_up" . ?W)
+                        ("1_to_1" . ?1)
+                        (:endgroup . nil)
+
+                        ;; Code TODOs tags
+                        ("questionable_code" . ?q)
+                        ("refactor" . ?F)
+
+                        ;; Special tags
+                        ("CRITICAL" . ?c)
+
+                        ;; Meeting tags
+                        ("meeting" . ?m)
+
+                        ;; Work Log Tags
+                        ("accomplishment" . ?A)
+                        ))
+#+END_SRC
+
 ** Export Options
 [[https://github.com/hniksic/emacs-htmlize][~htmlize~]] converts a buffer to HTML with nice syntax highlighting.
 #+BEGIN_SRC emacs-lisp
