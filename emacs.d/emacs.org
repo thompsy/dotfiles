@@ -1463,6 +1463,139 @@ See helpful examples at:
                         ))
 #+END_SRC
 
+** Capture Templates
+
+#+BEGIN_SRC emacs-lisp
+  (use-package org-capture
+    :straight nil
+    :general
+    (my-leader-def
+      "c" 'org-capture)
+    :config
+    (setq org-refile-targets '((nil :maxlevel . 9)
+                               (org-agenda-files :maxlevel . 9))
+          ;; Refile in a single go
+          org-outline-path-complete-in-steps nil
+          ;; Show full paths for refiling
+          org-refile-use-outline-path t
+          org-capture-templates
+          '(
+            ("c" "Note on current task" plain (clock) "\n\n%T from: %a\n%i\n%?")
+
+            ("g" "General To-Do"
+             entry (file+headline "~/notebook/refile.org" "General Tasks")
+             "* TODO [#B] %?\n:Created: %T\n "
+             :empty-lines 0)
+
+            ("s" "Source code To-Do"
+             entry (file+headline "~/notebook/refile.org" "Code Related Tasks")
+             "* TODO [#B] %?\n:Created: %T\n\nFrom [[file:%(org-capture-get :original-file)::%(at/get-capture-line-number)][%(org-capture-get :original-file-nondirectory):%(at/get-capture-line-number)]]:\n#+BEGIN_SRC\n%(at/get-capture-region-or-line-content)\n#+END_SRC\n\nIssue:\n"
+             :empty-lines 0)
+
+            ("n" "General Note"
+             entry (file+headline "~/notebook/notes.org" "General Notes")
+             "* %?\n:Created: %T\n "
+             :empty-lines 0)
+
+            ("m" "Meeting")
+
+            ("ma" "Adhoc Meeting"
+             entry (file+datetree "~/notebook/meetings.org")
+             "* %? :meeting:%^g \n:Created: %T\n** Attendees\n*** \n** Notes\n** Action Items\n*** TODO [#A] "
+             :tree-type week
+             :clock-in t
+             :clock-resume t
+             :empty-lines 0)
+
+            )))
+
+  (defun at/get-capture-line-number ()
+    "Get the line number from the buffer that org-capture was called from."
+
+    (with-current-buffer (org-capture-get :original-buffer) (number-to-string (line-number-at-pos))))
+
+  (defun at/get-capture-region-or-line-content ()
+    "Get the content of the active region or the current line from the buffer org-capture was called from."
+
+    (if  (equal (plist-get org-store-link-plist :initial) "")
+        (with-current-buffer (org-capture-get :original-buffer) (thing-at-point 'line t))
+      (plist-get org-store-link-plist :initial)))
+
+  ;; Heavily inspired by: https://emacs.stackexchange.com/questions/10597/how-to-refile-into-a-datetree
+  (defun at/org-refile-to-datetree (&optional file date action)
+    "Refile a subtree to a datetree corresponding to a date.
+    If FILE is nil, refile in the current file. If DATE is nil
+    refile using the entries timestamp or, failing that, the
+    current time. If an ACTION expression is supplied execute it
+    after pasting the subtree."
+
+    ;; TODO: which timestamp do we actually want to use here?
+    (let* ((datetree-date (or date
+                              (org-entry-get nil "TIMESTAMP" t)
+                              (org-read-date t nil "now")))
+           (date (org-date-to-gregorian datetree-date)))
+      (with-current-buffer (current-buffer)
+        (save-excursion
+          (org-cut-subtree)
+          (if file (find-file file))
+          (org-datetree-find-iso-week-create date)
+          (org-narrow-to-subtree)
+          (show-subtree)
+          (org-end-of-subtree t)
+          (newline)
+          (goto-char (point-max))
+          (org-paste-subtree 4)
+          (if action (eval-expression action))
+          (widen)))))
+
+  (defun at/refile-to-meetings-at-date (date)
+    "Refile a subtree to the supplied date in meetings.org"
+
+    (interactive "sEnter date in yyyy-mm-dd format: ")
+    (at/org-refile-to-datetree "meetings.org" date nil))
+
+  (defun at/complete-regular-meeting (file-name template)
+    "Mark the top-level headline in FILE-NAME as done, refile the
+    entry to meetings.org and repopulate the file with the given
+    template."
+
+    (interactive)
+    (unless
+        (string= file-name buffer-file-name)
+      (error "Function called from unexpected location"))
+    (beginning-of-buffer)
+    (org-todo "DONE")
+    (at/org-refile-to-datetree "~/notebook/meetings.org" nil nil)
+    (insert template))
+#+END_SRC
+
+** Regular Meetings Example
+This is an example of how I process regular meetings like 1 to 1s:
+1. use the capture template below to gather agenda items during the week. These are accumulated into the 'My Agenda' heading in the given file.
+2. during the meeting work through the agenda in the file
+3. once the meeting is complete run ~at/complete-meeting-X~ which will refile the meeting into the main ~meetings.org~ file and setup a new empty template for the next one.
+#+BEGIN_SRC emacs-lisp :tangle no
+
+;; Add local capture settings to main list
+(setq org-capture-templates (append
+                             org-capture-templates
+                             '(
+                               ("mp" "Note for 1:1 with X"
+                                 item (file+olp "~/notebook/regular_meetings/1_to_1_with_X.org" "1:1 with X" "My Agenda")
+                                 "%i"
+                                 :empty-lines 0)
+                               )))
+
+(defun at/complete-meeting-X ()
+  "Go to the top level of the current entry, mark it as done, refile it and copy across a template for next time."
+
+  (interactive)
+  (at/complete-regular-meeting
+   "/Users/andrew.thompson/notebook/regular_meetings/1_to_1_with_X.org"
+   "* 1:1 with X :meeting:1_to_1:\n** My Agenda\n** Notes\n** Action Items"))
+#+END_SRC
+
+
 ** Export Options
 [[https://github.com/hniksic/emacs-htmlize][~htmlize~]] converts a buffer to HTML with nice syntax highlighting.
 #+BEGIN_SRC emacs-lisp
