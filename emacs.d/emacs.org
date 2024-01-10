@@ -450,10 +450,7 @@ improvement on this by popping up in a floating window. I'll try it for a while 
   (blink-cursor-mode -1)                                ; Steady cursor
   (pixel-scroll-precision-mode)                         ; Smooth scrolling
 
-  ;; Use common keystrokes by default
-  (cua-mode)
-
-  ;; Display line numbers in programming mode
+    ;; Display line numbers in programming mode
   (add-hook 'prog-mode-hook 'display-line-numbers-mode)
   (setopt display-line-numbers-width 3)           ; Set a minimum width
 
