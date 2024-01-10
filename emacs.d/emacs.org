@@ -59,7 +59,6 @@ Other useful ideas here:
 - [[https://dehora.net/journal/how-i-use-org-mode]]
 
 * Packages to try
-** ~dogears~
 ** ~urgrep~
 ** ~bookmarks+~
 - we can bookmark buffers that aren't backed by files e.g. scratch
@@ -852,6 +851,34 @@ Base extras:
     (setq completion-styles '(orderless)))
 #+END_SRC
 
+** Bookmarks
+#+BEGIN_SRC emacs-lisp
+  ;; disable annoying bookmark icons
+  (setq bookmark-fringe-mark nil)
+
+  (use-package dogears
+    ;; TODO use general here
+    :bind (:map global-map
+                ("M-g d" . dogears-go)
+                ("M-g M-b" . dogears-back)
+                ("M-g M-f" . dogears-forward)
+                ("M-g M-d" . dogears-list))
+    :general
+    (my-leader-def
+      "e" 'hydra-dogears/body)
+    :config
+    (setq dogears-idle 2
+          dogears-limit 300)
+    (add-to-list 'dogears-functions 'kill-ring-save)
+    ;;(add-hook 'dogears-hooks 'after-change-functions)
+    (dogears-mode)
+    :hydra (hydra-dogears (:column 2)
+                     ("p" dogears-back "Back")
+                     ("n" dogears-forward "Forward")
+                     ("g" dogears-go "Go" :exit t)
+                     ("l" dogears-list "List: ":bind nil :exit t)
+                     ("q" nil "quit")))
+#+END_SRC
 
 ** Help
 [[https://github.com/Wilfred/helpful][~helpful~]] provides a slightly nicer interface to the built-in help files.
@@ -890,7 +917,6 @@ Base extras:
   _R_sync            ^ ^              ^ ^                ^ ^                _?_ summary
   _z_ compress-file  _A_ find regexp
   _Z_ compress       _Q_ repl regexp
-
   T - tag prefix
   "
                  ("\\" dired-do-ispell)
