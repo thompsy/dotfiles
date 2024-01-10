@@ -557,7 +557,8 @@ global leader key, ~my-leader-def~ and chain bindings from that.
       "a" 'org-agenda
       "b" '(:ignore t :wk "bookmarks")
       "bs" 'bookmark-set
-      "bl" 'consult-bookmark
+      "bl" 'list-bookmarks
+      "bj" 'consult-bookmark
       ;; quit / restart
       "q" '(:ignore t :wk "quit / restart")
       "qq" 'save-buffers-kill-terminal
