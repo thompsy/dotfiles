@@ -1241,6 +1241,10 @@ Now we've got a hydra to make the various window management functions easily acc
     ;; Auto parenthesis matching
     ((prog-mode . electric-pair-mode)))
 
+  (use-package expreg
+    :general
+    ("M-<" 'expreg-contract)
+    ("M->" 'expreg-expand))
 #+END_SRC
 ** Git
 #+BEGIN_SRC emacs-lisp  
