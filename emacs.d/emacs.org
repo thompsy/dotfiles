@@ -928,6 +928,82 @@ smaller to larger screens.
     (setq vundo-glyph-alist vundo-unicode-symbols))
 #+END_SRC
 
+** Spelling
+#+BEGIN_SRC emacs-lisp
+  ;; (use-package jinx
+  ;;   :hook (emacs-startup . global-jinx-mode)
+  ;;   :general
+  ;;   ("M-$" 'jinx-correct)
+  ;;   ("C-M-$" 'jinx-languages))
+#+END_SRC
+
+~flyspell~ is Emacs' spelling mode. I've added a decent hydra here for convenience.
+ #+BEGIN_SRC emacs-lisp
+   (setenv "LANG" "en_GB")
+   (use-package flyspell
+     :general
+     (my-leader-def
+       "s" '(hydra-spelling/body :wk "Spell"))
+     :hook ((prog-mode . flyspell-prog-mode)
+            ((org-mode text-mode) . flyspell-mode))
+     :config
+     (setq ispell-dictionary "english"
+           ispell-silently-savep t
+           ispell-personal-dictionary "~/.emacs.d/.aspell.en.pws")
+     :hydra (hydra-spelling (:color blue :hint nil)
+                            "
+           ^
+           ^Spelling^          ^Errors^            ^Checker^
+           ^────────^──────────^──────^────────────^───────^───────
+           _q_ quit            _<_ previous        _c_ correction
+           ^^                  _>_ next            _d_ dictionary
+           ^^                  _f_ check           _m_ mode
+           ^^                  ^^                  ^^
+           "
+                            ("q" nil)
+                            ("<" flyspell-correct-previous :color pink)
+                            (">" flyspell-correct-next :color pink)
+                            ("c" ispell)
+                            ("d" ispell-change-dictionary)
+                            ("f" flyspell-buffer)
+                            ("m" flyspell-mode)))
+
+   (add-to-list 'ispell-skip-region-alist '(":\\(PROPERTIES\\|LOGBOOK\\):" . ":END:"))
+   (add-to-list 'ispell-skip-region-alist '("#\\+BEGIN_SRC" . "#\\+END_SRC"))
+
+   (use-package flyspell-correct
+     :after flyspell)
+
+   (use-package consult-flyspell
+     :after (flyspell consult))
+
+   ;; bundle this config together
+   ;; From: https://codeberg.org/ideasman42/emacs-spell-fu
+   ;; (use-package spell-fu)
+
+   ;; (add-hook 'org-mode-hook
+   ;;           (lambda ()
+   ;;             (setq spell-fu-faces-exclude
+   ;;                   '(org-block-begin-line
+   ;;                     org-block-end-line
+   ;;                     org-code
+   ;;                     org-date
+   ;;                     org-drawer org-document-info-keyword
+   ;;                     org-ellipsis
+   ;;                     org-link
+   ;;                     org-meta-line
+   ;;                     org-properties
+   ;;                     org-properties-value
+   ;;                     org-special-keyword
+   ;;                     org-src
+   ;;                     org-tag
+   ;;                     org-verbatim))
+   ;;             (spell-fu-mode)))
+
+   ;; (add-hook 'emacs-lisp-mode-hook
+   ;;           (lambda ()
+   ;;             (spell-fu-mode)))
+#+END_SRC
 
 ** Rectangles
 This is a hydra for working with the ~rectangle~ commands.
