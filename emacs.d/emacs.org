@@ -85,8 +85,8 @@ don't want to commit to Git.
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/local.el" :eval no :mkdirp yes
   (provide 'local-setup)
 
-  (setopt user-full-name "Andrew Thompson"
-          user-mail-address "github@downthewire.co.uk")
+  (setq user-full-name "Andrew Thompson"
+        user-mail-address "github@downthewire.co.uk")
 
   (defconst my/org-dir
     "~/notebook/")
@@ -100,30 +100,31 @@ The ~early-init.el~ file is called very early in the initialisation process, so 
 to disable ~package.el~ in favour of ~straight.el~.
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/early-init.el" :eval no
   ;; Startup speed, annoyance suppression
-  (setopt gc-cons-threshold 10000000
-          warning-suppress-log-types '((comp) (bytecomp))
-          native-comp-async-report-warnings-errors 'silent)
+  (setq gc-cons-threshold 10000000)
+  (setq byte-compile-warnings '(not obsolete))
+  (setq warning-suppress-log-types '((comp) (bytecomp)))
+  (setq native-comp-async-report-warnings-errors 'silent)
 
-  ;; All these tools are in the menu-bar anyway
-  (tool-bar-mode -1)
+  ;; Silence stupid startup message
+  (setq inhibit-startup-echo-area-message (user-login-name))
 
   ;; Default frame configuration: full screen, good-looking title bar on macOS
-  (setopt inhibit-startup-echo-area-message (user-login-name)
-          frame-resize-pixelwise t
-          default-frame-alist '((fullscreen . maximized)
+  (setq frame-resize-pixelwise t)
+  (tool-bar-mode -1)                      ; All these tools are in the menu-bar anyway
+  (setq default-frame-alist '((fullscreen . maximized)
 
-  			                  ;; Disable scollbars
-  			                  (vertical-scroll-bars . nil)
-  			                  (horizontal-scroll-bars . nil)
+  			    ;; You can turn off scroll bars by uncommenting these lines:
+  			    (vertical-scroll-bars . nil)
+  			    (horizontal-scroll-bars . nil)
 
-  			                  ;; Setting the face in here prevents flashes of
-  			                  ;; color as the theme gets activated
-  			                  (background-color . "#000000")
-  			                  (ns-appearance . dark)
-  			                  (ns-transparent-titlebar . t)))
+  			    ;; Setting the face in here prevents flashes of
+  			    ;; color as the theme gets activated
+  			    (background-color . "#000000")
+  			    (ns-appearance . dark)
+  			    (ns-transparent-titlebar . t)))
 
   ;; Disable the default package manager so we can use straight.el later
-  (setopt package-enable-at-startup nil)
+  (setq package-enable-at-startup nil)
 #+END_SRC
 
 * Preamble
@@ -143,7 +144,7 @@ keep it in a separate file.
 * Package Manager
 Setup the [[https://github.com/radian-software/straight.el][~straight.el~]] package manager.
 #+BEGIN_SRC emacs-lisp
-  (setopt straight-repository-branch "master")
+  (setq straight-repository-branch "master")
 
   (defvar bootstrap-version)
   (let ((bootstrap-file
@@ -170,7 +171,7 @@ call straight-prune-build occasionally, since otherwise this cache file may grow
 time.
 #+END_QUOTE
 #+BEGIN_SRC emacs-lisp
-  (setopt straight-cache-autoloads t)
+  (setq straight-cache-autoloads t)
 #+END_SRC
 
 In addition:
@@ -180,7 +181,7 @@ you explicitly override it with :straight nil.
 #+END_QUOTE
 
 #+BEGIN_SRC emacs-lisp
-  (setopt straight-use-package-by-default t)
+  (setq straight-use-package-by-default t)
 #+END_SRC
 
 todo: update this link
@@ -198,30 +199,30 @@ explicitly load it with straight early in the init process. See more details in 
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-  (setopt use-package-always-demand t)
+  (setq use-package-always-demand t)
 #+END_SRC
 * Core Configuration
 A few miscellaneous settings. Note that emacs is not really a package strictly speaking which is why we include ~:straight nil~ so that our package manager doesn't try to fetch the source.
 #+BEGIN_SRC emacs-lisp
-  (use-package emacs
-    :straight nil
-    :init
-    ;; answer with y/n instead of typing out yes/no
-    (defalias 'yes-or-no-p 'y-or-n-p)
-    :config
-    (setopt indent-tabs-mode nil
+    (use-package emacs
+      :straight nil
+      :init
+      ;; answer with y/n instead of typing out yes/no
+      (defalias 'yes-or-no-p 'y-or-n-p)
+      :config
+      (setq indent-tabs-mode nil
             tab-width 4
             show-trailing-whitespace t
-            fill-column 100
-            indent-tabs-mode nil
-            fill-column 100
-            sentence-end-double-space nil
-            display-time-default-load-average nil)
-    :custom
-    ;; load new source files instead of stale elisp bytecode
-    (load-prefer-newer t)
-    ;; allow emacs to be any size, removes black bars
-    (frame-resize-pixelwise t))
+            fill-column 100)
+      (setq-default indent-tabs-mode nil
+                    fill-column 100)
+      (setopt sentence-end-double-space nil
+              display-time-default-load-average nil)
+      :custom
+      ;; load new source files instead of stale elisp bytecode
+      (load-prefer-newer t)
+      ;; allow emacs to be any size, removes black bars
+      (frame-resize-pixelwise t))
 #+END_SRC
 
 It's useful to have buffers auto-revert when files on disk change especially when using Git branches a lot!
@@ -233,11 +234,11 @@ It's useful to have buffers auto-revert when files on disk change especially whe
     :config
     (global-auto-revert-mode +1)
     ;; Automatically reread from disk if the underlying file changes
-    (setopt auto-revert-avoid-polling t
-            ;; Some systems don't do file notifications well; see
-            ;; https://todo.sr.ht/~ashton314/emacs-bedrock/11
-            auto-revert-interval 5
-            auto-revert-check-vc-info t))
+    (setopt auto-revert-avoid-polling t)
+    ;; Some systems don't do file notifications well; see
+    ;; https://todo.sr.ht/~ashton314/emacs-bedrock/11
+    (setopt auto-revert-interval 5)
+    (setopt auto-revert-check-vc-info t))
 #+END_SRC
 
 Use the system keyboard when killing and yanking.
@@ -263,10 +264,10 @@ other persistent data under ~user-emacs-directory~ rather than spamming them in 
 #+BEGIN_SRC emacs-lisp
   (use-package no-littering
     :init
-    (setopt no-littering-etc-directory
-            (expand-file-name "etc/" user-emacs-directory)
-            no-littering-var-directory
-            (expand-file-name "var/" user-emacs-directory)))
+    (setq no-littering-etc-directory
+          (expand-file-name "etc/" user-emacs-directory)
+          no-littering-var-directory
+          (expand-file-name "var/" user-emacs-directory)))
 #+END_SRC
 
 Use a separate custom file to remove auto-generated code from ~init.el~. This should be loaded prior
@@ -298,19 +299,19 @@ Setup some basic file hygiene. Keep some backup files around, but keep them out 
     :init
     (recentf-mode 1)
     :config
-    (setopt backup-by-copying t
-            backup-directory-alist '((".*" . "~/.emacs.d/backups/"))
-            delete-old-versions t
-            delete-auto-save-files t
-            kept-new-versions 6
-            kept-old-versions 2
-            version-control t
-            vc-make-backup-files t
-            recentf-max-menu-items 25
-            recentf-max-saved-items 500
-            create-lockfiles nil
-            auto-save-file-name-transforms
-            `((".*" "~/.emacs.d/auto-saves/" t))))
+    (setq backup-by-copying t
+          backup-directory-alist '((".*" . "~/.emacs.d/backups/"))
+          delete-old-versions t
+          delete-auto-save-files t
+          kept-new-versions 6
+          kept-old-versions 2
+          version-control t
+          vc-make-backup-files t
+          recentf-max-menu-items 25
+          recentf-max-saved-items 500
+          create-lockfiles nil
+          auto-save-file-name-transforms
+          `((".*" "~/.emacs.d/auto-saves/" t))))
 #+END_SRC
 
 Use UTF-8 everywhere.
@@ -322,7 +323,7 @@ Use UTF-8 everywhere.
     (set-default-coding-systems 'utf-8-unix)
     (set-language-environment 'utf-8)
     (set-terminal-coding-system 'utf-8-unix)
-    (setopt locale-coding-system 'utf-8-unix)
+    (setq locale-coding-system 'utf-8-unix)
     (set-selection-coding-system 'utf-8-unix))
 #+END_SRC
 
@@ -331,12 +332,12 @@ Use UTF-8 everywhere.
   (use-package uniquify
     :straight nil
     :config
-    (setopt uniquify-buffer-name-style 'forward
-            uniquify-separator "/"
-            ;; rename after killing uniquified
-            uniquify-after-kill-buffer-p t
-            ;; don't muck with special buffers
-            uniquify-ignore-buffers-re "^\\*"))
+    (setq uniquify-buffer-name-style 'forward
+          uniquify-separator "/"
+          ;; rename after killing uniquified
+          uniquify-after-kill-buffer-p t
+          ;; don't muck with special buffers
+          uniquify-ignore-buffers-re "^\\*"))
 #+END_SRC
 
 ** Discoverability
@@ -378,8 +379,8 @@ improvement on this by popping up in a floating window. I'll try it for a while 
 
   ;; Save history of minibuffer
   (savehist-mode)
-  (setopt savehist-additional-variables '(kill-ring search-ring regexp-search-ring))
-  (setopt savehist-file "~/.emacs.d/tmp/savehist")
+  (setq savehist-additional-variables '(kill-ring search-ring regexp-search-ring))
+  (setq savehist-file "~/.emacs.d/tmp/savehist")
 
 #+END_SRC
 
@@ -421,13 +422,13 @@ Turn off a bunch of frame related functionality for a more minimal experience.
     :straight nil
     :config
     (blink-cursor-mode -1)
-    (setopt initial-scratch-message ""
-            inhibit-startup-message t
-            visible-bell nil
-            ring-bell-function 'ignore
-            initial-frame-alist
-            '((menu-bar-lines . 0)
-              (tool-bar-lines . 0)))
+    (setq initial-scratch-message ""
+          inhibit-startup-message t
+          visible-bell nil
+          ring-bell-function 'ignore
+          initial-frame-alist
+          '((menu-bar-lines . 0)
+            (tool-bar-lines . 0)))
     (scroll-bar-mode 0)
     (tool-bar-mode 0)
     (menu-bar-mode 0)
@@ -435,7 +436,7 @@ Turn off a bunch of frame related functionality for a more minimal experience.
 #+END_SRC
 
 [[https://draculatheme.com/emacs][Dracula]] is a nice theme that's available for lots of apps.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp  
   (use-package dracula-theme
     :config
     (load-theme 'dracula))
@@ -457,7 +458,7 @@ Turn off a bunch of frame related functionality for a more minimal experience.
     (column-number-mode +1)
     (doom-modeline-mode +1)
     :config
-    (setopt doom-modeline-height 1)
+    (setq doom-modeline-height 1)
     (set-face-attribute 'mode-line nil :height 150)
     (set-face-attribute 'mode-line-inactive nil :height 150)
     :custom
@@ -606,12 +607,11 @@ Base extras:
 #+BEGIN_SRC emacs-lisp
   (use-package avy
     :demand t
-    :config
-    (setopt avy-background t
-      	    avy-keys '(
-                       ?a ?r ?s ?t ?g ?m ?n ?e ?i ?o
-      		       ?z ?x ?c ?d ?v ?k ?h ?, ?.
-      		       ?q ?w ?f ?p ?b ?j ?l ?u ?'))
+    :config (setq avy-background t
+      		avy-keys '(
+      			   ?a ?r ?s ?t ?g ?m ?n ?e ?i ?o
+      			   ?z ?x ?c ?d ?v ?k ?h ?, ?.
+      			   ?q ?w ?f ?p ?b ?j ?l ?u ?'))
     :general ("C-'" 'avy-goto-char-timer))
 
 #+END_SRC
@@ -673,7 +673,7 @@ Base extras:
       	 )
     :config
     ;; Narrowing lets you restrict results to certain groups of candidates
-    (setopt consult-narrow-key "<")
+    (setq consult-narrow-key "<")
 
     ;; set manual preview for result that will require a disk read
     (consult-customize
@@ -719,7 +719,7 @@ Base extras:
 #+END_SRC
 
 ** Minibuffer
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp  
   ;; Vertico: better vertical completion for minibuffer commands
   (use-package vertico
     :init
@@ -742,7 +742,7 @@ Base extras:
 #+END_SRC
 
 ** Completion
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp  
   ;; Popup completion-at-point
   (use-package corfu
     :straight (:files (:defaults "extensions/*"))
@@ -796,13 +796,13 @@ Base extras:
   ;; Orderless: powerful completion style
   (use-package orderless
     :config
-    (setopt completion-styles '(orderless)))
+    (setq completion-styles '(orderless)))
 #+END_SRC
 
 ** Bookmarks
 #+BEGIN_SRC emacs-lisp
   ;; disable annoying bookmark icons
-  (setopt bookmark-fringe-mark nil)
+  (setq bookmark-fringe-mark nil)
 
   (use-package dogears
     ;; TODO use general here
@@ -815,8 +815,8 @@ Base extras:
     (my-leader-def
       "e" 'hydra-dogears/body)
     :config
-    (setopt dogears-idle 2
-            dogears-limit 300)
+    (setq dogears-idle 2
+          dogears-limit 300)
     (add-to-list 'dogears-functions 'kill-ring-save)
     ;;(add-hook 'dogears-hooks 'after-change-functions)
     (dogears-mode)
@@ -912,7 +912,7 @@ Base extras:
 
   (use-package dired-git-info
     :config
-    (setopt dgi-auto-hide-details-p nil)
+    (setq dgi-auto-hide-details-p nil)
     (add-hook 'dired-after-readin-hook 'dired-git-info-auto-enable))
 
   (use-package all-the-icons-dired
@@ -935,7 +935,7 @@ Base extras:
   (use-package vundo
     :config
     ;; use a nicer unicode font to display the tree
-    (setopt vundo-glyph-alist vundo-unicode-symbols))
+    (setq vundo-glyph-alist vundo-unicode-symbols))
 #+END_SRC
 
 
@@ -1024,7 +1024,7 @@ copying windows.
     :general
     ("C-x o" 'ace-window)
     :config
-    (setopt aw-keys '(?a ?r ?s ?t ?n ?e ?i ?o)))
+    (setq aw-keys '(?a ?r ?s ?t ?n ?e ?i ?o)))
 #+END_SRC
 
 [[https://github.com/dimitri/switch-window][~switch-window~]] allows for easy switching between windows within a frame. It's slightly better than
@@ -1156,35 +1156,35 @@ Now we've got a hydra to make the various window management functions easily acc
   (use-package emacs
     :config
     ;; Treesitter config
-    (setopt treesit-language-source-alist
-  	      '((bash "https://github.com/tree-sitter/tree-sitter-bash")
-  	        (cmake "https://github.com/uyha/tree-sitter-cmake")
-  	        (css "https://github.com/tree-sitter/tree-sitter-css")
-  	        (elisp "https://github.com/Wilfred/tree-sitter-elisp")
-  	        (go "https://github.com/tree-sitter/tree-sitter-go")
-  	        (gomod "https://github.com/camdencheek/tree-sitter-go-mod")
-  	        (dockerfile "https://github.com/camdencheek/tree-sitter-dockerfile")
-  	        (html "https://github.com/tree-sitter/tree-sitter-html")
-  	        (javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
-  	        (json "https://github.com/tree-sitter/tree-sitter-json")
-  	        (make "https://github.com/alemuller/tree-sitter-make")
-  	        (markdown "https://github.com/ikatyang/tree-sitter-markdown")
-  	        (python "https://github.com/tree-sitter/tree-sitter-python")
-  	        (toml "https://github.com/tree-sitter/tree-sitter-toml")
-  	        (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
-  	        (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
-  	        (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
+    (setq treesit-language-source-alist
+  	'((bash "https://github.com/tree-sitter/tree-sitter-bash")
+  	  (cmake "https://github.com/uyha/tree-sitter-cmake")
+  	  (css "https://github.com/tree-sitter/tree-sitter-css")
+  	  (elisp "https://github.com/Wilfred/tree-sitter-elisp")
+  	  (go "https://github.com/tree-sitter/tree-sitter-go")
+  	  (gomod "https://github.com/camdencheek/tree-sitter-go-mod")
+  	  (dockerfile "https://github.com/camdencheek/tree-sitter-dockerfile")
+  	  (html "https://github.com/tree-sitter/tree-sitter-html")
+  	  (javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
+  	  (json "https://github.com/tree-sitter/tree-sitter-json")
+  	  (make "https://github.com/alemuller/tree-sitter-make")
+  	  (markdown "https://github.com/ikatyang/tree-sitter-markdown")
+  	  (python "https://github.com/tree-sitter/tree-sitter-python")
+  	  (toml "https://github.com/tree-sitter/tree-sitter-toml")
+  	  (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
+  	  (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
+  	  (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
     ;; Tell Emacs to prefer the treesitter mode
     ;; You'll want to run the command `M-x treesit-install-language-grammar' before editing.
-    (setopt major-mode-remap-alist
-  	      '((yaml-mode . yaml-ts-mode)
-  	        (bash-mode . bash-ts-mode)
-  	        (go-mode . go-ts-mode)
-  	        (js2-mode . js-ts-mode)
-  	        (typescript-mode . typescript-ts-mode)
-  	        (json-mode . json-ts-mode)
-  	        (css-mode . css-ts-mode)
-  	        (python-mode . python-ts-mode)))
+    (setq major-mode-remap-alist
+  	'((yaml-mode . yaml-ts-mode)
+  	  (bash-mode . bash-ts-mode)
+  	  (go-mode . go-ts-mode)
+  	  (js2-mode . js-ts-mode)
+  	  (typescript-mode . typescript-ts-mode)
+  	  (json-mode . json-ts-mode)
+  	  (css-mode . css-ts-mode)
+  	  (python-mode . python-ts-mode)))
     :hook
     ;; Auto parenthesis matching
     ((prog-mode . electric-pair-mode)))
@@ -1195,7 +1195,7 @@ Now we've got a hydra to make the various window management functions easily acc
     ("M->" 'expreg-expand))
 #+END_SRC
 ** Git
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp  
   (use-package magit
     :general
     ("C-x g" 'magit-status)
@@ -1310,7 +1310,7 @@ A nice Hydra menu to make things more accessible.
 #+END_SRC
 
 ** Particular Programming modes
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp  
   (use-package markdown-mode
     :hook ((markdown-mode . visual-line-mode)))
 
@@ -1342,8 +1342,8 @@ These packages need to be installed in the Python environment too.
   (use-package yasnippet
     :config
     (yas-global-mode +1)
-    (setopt yas-snippet-dirs (append yas-snippet-dirs
-  				                   '("~/.emacs.d/snippets/"))))
+    (setq yas-snippet-dirs (append yas-snippet-dirs
+  				 '("~/.emacs.d/snippets/"))))
 
   (use-package yasnippet-snippets
     :after yasnippet)
@@ -1374,25 +1374,23 @@ See helpful examples at:
     (org-mode-map "C-'" nil)
 
     :config
-    (setopt org-agenda-files my/org-agenda-files
-            org-directory my/org-dir
-            org-tags-column 75
-             ;; hide the log state change history a bit better
-            org-log-into-drawer t
-            org-deadline-warning-days 7
-            org-agenda-skip-scheduled-if-deadline-is-shown t
-            org-habit-graph-column 65
-             ;; show hours at max, not days
-            org-duration-format 'h:mm
-            org-agenda-compact-blocks t
-            org-cycle-separator-lines 0
-            ;; hide empty agenda sections
-            org-agenda-clockreport-parameter-plist '(:stepskip0 t :link t :maxlevel 2 :fileskip0 t)
-            ;; default show today
-            org-agenda-span 'day
-            org-agenda-start-day "-0d"
-            org-agenda-start-on-weekday 1)
-    (setq org-agenda-custom-commands
+    (setq org-agenda-files my/org-agenda-files
+          org-directory my/org-dir
+          org-tags-column 75
+          org-log-into-drawer t ;; hide the log state change history a bit better
+          org-deadline-warning-days 7
+          org-agenda-skip-scheduled-if-deadline-is-shown t
+          org-habit-graph-column 65
+          org-duration-format 'h:mm ;; show hours at max, not days
+          org-agenda-compact-blocks t
+          org-cycle-separator-lines 0
+          ;; hide empty agenda sections
+          org-agenda-clockreport-parameter-plist '(:stepskip0 t :link t :maxlevel 2 :fileskip0 t)
+          ;; default show today
+          org-agenda-span 'day
+          org-agenda-start-day "-0d"
+          org-agenda-start-on-weekday 1
+          org-agenda-custom-commands
           '(("d" "Done tasks" tags "/DONE|CANCELED")
             ("g" "Plan Today"
              ((agenda "" ((org-agenda-span 'day)))
@@ -1428,36 +1426,36 @@ See helpful examples at:
 
 ** Tags
 #+BEGIN_SRC emacs-lisp
-  (setopt org-tag-alist '(
-                          ;; Task types
-                          (:startgroup . nil)
-                          ("email" . ?e)
-                          ("design" . ?d)
-                          ("implementation" . ?M)
-                          ("improvement" . ?r)
-                          ("investigation" . ?v)
-                          (:endgroup . nil)
+  (setq org-tag-alist '(
+                        ;; Task types
+                        (:startgroup . nil)
+                        ("email" . ?e)
+                        ("design" . ?d)
+                        ("implementation" . ?M)
+                        ("improvement" . ?r)
+                        ("investigation" . ?v)
+                        (:endgroup . nil)
 
-                          ;; Meeting types
-                          (:startgroup . nil)
-                          ("weekly_setup" . ?S)
-                          ("weekly_wrap_up" . ?W)
-                          ("1_to_1" . ?1)
-                          (:endgroup . nil)
+                        ;; Meeting types
+                        (:startgroup . nil)
+                        ("weekly_setup" . ?S)
+                        ("weekly_wrap_up" . ?W)
+                        ("1_to_1" . ?1)
+                        (:endgroup . nil)
 
-                          ;; Code TODOs tags
-                          ("questionable_code" . ?q)
-                          ("refactor" . ?F)
+                        ;; Code TODOs tags
+                        ("questionable_code" . ?q)
+                        ("refactor" . ?F)
 
-                          ;; Special tags
-                          ("CRITICAL" . ?c)
+                        ;; Special tags
+                        ("CRITICAL" . ?c)
 
-                          ;; Meeting tags
-                          ("meeting" . ?m)
+                        ;; Meeting tags
+                        ("meeting" . ?m)
 
-                          ;; Work Log Tags
-                          ("accomplishment" . ?A)
-                          ))
+                        ;; Work Log Tags
+                        ("accomplishment" . ?A)
+                        ))
 #+END_SRC
 
 ** Capture Templates
@@ -1469,13 +1467,13 @@ See helpful examples at:
     (my-leader-def
       "c" 'org-capture)
     :config
-    (setopt org-refile-targets '((nil :maxlevel . 9)
-                                 (org-agenda-files :maxlevel . 9))
-            ;; Refile in a single go
-            org-outline-path-complete-in-steps nil
-            ;; Show full paths for refiling
-            org-refile-use-outline-path t)
-    (setq org-capture-templates
+    (setq org-refile-targets '((nil :maxlevel . 9)
+                               (org-agenda-files :maxlevel . 9))
+          ;; Refile in a single go
+          org-outline-path-complete-in-steps nil
+          ;; Show full paths for refiling
+          org-refile-use-outline-path t
+          org-capture-templates
           '(
             ("c" "Note on current task" plain (clock) "\n\n%T from: %a\n%i\n%?")
 
@@ -1572,23 +1570,24 @@ This is an example of how I process regular meetings like 1 to 1s:
 2. during the meeting work through the agenda in the file
 3. once the meeting is complete run ~at/complete-meeting-X~ which will refile the meeting into the main ~meetings.org~ file and setup a new empty template for the next one.
 #+BEGIN_SRC emacs-lisp :tangle no
-  ;; Add local capture settings to main list
-  (setopt org-capture-templates (append
-                                 org-capture-templates
-                                 '(
-                                   ("mp" "Note for 1:1 with X"
-                                    item (file+olp "~/notebook/regular_meetings/1_to_1_with_X.org" "1:1 with X" "My Agenda")
-                                    "%i"
-                                    :empty-lines 0)
-                                   )))
 
-  (defun at/complete-meeting-X ()
-    "Go to the top level of the current entry, mark it as done, refile it and copy across a template for next time."
+;; Add local capture settings to main list
+(setq org-capture-templates (append
+                             org-capture-templates
+                             '(
+                               ("mp" "Note for 1:1 with X"
+                                 item (file+olp "~/notebook/regular_meetings/1_to_1_with_X.org" "1:1 with X" "My Agenda")
+                                 "%i"
+                                 :empty-lines 0)
+                               )))
 
-    (interactive)
-    (at/complete-regular-meeting
-     "/Users/andrew.thompson/notebook/regular_meetings/1_to_1_with_X.org"
-     "* 1:1 with X :meeting:1_to_1:\n** My Agenda\n** Notes\n** Action Items"))
+(defun at/complete-meeting-X ()
+  "Go to the top level of the current entry, mark it as done, refile it and copy across a template for next time."
+
+  (interactive)
+  (at/complete-regular-meeting
+   "/Users/andrew.thompson/notebook/regular_meetings/1_to_1_with_X.org"
+   "* 1:1 with X :meeting:1_to_1:\n** My Agenda\n** Notes\n** Action Items"))
 #+END_SRC
 
 
@@ -1599,77 +1598,77 @@ This is an example of how I process regular meetings like 1 to 1s:
   (use-package org-super-agenda
     :after org-agenda
     :config
-    (setopt org-super-agenda-header-map nil)
+    (setq org-super-agenda-header-map nil)
     (org-super-agenda-mode))
 
-  (setopt org-agenda-custom-commands
-          '(
-            ("j" "Andrew's Super View"
-             (
-              (agenda ""
-                      (
-                       (org-agenda-remove-tags t)
-                       (org-agenda-span 7)
-                       )
-                      )
+  (setq org-agenda-custom-commands
+        '(
+          ("j" "Andrew's Super View"
+           (
+            (agenda ""
+                    (
+                     (org-agenda-remove-tags t)
+                     (org-agenda-span 7)
+                     )
+                    )
 
-              (alltodo ""
-                       (
-                        ;; Remove tags to make the view cleaner
-                        (org-agenda-remove-tags t)
-                        (org-agenda-prefix-format "  %t  %s")
-                        (org-agenda-overriding-header "CURRENT STATUS")
+            (alltodo ""
+                     (
+                      ;; Remove tags to make the view cleaner
+                      (org-agenda-remove-tags t)
+                      (org-agenda-prefix-format "  %t  %s")
+                      (org-agenda-overriding-header "CURRENT STATUS")
 
-                        ;; Define the super agenda groups (sorts by order)
-                        (org-super-agenda-groups
-                         '(
-                           ;; Filter where tag is CRITICAL
-                           (:name "Critical Tasks"
-                                  :tag "CRITICAL"
-                                  :order 0
-                                  )
-                           ;; Filter where TODO state is IN-PROGRESS
-                           (:name "Currently Working"
-                                  :todo "IN-PROGRESS"
-                                  :order 1
-                                  )
-                           ;; Filter where TODO state is PLANNING
-                           (:name "Planning Next Steps"
-                                  :todo "PLANNING"
-                                  :order 2
-                                  )
-                           ;; Filter where TODO state is BLOCKED or where the tag is obstacle
-                           (:name "Problems & Blockers"
-                                  :todo "BLOCKED"
-                                  :tag "obstacle"
-                                  :order 3
-                                  )
-                           ;; Filter where tag is meeting and priority is A (only want TODOs from meetings)
-                           (:name "Meeting Action Items"
-                                  :and (:tag "meeting" :priority "A")
-                                  :order 8
-                                  )
-                           ;; Filter where state is TODO and the priority is A and the tag is not meeting
-                           (:name "Other Important Items"
-                                  :and (:todo "TODO" :priority "A" :not (:tag "meeting"))
-                                  :order 9
-                                  )
-                           ;; Filter where state is TODO and priority is B
-                           (:name "General Backlog"
-                                  :and (:todo "TODO" :priority "B")
-                                  :order 10
-                                  )
-                           ;; Filter where the priority is C or less (supports future lower priorities)
-                           (:name "Non Critical"
-                                  :priority<= "C"
-                                  :order 11
-                                  )
-                           ;; Filter where TODO state is VERIFYING
-                           (:name "Currently Being Verified"
-                                  :todo "VERIFYING"
-                                  :order 20
-                                  )
-                           ))))))))
+                      ;; Define the super agenda groups (sorts by order)
+                      (org-super-agenda-groups
+                       '(
+                         ;; Filter where tag is CRITICAL
+                         (:name "Critical Tasks"
+                                :tag "CRITICAL"
+                                :order 0
+                                )
+                         ;; Filter where TODO state is IN-PROGRESS
+                         (:name "Currently Working"
+                                :todo "IN-PROGRESS"
+                                :order 1
+                                )
+                         ;; Filter where TODO state is PLANNING
+                         (:name "Planning Next Steps"
+                                :todo "PLANNING"
+                                :order 2
+                                )
+                         ;; Filter where TODO state is BLOCKED or where the tag is obstacle
+                         (:name "Problems & Blockers"
+                                :todo "BLOCKED"
+                                :tag "obstacle"
+                                :order 3
+                                )
+                         ;; Filter where tag is meeting and priority is A (only want TODOs from meetings)
+                         (:name "Meeting Action Items"
+                                :and (:tag "meeting" :priority "A")
+                                :order 8
+                                )
+                         ;; Filter where state is TODO and the priority is A and the tag is not meeting
+                         (:name "Other Important Items"
+                                :and (:todo "TODO" :priority "A" :not (:tag "meeting"))
+                                :order 9
+                                )
+                         ;; Filter where state is TODO and priority is B
+                         (:name "General Backlog"
+                                :and (:todo "TODO" :priority "B")
+                                :order 10
+                                )
+                         ;; Filter where the priority is C or less (supports future lower priorities)
+                         (:name "Non Critical"
+                                :priority<= "C"
+                                :order 11
+                                )
+                         ;; Filter where TODO state is VERIFYING
+                         (:name "Currently Being Verified"
+                                :todo "VERIFYING"
+                                :order 20
+                                )
+                     ))))))))
 
   (defhydra hydra-org-agenda (:pre (setq which-key-inhibit t)
                                    :post (setq which-key-inhibit nil)
