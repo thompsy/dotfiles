@@ -1393,6 +1393,13 @@ See helpful examples at:
     (global-org-modern-mode))
 #+end_src
 
+
+[[https://github.com/calvinwyoung/org-autolist][~org-autolist~]] modifies the way ~RET~ works when inserting lists to make it a bit more intuitive.
+#+BEGIN_SRC emacs-lisp
+  (use-package org-autolist
+    :hook (org-mode . org-autolist-mode))
+#+END_SRC
+
 ** Task States
 #+BEGIN_SRC emacs-lisp
   (setq org-todo-keywords
