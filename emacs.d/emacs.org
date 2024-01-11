@@ -1294,7 +1294,8 @@ A nice Hydra menu to make things more accessible.
     :straight nil
     :hook
     ((go-ts-mode . eglot-ensure)
-     (python-ts-mode . eglot-ensure))
+     (python-ts-mode . eglot-ensure)
+     (sh-mode . eglot-ensure))
     :custom
     (eglot-send-changes-idle-time 0.1)
     ;; activate Eglot in referenced non-project files
