@@ -585,8 +585,8 @@ smaller to larger screens.
                        ("q" nil "quit")))
 #+END_SRC
 
-* Motion Aids
-Base extras:
+* Navigation
+** Avy
 #+BEGIN_SRC emacs-lisp
   (use-package avy
     :demand t
@@ -596,10 +596,8 @@ Base extras:
       			   ?z ?x ?c ?d ?v ?k ?h ?, ?.
       			   ?q ?w ?f ?p ?b ?j ?l ?u ?'))
     :general ("C-'" 'avy-goto-char-timer))
-
 #+END_SRC
 
-* Navigation
 ** Consult
 #+BEGIN_SRC emacs-lisp
   (use-package embark-consult
