@@ -21,7 +21,10 @@ available. A few places that I've found particularly useful include:
 
 * Setup
 ** Config Updates
-*** Python issues
+*** DONE Python encoding issues
+:LOGBOOK:
+- State "DONE"       from              [2024-01-11 Thu 14:42]
+:END:
 This is the error:
 #+begin_src
 [stderr] Process EGLOT (arnold/(python-ts-mode python-mode)) stderr<1> finished
@@ -37,30 +40,33 @@ Possible solution from https://www.emacswiki.org/emacs/PythonProgrammingInEmacs:
 (setenv "LC_ALL" "en_US.UTF-8")
 (setenv "LANG" "en_US.UTF-8")
 #+end_src
-*** Add a comment to all leader keys for hydra
-*** Setup spelling and easy usage
+*** TODO Add a comment to all leader keys for hydra
+*** TODO Setup spelling and easy usage
 - https://codeberg.org/ideasman42/emacs-spell-fu
   - exclude specific faces. Looks good.
 - https://github.com/redguardtoo/wucuo
-*** Spelling should deal with ordinals
+*** TODO Spelling should deal with ordinals
 e.g. 2nd, 3rd
+*** TODO [#A] Minibuffer doesn't seem to be using history
+*** TODO [#A] Use Flycheck instead of Flymake
+Flycheck allows for different sources in parallel, e.g. ~gopls~ and ~golangci~.
 
-*** Experiment with ~treesit-font-lock-level~
-*** Explore ~transient-mark-mode~
+*** TODO Experiment with ~treesit-font-lock-level~
+*** TODO Explore ~transient-mark-mode~
 See [[https://www.masteringemacs.org/article/fixing-mark-commands-transient-mark-mode]]
-*** Figure out a way to autoload treesitter grammars
+*** TODO Figure out a way to autoload treesitter grammars
 It would also be good to keep these up to date.
-*** Have all hydras use q for quit
-*** Have ~project.el~ run the correct make target as compile command
-*** Corfu popup without hitting tab
+*** TODO Have all hydras use q for quit
+*** TODO Have ~project.el~ run the correct make target as compile command
+*** TODO Corfu popup without hitting tab
 - it might be nice to have this always popup with suggestions bars on the context e.g. Go, org etc. This might be Cape rather then Corfu
 - this might be helpful https://emacs.stackexchange.com/questions/78237/automatic-popup-of-words-from-the-buffer-using-corfu-and-dabbrev
 - this is useful context too https://www.reddit.com/r/emacs/comments/td0nth/sample_usage_of_cape_completion_at_point/
-*** Expore buffer placement options
+*** TODO Expore buffer placement options
 See [[https://www.masteringemacs.org/article/demystifying-emacs-window-manager]]
 
 ** Org-mode
-*** Document tangling from the command line
+*** TODO Document tangling from the command line
 See [[https://emacs.stackexchange.com/questions/27126/is-it-possible-to-org-bable-tangle-an-org-file-from-the-command-line]]
 *** Tags
 Ideas here:
@@ -74,25 +80,25 @@ Other useful ideas here:
 - [[https://dehora.net/journal/how-i-use-org-mode]]
 
 ** Packages to try
-*** ~urgrep~
-*** ~bookmarks+~
+*** TODO ~urgrep~
+*** TODO ~bookmarks+~
 - we can bookmark buffers that aren't backed by files e.g. scratch
-*** ~wgrep~
-*** ~tresitter-context~
-*** ~explain-pause-mode~
-*** ~visible-mark-mode~
-*** ~hyperbole~
-*** Debugging with ~dape~
-*** ~org-sticky-header~
+*** TODO ~wgrep~
+*** TODO ~tresitter-context~
+*** TODO ~explain-pause-mode~
+*** TODO ~visible-mark-mode~
+*** TODO ~hyperbole~
+*** TODO Debugging with ~dape~
+*** TODO ~org-sticky-header~
 ** Future Ideas
-*** Explore these configs
+*** TODO Explore these configs
 - [[https://old.reddit.com/r/emacs/comments/ehjcu2/screenshot_polishing_my_emacs_who_said_an_old/]]
 - [[https://kristofferbalintona.me/posts/202202211546/]]
   - good ideas with Vertico etc here
 - [[https://kristofferbalintona.me/posts/202202270056/]]
   - Corfu related config
 - [[https://protesilaos.com/emacs/dotemacs]]
-*** Explore ~embark~ more
+*** TODO Explore ~embark~ more
 
 * Local
 These are various, installation specific settings that might differ across machines, some of which I
