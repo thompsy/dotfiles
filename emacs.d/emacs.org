@@ -347,7 +347,10 @@ Use UTF-8 everywhere.
     (set-language-environment 'utf-8)
     (set-terminal-coding-system 'utf-8-unix)
     (setq locale-coding-system 'utf-8-unix)
-    (set-selection-coding-system 'utf-8-unix))
+    (set-selection-coding-system 'utf-8-unix)
+    (setenv "LC_CTYPE" "UTF-8")
+    (setenv "LC_ALL" "en_US.UTF-8")
+    (setenv "LANG" "en_US.UTF-8"))
 #+END_SRC
 
 ~uniqify~ renames buffers with the same name so that they're easier to distinguish.
@@ -1435,12 +1438,6 @@ These packages need to be installed in the Python environment too.
 
 #+BEGIN_SRC emacs-lisp
   (use-package pyvenv)
-
-  (add-hook 'python-ts-mode-hook
-            (lambda ()
-              (setenv "LC_CTYPE" "UTF-8")
-              (setenv "LC_ALL" "en_US.UTF-8")
-              (setenv "LANG" "en_US.UTF-8")))
 #+END_SRC
 
 * Yasnippets
