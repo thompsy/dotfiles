@@ -1753,6 +1753,22 @@ This is an example of how I process regular meetings like 1 to 1s:
     :defer t)
 #+END_SRC
 
+
+Useful function by
+[[https://old.reddit.com/r/emacs/comments/e98yyf/send_output_of_orgmdexportasmarkdownstraight_to/][ImmediateCurve]]
+for exporting the region to the clipboard as markdown.
+#+begin_src emacs-lisp
+  (defun org-to-clipboard-as-markdown ()
+    "Copy region to clipboard as markdown."
+    (interactive)
+    (save-window-excursion
+      (let ((org-export-with-toc nil))
+        (with-current-buffer (org-md-export-as-markdown)
+          (with-no-warnings (mark-whole-buffer))
+          (clipboard-kill-region (point-min) (point-max))
+          (kill-buffer-and-window)))))
+#+end_src
+
 * Site Local
 Various setup like sensitive tags and functions that deal with them are stored elsewhere and loaded here.
 #+begin_src emacs-lisp
