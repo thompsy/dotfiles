@@ -501,7 +501,7 @@ neat way. Note that ~:wk~ allows us to specify the text that is displayed by ~wh
 
 This hydra provides easy access to various package management commands.
 #+BEGIN_SRC emacs-lisp
-  (my-leader-def "s" '(hydra-straight-helper/body :wk "pkgs"))
+  (my-leader-def "P" '(hydra-straight-helper/body :wk "pkgs"))
   (defhydra hydra-straight-helper (:hint nil :color green)
     "
         _c_heck all       |_f_etch all     |_m_erge all      |_n_ormalize all   |p_u_sh all
