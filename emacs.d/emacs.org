@@ -1203,7 +1203,7 @@ Now we've got a hydra to make the various window management functions easily acc
       "g" 'hydra-my-git-menu/body)
     :config
     ;; This sets Magit to use the fullframe
-    (setq magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
+    ;; (setq magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
     (defun my/magit-yank-branch-name ()
       "Show the current branch in the echo-area and add it to the `kill-ring'."
       (interactive)
