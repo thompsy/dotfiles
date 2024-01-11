@@ -436,7 +436,7 @@ Turn off a bunch of frame related functionality for a more minimal experience.
 #+END_SRC
 
 [[https://draculatheme.com/emacs][Dracula]] is a nice theme that's available for lots of apps.
-#+BEGIN_SRC emacs-lisp  
+#+BEGIN_SRC emacs-lisp
   (use-package dracula-theme
     :config
     (load-theme 'dracula))
@@ -719,7 +719,7 @@ Base extras:
 #+END_SRC
 
 ** Minibuffer
-#+BEGIN_SRC emacs-lisp  
+#+BEGIN_SRC emacs-lisp
   ;; Vertico: better vertical completion for minibuffer commands
   (use-package vertico
     :init
@@ -742,7 +742,7 @@ Base extras:
 #+END_SRC
 
 ** Completion
-#+BEGIN_SRC emacs-lisp  
+#+BEGIN_SRC emacs-lisp
   ;; Popup completion-at-point
   (use-package corfu
     :straight (:files (:defaults "extensions/*"))
@@ -1195,7 +1195,7 @@ Now we've got a hydra to make the various window management functions easily acc
     ("M->" 'expreg-expand))
 #+END_SRC
 ** Git
-#+BEGIN_SRC emacs-lisp  
+#+BEGIN_SRC emacs-lisp
   (use-package magit
     :general
     ("C-x g" 'magit-status)
@@ -1310,7 +1310,7 @@ A nice Hydra menu to make things more accessible.
 #+END_SRC
 
 ** Particular Programming modes
-#+BEGIN_SRC emacs-lisp  
+#+BEGIN_SRC emacs-lisp
   (use-package markdown-mode
     :hook ((markdown-mode . visual-line-mode)))
 
