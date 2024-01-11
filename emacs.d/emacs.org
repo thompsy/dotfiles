@@ -21,6 +21,22 @@ available. A few places that I've found particularly useful include:
 
 * Setup
 ** Config Updates
+*** Python issues
+This is the error:
+#+begin_src
+[stderr] Process EGLOT (arnold/(python-ts-mode python-mode)) stderr<1> finished
+[stderr] Fatal Python error: config_get_locale_encoding: failed to get the locale encoding: nl_langinfo(CODESET) failed
+[stderr] Python runtime state: preinitialized
+#+end_src
+
+This is the same error: https://stackoverflow.com/questions/60557160/python3-8-fails-with-fatal-python-error-config-get-locale-encoding
+
+Possible solution from https://www.emacswiki.org/emacs/PythonProgrammingInEmacs:
+#+begin_src
+(setenv "LC_CTYPE" "UTF-8")
+(setenv "LC_ALL" "en_US.UTF-8")
+(setenv "LANG" "en_US.UTF-8")
+#+end_src
 *** Add a comment to all leader keys for hydra
 *** Setup spelling and easy usage
 - https://codeberg.org/ideasman42/emacs-spell-fu
@@ -1413,6 +1429,12 @@ These packages need to be installed in the Python environment too.
 
 #+BEGIN_SRC emacs-lisp
   (use-package pyvenv)
+
+  (add-hook 'python-ts-mode-hook
+            (lambda ()
+              (setenv "LC_CTYPE" "UTF-8")
+              (setenv "LC_ALL" "en_US.UTF-8")
+              (setenv "LANG" "en_US.UTF-8")))
 #+END_SRC
 
 * Yasnippets
