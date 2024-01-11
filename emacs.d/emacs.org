@@ -659,21 +659,22 @@ smaller to larger screens.
 
   (use-package consult-project-extra
     :straight t
-    :bind
-    (("C-x p f" . consult-project-extra-find)
-     ("C-x p o" . consult-project-extra-find-other-window)))
+    :general
+    ("C-x p f" 'consult-project-extra-find)
+    ("C-x p o" 'consult-project-extra-find-other-window))
 
   (use-package consult-dir
     :after vertico
-    :bind (("C-x C-d" . consult-dir)
-           :map vertico-map
-           ("C-x C-d" . consult-dir)
-           ("C-x C-j" . consult-dir-jump-file)))
+    :general
+    ("C-x C-d" 'consult-dir)
+    (:keymaps 'vertico-map
+              "C-x C-d" 'consult-dir
+              "C-x C-j" 'consult-dir-jump-file))
 
   (use-package embark
     :demand t
     :after avy
-    :bind (("C-c a" . embark-act))        ; bind this to an easy key to hit
+    :general ("C-c a" 'embark-act)        ; bind this to an easy key to hit
     :init
     ;; Add the option to run embark when using avy
     (defun bedrock/avy-action-embark (pt)
