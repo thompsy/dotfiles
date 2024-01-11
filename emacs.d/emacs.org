@@ -450,7 +450,7 @@ improvement on this by popping up in a floating window. I'll try it for a while 
   (blink-cursor-mode -1)                                ; Steady cursor
   (pixel-scroll-precision-mode)                         ; Smooth scrolling
 
-    ;; Display line numbers in programming mode
+  ;; Display line numbers in programming mode
   (add-hook 'prog-mode-hook 'display-line-numbers-mode)
   (setopt display-line-numbers-width 3)           ; Set a minimum width
 
@@ -1365,7 +1365,9 @@ A nice Hydra menu to make things more accessible.
 
   (use-package json-mode)
 
-  (use-package go-ts-mode)
+  (use-package go-ts-mode
+    :hook
+    (before-save . eglot-format))
 
   (use-package sh-script
     :hook (sh-mode . flymake-mode))
