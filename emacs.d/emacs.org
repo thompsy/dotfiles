@@ -123,6 +123,7 @@ to disable ~package.el~ in favour of ~straight.el~.
   			    (ns-appearance . dark)
   			    (ns-transparent-titlebar . t)))
 
+  ;; Disable the default package manager so we can use straight.el later
   (setq package-enable-at-startup nil)
 #+END_SRC
 
@@ -138,35 +139,6 @@ Load some local setup. As noted above, this is generally installation specific, 
 keep it in a separate file.
 #+BEGIN_SRC emacs-lisp
   (require 'local-setup "~/.emacs.d/local.el")
-#+END_SRC
-
-* Bedrock Emacs
-All of this is new, minimal stuff from bedrock emacs:
-#+BEGIN_SRC emacs-lisp
-  (setopt initial-major-mode 'fundamental-mode)  ; default mode for the *scratch* buffer
-  (setopt display-time-default-load-average nil) ; this information is useless for most
-
-  ;; Save history of minibuffer
-  (savehist-mode)
-
-  ;; Move through windows with Ctrl-<arrow keys>
-  (windmove-default-keybindings 'control) ; You can use other modifiers here
-
-  ;; Fix archaic defaults
-  (setopt sentence-end-double-space nil)
-
-  ;; Don't litter file system with *~ backup files; put them all inside
-  ;; ~/.emacs.d/backup or wherever
-  (defun bedrock--backup-file-name (fpath)
-    "Return a new file path of a given file path.
-  If the new path's directories does not exist, create them."
-    (let* ((backupRootDir "~/.emacs.d/emacs-backup/")
-  	 (filePath (replace-regexp-in-string "[A-Za-z]:" "" fpath )) ; remove Windows driver letter in path
-  	 (backupFilePath (replace-regexp-in-string "//" "/" (concat backupRootDir filePath "~") )))
-      (make-directory (file-name-directory backupFilePath) (file-name-directory backupFilePath))
-      backupFilePath))
-  (setopt make-backup-file-name-function 'bedrock--backup-file-name)
-
 #+END_SRC
 
 * Package Manager
@@ -232,23 +204,25 @@ explicitly load it with straight early in the init process. See more details in 
 * Core Configuration
 A few miscellaneous settings. Note that emacs is not really a package strictly speaking which is why we include ~:straight nil~ so that our package manager doesn't try to fetch the source.
 #+BEGIN_SRC emacs-lisp
-  (use-package emacs
-    :straight nil
-    :init
-    ;; answer with y/n instead of typing out yes/no
-    (defalias 'yes-or-no-p 'y-or-n-p)
-    :config
-    (setq indent-tabs-mode nil
-          tab-width 4
-          show-trailing-whitespace t
-          fill-column 100)
-    (setq-default indent-tabs-mode nil
-                  fill-column 100)
-    :custom
-    ;; load new source files instead of stale elisp bytecode
-    (load-prefer-newer t)
-    ;; allow emacs to be any size, removes black bars
-    (frame-resize-pixelwise t))
+    (use-package emacs
+      :straight nil
+      :init
+      ;; answer with y/n instead of typing out yes/no
+      (defalias 'yes-or-no-p 'y-or-n-p)
+      :config
+      (setq indent-tabs-mode nil
+            tab-width 4
+            show-trailing-whitespace t
+            fill-column 100)
+      (setq-default indent-tabs-mode nil
+                    fill-column 100)
+      (setopt sentence-end-double-space nil
+              display-time-default-load-average nil)
+      :custom
+      ;; load new source files instead of stale elisp bytecode
+      (load-prefer-newer t)
+      ;; allow emacs to be any size, removes black bars
+      (frame-resize-pixelwise t))
 #+END_SRC
 
 It's useful to have buffers auto-revert when files on disk change especially when using Git branches a lot!
@@ -319,8 +293,6 @@ a non-shell environment like OSX.
 
 ** Files
 Setup some basic file hygiene. Keep some backup files around, but keep them out of sight.
-
-TODO verify that some of these aren't duplicated above
 #+BEGIN_SRC emacs-lisp
   (use-package files
     :straight nil
@@ -404,6 +376,12 @@ improvement on this by popping up in a floating window. I'll try it for a while 
   					;(setopt completion-auto-select t)                     ; See `C-h v completion-auto-select' for more possible values
 
   (keymap-set minibuffer-mode-map "TAB" 'minibuffer-complete) ; TAB acts more like how it does in the shell
+
+  ;; Save history of minibuffer
+  (savehist-mode)
+  (setq savehist-additional-variables '(kill-ring search-ring regexp-search-ring))
+  (setq savehist-file "~/.emacs.d/tmp/savehist")
+
 #+END_SRC
 
 ** Inteface Enhancements
@@ -415,17 +393,11 @@ improvement on this by popping up in a floating window. I'll try it for a while 
   (setopt x-underline-at-descent-line nil)           ; Prettier underlines
   (setopt switch-to-buffer-obey-display-actions t)   ; Make switching buffers more consistent
 
-  (setopt show-trailing-whitespace nil)      ; By default, don't underline trailing spaces
   (setopt indicate-buffer-boundaries 'left)  ; Show buffer top and bottom in the margin
 
   ;; Enable horizontal scrolling
   (setopt mouse-wheel-tilt-scroll t)
   (setopt mouse-wheel-flip-direction t)
-
-  ;; We won't set these, but they're good to know about
-  ;;
-  ;; (setopt indent-tabs-mode nil)
-  ;; (setopt tab-width 4)
 
   ;; Misc. UI tweaks
   (blink-cursor-mode -1)                                ; Steady cursor
