@@ -3,7 +3,7 @@
 
 * emacs.org
 ** What is this?
-This is my emacs configuration in =org-mode=. To output the source code run ~org-babel-tangle~
+This is my emacs configuration in ~org-mode~. To output the source code run ~org-babel-tangle~
 (typically ~C-c~ ~C-v~ ~t~). This will output the relevant files into ~~/.emacs.d/~ where Emacs will pick
 them up.
 
@@ -21,6 +21,14 @@ available. A few places that I've found particularly useful include:
 
 * Setup
 ** Config Updates
+*** Add a comment to all leader keys for hydra
+*** Setup spelling and easy usage
+- https://codeberg.org/ideasman42/emacs-spell-fu
+  - exclude specific faces. Looks good.
+- https://github.com/redguardtoo/wucuo
+*** Spelling should deal with ordinals
+e.g. 2nd, 3rd
+
 *** Experiment with ~treesit-font-lock-level~
 *** Explore ~transient-mark-mode~
 See [[https://www.masteringemacs.org/article/fixing-mark-commands-transient-mark-mode]]
@@ -58,7 +66,6 @@ Other useful ideas here:
 *** ~explain-pause-mode~
 *** ~visible-mark-mode~
 *** ~hyperbole~
-*** ~jinx~ for spelling
 *** Debugging with ~dape~
 *** ~org-sticky-header~
 ** Future Ideas
