@@ -25,7 +25,6 @@ available. A few places that I've found particularly useful include:
 See [[https://www.masteringemacs.org/article/fixing-mark-commands-transient-mark-mode]]
 ** Figure out a way to autoload treesitter grammars
 It would also be good to keep these up to date.
-** Rationalise General config across packages
 ** Have all hydras use q for quit
 ** Have ~project.el~ run the correct make target as compile command
 ** Corfu popup without hitting tab
@@ -716,11 +715,11 @@ smaller to larger screens.
   (use-package vertico-directory
     :straight nil
     :after vertico
-    :bind (:map vertico-map
-    	      ("C-j" . vertico-directory-enter)
-    	      ("C-l" . vertico-directory-up)
-    	      ("DEL" . vertico-directory-delete-char)
-    	      ("M-DEL" . vertico-directory-delete-word)))
+    :general (:keymaps 'vertico-map
+    	      "C-j" 'vertico-directory-enter
+    	      "C-l" 'vertico-directory-up
+    	      "DEL" 'vertico-directory-delete-char
+    	      "M-DEL" 'vertico-directory-delete-word))
 
   ;; Marginalia: annotations for minibuffer
   (use-package marginalia
@@ -735,11 +734,11 @@ smaller to larger screens.
     :straight (:files (:defaults "extensions/*"))
     :init
     (global-corfu-mode)
-    :bind
-    (:map corfu-map
-      	("SPC" . corfu-insert-separator)
-      	("C-n" . corfu-next)
-      	("C-p" . corfu-previous)))
+    :general
+    (:keymaps 'corfu-map
+      	"SPC" 'corfu-insert-separator
+      	"C-n" 'corfu-next
+      	"C-p" 'corfu-previous))
 
   ;; Part of corfu
   (use-package corfu-popupinfo
@@ -792,15 +791,13 @@ smaller to larger screens.
   (setq bookmark-fringe-mark nil)
 
   (use-package dogears
-    ;; TODO use general here
-    :bind (:map global-map
-                ("M-g d" . dogears-go)
-                ("M-g M-b" . dogears-back)
-                ("M-g M-f" . dogears-forward)
-                ("M-g M-d" . dogears-list))
     :general
     (my-leader-def
       "e" 'hydra-dogears/body)
+    ("M-g d" 'dogears-go)
+    ("M-g M-b" 'dogears-back)
+    ("M-g M-f" 'dogears-forward)
+    ("M-g M-d" 'dogears-list)
     :config
     (setq dogears-idle 2
           dogears-limit 300)
@@ -808,11 +805,11 @@ smaller to larger screens.
     ;;(add-hook 'dogears-hooks 'after-change-functions)
     (dogears-mode)
     :hydra (hydra-dogears (:column 2)
-                     ("p" dogears-back "Back")
-                     ("n" dogears-forward "Forward")
-                     ("g" dogears-go "Go" :exit t)
-                     ("l" dogears-list "List: ":bind nil :exit t)
-                     ("q" nil "quit")))
+                          ("p" dogears-back "Back")
+                          ("n" dogears-forward "Forward")
+                          ("g" dogears-go "Go" :exit t)
+                          ("l" dogears-list "List: ":bind nil :exit t)
+                          ("q" nil "quit")))
 #+END_SRC
 
 ** Help
@@ -1276,7 +1273,7 @@ A nice Hydra menu to make things more accessible.
 #+BEGIN_SRC emacs-lisp
   (use-package flymake
     ;; TODO include this in project hydra
-    :bind (("H-e" . flymake-show-project-diagnostics)))
+    :general ("H-e" 'flymake-show-project-diagnostics))
 #+END_SRC
 
 ** LSP Servers
