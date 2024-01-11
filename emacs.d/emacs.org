@@ -23,14 +23,10 @@ available. A few places that I've found particularly useful include:
 ** Experiment with ~treesit-font-lock-level~
 ** Explore ~transient-mark-mode~
 See [[https://www.masteringemacs.org/article/fixing-mark-commands-transient-mark-mode]]
-** Get Python up and running
 ** Figure out a way to autoload treesitter grammars
 It would also be good to keep these up to date.
-** Add format on save with ~eglot~
-** Rationalise Hydra config across packages
 ** Rationalise General config across packages
 ** Have all hydras use q for quit
-** Use ~:after~ to specify any dependencies
 ** Have ~project.el~ run the correct make target as compile command
 ** Corfu popup without hitting tab
 - it might be nice to have this always popup with suggestions bars on the context e.g. Go, org etc. This might be Cape rather then Corfu
