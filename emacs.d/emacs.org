@@ -1269,9 +1269,19 @@ A nice Hydra menu to make things more accessible.
 
 ** Flymake
 #+BEGIN_SRC emacs-lisp
-  (use-package flymake
-    ;; TODO include this in project hydra
-    :general ("H-e" 'flymake-show-project-diagnostics))
+    (use-package flymake
+      :hook (prog-mode . flymake-mode)
+      ;; TODO include this in project hydra
+      :general
+      ("H-e" 'flymake-show-project-diagnostics)
+      (my-leader-def
+        "f" '(:ignore t :wk "flymake")
+        "fn" 'flymake-next-error
+        "fp" 'flymake-previous-error
+        "fn" 'flymake-next-error
+        "ff" 'consult-flymake
+        "fb" 'flymake-show-buffer-diagnostics
+        "fp" 'flymake-show-project-diagnostics))
 #+END_SRC
 
 ** LSP Servers
@@ -1280,9 +1290,7 @@ A nice Hydra menu to make things more accessible.
   (use-package eglot
     :straight nil
     :hook
-    ((go-ts-mode . eglot-ensure)
-     (python-ts-mode . eglot-ensure)
-     (sh-mode . eglot-ensure))
+    (prog-mode . eglot-ensure)
     :custom
     (eglot-send-changes-idle-time 0.1)
     ;; activate Eglot in referenced non-project files
@@ -1305,8 +1313,7 @@ A nice Hydra menu to make things more accessible.
     :hook
     (before-save . eglot-format))
 
-  (use-package sh-script
-    :hook (sh-mode . flymake-mode))
+  (use-package sh-script)
 
   (use-package terraform-mode
     :config
