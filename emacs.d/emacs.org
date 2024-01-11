@@ -386,7 +386,7 @@ improvement on this by popping up in a floating window. I'll try it for a while 
   ;; Save history of minibuffer
   (savehist-mode)
   (setq savehist-additional-variables '(kill-ring search-ring regexp-search-ring))
-  (setq savehist-file "~/.emacs.d/tmp/savehist")
+  (setq savehist-file "~/.emacs.d/savehist")
 
 #+END_SRC
 
