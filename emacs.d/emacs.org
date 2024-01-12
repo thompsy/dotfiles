@@ -976,19 +976,25 @@ smaller to larger screens.
      :hook ((prog-mode . flyspell-prog-mode)
             ((org-mode text-mode) . flyspell-mode))
      :config
-     (setq ispell-dictionary "english"
+     ;;TODO add this to :hook instead maybe in the org use-package
+     (add-hook 'org-mode-hook #'at/org-ispell)
+     (setq ispell-dictionary "en_GB"
+           ispell-local-dictionary "en_GB"
+           ispell-current-dictionary "en_GB"
+           ispell-program-name "hunspell"
            ispell-silently-savep t
-           ispell-personal-dictionary "~/.emacs.d/.aspell.en.pws")
+           ispell-personal-dictionary "~/.emacs.d/.aspell.en.pws"
+           )
      :hydra (hydra-spelling (:color blue :hint nil)
                             "
-           ^
-           ^Spelling^          ^Errors^            ^Checker^
-           ^────────^──────────^──────^────────────^───────^───────
-           _q_ quit            _<_ previous        _c_ correction
-           ^^                  _>_ next            _d_ dictionary
-           ^^                  _f_ check           _m_ mode
-           ^^                  ^^                  ^^
-           "
+            ^
+            ^Spelling^          ^Errors^            ^Checker^
+            ^────────^──────────^──────^────────────^───────^───────
+            _q_ quit            _<_ previous        _c_ correction
+            ^^                  _>_ next            _d_ dictionary
+            ^^                  _f_ check           _m_ mode
+            ^^                  ^^                  ^^
+            "
                             ("q" nil)
                             ("<" flyspell-correct-previous :color pink)
                             (">" flyspell-correct-next :color pink)
@@ -997,8 +1003,21 @@ smaller to larger screens.
                             ("f" flyspell-buffer)
                             ("m" flyspell-mode)))
 
-   (add-to-list 'ispell-skip-region-alist '(":\\(PROPERTIES\\|LOGBOOK\\):" . ":END:"))
-   (add-to-list 'ispell-skip-region-alist '("#\\+BEGIN_SRC" . "#\\+END_SRC"))
+
+
+   ;; Taken from: https://endlessparentheses.com/ispell-and-org-mode.html
+   (defun at/org-ispell ()
+     "Configure `ispell-skip-region-alist' for `org-mode'."
+     (make-local-variable 'ispell-skip-region-alist)
+     (add-to-list 'ispell-skip-region-alist '(org-property-drawer-re))
+     (add-to-list 'ispell-skip-region-alist '(org-logbook-drawer-re))
+     (add-to-list 'ispell-skip-region-alist '("~" "~"))
+     (add-to-list 'ispell-skip-region-alist '("=" "="))
+     (add-to-list 'ispell-skip-region-alist '(org-babel-src-block-regexp))
+     (add-to-list 'ispell-skip-region-alist '("^#\\+BEGIN_SRC" "^#\\+END_SRC"))
+     (add-to-list 'ispell-skip-region-alist '("^#\\+begin_src" "^#\\+end_src"))
+     )
+
 
    (use-package flyspell-correct
      :after flyspell)
