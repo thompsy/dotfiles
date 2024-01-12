@@ -40,7 +40,11 @@ Possible solution from https://www.emacswiki.org/emacs/PythonProgrammingInEmacs:
 (setenv "LC_ALL" "en_US.UTF-8")
 (setenv "LANG" "en_US.UTF-8")
 #+end_src
-*** TODO Add a comment to all leader keys for hydra
+*** DONE Add a comment to all leader keys for hydra
+:LOGBOOK:
+- State "DONE"       from "TODO"       [2024-01-12 Fri 11:39]
+:END:
+
 *** TODO Setup spelling and easy usage
 - https://codeberg.org/ideasman42/emacs-spell-fu
   - exclude specific faces. Looks good.
@@ -67,7 +71,11 @@ See: https://github.com/intramurz/flycheck-eglot
 See [[https://www.masteringemacs.org/article/fixing-mark-commands-transient-mark-mode]]
 *** TODO Figure out a way to autoload treesitter grammars
 It would also be good to keep these up to date.
-*** TODO Have all hydras use q for quit
+*** DONE Have all hydras use q for quit
+:LOGBOOK:
+- State "DONE"       from "TODO"       [2024-01-12 Fri 11:39]
+:END:
+
 *** DONE Have ~project.el~ run the correct make target as compile command
 :LOGBOOK:
 - State "DONE"       from "TODO"       [2024-01-12 Fri 10:21]
