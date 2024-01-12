@@ -6,14 +6,6 @@ ZSH_THEME="dracula"
 plugins=(history git common-aliases sudo tmux emacs docker docker-compose fasd you-should-use zsh-syntax-highlighting zsh-autosuggestions zsh-aliases-exa terraform ripgrep rust z)
 source ${ZSH}/oh-my-zsh.sh 
 
-LAYERS="${HOME}/dotfiles/zsh-layers"
-
-# Generic (ish) Layers
-source ${LAYERS}/gcloud.zsh
-source ${LAYERS}/kubernetes.zsh
-source ${LAYERS}/aws.zsh
-source ${LAYERS}/golang.zsh
-
 alias gs='git switch'
 alias kx="kubectx"
 alias kns="kubens"
@@ -39,6 +31,53 @@ export FZF_DEFAULT_OPTS="--exact"
 alias -g F='| fzf -e'
 
 eval "$(fasd --init auto)"
+
+###############################################################################
+# Go
+#
+export GOPATH=${HOME}/go/
+export GO111MODULE=on
+export PATH=${PATH}:${GOPATH}bin
+
+###############################################################################
+# Kubernetes
+#
+# CLI completion for kubectl/helm
+if [ $commands[kubectl] ]; then
+  source <(kubectl completion zsh)
+fi
+
+if [ $commands[helm] ]; then
+  source <(helm completion zsh)
+fi
+
+# Load individual kube contexts into $KUBECONFIG
+KCONFDIR=~/.kube
+export KUBECONFIG=${KCONFDIR}/dev.config:${KCONFDIR}/prod.config
+
+
+# Utility
+alias k='kubectl'
+
+# Get Cmds
+alias kg='kubectl get'
+alias kgp='kubectl get pods'
+alias kgns='kubectl get namespaces'
+alias kgall='kubectl get ingress,service,deployment,pod'
+alias kgcj='kuebctl get cronjobs'
+alias kgj='kubectl get jobs'
+alias kctx=kubectx
+
+# Configuration cmds
+alias kuc='kubectl config use-context'
+alias ksc='kubectl config set-context "$(kubectl config current-context)"'
+alias kns='kubens'
+
+# Networking
+alias kpf='kubectl port-forward'
+alias kp='kubectl proxy'
+
+
 
 ###############################################################################
 # Functions
