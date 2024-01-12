@@ -26,20 +26,20 @@ available. A few places that I've found particularly useful include:
 - State "DONE"       from              [2024-01-11 Thu 14:42]
 :END:
 This is the error:
-#+begin_src
+#+BEGIN_SRC
 [stderr] Process EGLOT (arnold/(python-ts-mode python-mode)) stderr<1> finished
 [stderr] Fatal Python error: config_get_locale_encoding: failed to get the locale encoding: nl_langinfo(CODESET) failed
 [stderr] Python runtime state: preinitialized
-#+end_src
+#+END_SRC
 
 This is the same error: https://stackoverflow.com/questions/60557160/python3-8-fails-with-fatal-python-error-config-get-locale-encoding
 
 Possible solution from https://www.emacswiki.org/emacs/PythonProgrammingInEmacs:
-#+begin_src
+#+BEGIN_SRC
 (setenv "LC_CTYPE" "UTF-8")
 (setenv "LC_ALL" "en_US.UTF-8")
 (setenv "LANG" "en_US.UTF-8")
-#+end_src
+#+END_SRC
 *** DONE Add a comment to all leader keys for hydra
 :LOGBOOK:
 - State "DONE"       from "TODO"       [2024-01-12 Fri 11:39]
@@ -336,11 +336,11 @@ to any themes so that they confirmation code gets stored in ~custom.el~.
 *** Exec Path Setup
 [[https://github.com/purcell/exec-path-from-shell][~exec-path-from-shell~]] loads the ~PATH~ from your shell setup. This is useful when running Emacs from
 a non-shell environment like OSX.
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package exec-path-from-shell
     :config
     (exec-path-from-shell-initialize))
-#+end_src
+#+END_SRC
 
 *** Files
 Setup some basic file hygiene. Keep some backup files around, but keep them out of sight.
@@ -625,7 +625,7 @@ This hydra gives easy access to inserting various Unicode characters.
 
 [[https://www.emacswiki.org/emacs/download/zoom-frm.el][~zoom-frm~]] is a nice way to zoom in and out on a frame basis. This is useful when switching from
 smaller to larger screens.
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package zoom-frm
     :general
     (my-leader-def "z" '(hydra-zoom/body :wk "zoom"))
@@ -875,7 +875,7 @@ smaller to larger screens.
 
 *** Help
 [[https://github.com/Wilfred/helpful][~helpful~]] provides a slightly nicer interface to the built-in help files.
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package helpful
     :general
     ("C-h f" 'helpful-callable)
@@ -885,7 +885,7 @@ smaller to larger screens.
     ("C-h k" 'helpful-key)
     ("C-h v" 'helpful-variable)
     ("C-h C-d" 'helpful-at-point))
-#+end_src
+#+END_SRC
 ** Filesystem
 *** Dired
 ~dired~ is basically a file explorer.
@@ -1040,7 +1040,7 @@ What's the workflow that I want here? Two fold:
      (add-to-list 'ispell-skip-region-alist '("=" "="))
      (add-to-list 'ispell-skip-region-alist '(org-babel-src-block-regexp))
      (add-to-list 'ispell-skip-region-alist '("^#\\+BEGIN_SRC" "^#\\+END_SRC"))
-     (add-to-list 'ispell-skip-region-alist '("^#\\+begin_src" "^#\\+end_src"))
+     (add-to-list 'ispell-skip-region-alist '("^#\\+BEGIN_SRC" "^#\\+END_SRC"))
      )
 
 
@@ -1356,11 +1356,11 @@ Now we've got a hydra to make the various window management functions easily acc
 [[https://github.com/dandavison/magit-delta][~magit-delta~]] enables improved diffs for Magit using [[https://github.com/dandavison/delta][delta]].
 
 I've disabled this for now since it seemed a bit slow.
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package magit-delta
     :disabled
     :hook (magit-mode . magit-delta-mode))
-#+end_src
+#+END_SRC
 [[https://github.com/emacsmirror/git-timemachine][~git-timemachine~]] allows you to walk through Git revisions of a file to view changes over time.
 #+BEGIN_SRC emacs-lisp
   (use-package git-timemachine
@@ -1424,7 +1424,7 @@ A nice Hydra menu to make things more accessible.
 #+END_SRC
 
 *** Flycheck
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package flycheck
     :general
     (my-leader-def
@@ -1464,7 +1464,7 @@ A nice Hydra menu to make things more accessible.
     :hook (go-ts-mode . flycheck-golangci-lint-setup)
     :config
     (setq flycheck-golangci-lint-tests t))
-#+end_src
+#+END_SRC
 *** LSP Servers
 
 #+BEGIN_SRC emacs-lisp
@@ -1577,11 +1577,11 @@ See helpful examples at:
 #+END_SRC
 
 [[https://github.com/minad/org-modern][~org-modern~]] gives ~org-mode~ a more modern style.
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package org-modern
     :config
     (global-org-modern-mode))
-#+end_src
+#+END_SRC
 
 
 [[https://github.com/calvinwyoung/org-autolist][~org-autolist~]] modifies the way ~RET~ works when inserting lists to make it a bit more intuitive.
@@ -2027,7 +2027,7 @@ Markdown. This handles the ~src~ blocks better than the default exporter.
 Useful function by
 [[https://old.reddit.com/r/emacs/comments/e98yyf/send_output_of_orgmdexportasmarkdownstraight_to/][ImmediateCurve]]
 for exporting the region to the clipboard as markdown.
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (defun at/org-to-clipboard-as-markdown ()
     "Copy region to clipboard as markdown."
     (interactive)
@@ -2047,10 +2047,10 @@ for exporting the region to the clipboard as markdown.
           (with-no-warnings (mark-whole-buffer))
           (clipboard-kill-region (point-min) (point-max))
           (kill-buffer-and-window)))))
-#+end_src
+#+END_SRC
 
 ** Site Local
 Various setup like sensitive tags and functions that deal with them are stored elsewhere and loaded here.
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (load "~/notebook/site-local.el")
-#+end_src
+#+END_SRC
