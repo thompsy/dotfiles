@@ -68,7 +68,11 @@ See [[https://www.masteringemacs.org/article/fixing-mark-commands-transient-mark
 *** TODO Figure out a way to autoload treesitter grammars
 It would also be good to keep these up to date.
 *** TODO Have all hydras use q for quit
-*** TODO Have ~project.el~ run the correct make target as compile command
+*** DONE Have ~project.el~ run the correct make target as compile command
+:LOGBOOK:
+- State "DONE"       from "TODO"       [2024-01-12 Fri 10:21]
+:END:
+
 *** TODO Corfu popup without hitting tab
 - it might be nice to have this always popup with suggestions bars on the context e.g. Go, org etc. This might be Cape rather then Corfu
 - this might be helpful https://emacs.stackexchange.com/questions/78237/automatic-popup-of-words-from-the-buffer-using-corfu-and-dabbrev
