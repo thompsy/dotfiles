@@ -180,7 +180,7 @@ to disable ~package.el~ in favour of ~straight.el~.
 
 ** Preamble
 Some initial comment blurb.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   ;;; init.el --- Initialization file for Emacs
   ;;; Commentary: Emacs Startup File --- initialization for Emacs
   ;;; Code:
@@ -188,13 +188,13 @@ Some initial comment blurb.
 
 Load some local setup. As noted above, this is generally installation specific, so its easiest to
 keep it in a separate file.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (require 'local-setup "~/.emacs.d/local.el")
 #+END_SRC
 
 ** Package Manager
 Setup the [[https://github.com/radian-software/straight.el][~straight.el~]] package manager.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (setq straight-repository-branch "master")
 
   (defvar bootstrap-version)
@@ -221,7 +221,7 @@ performance. No other configuration should be necessary to make this work; howev
 call straight-prune-build occasionally, since otherwise this cache file may grow quite large over
 time.
 #+END_QUOTE
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (setq straight-cache-autoloads t)
 #+END_SRC
 
@@ -231,13 +231,13 @@ You may customize straight-use-package-by-default to make it so that :straight t
 you explicitly override it with :straight nil.
 #+END_QUOTE
 
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (setq straight-use-package-by-default t)
 #+END_SRC
 
 todo: update this link
 Install [[https://github.com/jwiegley/use-package][~use-package~]] for easily installing other packages.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   ;; Install use-package to use with straight.el
   (straight-use-package 'use-package)
 #+END_SRC
@@ -245,16 +245,16 @@ Install [[https://github.com/jwiegley/use-package][~use-package~]] for easily in
 I don't want to use the built-in version of org-mode since it's usually pretty old. Instead I want
 straight to pull down the latest version. To avoid the built-in version getting loaded we need to
 explicitly load it with straight early in the init process. See more details in the [[https://github.com/radian-software/straight.el#the-wrong-version-of-my-package-was-loaded][~README.md~]].
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (straight-use-package 'org)
 #+END_SRC
 
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (setq use-package-always-demand t)
 #+END_SRC
 ** Core Configuration
 A few miscellaneous settings. Note that emacs is not really a package strictly speaking which is why we include ~:straight nil~ so that our package manager doesn't try to fetch the source.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
     (use-package emacs
       :straight nil
       :init
@@ -277,7 +277,7 @@ A few miscellaneous settings. Note that emacs is not really a package strictly s
 #+END_SRC
 
 It's useful to have buffers auto-revert when files on disk change especially when using Git branches a lot!
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package autorevert
     :straight nil
     :custom
@@ -293,7 +293,7 @@ It's useful to have buffers auto-revert when files on disk change especially whe
 #+END_SRC
 
 Use the system keyboard when killing and yanking.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package simple
     :straight nil
     :custom
@@ -303,7 +303,7 @@ Use the system keyboard when killing and yanking.
 
 [[https://github.com/emacs-mirror/emacs/blob/master/lisp/saveplace.el][~saveplace~]] jumps back to
 the last when later visiting a file. This is handy to pick up where you left off.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package saveplace
     :straight nil
     :config
@@ -312,7 +312,7 @@ the last when later visiting a file. This is handy to pick up where you left off
 
 [[https://github.com/emacscollective/no-littering][~no-littering~]] keeps configuration files and
 other persistent data under ~user-emacs-directory~ rather than spamming them in inconsistent places.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package no-littering
     :init
     (setq no-littering-etc-directory
@@ -323,7 +323,7 @@ other persistent data under ~user-emacs-directory~ rather than spamming them in 
 
 Use a separate custom file to remove auto-generated code from ~init.el~. This should be loaded prior
 to any themes so that they confirmation code gets stored in ~custom.el~.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package cus-edit
     :straight nil
     :custom
@@ -336,7 +336,7 @@ to any themes so that they confirmation code gets stored in ~custom.el~.
 *** Exec Path Setup
 [[https://github.com/purcell/exec-path-from-shell][~exec-path-from-shell~]] loads the ~PATH~ from your shell setup. This is useful when running Emacs from
 a non-shell environment like OSX.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package exec-path-from-shell
     :config
     (exec-path-from-shell-initialize))
@@ -344,7 +344,7 @@ a non-shell environment like OSX.
 
 *** Files
 Setup some basic file hygiene. Keep some backup files around, but keep them out of sight.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package files
     :straight nil
     :init
@@ -366,7 +366,7 @@ Setup some basic file hygiene. Keep some backup files around, but keep them out 
 #+END_SRC
 
 Use UTF-8 everywhere.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package mule
     :straight nil
     :config
@@ -382,7 +382,7 @@ Use UTF-8 everywhere.
 #+END_SRC
 
 ~uniqify~ renames buffers with the same name so that they're easier to distinguish.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package uniquify
     :straight nil
     :config
@@ -404,7 +404,7 @@ The only slight issue with this is that the size of the minibuffer expands a lot
 view of the current buffer to change depending on where the point is. ~which-key-posframe~ provides an
 improvement on this by popping up in a floating window. I'll try it for a while and see.
 
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package which-key
     :custom
     (which-key-idle-delay 0)
@@ -413,14 +413,14 @@ improvement on this by popping up in a floating window. I'll try it for a while 
 #+END_SRC
 
 *** Savehist
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   ;; Save history of minibuffer
   (savehist-mode)
   (setq savehist-additional-variables '(kill-ring search-ring regexp-search-ring))
 #+END_SRC
 
 *** Inteface Enhancements
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   ;; Mode line information
   (setopt line-number-mode t)                        ; Show current line in modeline
   (setopt column-number-mode t)                      ; Show column as well
@@ -452,7 +452,7 @@ improvement on this by popping up in a floating window. I'll try it for a while 
 
 ** Aesthetics
 Turn off a bunch of frame related functionality for a more minimal experience.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package frame
     :straight nil
     :config
@@ -471,7 +471,7 @@ Turn off a bunch of frame related functionality for a more minimal experience.
 #+END_SRC
 
 [[https://draculatheme.com/emacs][Dracula]] is a nice theme that's available for lots of apps.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package dracula-theme
     :config
     (load-theme 'dracula))
@@ -486,7 +486,7 @@ Turn off a bunch of frame related functionality for a more minimal experience.
 #+END_SRC
 
 [[https://github.com/seagle0128/doom-modeline][~doom-modeline~]] is a fancy, fast and minimal mode-line. This required running ~M-x nerd-icons-install-fonts~ to install the required icon font.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package doom-modeline
     :demand t
     :init
@@ -505,7 +505,7 @@ Turn off a bunch of frame related functionality for a more minimal experience.
 [[https://github.com/noctuid/general.el][~general.el~]] provides a convenient method for binding
 keys. It also integrates well with ~use-package~. In particular, this allows us to easily setup a
 global leader key, ~my-leader-def~ and chain bindings from that.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package general
     :custom
     (general-override-states '(insert emacs hybrid normal visual motion operator replace))
@@ -551,7 +551,7 @@ global leader key, ~my-leader-def~ and chain bindings from that.
 *** Hydra
 [[https://github.com/abo-abo/hydra][~hydra~]] allows us to specify related keybindings together in a
 neat way. Note that ~:wk~ allows us to specify the text that is displayed by ~which-key~ for this hydra.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package hydra)
 
   ;; This allows us to use :hydra within use-package
@@ -559,7 +559,7 @@ neat way. Note that ~:wk~ allows us to specify the text that is displayed by ~wh
 #+END_SRC
 
 This hydra provides easy access to various package management commands.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (my-leader-def "P" '(hydra-straight-helper/body :wk "pkgs"))
   (defhydra hydra-straight-helper (:hint nil :color green)
     "
@@ -592,7 +592,7 @@ This hydra provides easy access to various package management commands.
 #+END_SRC
 
 This hydra gives easy access to inserting various Unicode characters.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (defun my/insert-unicode (unicode-name)
     "Same as C-x 8 enter UNICODE-NAME."
     (insert-char (gethash unicode-name (ucs-names))))
@@ -625,7 +625,7 @@ This hydra gives easy access to inserting various Unicode characters.
 
 [[https://www.emacswiki.org/emacs/download/zoom-frm.el][~zoom-frm~]] is a nice way to zoom in and out on a frame basis. This is useful when switching from
 smaller to larger screens.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package zoom-frm
     :general
     (my-leader-def "z" '(hydra-zoom/body :wk "zoom"))
@@ -639,7 +639,7 @@ smaller to larger screens.
 
 ** Navigation
 *** Avy
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package avy
     :demand t
     :config (setq avy-background t
@@ -651,7 +651,7 @@ smaller to larger screens.
 #+END_SRC
 
 *** Consult
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package embark-consult
     :after (embark consult))
 
@@ -752,7 +752,7 @@ smaller to larger screens.
 #+END_SRC
 
 *** Minibuffer
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   ;; For help, see: https://www.masteringemacs.org/article/understanding-minibuffer-completion
   (setopt completion-cycle-threshold 1)                  ; TAB cycles candidates
   (setopt completions-detailed t)                        ; Show annotations
@@ -789,7 +789,7 @@ smaller to larger screens.
 #+END_SRC
 
 *** Completion
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   ;; Popup completion-at-point
   (use-package corfu
     :straight (:files (:defaults "extensions/*"))
@@ -847,7 +847,7 @@ smaller to larger screens.
 #+END_SRC
 
 *** Bookmarks
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   ;; disable annoying bookmark icons
   (setq bookmark-fringe-mark nil)
 
@@ -875,7 +875,7 @@ smaller to larger screens.
 
 *** Help
 [[https://github.com/Wilfred/helpful][~helpful~]] provides a slightly nicer interface to the built-in help files.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package helpful
     :general
     ("C-h f" 'helpful-callable)
@@ -889,7 +889,7 @@ smaller to larger screens.
 ** Filesystem
 *** Dired
 ~dired~ is basically a file explorer.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package dired
     :straight nil
     :defer t
@@ -968,7 +968,7 @@ smaller to larger screens.
 ** Editing
 *** Undo
 [[https://github.com/emacsmirror/undo-fu][~undo-fu~]] improves the default undo experience.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package undo-fu
     :general
     ("C-z" 'undo-fu-only-undo)
@@ -976,7 +976,7 @@ smaller to larger screens.
 #+END_SRC
 
 [[https://github.com/casouri/vundo][~vundo~]] displays a nice braching undo tree built on top of the default undo system.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package vundo
     :config
     ;; use a nicer unicode font to display the tree
@@ -992,7 +992,7 @@ few words back.
 What's the workflow that I want here? Two fold:
 1. spell as I type and correct works as I go. ~C-;~ is adequate for this, except I can't add to dictionary from there easily. Maybe the flyspell-correct package could help here.
 2. batch spell a buffer or region. The ~ispell~ interface is probably OK for this.
- #+BEGIN_SRC emacs-lisp
+ #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
    (setenv "LANG" "en_GB")
    (use-package flyspell
      :general
@@ -1083,7 +1083,7 @@ This is a hydra for working with the ~rectangle~ commands.
 
 TODO: I should understand how this works better.
 
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (my-leader-def "R" '(hydra-rectangle/body :wk "rectangle"))
   (defhydra hydra-rectangle (:body-pre (rectangle-mark-mode 1)
                                        :color pink
@@ -1117,7 +1117,7 @@ TODO: I should understand how this works better.
 *** Whitespace Removal
 [[https://github.com/lewang/ws-butler][~ws-butler~]] automatically removes trailing whitespace from lines that have been editted.
 
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package ws-butler
     :config
     (ws-butler-global-mode))
@@ -1126,7 +1126,7 @@ TODO: I should understand how this works better.
 
 *** Move to beginning of line
 This snippet provides smarter moving to the beginning of the line. Copied from [[https://emacsredux.com/blog/2013/05/22/smarter-navigation-to-the-beginning-of-a-line/][EmacsRedux]].
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (defun smarter-move-beginning-of-line (arg)
     "Move point back to indentation of beginning of line.
 
@@ -1158,7 +1158,7 @@ This snippet provides smarter moving to the beginning of the line. Copied from [
 
 [[https://github.com/abo-abo/ace-window][~ace-window~]] allows for easy switching between windows within a frame, splitting windows and moving and
 copying windows.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package ace-window
     :general
     ("C-x o" 'ace-window)
@@ -1169,7 +1169,7 @@ copying windows.
 [[https://github.com/dimitri/switch-window][~switch-window~]] allows for easy switching between windows within a frame. It's slightly better than
 ~ace-window~ for that basic task as the labels for the windows are larger. However, ~ace-window~ is
 worth keeping around for other functionality.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package switch-window
     :general
     ("M-o" 'switch-window)
@@ -1180,14 +1180,14 @@ worth keeping around for other functionality.
 
 [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Window-Convenience.html#index-winner_002dmode][~winner-mode~]] tracks changes in window configuration for a frame so that they can be undone or
 redone.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package winner
     :commands winner-mode
     :init (winner-mode t))
 #+END_SRC
 
 These are various functions for manipulating window size.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (defun hydra-move-splitter-left (delta)
     "Move window splitter left."
     (interactive "p")
@@ -1222,7 +1222,7 @@ These are various functions for manipulating window size.
 #+END_SRC
 
 Now we've got a hydra to make the various window management functions easily accessible.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (defhydra hydra-window-delux (:hint nil)
     "
       ^Movement^        ^Split^          ^Switch^            ^Resize^
@@ -1291,7 +1291,7 @@ Now we've got a hydra to make the various window management functions easily acc
 
 ** Software Development
 *** Treesitter Setup
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package emacs
     :config
     ;; Treesitter config
@@ -1334,7 +1334,7 @@ Now we've got a hydra to make the various window management functions easily acc
     ("M->" 'expreg-expand))
 #+END_SRC
 *** Git
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package magit
     :general
     ("C-x g" 'magit-status)
@@ -1356,26 +1356,26 @@ Now we've got a hydra to make the various window management functions easily acc
 [[https://github.com/dandavison/magit-delta][~magit-delta~]] enables improved diffs for Magit using [[https://github.com/dandavison/delta][delta]].
 
 I've disabled this for now since it seemed a bit slow.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package magit-delta
     :disabled
     :hook (magit-mode . magit-delta-mode))
 #+END_SRC
 [[https://github.com/emacsmirror/git-timemachine][~git-timemachine~]] allows you to walk through Git revisions of a file to view changes over time.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package git-timemachine
     :defer t)
 #+END_SRC
 
 [[https://github.com/redguardtoo/vc-msg][~vc-msg~]] shows a popup containing the commit message that last affected the current line.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package vc-msg
     :defer t)
 #+END_SRC
 
 [[https://github.com/dgutov/diff-hl][~diff-hl~]] shows icons on the buffer fringe for lines that have been added, removed or
 modified.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package diff-hl
     :hook (magit-post-refresh . diff-hl-magit-post-refresh)
     :config
@@ -1385,12 +1385,12 @@ modified.
 
 [[https://github.com/rmuslimov/browse-at-remote][~browse-at-remote~]] allows for quick jumping to the relevant Github (or whatever) page corresponding
 to the current file.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package browse-at-remote)
  #+END_SRC
 
 A nice Hydra menu to make things more accessible.
-  #+BEGIN_SRC emacs-lisp
+  #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
     (defhydra hydra-my-git-menu (:color blue
                                         :hint nil)
       "
@@ -1424,7 +1424,7 @@ A nice Hydra menu to make things more accessible.
 #+END_SRC
 
 *** Flycheck
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package flycheck
     :general
     (my-leader-def
@@ -1467,7 +1467,7 @@ A nice Hydra menu to make things more accessible.
 #+END_SRC
 *** LSP Servers
 
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package eglot
     :straight nil
     :hook
@@ -1484,7 +1484,7 @@ A nice Hydra menu to make things more accessible.
 #+END_SRC
 
 *** Particular Programming modes
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package markdown-mode
     :hook ((markdown-mode . visual-line-mode)))
 
@@ -1508,12 +1508,12 @@ These packages need to be installed in the Python environment too.
  pip install "python-lsp-server[all]" pylsp-mypy pylsp-rope python-lsp-ruff python-lsp-black
 #+END_SRC
 
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package pyvenv)
 #+END_SRC
 
 ** Yasnippets
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package yasnippet
     :config
     (yas-global-mode +1)
@@ -1541,7 +1541,7 @@ See helpful examples at:
 - http://doc.norang.ca/org-mode.html
 
 *** Setup
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package org
     :general
     ("C-c l" 'org-store-link)
@@ -1577,7 +1577,7 @@ See helpful examples at:
 #+END_SRC
 
 [[https://github.com/minad/org-modern][~org-modern~]] gives ~org-mode~ a more modern style.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package org-modern
     :config
     (global-org-modern-mode))
@@ -1585,13 +1585,13 @@ See helpful examples at:
 
 
 [[https://github.com/calvinwyoung/org-autolist][~org-autolist~]] modifies the way ~RET~ works when inserting lists to make it a bit more intuitive.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package org-autolist
     :hook (org-mode . org-autolist-mode))
 #+END_SRC
 
 *** Task States
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (setq org-todo-keywords
       '((sequence "TODO(t)"
                   "PLANNING(p)"
@@ -1607,7 +1607,7 @@ See helpful examples at:
 #+END_SRC
 
 *** Tags
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (setq org-tag-alist '(
                         ;; Task types
                         (:startgroup . nil)
@@ -1642,7 +1642,7 @@ See helpful examples at:
 
 *** Capture Templates
 
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package org-capture
     :straight nil
     :general
@@ -1751,7 +1751,7 @@ This is an example of how I process regular meetings like 1 to 1s:
 1. use the capture template below to gather agenda items during the week. These are accumulated into the 'My Agenda' heading in the given file.
 2. during the meeting work through the agenda in the file
 3. once the meeting is complete run ~at/complete-meeting-X~ which will refile the meeting into the main ~meetings.org~ file and setup a new empty template for the next one.
-#+BEGIN_SRC emacs-lisp :tangle no
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el" :tangle no
 
 ;; Add local capture settings to main list
 (setq org-capture-templates (append
@@ -1776,7 +1776,7 @@ This is an example of how I process regular meetings like 1 to 1s:
 *** Agenda
 [[https://github.com/alphapapa/org-super-agenda][~org-super-agenda~]] improves the existing ~org-agenda~ in various ways.
 
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package org-super-agenda
     :after org-agenda
     :config
@@ -1939,7 +1939,7 @@ This is an example of how I process regular meetings like 1 to 1s:
 *** Blocks
 Setup various ~org-mode~ structure templates. When typing ~<~ at the start of a line this will popup
 a menu of various types of blocks that you may want to insert.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (defun my-org-structure-templates ()
     (require 'org-tempo)
     (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
@@ -2013,21 +2013,21 @@ a menu of various types of blocks that you may want to insert.
 
 *** Export Options
 [[https://github.com/hniksic/emacs-htmlize][~htmlize~]] converts a buffer to HTML with nice syntax highlighting.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package htmlize
     :defer t)
 #+END_SRC
 
 [[https://github.com/larstvei/ox-gfm][~ox-gfm~]] formats ~org-mode~ content as Github flavoured
 Markdown. This handles the ~src~ blocks better than the default exporter.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package ox-gfm)
 #+END_SRC
 
 Useful function by
 [[https://old.reddit.com/r/emacs/comments/e98yyf/send_output_of_orgmdexportasmarkdownstraight_to/][ImmediateCurve]]
 for exporting the region to the clipboard as markdown.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (defun at/org-to-clipboard-as-markdown ()
     "Copy region to clipboard as markdown."
     (interactive)
@@ -2051,6 +2051,6 @@ for exporting the region to the clipboard as markdown.
 
 ** Site Local
 Various setup like sensitive tags and functions that deal with them are stored elsewhere and loaded here.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (load "~/notebook/site-local.el")
 #+END_SRC
