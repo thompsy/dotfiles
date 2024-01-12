@@ -1964,7 +1964,7 @@ a menu of various types of blocks that you may want to insert.
     ("H" (hot-expand "<H"))
     ("A" (hot-expand "<A"))
     ("<" self-insert-command "ins")
-    ("o" nil "quit"))
+    ("q" nil "quit"))
 
   (require 'org-tempo) ; Required from org 9 onwards for old template expansion
   ;; Reset the org-template expnsion system, this is need after upgrading to org 9 for some reason
