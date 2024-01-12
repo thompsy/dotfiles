@@ -45,9 +45,16 @@ Possible solution from https://www.emacswiki.org/emacs/PythonProgrammingInEmacs:
 - https://codeberg.org/ideasman42/emacs-spell-fu
   - exclude specific faces. Looks good.
 - https://github.com/redguardtoo/wucuo
-*** TODO Spelling should deal with ordinals
+*** DONE Spelling should deal with ordinals
+:LOGBOOK:
+- State "DONE"       from "TODO"       [2024-01-12 Fri 10:08]
+:END:
 e.g. 2nd, 3rd
-*** TODO [#A] Minibuffer doesn't seem to be using history
+*** DONE [#A] Minibuffer doesn't seem to be using history
+:LOGBOOK:
+- State "DONE"       from "TODO"       [2024-01-12 Fri 10:08]
+:END:
+
 *** DONE [#A] Use Flycheck instead of Flymake
 :LOGBOOK:
 - State "DONE"       from "TODO"       [2024-01-11 Thu 22:54]
@@ -84,7 +91,11 @@ Other useful ideas here:
 - [[https://dehora.net/journal/how-i-use-org-mode]]
 
 ** Packages to try
-*** TODO ~urgrep~
+*** DONE ~urgrep~
+:LOGBOOK:
+- State "DONE"       from "TODO"       [2024-01-12 Fri 10:11]
+:END:
+
 *** TODO ~bookmarks+~
 - we can bookmark buffers that aren't backed by files e.g. scratch
 *** TODO ~wgrep~
@@ -393,8 +404,6 @@ improvement on this by popping up in a floating window. I'll try it for a while 
   ;; Save history of minibuffer
   (savehist-mode)
   (setq savehist-additional-variables '(kill-ring search-ring regexp-search-ring))
-  (setq savehist-file "~/.emacs.d/savehist")
-
 #+END_SRC
 
 ** Inteface Enhancements
@@ -513,14 +522,14 @@ global leader key, ~my-leader-def~ and chain bindings from that.
     ;; Setup some initial bindings.
     ;; TODO some of these should probably live elsewhere
     (my-leader-def
-      "m" 'execute-extended-command
+      "m" '(execute-extended-command :wk "exec")
       "a" 'org-agenda
       "b" '(:ignore t :wk "bookmarks")
       "bs" 'bookmark-set
       "bl" 'list-bookmarks
       "bj" 'consult-bookmark
       ;; quit / restart
-      "q" '(:ignore t :wk "quit / restart")
+      "q" '(:ignore t :wk "quit")
       "qq" 'save-buffers-kill-terminal
       "qQ" 'save-buffers-kill-emacs
       "qr" 'restart-emacs))
@@ -828,7 +837,7 @@ smaller to larger screens.
   (use-package dogears
     :general
     (my-leader-def
-      "e" 'hydra-dogears/body)
+      "e" '(hydra-dogears/body :wk "dogears"))
     ("M-g d" 'dogears-go)
     ("M-g M-b" 'dogears-back)
     ("M-g M-f" 'dogears-forward)
@@ -972,7 +981,7 @@ smaller to larger screens.
    (use-package flyspell
      :general
      (my-leader-def
-       "s" '(hydra-spelling/body :wk "Spell"))
+       "s" '(hydra-spelling/body :wk "spell"))
      :hook ((prog-mode . flyspell-prog-mode)
             ((org-mode text-mode) . flyspell-mode))
      :config
@@ -1261,7 +1270,7 @@ Now we've got a hydra to make the various window management functions easily acc
 
     ("q" nil))
   (my-leader-def
-    "w" '(hydra-window-delux/body :wk "Window Management"))
+    "w" '(hydra-window-delux/body :wk "windows"))
 #+END_SRC
 
 * Software Development
@@ -1314,7 +1323,7 @@ Now we've got a hydra to make the various window management functions easily acc
     :general
     ("C-x g" 'magit-status)
     (my-leader-def
-      "g" 'hydra-my-git-menu/body)
+      "g" '(hydra-my-git-menu/body :wk "git"))
     :config
     ;; This sets Magit to use the fullframe
     ;; (setq magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
