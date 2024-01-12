@@ -975,15 +975,14 @@ smaller to larger screens.
 #+END_SRC
 
 ** Spelling
-#+BEGIN_SRC emacs-lisp
-  ;; (use-package jinx
-  ;;   :hook (emacs-startup . global-jinx-mode)
-  ;;   :general
-  ;;   ("M-$" 'jinx-correct)
-  ;;   ("C-M-$" 'jinx-languages))
-#+END_SRC
-
 ~flyspell~ is Emacs' spelling mode. I've added a decent hydra here for convenience.
+
+If I miss-spell something I can hit ~C-;~ and it will auto correct the previous word even if it's a
+few words back.
+
+What's the workflow that I want here? Two fold:
+1. spell as I type and correct works as I go. ~C-;~ is adequate for this, except I can't add to dictionary from there easily. Maybe the flyspell-correct package could help here.
+2. batch spell a buffer or region. The ~ispell~ interface is probably OK for this.
  #+BEGIN_SRC emacs-lisp
    (setenv "LANG" "en_GB")
    (use-package flyspell
@@ -1036,8 +1035,8 @@ smaller to larger screens.
      )
 
 
-   (use-package flyspell-correct
-     :after flyspell)
+   ;;(use-package flyspell-correct
+   ;;  :after flyspell)
 
    (use-package consult-flyspell
      :after (flyspell consult))
