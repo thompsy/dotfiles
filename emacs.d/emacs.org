@@ -702,6 +702,10 @@ smaller to larger screens.
      consult--source-recent-file consult--source-project-recent-file
      ;; :preview-key '(:debounce 0.4 any) ;; Option 1: Delay preview
      :preview-key "M-.")            ;; Option 2: Manual preview
+    :init
+    ;; Use Consult to select xref locations with preview
+    (setq xref-show-xrefs-function #'consult-xref
+          xref-show-definitions-function #'consult-xref)
     )
 
   (use-package consult-project-extra
