@@ -48,8 +48,12 @@ Possible solution from https://www.emacswiki.org/emacs/PythonProgrammingInEmacs:
 *** TODO Spelling should deal with ordinals
 e.g. 2nd, 3rd
 *** TODO [#A] Minibuffer doesn't seem to be using history
-*** TODO [#A] Use Flycheck instead of Flymake
+*** DONE [#A] Use Flycheck instead of Flymake
+:LOGBOOK:
+- State "DONE"       from "TODO"       [2024-01-11 Thu 22:54]
+:END:
 Flycheck allows for different sources in parallel, e.g. ~gopls~ and ~golangci~.
+See: https://github.com/intramurz/flycheck-eglot
 
 *** TODO Experiment with ~treesit-font-lock-level~
 *** TODO Explore ~transient-mark-mode~
@@ -645,7 +649,7 @@ smaller to larger screens.
     ("C-x p b" 'consult-project-buffer)      ;; orig. project-switch-to-buffer
     ;; M-g bindings in `goto-map'
     ("M-g e" 'consult-compile-error)
-    ("M-g f" 'consult-flymake)               ;; Alternative: consult-flycheck
+    ("M-g f" 'consult-flycheck)              ;; Alternative: consult-flymake
     ("M-g g" 'consult-goto-line)             ;; orig. goto-line
     ("M-g M-g" 'consult-goto-line)           ;; orig. goto-line
     ("M-g o" 'consult-outline)               ;; Alternative: consult-org-heading
@@ -1375,24 +1379,48 @@ A nice Hydra menu to make things more accessible.
       ("<ESC>" git-timemachine-show-current-revision "quit" :exit t))
 #+END_SRC
 
+** Flycheck
+#+begin_src emacs-lisp
+  (use-package flycheck
+    :general
+    (my-leader-def
+      "f" '(hydra-flycheck-mode/body :wk "flycheck"))
+    :config
+    (global-flycheck-mode +1)
+    :hydra
+    (hydra-flycheck-mode
+     (:hint nil
+            :color green
+            :pre (flycheck-list-errors)
+            :post (quit-windows-on "*Flycheck errors*"))
+     "
+  Find Errors        Describe Errors
+  -----------------------------------
+  _f_irst error      _s_how error
+  _n_ext error       _e_xplain error
+  _p_rev error       ^ ^
+  _l_ist errors      _q_uit
+  "
+     ("f" flycheck-first-error)
+     ("n" flycheck-next-error)
+     ("p" flycheck-previous-error)
+     ("l" flycheck-list-errors)
+     ("s" flycheck-display-error-at-point)
+     ("e" flycheck-explain-error-at-point)
+     ("q" nil :exit t)))
 
-** Flymake
-#+BEGIN_SRC emacs-lisp
-    (use-package flymake
-      :hook (prog-mode . flymake-mode)
-      ;; TODO include this in project hydra
-      :general
-      ("H-e" 'flymake-show-project-diagnostics)
-      (my-leader-def
-        "f" '(:ignore t :wk "flymake")
-        "fn" 'flymake-next-error
-        "fp" 'flymake-previous-error
-        "fn" 'flymake-next-error
-        "ff" 'consult-flymake
-        "fb" 'flymake-show-buffer-diagnostics
-        "fp" 'flymake-show-project-diagnostics))
-#+END_SRC
+  (use-package flycheck-eglot
+    :after (flycheck eglot)
+    :custom (flycheck-eglot-exclusive nil)
+    :config
+    (global-flycheck-eglot-mode 1))
 
+  (use-package flycheck-golangci-lint
+    :after (flycheck)
+    :hook (go-ts-mode . flycheck-golangci-lint-setup)
+    :config
+    (setq flycheck-golangci-lint-tests t))
+#+end_src
 ** LSP Servers
 
 #+BEGIN_SRC emacs-lisp
