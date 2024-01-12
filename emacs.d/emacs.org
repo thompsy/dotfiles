@@ -19,7 +19,7 @@ available. A few places that I've found particularly useful include:
 - [[https://github.com/ianpan870102/yay-evil-emacs/blob/master/config.org][yay-evil]]
 - [[https://framagit.org/steckerhalter/steckemacs.el/-/tree/master][steckemacs]]
 
-* Setup
+* Tasks
 ** Config Updates
 *** DONE Python encoding issues
 :LOGBOOK:
@@ -127,7 +127,8 @@ Other useful ideas here:
 - [[https://protesilaos.com/emacs/dotemacs]]
 *** TODO Explore ~embark~ more
 
-* Local
+* Emacs
+** Local
 These are various, installation specific settings that might differ across machines, some of which I
 don't want to commit to Git.
 
@@ -145,7 +146,7 @@ don't want to commit to Git.
     (list my/org-dir))
 #+END_SRC
 
-* Early Init
+** Early Init
 The ~early-init.el~ file is called very early in the initialisation process, so this is a good point
 to disable ~package.el~ in favour of ~straight.el~.
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/early-init.el" :eval no
@@ -177,7 +178,7 @@ to disable ~package.el~ in favour of ~straight.el~.
   (setq package-enable-at-startup nil)
 #+END_SRC
 
-* Preamble
+** Preamble
 Some initial comment blurb.
 #+BEGIN_SRC emacs-lisp
   ;;; init.el --- Initialization file for Emacs
@@ -191,7 +192,7 @@ keep it in a separate file.
   (require 'local-setup "~/.emacs.d/local.el")
 #+END_SRC
 
-* Package Manager
+** Package Manager
 Setup the [[https://github.com/radian-software/straight.el][~straight.el~]] package manager.
 #+BEGIN_SRC emacs-lisp
   (setq straight-repository-branch "master")
@@ -251,7 +252,7 @@ explicitly load it with straight early in the init process. See more details in 
 #+BEGIN_SRC emacs-lisp
   (setq use-package-always-demand t)
 #+END_SRC
-* Core Configuration
+** Core Configuration
 A few miscellaneous settings. Note that emacs is not really a package strictly speaking which is why we include ~:straight nil~ so that our package manager doesn't try to fetch the source.
 #+BEGIN_SRC emacs-lisp
     (use-package emacs
@@ -332,7 +333,7 @@ to any themes so that they confirmation code gets stored in ~custom.el~.
         (load-file custom-file)))
 #+END_SRC
 
-** Exec Path Setup
+*** Exec Path Setup
 [[https://github.com/purcell/exec-path-from-shell][~exec-path-from-shell~]] loads the ~PATH~ from your shell setup. This is useful when running Emacs from
 a non-shell environment like OSX.
 #+begin_src emacs-lisp
@@ -341,7 +342,7 @@ a non-shell environment like OSX.
     (exec-path-from-shell-initialize))
 #+end_src
 
-** Files
+*** Files
 Setup some basic file hygiene. Keep some backup files around, but keep them out of sight.
 #+BEGIN_SRC emacs-lisp
   (use-package files
@@ -393,7 +394,7 @@ Use UTF-8 everywhere.
           uniquify-ignore-buffers-re "^\\*"))
 #+END_SRC
 
-** Discoverability
+*** Discoverability
 [[https://github.com/justbur/emacs-which-key][~which-key~]] displays all of the available keybindings following a incompletely entered command. For
 example, pressing ~C-x~ and waiting a moment will cause ~which-key~ to populate the minibuffer with all
 the available next keys along with their corresponding commands. This makes discovery of new
@@ -411,14 +412,14 @@ improvement on this by popping up in a floating window. I'll try it for a while 
     (which-key-mode +1))
 #+END_SRC
 
-** Savehist
+*** Savehist
 #+BEGIN_SRC emacs-lisp
   ;; Save history of minibuffer
   (savehist-mode)
   (setq savehist-additional-variables '(kill-ring search-ring regexp-search-ring))
 #+END_SRC
 
-** Inteface Enhancements
+*** Inteface Enhancements
 #+BEGIN_SRC emacs-lisp
   ;; Mode line information
   (setopt line-number-mode t)                        ; Show current line in modeline
@@ -449,7 +450,7 @@ improvement on this by popping up in a floating window. I'll try it for a while 
     (mapc (lambda (hook) (add-hook hook 'hl-line-mode)) hl-line-hooks))
 #+END_SRC
 
-* Aesthetics
+** Aesthetics
 Turn off a bunch of frame related functionality for a more minimal experience.
 #+BEGIN_SRC emacs-lisp
   (use-package frame
@@ -500,7 +501,7 @@ Turn off a bunch of frame related functionality for a more minimal experience.
     (doom-modeline-buffer-file-name-style 'truncate-upto-project))
 #+END_SRC
 
-* Keybindings
+** Keybindings
 [[https://github.com/noctuid/general.el][~general.el~]] provides a convenient method for binding
 keys. It also integrates well with ~use-package~. In particular, this allows us to easily setup a
 global leader key, ~my-leader-def~ and chain bindings from that.
@@ -547,7 +548,7 @@ global leader key, ~my-leader-def~ and chain bindings from that.
       "qr" 'restart-emacs))
 #+END_SRC
 
-** Hydra
+*** Hydra
 [[https://github.com/abo-abo/hydra][~hydra~]] allows us to specify related keybindings together in a
 neat way. Note that ~:wk~ allows us to specify the text that is displayed by ~which-key~ for this hydra.
 #+BEGIN_SRC emacs-lisp
@@ -636,8 +637,8 @@ smaller to larger screens.
                        ("q" nil "quit")))
 #+END_SRC
 
-* Navigation
-** Avy
+** Navigation
+*** Avy
 #+BEGIN_SRC emacs-lisp
   (use-package avy
     :demand t
@@ -649,7 +650,7 @@ smaller to larger screens.
     :general ("C-'" 'avy-goto-char-timer))
 #+END_SRC
 
-** Consult
+*** Consult
 #+BEGIN_SRC emacs-lisp
   (use-package embark-consult
     :after (embark consult))
@@ -750,7 +751,7 @@ smaller to larger screens.
     (setf (alist-get ?. avy-dispatch-alist) 'bedrock/avy-action-embark))
 #+END_SRC
 
-** Minibuffer
+*** Minibuffer
 #+BEGIN_SRC emacs-lisp
   ;; For help, see: https://www.masteringemacs.org/article/understanding-minibuffer-completion
   (setopt completion-cycle-threshold 1)                  ; TAB cycles candidates
@@ -787,7 +788,7 @@ smaller to larger screens.
     (marginalia-mode))
 #+END_SRC
 
-** Completion
+*** Completion
 #+BEGIN_SRC emacs-lisp
   ;; Popup completion-at-point
   (use-package corfu
@@ -845,7 +846,7 @@ smaller to larger screens.
     (setq completion-styles '(orderless)))
 #+END_SRC
 
-** Bookmarks
+*** Bookmarks
 #+BEGIN_SRC emacs-lisp
   ;; disable annoying bookmark icons
   (setq bookmark-fringe-mark nil)
@@ -872,7 +873,7 @@ smaller to larger screens.
                           ("q" nil "quit")))
 #+END_SRC
 
-** Help
+*** Help
 [[https://github.com/Wilfred/helpful][~helpful~]] provides a slightly nicer interface to the built-in help files.
 #+begin_src emacs-lisp
   (use-package helpful
@@ -885,8 +886,8 @@ smaller to larger screens.
     ("C-h v" 'helpful-variable)
     ("C-h C-d" 'helpful-at-point))
 #+end_src
-* Filesystem
-** Dired
+** Filesystem
+*** Dired
 ~dired~ is basically a file explorer.
 #+BEGIN_SRC emacs-lisp
   (use-package dired
@@ -964,8 +965,8 @@ smaller to larger screens.
     :config
     (add-hook 'dired-mode-hook 'all-the-icons-dired-mode))
 #+END_SRC
-* Editting
-** Undo
+** Editing
+*** Undo
 [[https://github.com/emacsmirror/undo-fu][~undo-fu~]] improves the default undo experience.
 #+BEGIN_SRC emacs-lisp
   (use-package undo-fu
@@ -982,7 +983,7 @@ smaller to larger screens.
     (setq vundo-glyph-alist vundo-unicode-symbols))
 #+END_SRC
 
-** Spelling
+*** Spelling
 ~flyspell~ is Emacs' spelling mode. I've added a decent hydra here for convenience.
 
 If I miss-spell something I can hit ~C-;~ and it will auto correct the previous word even if it's a
@@ -1077,7 +1078,7 @@ What's the workflow that I want here? Two fold:
    ;;             (spell-fu-mode)))
 #+END_SRC
 
-** Rectangles
+*** Rectangles
 This is a hydra for working with the ~rectangle~ commands.
 
 TODO: I should understand how this works better.
@@ -1113,7 +1114,7 @@ TODO: I should understand how this works better.
     ("q" nil))
 #+END_SRC
 
-** Whitespace Removal
+*** Whitespace Removal
 [[https://github.com/lewang/ws-butler][~ws-butler~]] automatically removes trailing whitespace from lines that have been editted.
 
 #+BEGIN_SRC emacs-lisp
@@ -1123,7 +1124,7 @@ TODO: I should understand how this works better.
 #+END_SRC
 
 
-** Move to beginning of line
+*** Move to beginning of line
 This snippet provides smarter moving to the beginning of the line. Copied from [[https://emacsredux.com/blog/2013/05/22/smarter-navigation-to-the-beginning-of-a-line/][EmacsRedux]].
 #+BEGIN_SRC emacs-lisp
   (defun smarter-move-beginning-of-line (arg)
@@ -1153,7 +1154,7 @@ This snippet provides smarter moving to the beginning of the line. Copied from [
   (general-define-key "C-a" 'smarter-move-beginning-of-line)
 #+END_SRC
 
-* Window Management
+** Window Management
 
 [[https://github.com/abo-abo/ace-window][~ace-window~]] allows for easy switching between windows within a frame, splitting windows and moving and
 copying windows.
@@ -1288,8 +1289,8 @@ Now we've got a hydra to make the various window management functions easily acc
     "w" '(hydra-window-delux/body :wk "windows"))
 #+END_SRC
 
-* Software Development
-** Treesitter Setup
+** Software Development
+*** Treesitter Setup
 #+BEGIN_SRC emacs-lisp
   (use-package emacs
     :config
@@ -1332,7 +1333,7 @@ Now we've got a hydra to make the various window management functions easily acc
     ("M-<" 'expreg-contract)
     ("M->" 'expreg-expand))
 #+END_SRC
-** Git
+*** Git
 #+BEGIN_SRC emacs-lisp
   (use-package magit
     :general
@@ -1422,7 +1423,7 @@ A nice Hydra menu to make things more accessible.
       ("<ESC>" git-timemachine-show-current-revision "quit" :exit t))
 #+END_SRC
 
-** Flycheck
+*** Flycheck
 #+begin_src emacs-lisp
   (use-package flycheck
     :general
@@ -1464,7 +1465,7 @@ A nice Hydra menu to make things more accessible.
     :config
     (setq flycheck-golangci-lint-tests t))
 #+end_src
-** LSP Servers
+*** LSP Servers
 
 #+BEGIN_SRC emacs-lisp
   (use-package eglot
@@ -1482,7 +1483,7 @@ A nice Hydra menu to make things more accessible.
     (fset #'jsonrpc--log-event #'ignore))
 #+END_SRC
 
-** Particular Programming modes
+*** Particular Programming modes
 #+BEGIN_SRC emacs-lisp
   (use-package markdown-mode
     :hook ((markdown-mode . visual-line-mode)))
@@ -1511,7 +1512,7 @@ These packages need to be installed in the Python environment too.
   (use-package pyvenv)
 #+END_SRC
 
-* Yasnippets
+** Yasnippets
 #+BEGIN_SRC emacs-lisp
   (use-package yasnippet
     :config
@@ -1523,7 +1524,7 @@ These packages need to be installed in the Python environment too.
     :after yasnippet)
 #+END_SRC
 
-** Snippets
+*** Snippets
 These are various snippets for use with Yasnippet.
 #+BEGIN_SRC :tangle "~/.emacs.d/snippets/go-mode/ifen" :eval no :mkdirp yes
 # -*- mode: snippet -*-
@@ -1535,11 +1536,11 @@ if err != nil {
 }
 #+END_SRC
 
-* Org
+** Org
 See helpful examples at:
 - http://doc.norang.ca/org-mode.html
 
-** Setup
+*** Setup
 #+BEGIN_SRC emacs-lisp
   (use-package org
     :general
@@ -1589,7 +1590,7 @@ See helpful examples at:
     :hook (org-mode . org-autolist-mode))
 #+END_SRC
 
-** Task States
+*** Task States
 #+BEGIN_SRC emacs-lisp
   (setq org-todo-keywords
       '((sequence "TODO(t)"
@@ -1605,7 +1606,7 @@ See helpful examples at:
                   "WONT-DO(n@/!)")))
 #+END_SRC
 
-** Tags
+*** Tags
 #+BEGIN_SRC emacs-lisp
   (setq org-tag-alist '(
                         ;; Task types
@@ -1639,7 +1640,7 @@ See helpful examples at:
                         ))
 #+END_SRC
 
-** Capture Templates
+*** Capture Templates
 
 #+BEGIN_SRC emacs-lisp
   (use-package org-capture
@@ -1745,7 +1746,7 @@ See helpful examples at:
     (insert template))
 #+END_SRC
 
-** Regular Meetings Example
+*** Regular Meetings Example
 This is an example of how I process regular meetings like 1 to 1s:
 1. use the capture template below to gather agenda items during the week. These are accumulated into the 'My Agenda' heading in the given file.
 2. during the meeting work through the agenda in the file
@@ -1772,7 +1773,7 @@ This is an example of how I process regular meetings like 1 to 1s:
 #+END_SRC
 
 
-** Agenda
+*** Agenda
 [[https://github.com/alphapapa/org-super-agenda][~org-super-agenda~]] improves the existing ~org-agenda~ in various ways.
 
 #+BEGIN_SRC emacs-lisp
@@ -1935,7 +1936,7 @@ This is an example of how I process regular meetings like 1 to 1s:
    "." 'hydra-org-agenda/body)
 #+END_SRC
 
-** Blocks
+*** Blocks
 Setup various ~org-mode~ structure templates. When typing ~<~ at the start of a line this will popup
 a menu of various types of blocks that you may want to insert.
 #+BEGIN_SRC emacs-lisp
@@ -2010,7 +2011,7 @@ a menu of various types of blocks that you may want to insert.
       org-structure-template-alist))
 #+END_SRC
 
-** Export Options
+*** Export Options
 [[https://github.com/hniksic/emacs-htmlize][~htmlize~]] converts a buffer to HTML with nice syntax highlighting.
 #+BEGIN_SRC emacs-lisp
   (use-package htmlize
@@ -2048,7 +2049,7 @@ for exporting the region to the clipboard as markdown.
           (kill-buffer-and-window)))))
 #+end_src
 
-* Site Local
+** Site Local
 Various setup like sensitive tags and functions that deal with them are stored elsewhere and loaded here.
 #+begin_src emacs-lisp
   (load "~/notebook/site-local.el")
