@@ -1978,12 +1978,22 @@ Useful function by
 [[https://old.reddit.com/r/emacs/comments/e98yyf/send_output_of_orgmdexportasmarkdownstraight_to/][ImmediateCurve]]
 for exporting the region to the clipboard as markdown.
 #+begin_src emacs-lisp
-  (defun org-to-clipboard-as-markdown ()
+  (defun at/org-to-clipboard-as-markdown ()
     "Copy region to clipboard as markdown."
     (interactive)
     (save-window-excursion
       (let ((org-export-with-toc nil))
         (with-current-buffer (org-md-export-as-markdown)
+          (with-no-warnings (mark-whole-buffer))
+          (clipboard-kill-region (point-min) (point-max))
+          (kill-buffer-and-window)))))
+
+    (defun at/org-to-clipboard-as-text ()
+    "Copy region to clipboard as ascii text."
+    (interactive)
+    (save-window-excursion
+      (let ((org-export-with-toc nil))
+        (with-current-buffer (org-ascii-export-as-ascii)
           (with-no-warnings (mark-whole-buffer))
           (clipboard-kill-region (point-min) (point-max))
           (kill-buffer-and-window)))))
