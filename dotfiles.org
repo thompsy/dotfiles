@@ -986,7 +986,14 @@ smaller to larger screens.
     ;; use a nicer unicode font to display the tree
     (setq vundo-glyph-alist vundo-unicode-symbols))
 #+END_SRC
-
+*** Fill/Unfill Paragraph
+[[https://github.com/purcell/unfill][~unfill~]] is an ideal little helper function to Emacs'
+built-in ~fill~ function.
+#+begin_src emacs-lisp
+  (use-package unfill
+    :general
+    ("M-q" 'unfill-toggle))
+#+end_src
 *** Spelling
 ~flyspell~ is Emacs' spelling mode. I've added a decent hydra here for convenience.
 
