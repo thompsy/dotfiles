@@ -25,6 +25,7 @@ available. A few places that I've found particularly useful include:
 *** TODO Homebrew
 It would be good to auto install packages if on the Mac
 ** Config Updates
+*** TODO Set correct buffer type when use Zellij's scroll to editor function
 *** DONE Python encoding issues
 :LOGBOOK:
 - State "DONE"       from              [2024-01-11 Thu 14:42]
