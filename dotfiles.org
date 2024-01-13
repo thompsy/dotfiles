@@ -989,7 +989,7 @@ smaller to larger screens.
 *** Fill/Unfill Paragraph
 [[https://github.com/purcell/unfill][~unfill~]] is an ideal little helper function to Emacs'
 built-in ~fill~ function.
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package unfill
     :general
     ("M-q" 'unfill-toggle))
@@ -2070,7 +2070,7 @@ file and then rebuild the package and module.
 Some interesting config options:
 - https://github.com/jeffyql/dotfiles/blob/4484469d36e716dfe9431f1b489015423b63a91f/init-vterm.el
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package vterm
     :ensure t
     :general
@@ -2083,7 +2083,7 @@ Some interesting config options:
           '("M-:" "C-c" "C-x" "C-u" "C-g" "C-h" "C-l" "M-x" "M-o" "C-y" "M-y" "C-t" "M-s")))
 #+end_src
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package multi-vterm)
 #+end_src
 
@@ -2091,7 +2091,7 @@ Some interesting config options:
 
 TODO: get this setup to toggle a vterm in the directory of the current buffer and name the buffer
 after the directory.
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package vterm-toggle)
 #+end_src
 ** Site Local
