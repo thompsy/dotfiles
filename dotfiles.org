@@ -1564,9 +1564,12 @@ See helpful examples at:
           org-directory my/org-dir
           org-tags-column 75
           org-log-into-drawer t ;; hide the log state change history a bit better
+          org-hide-emphasis-markers t ;;TODO ignore emphasis markers on kill?
+          org-log-done t
           org-deadline-warning-days 7
           org-agenda-skip-scheduled-if-deadline-is-shown t
           org-habit-graph-column 65
+          org-archive-location "archive.org::datetree/"
           org-duration-format 'h:mm ;; show hours at max, not days
           org-agenda-compact-blocks t
           org-cycle-separator-lines 0
