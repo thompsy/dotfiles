@@ -1,11 +1,10 @@
 #+TITLE: dotfiles.org
-#+PROPERTY: header-args:emacs-lisp :tangle ~/.emacs.d/init.el :results silent :exports code
 
-* emacs.org
+* Dotfiles
 ** What is this?
-This is my emacs configuration in ~org-mode~. To output the source code run ~org-babel-tangle~
-(typically ~C-c~ ~C-v~ ~t~). This will output the relevant files into ~~/.emacs.d/~ where Emacs will pick
-them up.
+This is my dotfiles configuration in ~org-mode~. To output the source code run ~org-babel-tangle~
+(typically ~C-c~ ~C-v~ ~t~). This will create and populate the various config files to the correct
+locations.
 
 Many (most!) things in this file have been inspired by others making their configuration
 available. A few places that I've found particularly useful include:
