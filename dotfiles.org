@@ -1584,7 +1584,11 @@ See helpful examples at:
               (org-agenda-entry-types '(:deadline))
               (org-agenda-overriding-header "Today's Deadlines "))))
           ))
+#+END_SRC
 
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+  (use-package org-appear
+    :hook (org-mode . org-appear-mode))
 #+END_SRC
 
 [[https://github.com/minad/org-modern][~org-modern~]] gives ~org-mode~ a more modern style.
