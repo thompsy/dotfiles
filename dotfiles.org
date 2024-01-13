@@ -2596,7 +2596,7 @@ Various setup like sensitive tags and functions that deal with them are stored e
 
 * Starship
 [[https://starship.rs/][Starship]] is an easy way to get a decent shell prompt without much messing around.
-#+BEGIN_SRC text  :tangle "~/.config/starship.toml"
+#+BEGIN_SRC toml  :tangle "~/.config/starship.toml"
   [aws]
   style = "bold #ffb86c"
 
