@@ -2553,3 +2553,42 @@ Various setup like sensitive tags and functions that deal with them are stored e
   //
   // theme_dir "/path/to/my/theme_dir"
 #+END_SRC
+
+* Starship
+[[https://starship.rs/][Starship]] is an easy way to get a decent shell prompt without much messing around.
+#+BEGIN_SRC text  :tangle "~/.config/starship.toml"
+  [aws]
+  style = "bold #ffb86c"
+
+  [character]
+  error_symbol = "[λ](bold #ff5555)"
+  success_symbol = "[λ](bold #50fa7b)"
+
+  [cmd_duration]
+  style = "bold #f1fa8c"
+
+  [directory]
+  style = "bold #50fa7b"
+
+  [git_branch]
+  style = "bold #ff79c6"
+
+  [git_status]
+  style = "bold #ff5555"
+
+  [hostname]
+  style = "bold #bd93f9"
+
+  [username]
+  format = "[$user]($style) on "
+  style_user = "bold #8be9fd"
+
+  [kubernetes]
+  disabled = false
+
+  [docker_context]
+  disabled = false
+
+  [time]
+  disabled = false
+#+END_SRC
