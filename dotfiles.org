@@ -1681,7 +1681,7 @@ See helpful examples at:
             ("m" "Meeting")
 
             ("ma" "Adhoc Meeting"
-             entry (file+datetree "~/notebook/meetings.org")
+             entry (file+olp+datetree "~/notebook/meetings.org")
              "* %? :meeting:%^g \n:Created: %T\n** Attendees\n*** \n** Notes\n** Action Items\n*** TODO [#A] "
              :tree-type week
              :clock-in t
