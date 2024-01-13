@@ -2053,6 +2053,40 @@ for exporting the region to the clipboard as markdown.
           (kill-buffer-and-window)))))
 #+END_SRC
 
+** Shells
+[[https://github.com/akermu/emacs-libvterm][~vterm~]] provides a terminal emulator within Emacs.
+
+There's a slight wrinkle here in that trying to add my prefix key, currently "C-t" to the list of
+exceptions doesn't actually work. To get this to work I've needed to edit the actual ~vterm.el~ source
+file and then rebuild the package and module.
+
+Some interesting config options:
+- https://github.com/jeffyql/dotfiles/blob/4484469d36e716dfe9431f1b489015423b63a91f/init-vterm.el
+
+#+begin_src emacs-lisp
+  (use-package vterm
+    :ensure t
+    :general
+    (my-leader-def "x" 'vterm-toggle)
+    :config
+    (setq vterm-max-scrollback 100000
+          vterm-clear-scrollback t
+          vterm-buffer-name-string "vterm-%s"
+          vterm-keymap-exceptions
+          '("M-:" "C-c" "C-x" "C-u" "C-g" "C-h" "C-l" "M-x" "M-o" "C-y" "M-y" "C-t" "M-s")))
+#+end_src
+
+#+begin_src emacs-lisp
+  (use-package multi-vterm)
+#+end_src
+
+[[https://github.com/jixiuf/vterm-toggle][~vterm-toggle~]] allows for easy toggling of vterms.
+
+TODO: get this setup to toggle a vterm in the directory of the current buffer and name the buffer
+after the directory.
+#+begin_src emacs-lisp
+  (use-package vterm-toggle)
+#+end_src
 ** Site Local
 Various setup like sensitive tags and functions that deal with them are stored elsewhere and loaded here.
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
