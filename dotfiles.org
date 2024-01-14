@@ -2605,6 +2605,96 @@ Various setup like sensitive tags and functions that deal with them are stored e
 * Starship
 [[https://starship.rs/][Starship]] is an easy way to get a decent shell prompt without much messing around.
 #+BEGIN_SRC toml  :tangle "~/.config/starship.toml"
+  # I include this so I can keep the dicrectory first, before the kubernetes context
+  format = """
+  $username\
+  $hostname\
+  $localip\
+  $shlvl\
+  $singularity\
+  $directory\
+  $vcsh\
+  $fossil_branch\
+  $fossil_metrics\
+  $git_branch\
+  $git_commit\
+  $git_state\
+  $git_metrics\
+  $git_status\
+  $hg_branch\
+  $pijul_channel\
+  $docker_context\
+  $package\
+  $c\
+  $cmake\
+  $cobol\
+  $daml\
+  $dart\
+  $deno\
+  $dotnet\
+  $elixir\
+  $elm\
+  $erlang\
+  $fennel\
+  $golang\
+  $guix_shell\
+  $haskell\
+  $haxe\
+  $helm\
+  $java\
+  $julia\
+  $kotlin\
+  $gradle\
+  $lua\
+  $nim\
+  $nodejs\
+  $ocaml\
+  $opa\
+  $perl\
+  $php\
+  $pulumi\
+  $purescript\
+  $python\
+  $raku\
+  $rlang\
+  $red\
+  $ruby\
+  $rust\
+  $scala\
+  $solidity\
+  $swift\
+  $terraform\
+  $typst\
+  $vlang\
+  $vagrant\
+  $zig\
+  $buf\
+  $nix_shell\
+  $conda\
+  $meson\
+  $spack\
+  $memory_usage\
+  $aws\
+  $gcloud\
+  $openstack\
+  $azure\
+  $kubernetes\
+  $direnv\
+  $env_var\
+  $crystal\
+  $custom\
+  $sudo\
+  $cmd_duration\
+  $line_break\
+  $jobs\
+  $battery\
+  $time\
+  $status\
+  $os\
+  $container\
+  $shell\
+  $character"""
+
   [aws]
   style = "bold #ffb86c"
 
@@ -2633,6 +2723,8 @@ Various setup like sensitive tags and functions that deal with them are stored e
 
   [kubernetes]
   disabled = false
+  format = 'in [$symbol$context( \($namespace\))]($style)'
+  style = 'bold bright-red'
 
   [docker_context]
   disabled = false
