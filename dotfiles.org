@@ -2385,7 +2385,7 @@ crowd and I can get by ok with a more home-brewed solution that basically uses ~
 
 
 * Zellij
-#+BEGIN_SRC text :tangle "~/.config/zellij/config.kdl"
+#+BEGIN_SRC text :tangle "~/.config/zellij/config.kdl" :mkdirp yes
   // If you'd like to override the default keybindings completely, be sure to change "keybinds" to "keybinds clear-defaults=true"
   keybinds {
       // unbind C-g since I use it in Emacs a lot
@@ -2710,7 +2710,7 @@ crowd and I can get by ok with a more home-brewed solution that basically uses ~
 
 * Starship
 [[https://starship.rs/][Starship]] is an easy way to get a decent shell prompt without much messing around.
-#+BEGIN_SRC toml  :tangle "~/.config/starship.toml"
+#+BEGIN_SRC toml  :tangle "~/.config/starship.toml" :mkdirp yes
   # I include this so I can keep the dicrectory first, before the kubernetes context
   format = """
   $username\
