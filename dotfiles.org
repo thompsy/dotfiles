@@ -2380,7 +2380,10 @@ crowd and I can get by ok with a more home-brewed solution that basically uses ~
   ZSH_THEME_TERM_TITLE_IDLE="%~"
 
   # source any site-local config
-  source ~/notebook/local-dotfiles/zshrc
+  if [ -f "${HOME}/notebook/local-dotfiles/zshrc" ]
+  then
+      source ~/notebook/local-dotfiles/zshrc
+  fi
 #+END_SRC
 
 
