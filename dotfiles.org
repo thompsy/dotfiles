@@ -2838,5 +2838,6 @@ crowd and I can get by ok with a more home-brewed solution that basically uses ~
   dialect = "uk"
   style = "compact"
   inline_height = "10"
+  enter_accept = "true"
 #+END_SRC
 
