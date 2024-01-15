@@ -2289,6 +2289,8 @@ crowd and I can get by ok with a more home-brewed solution that basically uses ~
   fi
 
   alias u='ugrep'
+  alias ..='cd ..'
+  alias ...='cd ../..'
 
   export LANG="en_US.UTF-8"
   export PATH="/opt/homebrew/opt/libpq/bin:/opt/homebrew/opt/mysql-client/bin:$PATH"
