@@ -1575,6 +1575,10 @@ See helpful examples at:
           org-cycle-separator-lines 0
           ;; hide empty agenda sections
           org-agenda-clockreport-parameter-plist '(:stepskip0 t :link t :maxlevel 2 :fileskip0 t)
+          org-structure-template-alist (append
+                                        org-structure-template-alist
+                                        '(("not" . "note")
+                                          ("m" . "export markdown")))
           ;; default show today
           org-agenda-span 'day
           org-agenda-start-day "-0d"
@@ -1585,8 +1589,7 @@ See helpful examples at:
              ((agenda "" ((org-agenda-span 'day)))
               (org-agenda-skip-function '(org-agenda-skip-deadline-if-not-today))
               (org-agenda-entry-types '(:deadline))
-              (org-agenda-overriding-header "Today's Deadlines "))))
-          ))
+              (org-agenda-overriding-header "Today's Deadlines "))))))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
@@ -1968,7 +1971,7 @@ a menu of various types of blocks that you may want to insert.
     "
    _c_enter  _Q_uote     _e_macs-lisp    _L_aTeX:
    _l_ink    _E_xample   _p_erl          _i_ndex:
-   _a_scii   _v_erse     _P_erl tangled  _I_NCLUDE:
+   _a_scii   _v_erse     _m_arkdown      _I_NCLUDE:
    _s_rc     _n_ote      plant_u_ml      _H_TML:
    _h_tml    ^ ^         ^ ^             _A_SCII:
   "
@@ -1986,7 +1989,7 @@ a menu of various types of blocks that you may want to insert.
     ("e" (hot-expand "<s" "emacs-lisp"))
     ("p" (hot-expand "<s" "perl"))
     ("u" (hot-expand "<s" "plantuml :file CHANGE.png"))
-    ("P" (hot-expand "<s" "perl" ":results output :exports both :shebang \"#!/usr/bin/env perl\"\n"))
+    ("m" (hot-expand "<m"))
     ("I" (hot-expand "<I"))
     ("H" (hot-expand "<H"))
     ("A" (hot-expand "<A"))
@@ -2022,11 +2025,6 @@ a menu of various types of blocks that you may want to insert.
           (if (or (region-active-p) (looking-back "^"))
               (hydra-org-template/body)
             (self-insert-command 1))))
-
-  (eval-after-load "org"
-    '(cl-pushnew
-      '("not" . "note")
-      org-structure-template-alist))
 #+END_SRC
 
 *** Export Options
