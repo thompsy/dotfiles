@@ -2258,7 +2258,7 @@ crowd and I can get by ok with a more home-brewed solution that basically uses ~
   ###############################################################################
   # Kubernetes
   #
-  if command -v lsd &> /dev/null
+  if command -v kubectl &> /dev/null
   then
       # CLI completion for kubectl/helm
       if [ $commands[kubectl] ]; then
