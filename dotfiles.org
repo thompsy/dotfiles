@@ -1336,9 +1336,7 @@ Now we've got a hydra to make the various window management functions easily acc
   	  (json-mode . json-ts-mode)
   	  (css-mode . css-ts-mode)
   	  (python-mode . python-ts-mode)))
-    :hook
-    ;; Auto parenthesis matching
-    ((prog-mode . electric-pair-mode)))
+    )
 
   (use-package expreg
     :general
