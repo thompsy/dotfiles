@@ -2108,10 +2108,16 @@ Various setup like sensitive tags and functions that deal with them are stored e
 
 * Zsh
 I would quite like to use a Zsh plugin manager but there doesn't seem to be a clear winner in the
-crowd and I can get by ok with a more home-brewed solution that basically uses ~cargo~ as a package manager.
-
+crowd and I can get by ok with a more home-brewed solution that basically uses ~cargo~ as a package
+manager. The only real downside of this is that the initial setup eats a lot of CPU!
 
 #+BEGIN_SRC shell :tangle "~/.zshrc"
+
+  if ! command -v git &> /dev/null
+  then
+      echo "Git not present on system. Skipping local setup."
+      exit
+  fi
 
   # Enalbe syntax highlighting
   if [ ! -d "${HOME}/.zsh-syntax-highlighting/" ]; then
@@ -2126,7 +2132,6 @@ crowd and I can get by ok with a more home-brewed solution that basically uses ~
       echo "Installing Zsh completions..."
       git clone https://github.com/zsh-users/zsh-completions.git ~/.zsh-completions
       fpath=(path/to/zsh-completions/src $fpath)
-      rm -f ~/.zcompdump
   fi
   compinit
 
