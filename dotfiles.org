@@ -2102,7 +2102,8 @@ after the directory.
 ** Site Local
 Various setup like sensitive tags and functions that deal with them are stored elsewhere and loaded here.
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
-  (load "~/notebook/local-dotfiles/site-local.el")
+  (if file-exists-p "~/notebook/local-dotfiles/site-local.el"
+    (load "~/notebook/local-dotfiles/site-local.el"))
 #+END_SRC
 
 * Zsh
