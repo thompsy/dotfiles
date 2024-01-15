@@ -2821,7 +2821,7 @@ crowd and I can get by ok with a more home-brewed solution that basically uses ~
 
   [kubernetes]
   disabled = false
-  format = 'in [$symbol$context( \($namespace\))]($style)'
+  format = 'in [$symbol$context( \($namespace\))]($style) '
   style = 'bold bright-red'
 
   [docker_context]
