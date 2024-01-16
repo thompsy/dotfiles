@@ -1565,6 +1565,7 @@ See helpful examples at:
           org-log-into-drawer t ;; hide the log state change history a bit better
           org-hide-emphasis-markers t ;;TODO ignore emphasis markers on kill?
           org-log-done t
+          org-id-link-to-org-use-id t
           org-deadline-warning-days 7
           org-agenda-skip-scheduled-if-deadline-is-shown t
           org-agenda-start-with-log-mode t
