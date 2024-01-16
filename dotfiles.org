@@ -1650,6 +1650,23 @@ if err != nil {
 }
 #+END_SRC
 
+*** Kubernetes
+:PROPERTIES:
+:ID:       664E2A07-1DA8-4255-892E-565438153A71
+:END:
+#+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
+  (use-package kele
+    :straight t
+    :config
+    (kele-mode 1))
+
+  (use-package kubernetes
+    :commands (kubernetes-overview)
+    :config
+    (setq kubernetes-poll-frequency 3600
+          kubernetes-redraw-frequency 3600))
+#+end_src
+
 ** Org
 See helpful examples at:
 - http://doc.norang.ca/org-mode.html
@@ -2413,8 +2430,7 @@ manager. The only real downside of this is that the initial setup eats a lot of 
       alias kns="kubens"
 
       # Load individual kube contexts into $KUBECONFIG
-      KCONFDIR=~/.kube
-      export KUBECONFIG=${KCONFDIR}/dev.config:${KCONFDIR}/prod.config
+      export KUBECONFIG=${KUBECONFDIR}/config
 
 
       # Get Cmds
