@@ -2160,36 +2160,35 @@ a menu of various types of blocks that you may want to insert.
     :defer t)
 #+END_SRC
 
-[[https://github.com/larstvei/ox-gfm][~ox-gfm~]] formats ~org-mode~ content as Github flavoured
-Markdown. This handles the ~src~ blocks better than the default exporter.
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
-  (use-package ox-gfm)
-#+END_SRC
+[[https://github.com/sshaw/copy-as-format][~copy-as-format~]] makes it easy to copy a region and convert the markup to a bunch of different
+flavours for easy pasting into other places.
+#+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
+  (use-package copy-as-format
+    :bind (("C-c w m" . copy-as-format-markdown)
+           ("C-c w s" . copy-as-format-slack)
+           ("C-c w o" . copy-as-format-org-mode)
+           ("C-c w r" . copy-as-format-rst)
+           ("C-c w g" . copy-as-format-github)
+           ("C-c w w" . copy-as-format))
+    :custom
+    (copy-as-format-default "slack")
+    :config
+    (defun copy-as-format--org-mode (text _multiline)
+      (format "#+begin_src %s\n%s\n#+end_src\n"
+              (replace-regexp-in-string "-mode\\'" "" (symbol-name major-mode))
+              text)))
+#+end_src
 
-Useful function by
-[[https://old.reddit.com/r/emacs/comments/e98yyf/send_output_of_orgmdexportasmarkdownstraight_to/][ImmediateCurve]]
-for exporting the region to the clipboard as markdown.
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
-  (defun at/org-to-clipboard-as-markdown ()
-    "Copy region to clipboard as markdown."
-    (interactive)
-    (save-window-excursion
-      (let ((org-export-with-toc nil))
-        (with-current-buffer (org-gfm-export-as-markdown)
-          (with-no-warnings (mark-whole-buffer))
-          (clipboard-kill-region (point-min) (point-max))
-          (kill-buffer-and-window)))))
-
-    (defun at/org-to-clipboard-as-text ()
-    "Copy region to clipboard as ascii text."
-    (interactive)
-    (save-window-excursion
-      (let ((org-export-with-toc nil))
-        (with-current-buffer (org-ascii-export-as-ascii)
-          (with-no-warnings (mark-whole-buffer))
-          (clipboard-kill-region (point-min) (point-max))
-          (kill-buffer-and-window)))))
-#+END_SRC
+[[https://github.com/titaniumbones/ox-slack][~ox-slack~]] is an ~org-mode~ exporter that converts text to Slack flavoured markdown.
+#+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
+  (use-package ox-slack
+    :after org
+    :bind
+    ("C-c w k" . org-slack-export-to-clipboard-as-slack)
+    :config
+    (advice-add 'org-slack-export-to-clipboard-as-slack
+                :after #'(lambda () (deactivate-mark))))
+#+end_src
 
 ** Shells
 :PROPERTIES:
