@@ -2591,7 +2591,7 @@ manager. The only real downside of this is that the initial setup eats a lot of 
   //   - detach (Default)
   //   - quit
   //
-  // on_force_close "quit"
+  on_force_close "detach"
 
   //  Send a request for a simplified ui (without arrow fonts) to plugins
   //  Options:
