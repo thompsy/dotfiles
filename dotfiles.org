@@ -553,6 +553,11 @@ global leader key, ~my-leader-def~ and chain bindings from that.
       "qr" 'restart-emacs))
 #+END_SRC
 
+[[https://github.com/Fuco1/free-keys][~free-keys~]] shows unused key bindings.
+#+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
+  (use-package free-keys)
+#+end_src
+
 *** Hydra
 [[https://github.com/abo-abo/hydra][~hydra~]] allows us to specify related keybindings together in a
 neat way. Note that ~:wk~ allows us to specify the text that is displayed by ~which-key~ for this hydra.
