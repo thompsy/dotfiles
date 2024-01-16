@@ -1656,7 +1656,6 @@ if err != nil {
 :END:
 #+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package kele
-    :straight t
     :config
     (kele-mode 1))
 
