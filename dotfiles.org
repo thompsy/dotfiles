@@ -134,6 +134,9 @@ Other useful ideas here:
 
 * Emacs
 ** Local
+:PROPERTIES:
+:ID:       A9EE2453-8D16-484B-AF4A-D212F0B6F4FE
+:END:
 These are various, installation specific settings that might differ across machines, some of which I
 don't want to commit to Git.
 
@@ -152,6 +155,9 @@ don't want to commit to Git.
 #+END_SRC
 
 ** Early Init
+:PROPERTIES:
+:ID:       9C54903A-53BB-4D29-90A5-9ED43A95F3DE
+:END:
 The ~early-init.el~ file is called very early in the initialisation process, so this is a good point
 to disable ~package.el~ in favour of ~straight.el~.
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/early-init.el" :eval no
@@ -184,6 +190,9 @@ to disable ~package.el~ in favour of ~straight.el~.
 #+END_SRC
 
 ** Preamble
+:PROPERTIES:
+:ID:       C189F4FE-CACC-4BE4-BBCE-BC1D44D6653E
+:END:
 Some initial comment blurb.
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   ;;; init.el --- Initialization file for Emacs
@@ -198,6 +207,9 @@ keep it in a separate file.
 #+END_SRC
 
 ** Package Manager
+:PROPERTIES:
+:ID:       B3B9D84C-661E-457F-9282-421A1B12060E
+:END:
 Setup the [[https://github.com/radian-software/straight.el][~straight.el~]] package manager.
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (setq straight-repository-branch "master")
@@ -258,6 +270,9 @@ explicitly load it with straight early in the init process. See more details in 
   (setq use-package-always-demand t)
 #+END_SRC
 ** Core Configuration
+:PROPERTIES:
+:ID:       58236767-8AD4-4A25-A2A9-02BDEDC9E6D4
+:END:
 A few miscellaneous settings. Note that emacs is not really a package strictly speaking which is why we include ~:straight nil~ so that our package manager doesn't try to fetch the source.
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
     (use-package emacs
@@ -339,6 +354,9 @@ to any themes so that they confirmation code gets stored in ~custom.el~.
 #+END_SRC
 
 *** Exec Path Setup
+:PROPERTIES:
+:ID:       0C607D19-2464-4AC0-8FDC-BB6A2420ED3F
+:END:
 [[https://github.com/purcell/exec-path-from-shell][~exec-path-from-shell~]] loads the ~PATH~ from your shell setup. This is useful when running Emacs from
 a non-shell environment like OSX.
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
@@ -348,6 +366,9 @@ a non-shell environment like OSX.
 #+END_SRC
 
 *** Files
+:PROPERTIES:
+:ID:       A2401A62-B9F5-4A39-8C9B-9BEE0ECCEC17
+:END:
 Setup some basic file hygiene. Keep some backup files around, but keep them out of sight.
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package files
@@ -400,6 +421,9 @@ Use UTF-8 everywhere.
 #+END_SRC
 
 *** Discoverability
+:PROPERTIES:
+:ID:       97DB78E1-C522-4A0E-9AC2-6FBA15253B26
+:END:
 [[https://github.com/justbur/emacs-which-key][~which-key~]] displays all of the available keybindings following a incompletely entered command. For
 example, pressing ~C-x~ and waiting a moment will cause ~which-key~ to populate the minibuffer with all
 the available next keys along with their corresponding commands. This makes discovery of new
@@ -418,6 +442,9 @@ improvement on this by popping up in a floating window. I'll try it for a while 
 #+END_SRC
 
 *** Savehist
+:PROPERTIES:
+:ID:       C7C96A0A-E6EA-4FB1-BD24-9E83A8F7761C
+:END:
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   ;; Save history of minibuffer
   (savehist-mode)
@@ -425,6 +452,9 @@ improvement on this by popping up in a floating window. I'll try it for a while 
 #+END_SRC
 
 *** Inteface Enhancements
+:PROPERTIES:
+:ID:       2D0FB78A-3A47-4707-A038-6DD3FCF03DE3
+:END:
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   ;; Mode line information
   (setopt line-number-mode t)                        ; Show current line in modeline
@@ -456,6 +486,9 @@ improvement on this by popping up in a floating window. I'll try it for a while 
 #+END_SRC
 
 ** Aesthetics
+:PROPERTIES:
+:ID:       6984A6E9-A3A7-4673-8A6A-64E17B687898
+:END:
 Turn off a bunch of frame related functionality for a more minimal experience.
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package frame
@@ -507,6 +540,9 @@ Turn off a bunch of frame related functionality for a more minimal experience.
 #+END_SRC
 
 ** Keybindings
+:PROPERTIES:
+:ID:       55DF7803-F4D1-43ED-B5EC-F4377C20B52B
+:END:
 [[https://github.com/noctuid/general.el][~general.el~]] provides a convenient method for binding
 keys. It also integrates well with ~use-package~. In particular, this allows us to easily setup a
 global leader key, ~my-leader-def~ and chain bindings from that.
@@ -559,6 +595,9 @@ global leader key, ~my-leader-def~ and chain bindings from that.
 #+end_src
 
 *** Hydra
+:PROPERTIES:
+:ID:       1845AD20-50EC-468B-99C6-19808C288DF1
+:END:
 [[https://github.com/abo-abo/hydra][~hydra~]] allows us to specify related keybindings together in a
 neat way. Note that ~:wk~ allows us to specify the text that is displayed by ~which-key~ for this hydra.
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
@@ -649,6 +688,9 @@ smaller to larger screens.
 
 ** Navigation
 *** Avy
+:PROPERTIES:
+:ID:       6CBC9104-AD62-4843-8C69-EB2223F5903D
+:END:
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package avy
     :demand t
@@ -661,6 +703,9 @@ smaller to larger screens.
 #+END_SRC
 
 *** Consult
+:PROPERTIES:
+:ID:       49DCD1B7-C7DE-4D49-8E47-D194614FA7EB
+:END:
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package embark-consult
     :after (embark consult))
@@ -762,6 +807,9 @@ smaller to larger screens.
 #+END_SRC
 
 *** Minibuffer
+:PROPERTIES:
+:ID:       2510CFE9-62F4-451B-8971-1CF2452B4A87
+:END:
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   ;; For help, see: https://www.masteringemacs.org/article/understanding-minibuffer-completion
   (setopt completion-cycle-threshold 1)                  ; TAB cycles candidates
@@ -799,6 +847,9 @@ smaller to larger screens.
 #+END_SRC
 
 *** Completion
+:PROPERTIES:
+:ID:       C4C77C86-7E03-4C26-92D9-8A909D35A157
+:END:
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   ;; Popup completion-at-point
   (use-package corfu
@@ -857,6 +908,9 @@ smaller to larger screens.
 #+END_SRC
 
 *** Bookmarks
+:PROPERTIES:
+:ID:       07C52099-B065-485D-A22A-832A8E471A76
+:END:
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   ;; disable annoying bookmark icons
   (setq bookmark-fringe-mark nil)
@@ -884,6 +938,9 @@ smaller to larger screens.
 #+END_SRC
 
 *** Help
+:PROPERTIES:
+:ID:       7CAA4640-4E86-436F-B058-2BC5FF7A2CBF
+:END:
 [[https://github.com/Wilfred/helpful][~helpful~]] provides a slightly nicer interface to the built-in help files.
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package helpful
@@ -898,6 +955,9 @@ smaller to larger screens.
 #+END_SRC
 ** Filesystem
 *** Dired
+:PROPERTIES:
+:ID:       39BCEA77-6E29-467F-AC8D-0A2C332EA43D
+:END:
 ~dired~ is basically a file explorer.
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package dired
@@ -977,6 +1037,9 @@ smaller to larger screens.
 #+END_SRC
 ** Editing
 *** Undo
+:PROPERTIES:
+:ID:       B74C61C8-46C8-4BCB-BCCB-AE63283C1C5C
+:END:
 [[https://github.com/emacsmirror/undo-fu][~undo-fu~]] improves the default undo experience.
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package undo-fu
@@ -993,6 +1056,9 @@ smaller to larger screens.
     (setq vundo-glyph-alist vundo-unicode-symbols))
 #+END_SRC
 *** Fill/Unfill Paragraph
+:PROPERTIES:
+:ID:       AD567D1B-47AC-456E-A711-87039063F48C
+:END:
 [[https://github.com/purcell/unfill][~unfill~]] is an ideal little helper function to Emacs'
 built-in ~fill~ function.
 #+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
@@ -1001,6 +1067,9 @@ built-in ~fill~ function.
     ("M-q" 'unfill-toggle))
 #+end_src
 *** Spelling
+:PROPERTIES:
+:ID:       05DF5D12-0C29-44DD-88A5-F25762BC4F85
+:END:
 ~flyspell~ is Emacs' spelling mode. I've added a decent hydra here for convenience.
 
 If I miss-spell something I can hit ~C-;~ and it will auto correct the previous word even if it's a
@@ -1096,6 +1165,9 @@ What's the workflow that I want here? Two fold:
 #+END_SRC
 
 *** Rectangles
+:PROPERTIES:
+:ID:       85B5D4E0-B5D3-408D-A41D-A2BC44E3F029
+:END:
 This is a hydra for working with the ~rectangle~ commands.
 
 TODO: I should understand how this works better.
@@ -1132,6 +1204,9 @@ TODO: I should understand how this works better.
 #+END_SRC
 
 *** Whitespace Removal
+:PROPERTIES:
+:ID:       C2594210-A96C-4018-93BD-0C18BAE953F5
+:END:
 [[https://github.com/lewang/ws-butler][~ws-butler~]] automatically removes trailing whitespace from lines that have been editted.
 
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
@@ -1142,6 +1217,9 @@ TODO: I should understand how this works better.
 
 
 *** Move to beginning of line
+:PROPERTIES:
+:ID:       E1E19C91-7B99-452A-8FB2-6AE35A2DF2CD
+:END:
 This snippet provides smarter moving to the beginning of the line. Copied from [[https://emacsredux.com/blog/2013/05/22/smarter-navigation-to-the-beginning-of-a-line/][EmacsRedux]].
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (defun smarter-move-beginning-of-line (arg)
@@ -1172,6 +1250,9 @@ This snippet provides smarter moving to the beginning of the line. Copied from [
 #+END_SRC
 
 ** Window Management
+:PROPERTIES:
+:ID:       33BDFB30-8D15-49B7-87EC-ED43951373DF
+:END:
 
 [[https://github.com/abo-abo/ace-window][~ace-window~]] allows for easy switching between windows within a frame, splitting windows and moving and
 copying windows.
@@ -1308,6 +1389,9 @@ Now we've got a hydra to make the various window management functions easily acc
 
 ** Software Development
 *** Treesitter Setup
+:PROPERTIES:
+:ID:       199394FB-985F-4076-BEF4-2A3139FFFCB9
+:END:
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package emacs
     :config
@@ -1349,6 +1433,9 @@ Now we've got a hydra to make the various window management functions easily acc
     ("M->" 'expreg-expand))
 #+END_SRC
 *** Git
+:PROPERTIES:
+:ID:       D2862523-93E3-4F58-B975-0AAB2F0955FA
+:END:
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package magit
     :general
@@ -1439,6 +1526,9 @@ A nice Hydra menu to make things more accessible.
 #+END_SRC
 
 *** Flycheck
+:PROPERTIES:
+:ID:       ED7011C9-4F36-493B-9E80-BB3FF232FF5E
+:END:
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package flycheck
     :general
@@ -1481,6 +1571,9 @@ A nice Hydra menu to make things more accessible.
     (setq flycheck-golangci-lint-tests t))
 #+END_SRC
 *** LSP Servers
+:PROPERTIES:
+:ID:       482ED4FE-7F7F-4D0E-A3F3-14CEC5372337
+:END:
 
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package eglot
@@ -1499,6 +1592,9 @@ A nice Hydra menu to make things more accessible.
 #+END_SRC
 
 *** Particular Programming modes
+:PROPERTIES:
+:ID:       8DE130F8-A158-4350-A02F-C99A2EC9A288
+:END:
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package markdown-mode
     :hook ((markdown-mode . visual-line-mode)))
@@ -1528,6 +1624,9 @@ These packages need to be installed in the Python environment too.
 #+END_SRC
 
 ** Yasnippets
+:PROPERTIES:
+:ID:       1A54EDBC-D408-4843-8028-CEE653B9E440
+:END:
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package yasnippet
     :config
@@ -1556,6 +1655,9 @@ See helpful examples at:
 - http://doc.norang.ca/org-mode.html
 
 *** Setup
+:PROPERTIES:
+:ID:       F8105CAC-7798-4FA9-99AD-A946940C527A
+:END:
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package org
     :general
@@ -1618,6 +1720,9 @@ See helpful examples at:
 #+END_SRC
 
 *** Task States
+:PROPERTIES:
+:ID:       6E3FBBD2-310E-4EDF-8EA3-CA9C4AA56F08
+:END:
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (setq org-todo-keywords
       '((sequence "TODO(t)"
@@ -1634,6 +1739,9 @@ See helpful examples at:
 #+END_SRC
 
 *** Tags
+:PROPERTIES:
+:ID:       23040127-1D67-4725-90FE-22183BE585E9
+:END:
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (setq org-tag-alist '(
                         ;; Task types
@@ -1668,6 +1776,9 @@ See helpful examples at:
 #+END_SRC
 
 *** Capture Templates
+:PROPERTIES:
+:ID:       FEDA9815-5C33-42E4-BE74-EE2C99A79184
+:END:
 
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package org-capture
@@ -1801,6 +1912,9 @@ This is an example of how I process regular meetings like 1 to 1s:
 
 
 *** Agenda
+:PROPERTIES:
+:ID:       E9F8DE67-D355-430F-B93B-F57AE1D2E10F
+:END:
 [[https://github.com/alphapapa/org-super-agenda][~org-super-agenda~]] improves the existing ~org-agenda~ in various ways.
 
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
@@ -1964,6 +2078,9 @@ This is an example of how I process regular meetings like 1 to 1s:
 #+END_SRC
 
 *** Blocks
+:PROPERTIES:
+:ID:       FF254A72-BC0A-4F8E-B857-D72250D95EC7
+:END:
 Setup various ~org-mode~ structure templates. When typing ~<~ at the start of a line this will popup
 a menu of various types of blocks that you may want to insert.
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
@@ -2034,6 +2151,9 @@ a menu of various types of blocks that you may want to insert.
 #+END_SRC
 
 *** Export Options
+:PROPERTIES:
+:ID:       32ED7961-A5B9-4EB0-B18D-BA3CF1D9B56A
+:END:
 [[https://github.com/hniksic/emacs-htmlize][~htmlize~]] converts a buffer to HTML with nice syntax highlighting.
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package htmlize
@@ -2072,6 +2192,9 @@ for exporting the region to the clipboard as markdown.
 #+END_SRC
 
 ** Shells
+:PROPERTIES:
+:ID:       C357E950-E226-4B10-83AD-FD2EDEFE4781
+:END:
 [[https://github.com/akermu/emacs-libvterm][~vterm~]] provides a terminal emulator within Emacs.
 
 There's a slight wrinkle here in that trying to add my prefix key, currently "C-t" to the list of
@@ -2106,6 +2229,9 @@ after the directory.
   (use-package vterm-toggle)
 #+end_src
 ** Site Local
+:PROPERTIES:
+:ID:       07C27D9E-4EE9-424B-8D36-AD2FCE24B14E
+:END:
 Various setup like sensitive tags and functions that deal with them are stored elsewhere and loaded here.
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (if (file-exists-p "~/notebook/local-dotfiles/site-local.el")
@@ -2113,6 +2239,9 @@ Various setup like sensitive tags and functions that deal with them are stored e
 #+END_SRC
 
 * Zsh
+:PROPERTIES:
+:ID:       9FCE7FDA-7FA3-47CE-B357-7443D0C92F44
+:END:
 I would quite like to use a Zsh plugin manager but there doesn't seem to be a clear winner in the
 crowd and I can get by ok with a more home-brewed solution that basically uses ~cargo~ as a package
 manager. The only real downside of this is that the initial setup eats a lot of CPU!
@@ -2400,6 +2529,9 @@ manager. The only real downside of this is that the initial setup eats a lot of 
 
 
 * Zellij
+:PROPERTIES:
+:ID:       0134A24C-061C-40A6-9957-A8A527147D46
+:END:
 #+BEGIN_SRC text :tangle "~/.config/zellij/config.kdl" :mkdirp yes
   // If you'd like to override the default keybindings completely, be sure to change "keybinds" to "keybinds clear-defaults=true"
   keybinds {
@@ -2724,6 +2856,9 @@ manager. The only real downside of this is that the initial setup eats a lot of 
 #+END_SRC
 
 * Starship
+:PROPERTIES:
+:ID:       0C68921D-BD1C-4510-8F72-5AD0480CBA8C
+:END:
 [[https://starship.rs/][Starship]] is an easy way to get a decent shell prompt without much messing around.
 #+BEGIN_SRC toml  :tangle "~/.config/starship.toml" :mkdirp yes
   # I include this so I can keep the dicrectory first, before the kubernetes context
@@ -2856,6 +2991,9 @@ manager. The only real downside of this is that the initial setup eats a lot of 
 
 
 * Atuin
+:PROPERTIES:
+:ID:       CAD617A3-6F3B-4C1D-80B8-A28C1B7B3BFB
+:END:
 [[https://github.com/atuinsh/atuin][~atuin~]] is a handy tool for keeping track of shell history.
 #+BEGIN_SRC toml :tangle "~/.config/atuin/config.toml" :mkdirp yes
   dialect = "uk"
