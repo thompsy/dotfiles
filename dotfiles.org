@@ -2205,7 +2205,6 @@ Some interesting config options:
 
 #+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package vterm
-    :ensure t
     :general
     (my-leader-def "x" 'vterm-toggle)
     :config
