@@ -2438,7 +2438,6 @@ manager. The only real downside of this is that the initial setup eats a lot of 
       # Load individual kube contexts into $KUBECONFIG
       export KUBECONFIG="${HOME}/.kube/config"
 
-
       # Get Cmds
       alias kg='kubectl get'
       alias kgp='kubectl get pods'
