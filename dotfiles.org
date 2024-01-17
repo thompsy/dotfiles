@@ -1612,6 +1612,8 @@ A nice Hydra menu to make things more accessible.
   (use-package terraform-mode
     :config
     (setq terraform-format-on-save t))
+
+  (use-package fish-mode)
 #+END_SRC
 
 These packages need to be installed in the Python environment too.
@@ -2206,6 +2208,12 @@ flavours for easy pasting into other places.
                 :after #'(lambda () (deactivate-mark))))
 #+end_src
 
+Get fish shell syntax working.
+#+begin_src emacs-lisp
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((shell . t)))
+#+end_src
 ** Shells
 :PROPERTIES:
 :ID:       C357E950-E226-4B10-83AD-FD2EDEFE4781
@@ -2546,7 +2554,149 @@ manager. The only real downside of this is that the initial setup eats a lot of 
   fi
 #+END_SRC
 
+* Fish
+:PROPERTIES:
+:ID:       3EC52AEB-93C6-4720-8F88-EEA892B825C2
+:END:
+#+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
+  if status is-interactive
+      # Commands to run in interactive sessions can go here
 
+      if test -e ~/notebook/local-dotendles/endshrc
+          source ~/notebook/local-dotfiles/fishrc
+      end
+
+      # Install Rust
+      if ! type -q cargo
+          echo "Installing Rust..."
+          curl https://sh.rustup.rs -sSf | sh -s -- -y --no-modify-path --default-toolchain stable --proendle minimal
+      end
+
+      # Install zoxide
+      if ! type -q zoxide
+          echo "Installing zoxide..."
+          cargo install zoxide --locked
+      end
+      zoxide init fish | source
+
+      # Install starship
+      if ! type -q starship
+          echo "Installing starship..."
+          cargo install starship --locked
+      end
+      starship init fish | source
+
+      # Install atuin
+      if ! type -q atuin
+          echo "Installing atuin..."
+          cargo install atuin
+      end
+      atuin init fish | source
+      bind \cr _atuin_search
+
+      # Install lsd
+      if ! type -q lsd
+          echo "Installing Nerd Fonts..."
+          git clone --endlter=blob:none --sparse git@github.com:ryanoasis/nerd-fonts ~/.nerd-fonts
+          cd ~/.nerd-fonts
+          git sparse-checkout add patched-fonts/EndraCode
+          ./install.sh EndraCode
+          echo "Don't forget to set this font in the terminal."
+
+          echo "Installing lsd..."
+          cargo install lsd
+      end
+
+      abbr --add ls lsd --group-directories-first
+      abbr --add l lsd --group-directories-first -l
+      abbr --add la lsd --group-directories-first -a
+      abbr --add ll lsd --group-directories-first -la
+      abbr --add lt lsd --group-directories-first --tree
+
+      # # Install bat
+      if ! type -q bat
+          echo "Installing bat..."
+          cargo install bat --locked
+      end
+      abbr --add bat cat
+
+      # Install zellij
+      if ! type -q zellij
+          echo "Installing zellij..."
+          cargo install zellij --locked
+
+          #TODO also install room plugin
+      end
+
+      # Install ripgrep
+      if ! type -q rg
+          echo "Installing ripgrep..."
+          cargo install ripgrep
+      end
+
+      ################################################################################
+      # Git aliases
+      #
+      abbr --add g git
+      abbr --add gst git status
+      abbr --add ga git add
+      abbr --add gl git pull
+      abbr --add gcmsg git commit --message
+      abbr --add gco git checkout
+      abbr --add gd git diff
+      abbr --add gdc git diff --cached
+      abbr --add gds git diff --staged
+      abbr --add glgg git log --graph
+      abbr --add glgga git log --graph --decorate --all
+      abbr --add glgm git log --graph --max-count=10
+      abbr --add glods git log --graph --pretty="%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%ad) %C(bold blue)<%an>%Creset" --date=short
+      abbr --add glod git log --graph --pretty="%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%ad) %C(bold blue)<%an>%Creset"
+      abbr --add glola git log --graph --pretty="%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%ar) %C(bold blue)<%an>%Creset" --all
+      abbr --add glols git log --graph --pretty="%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%ar) %C(bold blue)<%an>%Creset" --stat
+      abbr --add glol git log --graph --pretty="%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%ar) %C(bold blue)<%an>%Creset"
+      abbr --add glo git log --oneline --decorate
+      abbr --add glog git log --oneline --decorate --graph
+      abbr --add gloga git log --oneline --decorate --graph --all
+
+      ###############################################################################
+      # Go
+      #
+      set -x GOPATH $HOME/go/
+      set -x GO111MODULE on
+      fish_add_path $GOPATH/bin
+
+      ###############################################################################
+      # Kubernetes
+      #
+      if type -q kubectl
+          set -x KUBECONFIG $HOME/.kube/config
+
+          abbr --add k kubectl
+          abbr --add kx "kubectx"
+          abbr --add kns "kubens"
+
+          # Get Cmds
+          abbr --add kg kubectl get
+          abbr --add kgp kubectl get pods
+          abbr --add kgns kubectl get namespaces
+          abbr --add kgall kubectl get ingress,service,deployment,pod
+          abbr --add kgcj kuebctl get cronjobs
+          abbr --add kgj kubectl get jobs
+          abbr --add kctx kubectx
+
+          # Networking
+          abbr --add kpf kubectl port-forward
+          abbr --add kp kubectl proxy
+      end
+
+      ################################################################################
+      # Update PATH
+      #
+      fish_add_path ~/.cargo/bin
+      fish_add_path ~/bin
+
+  end
+#+end_src
 * Zellij
 :PROPERTIES:
 :ID:       0134A24C-061C-40A6-9957-A8A527147D46
