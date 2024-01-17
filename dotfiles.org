@@ -2429,7 +2429,7 @@ manager. The only real downside of this is that the initial setup eats a lot of 
       alias kns="kubens"
 
       # Load individual kube contexts into $KUBECONFIG
-      export KUBECONFIG=${KUBECONFDIR}/config
+      export KUBECONFIG="${HOME}/.kube/config"
 
 
       # Get Cmds
