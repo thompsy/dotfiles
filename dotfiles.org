@@ -2362,7 +2362,7 @@ manager. The only real downside of this is that the initial setup eats a lot of 
   fi
 
   # Install ripgrep
-  if ! command -v ripgrep &> /dev/null
+  if ! command -v rg &> /dev/null
   then
       echo "Installing ripgrep..."
       cargo install ripgrep
