@@ -384,8 +384,8 @@ Setup some basic file hygiene. Keep some backup files around, but keep them out 
           kept-old-versions 2
           version-control t
           vc-make-backup-files t
-          recentf-max-menu-items 25
-          recentf-max-saved-items 500
+          recentf-max-menu-items 250
+          recentf-max-saved-items 5000
           create-lockfiles nil
           auto-save-file-name-transforms
           `((".*" "~/.emacs.d/auto-saves/" t))))
