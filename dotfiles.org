@@ -2235,6 +2235,12 @@ Some interesting config options:
     (setq vterm-max-scrollback 100000
           vterm-clear-scrollback t
           vterm-buffer-name-string "vterm-%s"
+          vterm-shell "fish"
+          vterm-eval-cmds '(("find-file" find-file)
+                            ("message" message)
+                            ("vterm-clear-scrollback" vterm-clear-scrollback)
+                            ("dired" dired)
+                            ("ediff-files" ediff-files))
           vterm-keymap-exceptions
           '("M-:" "C-c" "C-x" "C-u" "C-g" "C-h" "C-l" "M-x" "M-o" "C-y" "M-y" "C-t" "M-s")))
 #+end_src
@@ -2695,6 +2701,42 @@ manager. The only real downside of this is that the initial setup eats a lot of 
       fish_add_path ~/.cargo/bin
       fish_add_path ~/bin
 
+      ################################################################################
+      # Emacs vterm
+      #
+      # Taken from: https://github.com/pymander/vfish/
+      if test 'vterm' = "$INSIDE_EMACS" \
+          -a -n "$EMACS_VTERM_PATH" \
+          -a -f "$EMACS_VTERM_PATH/etc/emacs-vterm.fish"
+
+          # Clean up old junk functions just in case.
+          functions --erase vterm_old_fish_prompt
+
+          # Load the setup that comes with vterm.
+          source "$EMACS_VTERM_PATH/etc/emacs-vterm.fish"
+
+          function vf --description 'Open a file for editing in Emacs from vterm'
+              vterm_cmd find-file (realpath "$argv")
+          end
+
+          function vd --description 'Run dired on a directory from vterm'
+              set -f dir "$argv"
+              if test "x" = "x$dir"
+                  set dir (pwd)
+              end
+              vterm_cmd dired (realpath "$dir")
+          end
+
+          function vz --description 'Use "zoxide" to run dired directly from vterm'
+              if functions --query __zoxide_z
+                  set -l dir (zoxide query "$argv[1]")
+                  vterm_cmd dired (realpath "$dir")
+              else
+                  echo "Install z for fish shell from https://github.com/jethrokuan/z to use this command."
+                  return 1
+              end
+          end
+      end
   end
 #+end_src
 * Zellij
