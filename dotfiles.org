@@ -2568,14 +2568,15 @@ manager. The only real downside of this is that the initial setup eats a lot of 
   if status is-interactive
       # Commands to run in interactive sessions can go here
 
-      if test -e ~/notebook/local-dotendles/endshrc
+      if test -e ~/notebook/local-dotfiles/fishrc
+          echo "Sourcing local config..."
           source ~/notebook/local-dotfiles/fishrc
       end
 
       # Install Rust
       if ! type -q cargo
           echo "Installing Rust..."
-          curl https://sh.rustup.rs -sSf | sh -s -- -y --no-modify-path --default-toolchain stable --proendle minimal
+          curl https://sh.rustup.rs -sSf | sh -s -- -y --no-modify-path --default-toolchain stable --profile minimal
       end
 
       # Install zoxide
@@ -2603,10 +2604,10 @@ manager. The only real downside of this is that the initial setup eats a lot of 
       # Install lsd
       if ! type -q lsd
           echo "Installing Nerd Fonts..."
-          git clone --endlter=blob:none --sparse git@github.com:ryanoasis/nerd-fonts ~/.nerd-fonts
+          git clone --filter=blob:none --sparse git@github.com:ryanoasis/nerd-fonts ~/.nerd-fonts
           cd ~/.nerd-fonts
-          git sparse-checkout add patched-fonts/EndraCode
-          ./install.sh EndraCode
+          git sparse-checkout add patched-fonts/FiraCode
+          ./install.sh FiraCode
           echo "Don't forget to set this font in the terminal."
 
           echo "Installing lsd..."
