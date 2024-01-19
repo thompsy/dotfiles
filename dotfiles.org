@@ -2702,6 +2702,10 @@ manager. The only real downside of this is that the initial setup eats a lot of 
       fish_add_path ~/.cargo/bin
       fish_add_path ~/bin
 
+      if type -q brew; and brew list libpq > /dev/null
+          fish_add_path /opt/homebrew/opt/libpq/bin
+      end
+
       ################################################################################
       # Emacs vterm
       #
