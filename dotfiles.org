@@ -953,6 +953,14 @@ smaller to larger screens.
     ("C-h v" 'helpful-variable)
     ("C-h C-d" 'helpful-at-point))
 #+END_SRC
+
+*** Beacon
+#+begin_src emacs-lisp
+  (use-package beacon
+    :config
+    (setq beacon-color "#666600")
+    (beacon-mode 1))
+#+end_src
 ** Filesystem
 *** Dired
 :PROPERTIES:
