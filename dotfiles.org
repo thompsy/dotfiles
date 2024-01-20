@@ -3338,6 +3338,11 @@ Useful key bindings:
   $shell\
   $character"""
 
+  [directory]
+  truncate_to_repo = true
+  truncation_length = 0
+  style = "bold #50fa7b"
+
   [aws]
   style = "bold #ffb86c"
 
@@ -3347,9 +3352,6 @@ Useful key bindings:
 
   [cmd_duration]
   style = "bold #f1fa8c"
-
-  [directory]
-  style = "bold #50fa7b"
 
   [git_branch]
   style = "bold #ff79c6"
