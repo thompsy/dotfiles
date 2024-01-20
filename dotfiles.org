@@ -2692,7 +2692,8 @@ Useful key bindings:
           echo "Installing zellij..."
           cargo install zellij --locked
 
-          #TODO also install room plugin
+          # Also install room plugin for easier switching between tabs
+          curl -L "https://github.com/rvcas/room/releases/latest/download/room.wasm" -o ~/.config/zellij/plugins/room.wasm
       end
 
       # Install ripgrep
