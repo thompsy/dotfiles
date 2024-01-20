@@ -1,7 +1,0 @@
-*.iml
-.idea/
-build/
-target/
-__pycache__
-*.pyc
-projectile-bookmarks.eld
