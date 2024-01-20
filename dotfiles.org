@@ -2556,6 +2556,12 @@ manager. The only real downside of this is that the initial setup eats a lot of 
 :PROPERTIES:
 :ID:       3EC52AEB-93C6-4720-8F88-EEA892B825C2
 :END:
+
+Testing out Fish Shell and so far I'm quite impressed. The completions are very nice and need no setup at all.
+
+Useful key bindings:
+- ~Alt .~ :: cycle through arguments to previous commands
+
 #+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
   if status is-interactive
       # Commands to run in interactive sessions can go here
