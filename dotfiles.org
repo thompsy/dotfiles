@@ -2763,8 +2763,14 @@ Useful key bindings:
       fish_add_path ~/.cargo/bin
       fish_add_path ~/bin
 
-      if type -q brew; and brew list libpq > /dev/null
-          fish_add_path /opt/homebrew/opt/libpq/bin
+      if type -q brew
+          # Add the default homebrew locations to the path
+          eval (/opt/homebrew/bin/brew shellenv)
+
+          # if libpq is installed then add it to the path too
+          if brew list libpq > /dev/null
+              fish_add_path /opt/homebrew/opt/libpq/bin
+          end
       end
 
       ################################################################################
