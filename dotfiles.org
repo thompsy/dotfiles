@@ -1657,9 +1657,7 @@ if err != nil {
 :ID:       664E2A07-1DA8-4255-892E-565438153A71
 :END:
 #+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
-  (use-package kele
-    :config
-    (kele-mode 1))
+  (use-package kele)
 
   (use-package kubernetes
     :commands (kubernetes-overview)
