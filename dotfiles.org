@@ -1321,7 +1321,13 @@ This snippet provides smarter moving to the beginning of the line. Copied from [
   ;; remap C-a to `smarter-move-beginning-of-line'
   (general-define-key "C-a" 'smarter-move-beginning-of-line)
 #+END_SRC
-
+*** CSV
+:PROPERTIES:
+:ID:       05DE8310-10CB-42D1-BF55-F9B07FAB76C4
+:END:
+#+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
+  (use-package csv-mode)
+#+end_src
 ** Window Management
 :PROPERTIES:
 :ID:       33BDFB30-8D15-49B7-87EC-ED43951373DF
