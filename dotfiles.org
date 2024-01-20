@@ -19,37 +19,10 @@ available. A few places that I've found particularly useful include:
 - [[https://framagit.org/steckerhalter/steckemacs.el/-/tree/master][steckemacs]]
 
 * Tasks
-** Zsh
-*** TODO Add zshrc here
-*** TODO Add Zellij here
 *** TODO Homebrew
 It would be good to auto install packages if on the Mac
 ** Config Updates
 *** TODO Set correct buffer type when use Zellij's scroll to editor function
-*** DONE Python encoding issues
-:LOGBOOK:
-- State "DONE"       from              [2024-01-11 Thu 14:42]
-:END:
-This is the error:
-#+BEGIN_SRC
-[stderr] Process EGLOT (arnold/(python-ts-mode python-mode)) stderr<1> finished
-[stderr] Fatal Python error: config_get_locale_encoding: failed to get the locale encoding: nl_langinfo(CODESET) failed
-[stderr] Python runtime state: preinitialized
-#+END_SRC
-
-This is the same error: https://stackoverflow.com/questions/60557160/python3-8-fails-with-fatal-python-error-config-get-locale-encoding
-
-Possible solution from https://www.emacswiki.org/emacs/PythonProgrammingInEmacs:
-#+BEGIN_SRC
-(setenv "LC_CTYPE" "UTF-8")
-(setenv "LC_ALL" "en_US.UTF-8")
-(setenv "LANG" "en_US.UTF-8")
-#+END_SRC
-*** DONE Add a comment to all leader keys for hydra
-:LOGBOOK:
-- State "DONE"       from "TODO"       [2024-01-12 Fri 11:39]
-:END:
-
 *** TODO Setup spelling and easy usage
 - https://codeberg.org/ideasman42/emacs-spell-fu
   - exclude specific faces. Looks good.
@@ -59,33 +32,11 @@ Possible solution from https://www.emacswiki.org/emacs/PythonProgrammingInEmacs:
 - State "DONE"       from "TODO"       [2024-01-12 Fri 10:08]
 :END:
 e.g. 2nd, 3rd
-*** DONE [#A] Minibuffer doesn't seem to be using history
-:LOGBOOK:
-- State "DONE"       from "TODO"       [2024-01-12 Fri 10:08]
-:END:
-
-*** DONE [#A] Use Flycheck instead of Flymake
-:LOGBOOK:
-- State "DONE"       from "TODO"       [2024-01-11 Thu 22:54]
-:END:
-Flycheck allows for different sources in parallel, e.g. ~gopls~ and ~golangci~.
-See: https://github.com/intramurz/flycheck-eglot
-
 *** TODO Experiment with ~treesit-font-lock-level~
 *** TODO Explore ~transient-mark-mode~
 See [[https://www.masteringemacs.org/article/fixing-mark-commands-transient-mark-mode]]
 *** TODO Figure out a way to autoload treesitter grammars
 It would also be good to keep these up to date.
-*** DONE Have all hydras use q for quit
-:LOGBOOK:
-- State "DONE"       from "TODO"       [2024-01-12 Fri 11:39]
-:END:
-
-*** DONE Have ~project.el~ run the correct make target as compile command
-:LOGBOOK:
-- State "DONE"       from "TODO"       [2024-01-12 Fri 10:21]
-:END:
-
 *** TODO Corfu popup without hitting tab
 - it might be nice to have this always popup with suggestions bars on the context e.g. Go, org etc. This might be Cape rather then Corfu
 - this might be helpful https://emacs.stackexchange.com/questions/78237/automatic-popup-of-words-from-the-buffer-using-corfu-and-dabbrev
@@ -108,11 +59,6 @@ Other useful ideas here:
 - [[https://dehora.net/journal/how-i-use-org-mode]]
 
 ** Packages to try
-*** DONE ~urgrep~
-:LOGBOOK:
-- State "DONE"       from "TODO"       [2024-01-12 Fri 10:11]
-:END:
-
 *** TODO ~bookmarks+~
 - we can bookmark buffers that aren't backed by files e.g. scratch
 *** TODO ~wgrep~
