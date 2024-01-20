@@ -384,8 +384,8 @@ Setup some basic file hygiene. Keep some backup files around, but keep them out 
           kept-old-versions 2
           version-control t
           vc-make-backup-files t
-          recentf-max-menu-items 25
-          recentf-max-saved-items 500
+          recentf-max-menu-items 250
+          recentf-max-saved-items 5000
           create-lockfiles nil
           auto-save-file-name-transforms
           `((".*" "~/.emacs.d/auto-saves/" t))))
@@ -1832,7 +1832,7 @@ See helpful examples at:
 
             ("ma" "Adhoc Meeting"
              entry (file+olp+datetree "~/notebook/meetings.org")
-             "* %? :meeting:%^g \n:Created: %T\n** Attendees\n*** \n** Notes\n** Action Items\n*** TODO [#A] "
+             "* %? :meeting:%^g \n:Created: %T\n** Attendees\n- \n** Notes\n** Action Items\n*** TODO [#A] "
              :tree-type week
              :clock-in t
              :clock-resume t
@@ -2233,6 +2233,12 @@ Some interesting config options:
     (setq vterm-max-scrollback 100000
           vterm-clear-scrollback t
           vterm-buffer-name-string "vterm-%s"
+          vterm-shell "fish"
+          vterm-eval-cmds '(("find-file" find-file)
+                            ("message" message)
+                            ("vterm-clear-scrollback" vterm-clear-scrollback)
+                            ("dired" dired)
+                            ("ediff-files" ediff-files))
           vterm-keymap-exceptions
           '("M-:" "C-c" "C-x" "C-u" "C-g" "C-h" "C-l" "M-x" "M-o" "C-y" "M-y" "C-t" "M-s")))
 #+end_src
@@ -2566,14 +2572,15 @@ Useful key bindings:
   if status is-interactive
       # Commands to run in interactive sessions can go here
 
-      if test -e ~/notebook/local-dotendles/endshrc
+      if test -e ~/notebook/local-dotfiles/fishrc
+          echo "Sourcing local config..."
           source ~/notebook/local-dotfiles/fishrc
       end
 
       # Install Rust
       if ! type -q cargo
           echo "Installing Rust..."
-          curl https://sh.rustup.rs -sSf | sh -s -- -y --no-modify-path --default-toolchain stable --proendle minimal
+          curl https://sh.rustup.rs -sSf | sh -s -- -y --no-modify-path --default-toolchain stable --profile minimal
       end
 
       # Install zoxide
@@ -2601,10 +2608,10 @@ Useful key bindings:
       # Install lsd
       if ! type -q lsd
           echo "Installing Nerd Fonts..."
-          git clone --endlter=blob:none --sparse git@github.com:ryanoasis/nerd-fonts ~/.nerd-fonts
+          git clone --filter=blob:none --sparse git@github.com:ryanoasis/nerd-fonts ~/.nerd-fonts
           cd ~/.nerd-fonts
-          git sparse-checkout add patched-fonts/EndraCode
-          ./install.sh EndraCode
+          git sparse-checkout add patched-fonts/FiraCode
+          ./install.sh FiraCode
           echo "Don't forget to set this font in the terminal."
 
           echo "Installing lsd..."
@@ -2699,6 +2706,46 @@ Useful key bindings:
       fish_add_path ~/.cargo/bin
       fish_add_path ~/bin
 
+      if type -q brew; and brew list libpq > /dev/null
+          fish_add_path /opt/homebrew/opt/libpq/bin
+      end
+
+      ################################################################################
+      # Emacs vterm
+      #
+      # Taken from: https://github.com/pymander/vfish/
+      if test 'vterm' = "$INSIDE_EMACS" \
+          -a -n "$EMACS_VTERM_PATH" \
+          -a -f "$EMACS_VTERM_PATH/etc/emacs-vterm.fish"
+
+          # Clean up old junk functions just in case.
+          functions --erase vterm_old_fish_prompt
+
+          # Load the setup that comes with vterm.
+          source "$EMACS_VTERM_PATH/etc/emacs-vterm.fish"
+
+          function vf --description 'Open a file for editing in Emacs from vterm'
+              vterm_cmd find-file (realpath "$argv")
+          end
+
+          function vd --description 'Run dired on a directory from vterm'
+              set -f dir "$argv"
+              if test "x" = "x$dir"
+                  set dir (pwd)
+              end
+              vterm_cmd dired (realpath "$dir")
+          end
+
+          function vz --description 'Use "zoxide" to run dired directly from vterm'
+              if functions --query __zoxide_z
+                  set -l dir (zoxide query "$argv[1]")
+                  vterm_cmd dired (realpath "$dir")
+              else
+                  echo "Install z for fish shell from https://github.com/jethrokuan/z to use this command."
+                  return 1
+              end
+          end
+      end
   end
 #+end_src
 * Zellij
