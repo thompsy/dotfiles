@@ -1,7 +1,14 @@
 #+TITLE: dotfiles.org
 
 * Dotfiles
+:PROPERTIES:
+:CUSTOM_ID: dotfiles
+:END:
 ** What is this?
+:PROPERTIES:
+:TOC:      :include all :depth 9 :force (depth) :ignore (nothing) :local (nothing)
+:CUSTOM_ID: what-is-this
+:END:
 This is my dotfiles configuration in ~org-mode~. To output the source code run ~org-babel-tangle~
 (typically ~C-c~ ~C-v~ ~t~). This will create and populate the various config files to the correct
 locations.
@@ -18,8 +25,79 @@ available. A few places that I've found particularly useful include:
 - [[https://github.com/ianpan870102/yay-evil-emacs/blob/master/config.org][yay-evil]]
 - [[https://framagit.org/steckerhalter/steckemacs.el/-/tree/master][steckemacs]]
 
+:CONTENTS:
+- [[#dotfiles][Dotfiles]]
+  - [[#what-is-this][What is this?]]
+- [[#tasks][Tasks]]
+  - [[#homebrew][Homebrew]]
+- [[#emacs][Emacs]]
+  - [[#local][Local]]
+  - [[#early-init][Early Init]]
+  - [[#preamble][Preamble]]
+  - [[#package-manager][Package Manager]]
+  - [[#core-configuration][Core Configuration]]
+    - [[#exec-path-setup][Exec Path Setup]]
+    - [[#files][Files]]
+    - [[#discoverability][Discoverability]]
+    - [[#savehist][Savehist]]
+    - [[#inteface-enhancements][Inteface Enhancements]]
+  - [[#aesthetics][Aesthetics]]
+  - [[#keybindings][Keybindings]]
+    - [[#hydra][Hydra]]
+  - [[#navigation][Navigation]]
+    - [[#avy][Avy]]
+    - [[#consult][Consult]]
+    - [[#minibuffer][Minibuffer]]
+    - [[#completion][Completion]]
+    - [[#bookmarks][Bookmarks]]
+    - [[#help][Help]]
+    - [[#beacon][Beacon]]
+  - [[#filesystem][Filesystem]]
+    - [[#dired][Dired]]
+  - [[#editing][Editing]]
+    - [[#undo][Undo]]
+    - [[#fillunfill-paragraph][Fill/Unfill Paragraph]]
+    - [[#spelling][Spelling]]
+    - [[#rectangles][Rectangles]]
+    - [[#whitespace-removal][Whitespace Removal]]
+    - [[#move-to-beginning-of-line][Move to beginning of line]]
+  - [[#window-management][Window Management]]
+  - [[#software-development][Software Development]]
+    - [[#treesitter-setup][Treesitter Setup]]
+    - [[#git][Git]]
+    - [[#flycheck][Flycheck]]
+    - [[#lsp-servers][LSP Servers]]
+    - [[#particular-programming-modes][Particular Programming modes]]
+  - [[#yasnippets][Yasnippets]]
+    - [[#snippets][Snippets]]
+    - [[#kubernetes][Kubernetes]]
+  - [[#org][Org]]
+    - [[#setup][Setup]]
+    - [[#task-states][Task States]]
+    - [[#tags][Tags]]
+    - [[#capture-templates][Capture Templates]]
+    - [[#regular-meetings-example][Regular Meetings Example]]
+    - [[#agenda][Agenda]]
+    - [[#blocks][Blocks]]
+    - [[#export-options][Export Options]]
+  - [[#shells][Shells]]
+  - [[#site-local][Site Local]]
+- [[#zsh][Zsh]]
+- [[#fish][Fish]]
+- [[#zellij][Zellij]]
+- [[#starship][Starship]]
+- [[#atuin][Atuin]]
+:END:
+
+
 * Tasks
+:PROPERTIES:
+:CUSTOM_ID: tasks
+:END:
 *** TODO Homebrew
+:PROPERTIES:
+:CUSTOM_ID: homebrew
+:END:
 It would be good to auto install packages if on the Mac
 ** Config Updates
 *** TODO Set correct buffer type when use Zellij's scroll to editor function
@@ -79,9 +157,13 @@ Other useful ideas here:
 *** TODO Explore ~embark~ more
 
 * Emacs
+:PROPERTIES:
+:CUSTOM_ID: emacs
+:END:
 ** Local
 :PROPERTIES:
 :ID:       A9EE2453-8D16-484B-AF4A-D212F0B6F4FE
+:CUSTOM_ID: local
 :END:
 These are various, installation specific settings that might differ across machines, some of which I
 don't want to commit to Git.
@@ -103,6 +185,7 @@ don't want to commit to Git.
 ** Early Init
 :PROPERTIES:
 :ID:       9C54903A-53BB-4D29-90A5-9ED43A95F3DE
+:CUSTOM_ID: early-init
 :END:
 The ~early-init.el~ file is called very early in the initialisation process, so this is a good point
 to disable ~package.el~ in favour of ~straight.el~.
@@ -138,6 +221,7 @@ to disable ~package.el~ in favour of ~straight.el~.
 ** Preamble
 :PROPERTIES:
 :ID:       C189F4FE-CACC-4BE4-BBCE-BC1D44D6653E
+:CUSTOM_ID: preamble
 :END:
 Some initial comment blurb.
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
@@ -155,6 +239,7 @@ keep it in a separate file.
 ** Package Manager
 :PROPERTIES:
 :ID:       B3B9D84C-661E-457F-9282-421A1B12060E
+:CUSTOM_ID: package-manager
 :END:
 Setup the [[https://github.com/radian-software/straight.el][~straight.el~]] package manager.
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
@@ -218,6 +303,7 @@ explicitly load it with straight early in the init process. See more details in 
 ** Core Configuration
 :PROPERTIES:
 :ID:       58236767-8AD4-4A25-A2A9-02BDEDC9E6D4
+:CUSTOM_ID: core-configuration
 :END:
 A few miscellaneous settings. Note that emacs is not really a package strictly speaking which is why we include ~:straight nil~ so that our package manager doesn't try to fetch the source.
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
@@ -302,6 +388,7 @@ to any themes so that they confirmation code gets stored in ~custom.el~.
 *** Exec Path Setup
 :PROPERTIES:
 :ID:       0C607D19-2464-4AC0-8FDC-BB6A2420ED3F
+:CUSTOM_ID: exec-path-setup
 :END:
 [[https://github.com/purcell/exec-path-from-shell][~exec-path-from-shell~]] loads the ~PATH~ from your shell setup. This is useful when running Emacs from
 a non-shell environment like OSX.
@@ -314,6 +401,7 @@ a non-shell environment like OSX.
 *** Files
 :PROPERTIES:
 :ID:       A2401A62-B9F5-4A39-8C9B-9BEE0ECCEC17
+:CUSTOM_ID: files
 :END:
 Setup some basic file hygiene. Keep some backup files around, but keep them out of sight.
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
@@ -369,6 +457,7 @@ Use UTF-8 everywhere.
 *** Discoverability
 :PROPERTIES:
 :ID:       97DB78E1-C522-4A0E-9AC2-6FBA15253B26
+:CUSTOM_ID: discoverability
 :END:
 [[https://github.com/justbur/emacs-which-key][~which-key~]] displays all of the available keybindings following a incompletely entered command. For
 example, pressing ~C-x~ and waiting a moment will cause ~which-key~ to populate the minibuffer with all
@@ -390,6 +479,7 @@ improvement on this by popping up in a floating window. I'll try it for a while 
 *** Savehist
 :PROPERTIES:
 :ID:       C7C96A0A-E6EA-4FB1-BD24-9E83A8F7761C
+:CUSTOM_ID: savehist
 :END:
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   ;; Save history of minibuffer
@@ -400,6 +490,7 @@ improvement on this by popping up in a floating window. I'll try it for a while 
 *** Inteface Enhancements
 :PROPERTIES:
 :ID:       2D0FB78A-3A47-4707-A038-6DD3FCF03DE3
+:CUSTOM_ID: inteface-enhancements
 :END:
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   ;; Mode line information
@@ -434,6 +525,7 @@ improvement on this by popping up in a floating window. I'll try it for a while 
 ** Aesthetics
 :PROPERTIES:
 :ID:       6984A6E9-A3A7-4673-8A6A-64E17B687898
+:CUSTOM_ID: aesthetics
 :END:
 Turn off a bunch of frame related functionality for a more minimal experience.
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
@@ -488,6 +580,7 @@ Turn off a bunch of frame related functionality for a more minimal experience.
 ** Keybindings
 :PROPERTIES:
 :ID:       55DF7803-F4D1-43ED-B5EC-F4377C20B52B
+:CUSTOM_ID: keybindings
 :END:
 [[https://github.com/noctuid/general.el][~general.el~]] provides a convenient method for binding
 keys. It also integrates well with ~use-package~. In particular, this allows us to easily setup a
@@ -543,6 +636,7 @@ global leader key, ~my-leader-def~ and chain bindings from that.
 *** Hydra
 :PROPERTIES:
 :ID:       1845AD20-50EC-468B-99C6-19808C288DF1
+:CUSTOM_ID: hydra
 :END:
 [[https://github.com/abo-abo/hydra][~hydra~]] allows us to specify related keybindings together in a
 neat way. Note that ~:wk~ allows us to specify the text that is displayed by ~which-key~ for this hydra.
@@ -633,9 +727,13 @@ smaller to larger screens.
 #+END_SRC
 
 ** Navigation
+:PROPERTIES:
+:CUSTOM_ID: navigation
+:END:
 *** Avy
 :PROPERTIES:
 :ID:       6CBC9104-AD62-4843-8C69-EB2223F5903D
+:CUSTOM_ID: avy
 :END:
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package avy
@@ -651,6 +749,7 @@ smaller to larger screens.
 *** Consult
 :PROPERTIES:
 :ID:       49DCD1B7-C7DE-4D49-8E47-D194614FA7EB
+:CUSTOM_ID: consult
 :END:
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package embark-consult
@@ -755,6 +854,7 @@ smaller to larger screens.
 *** Minibuffer
 :PROPERTIES:
 :ID:       2510CFE9-62F4-451B-8971-1CF2452B4A87
+:CUSTOM_ID: minibuffer
 :END:
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   ;; For help, see: https://www.masteringemacs.org/article/understanding-minibuffer-completion
@@ -795,6 +895,7 @@ smaller to larger screens.
 *** Completion
 :PROPERTIES:
 :ID:       C4C77C86-7E03-4C26-92D9-8A909D35A157
+:CUSTOM_ID: completion
 :END:
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   ;; Popup completion-at-point
@@ -856,6 +957,7 @@ smaller to larger screens.
 *** Bookmarks
 :PROPERTIES:
 :ID:       07C52099-B065-485D-A22A-832A8E471A76
+:CUSTOM_ID: bookmarks
 :END:
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   ;; disable annoying bookmark icons
@@ -886,6 +988,7 @@ smaller to larger screens.
 *** Help
 :PROPERTIES:
 :ID:       7CAA4640-4E86-436F-B058-2BC5FF7A2CBF
+:CUSTOM_ID: help
 :END:
 [[https://github.com/Wilfred/helpful][~helpful~]] provides a slightly nicer interface to the built-in help files.
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
@@ -901,6 +1004,9 @@ smaller to larger screens.
 #+END_SRC
 
 *** Beacon
+:PROPERTIES:
+:CUSTOM_ID: beacon
+:END:
 #+begin_src emacs-lisp
   (use-package beacon
     :config
@@ -908,9 +1014,13 @@ smaller to larger screens.
     (beacon-mode 1))
 #+end_src
 ** Filesystem
+:PROPERTIES:
+:CUSTOM_ID: filesystem
+:END:
 *** Dired
 :PROPERTIES:
 :ID:       39BCEA77-6E29-467F-AC8D-0A2C332EA43D
+:CUSTOM_ID: dired
 :END:
 ~dired~ is basically a file explorer.
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
@@ -990,9 +1100,13 @@ smaller to larger screens.
     (add-hook 'dired-mode-hook 'all-the-icons-dired-mode))
 #+END_SRC
 ** Editing
+:PROPERTIES:
+:CUSTOM_ID: editing
+:END:
 *** Undo
 :PROPERTIES:
 :ID:       B74C61C8-46C8-4BCB-BCCB-AE63283C1C5C
+:CUSTOM_ID: undo
 :END:
 [[https://github.com/emacsmirror/undo-fu][~undo-fu~]] improves the default undo experience.
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
@@ -1012,6 +1126,7 @@ smaller to larger screens.
 *** Fill/Unfill Paragraph
 :PROPERTIES:
 :ID:       AD567D1B-47AC-456E-A711-87039063F48C
+:CUSTOM_ID: fillunfill-paragraph
 :END:
 [[https://github.com/purcell/unfill][~unfill~]] is an ideal little helper function to Emacs'
 built-in ~fill~ function.
@@ -1023,6 +1138,7 @@ built-in ~fill~ function.
 *** Spelling
 :PROPERTIES:
 :ID:       05DF5D12-0C29-44DD-88A5-F25762BC4F85
+:CUSTOM_ID: spelling
 :END:
 ~flyspell~ is Emacs' spelling mode. I've added a decent hydra here for convenience.
 
@@ -1121,6 +1237,7 @@ What's the workflow that I want here? Two fold:
 *** Rectangles
 :PROPERTIES:
 :ID:       85B5D4E0-B5D3-408D-A41D-A2BC44E3F029
+:CUSTOM_ID: rectangles
 :END:
 This is a hydra for working with the ~rectangle~ commands.
 
@@ -1160,6 +1277,7 @@ TODO: I should understand how this works better.
 *** Whitespace Removal
 :PROPERTIES:
 :ID:       C2594210-A96C-4018-93BD-0C18BAE953F5
+:CUSTOM_ID: whitespace-removal
 :END:
 [[https://github.com/lewang/ws-butler][~ws-butler~]] automatically removes trailing whitespace from lines that have been editted.
 
@@ -1173,6 +1291,7 @@ TODO: I should understand how this works better.
 *** Move to beginning of line
 :PROPERTIES:
 :ID:       E1E19C91-7B99-452A-8FB2-6AE35A2DF2CD
+:CUSTOM_ID: move-to-beginning-of-line
 :END:
 This snippet provides smarter moving to the beginning of the line. Copied from [[https://emacsredux.com/blog/2013/05/22/smarter-navigation-to-the-beginning-of-a-line/][EmacsRedux]].
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
@@ -1206,6 +1325,7 @@ This snippet provides smarter moving to the beginning of the line. Copied from [
 ** Window Management
 :PROPERTIES:
 :ID:       33BDFB30-8D15-49B7-87EC-ED43951373DF
+:CUSTOM_ID: window-management
 :END:
 
 [[https://github.com/abo-abo/ace-window][~ace-window~]] allows for easy switching between windows within a frame, splitting windows and moving and
@@ -1342,9 +1462,13 @@ Now we've got a hydra to make the various window management functions easily acc
 #+END_SRC
 
 ** Software Development
+:PROPERTIES:
+:CUSTOM_ID: software-development
+:END:
 *** Treesitter Setup
 :PROPERTIES:
 :ID:       199394FB-985F-4076-BEF4-2A3139FFFCB9
+:CUSTOM_ID: treesitter-setup
 :END:
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package emacs
@@ -1389,6 +1513,7 @@ Now we've got a hydra to make the various window management functions easily acc
 *** Git
 :PROPERTIES:
 :ID:       D2862523-93E3-4F58-B975-0AAB2F0955FA
+:CUSTOM_ID: git
 :END:
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package magit
@@ -1530,6 +1655,7 @@ A nice Hydra menu to make things more accessible.
 *** Flycheck
 :PROPERTIES:
 :ID:       ED7011C9-4F36-493B-9E80-BB3FF232FF5E
+:CUSTOM_ID: flycheck
 :END:
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package flycheck
@@ -1575,6 +1701,7 @@ A nice Hydra menu to make things more accessible.
 *** LSP Servers
 :PROPERTIES:
 :ID:       482ED4FE-7F7F-4D0E-A3F3-14CEC5372337
+:CUSTOM_ID: lsp-servers
 :END:
 
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
@@ -1596,6 +1723,7 @@ A nice Hydra menu to make things more accessible.
 *** Particular Programming modes
 :PROPERTIES:
 :ID:       8DE130F8-A158-4350-A02F-C99A2EC9A288
+:CUSTOM_ID: particular-programming-modes
 :END:
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package markdown-mode
@@ -1630,6 +1758,7 @@ These packages need to be installed in the Python environment too.
 ** Yasnippets
 :PROPERTIES:
 :ID:       1A54EDBC-D408-4843-8028-CEE653B9E440
+:CUSTOM_ID: yasnippets
 :END:
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package yasnippet
@@ -1643,6 +1772,9 @@ These packages need to be installed in the Python environment too.
 #+END_SRC
 
 *** Snippets
+:PROPERTIES:
+:CUSTOM_ID: snippets
+:END:
 These are various snippets for use with Yasnippet.
 #+BEGIN_SRC :tangle "~/.emacs.d/snippets/go-mode/ifen" :eval no :mkdirp yes
 # -*- mode: snippet -*-
@@ -1657,6 +1789,7 @@ if err != nil {
 *** Kubernetes
 :PROPERTIES:
 :ID:       664E2A07-1DA8-4255-892E-565438153A71
+:CUSTOM_ID: kubernetes
 :END:
 #+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package kele)
@@ -1669,12 +1802,16 @@ if err != nil {
 #+end_src
 
 ** Org
+:PROPERTIES:
+:CUSTOM_ID: org
+:END:
 See helpful examples at:
 - http://doc.norang.ca/org-mode.html
 
 *** Setup
 :PROPERTIES:
 :ID:       F8105CAC-7798-4FA9-99AD-A946940C527A
+:CUSTOM_ID: setup
 :END:
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package org
@@ -1740,6 +1877,7 @@ See helpful examples at:
 *** Task States
 :PROPERTIES:
 :ID:       6E3FBBD2-310E-4EDF-8EA3-CA9C4AA56F08
+:CUSTOM_ID: task-states
 :END:
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (setq org-todo-keywords
@@ -1759,6 +1897,7 @@ See helpful examples at:
 *** Tags
 :PROPERTIES:
 :ID:       23040127-1D67-4725-90FE-22183BE585E9
+:CUSTOM_ID: tags
 :END:
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (setq org-tag-alist '(
@@ -1796,6 +1935,7 @@ See helpful examples at:
 *** Capture Templates
 :PROPERTIES:
 :ID:       FEDA9815-5C33-42E4-BE74-EE2C99A79184
+:CUSTOM_ID: capture-templates
 :END:
 
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
@@ -1903,6 +2043,9 @@ See helpful examples at:
 #+END_SRC
 
 *** Regular Meetings Example
+:PROPERTIES:
+:CUSTOM_ID: regular-meetings-example
+:END:
 This is an example of how I process regular meetings like 1 to 1s:
 1. use the capture template below to gather agenda items during the week. These are accumulated into the 'My Agenda' heading in the given file.
 2. during the meeting work through the agenda in the file
@@ -1932,6 +2075,7 @@ This is an example of how I process regular meetings like 1 to 1s:
 *** Agenda
 :PROPERTIES:
 :ID:       E9F8DE67-D355-430F-B93B-F57AE1D2E10F
+:CUSTOM_ID: agenda
 :END:
 [[https://github.com/alphapapa/org-super-agenda][~org-super-agenda~]] improves the existing ~org-agenda~ in various ways.
 
@@ -2098,6 +2242,7 @@ This is an example of how I process regular meetings like 1 to 1s:
 *** Blocks
 :PROPERTIES:
 :ID:       FF254A72-BC0A-4F8E-B857-D72250D95EC7
+:CUSTOM_ID: blocks
 :END:
 Setup various ~org-mode~ structure templates. When typing ~<~ at the start of a line this will popup
 a menu of various types of blocks that you may want to insert.
@@ -2171,6 +2316,7 @@ a menu of various types of blocks that you may want to insert.
 *** Export Options
 :PROPERTIES:
 :ID:       32ED7961-A5B9-4EB0-B18D-BA3CF1D9B56A
+:CUSTOM_ID: export-options
 :END:
 [[https://github.com/hniksic/emacs-htmlize][~htmlize~]] converts a buffer to HTML with nice syntax highlighting.
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
@@ -2209,14 +2355,21 @@ flavours for easy pasting into other places.
 #+end_src
 
 Get fish shell syntax working.
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((shell . t)))
 #+end_src
+
+#+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
+  (use-package org-make-toc
+    :config
+    (setq org-make-toc-insert-custom-ids t))
+#+end_src
 ** Shells
 :PROPERTIES:
 :ID:       C357E950-E226-4B10-83AD-FD2EDEFE4781
+:CUSTOM_ID: shells
 :END:
 [[https://github.com/akermu/emacs-libvterm][~vterm~]] provides a terminal emulator within Emacs.
 
@@ -2259,6 +2412,7 @@ after the directory.
 ** Site Local
 :PROPERTIES:
 :ID:       07C27D9E-4EE9-424B-8D36-AD2FCE24B14E
+:CUSTOM_ID: site-local
 :END:
 Various setup like sensitive tags and functions that deal with them are stored elsewhere and loaded here.
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
@@ -2269,6 +2423,7 @@ Various setup like sensitive tags and functions that deal with them are stored e
 * Zsh
 :PROPERTIES:
 :ID:       9FCE7FDA-7FA3-47CE-B357-7443D0C92F44
+:CUSTOM_ID: zsh
 :END:
 I would quite like to use a Zsh plugin manager but there doesn't seem to be a clear winner in the
 crowd and I can get by ok with a more home-brewed solution that basically uses ~cargo~ as a package
@@ -2563,6 +2718,7 @@ manager. The only real downside of this is that the initial setup eats a lot of 
 * Fish
 :PROPERTIES:
 :ID:       3EC52AEB-93C6-4720-8F88-EEA892B825C2
+:CUSTOM_ID: fish
 :END:
 
 Testing out Fish Shell and so far I'm quite impressed. The completions are very nice and need no setup at all.
@@ -2760,6 +2916,7 @@ Useful key bindings:
 * Zellij
 :PROPERTIES:
 :ID:       0134A24C-061C-40A6-9957-A8A527147D46
+:CUSTOM_ID: zellij
 :END:
 #+BEGIN_SRC text :tangle "~/.config/zellij/config.kdl" :mkdirp yes
   // If you'd like to override the default keybindings completely, be sure to change "keybinds" to "keybinds clear-defaults=true"
@@ -3087,6 +3244,7 @@ Useful key bindings:
 * Starship
 :PROPERTIES:
 :ID:       0C68921D-BD1C-4510-8F72-5AD0480CBA8C
+:CUSTOM_ID: starship
 :END:
 [[https://starship.rs/][Starship]] is an easy way to get a decent shell prompt without much messing around.
 #+BEGIN_SRC toml  :tangle "~/.config/starship.toml" :mkdirp yes
@@ -3222,6 +3380,7 @@ Useful key bindings:
 * Atuin
 :PROPERTIES:
 :ID:       CAD617A3-6F3B-4C1D-80B8-A28C1B7B3BFB
+:CUSTOM_ID: atuin
 :END:
 [[https://github.com/atuinsh/atuin][~atuin~]] is a handy tool for keeping track of shell history.
 #+BEGIN_SRC toml :tangle "~/.config/atuin/config.toml" :mkdirp yes
