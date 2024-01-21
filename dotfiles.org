@@ -3367,7 +3367,7 @@ Useful key bindings:
   [kubernetes]
   disabled = false
   format = 'in [$symbol$context( \($namespace\))]($style) '
-  style = 'bold bright-red'
+  style = "bold #bd93f9"
 
   [docker_context]
   disabled = false
