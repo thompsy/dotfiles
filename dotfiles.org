@@ -1325,7 +1325,13 @@ This snippet provides smarter moving to the beginning of the line. Copied from [
   ;; remap C-a to `smarter-move-beginning-of-line'
   (general-define-key "C-a" 'smarter-move-beginning-of-line)
 #+END_SRC
-
+*** CSV
+:PROPERTIES:
+:ID:       05DE8310-10CB-42D1-BF55-F9B07FAB76C4
+:END:
+#+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
+  (use-package csv-mode)
+#+end_src
 ** Window Management
 :PROPERTIES:
 :ID:       33BDFB30-8D15-49B7-87EC-ED43951373DF
@@ -2864,6 +2870,13 @@ Useful key bindings:
       end
 
       ################################################################################
+      # Python
+      #
+      # Need to run this in each venv seemingly:
+      # python -m pip install virtualfish
+      # eval (python -m virtualfish)
+
+      ################################################################################
       # Update PATH
       #
       fish_add_path ~/.cargo/bin
@@ -3342,6 +3355,11 @@ Useful key bindings:
   $shell\
   $character"""
 
+  [directory]
+  truncate_to_repo = true
+  truncation_length = 0
+  style = "bold #50fa7b"
+
   [aws]
   style = "bold #ffb86c"
 
@@ -3351,9 +3369,6 @@ Useful key bindings:
 
   [cmd_duration]
   style = "bold #f1fa8c"
-
-  [directory]
-  style = "bold #50fa7b"
 
   [git_branch]
   style = "bold #ff79c6"
