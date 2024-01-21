@@ -283,7 +283,6 @@ you explicitly override it with :straight nil.
   (setq straight-use-package-by-default t)
 #+END_SRC
 
-todo: update this link
 Install [[https://github.com/jwiegley/use-package][~use-package~]] for easily installing other packages.
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   ;; Install use-package to use with straight.el
@@ -297,6 +296,7 @@ explicitly load it with straight early in the init process. See more details in 
   (straight-use-package 'org)
 #+END_SRC
 
+Load packages immediately by default.
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (setq use-package-always-demand t)
 #+END_SRC
@@ -305,7 +305,8 @@ explicitly load it with straight early in the init process. See more details in 
 :ID:       58236767-8AD4-4A25-A2A9-02BDEDC9E6D4
 :CUSTOM_ID: core-configuration
 :END:
-A few miscellaneous settings. Note that emacs is not really a package strictly speaking which is why we include ~:straight nil~ so that our package manager doesn't try to fetch the source.
+A few miscellaneous settings. Note that emacs is not really a package strictly speaking which is why
+we include ~:straight nil~ so that our package manager doesn't try to fetch the source.
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
     (use-package emacs
       :straight nil
@@ -328,7 +329,8 @@ A few miscellaneous settings. Note that emacs is not really a package strictly s
       (frame-resize-pixelwise t))
 #+END_SRC
 
-It's useful to have buffers auto-revert when files on disk change especially when using Git branches a lot!
+It's useful to have buffers auto-revert when files on disk change especially when using Git branches
+a lot!
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package autorevert
     :straight nil
@@ -353,8 +355,8 @@ Use the system keyboard when killing and yanking.
     (save-interprogram-paste-before-kill t))
 #+END_SRC
 
-[[https://github.com/emacs-mirror/emacs/blob/master/lisp/saveplace.el][~saveplace~]] jumps back to
-the last when later visiting a file. This is handy to pick up where you left off.
+[[https://github.com/emacs-mirror/emacs/blob/master/lisp/saveplace.el][~saveplace~]] jumps back to the last when later visiting a file. This is handy to pick up where you
+left off.
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package saveplace
     :straight nil
@@ -362,8 +364,8 @@ the last when later visiting a file. This is handy to pick up where you left off
     (save-place-mode +1))
 #+END_SRC
 
-[[https://github.com/emacscollective/no-littering][~no-littering~]] keeps configuration files and
-other persistent data under ~user-emacs-directory~ rather than spamming them in inconsistent places.
+[[https://github.com/emacscollective/no-littering][~no-littering~]] keeps configuration files and other persistent data under ~user-emacs-directory~ rather
+than spamming them in inconsistent places.
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package no-littering
     :init
@@ -466,7 +468,7 @@ commands very easy.
 
 The only slight issue with this is that the size of the minibuffer expands a lot which can cause the
 view of the current buffer to change depending on where the point is. ~which-key-posframe~ provides an
-improvement on this by popping up in a floating window. I'll try it for a while and see.
+improvement on this by popping up in a floating window.
 
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package which-key
@@ -481,6 +483,7 @@ improvement on this by popping up in a floating window. I'll try it for a while 
 :ID:       C7C96A0A-E6EA-4FB1-BD24-9E83A8F7761C
 :CUSTOM_ID: savehist
 :END:
+Save a number of useful varibles so that they persist across emacs sessions.
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   ;; Save history of minibuffer
   (savehist-mode)
@@ -561,7 +564,8 @@ Turn off a bunch of frame related functionality for a more minimal experience.
     (all-the-icons-completion-mode))
 #+END_SRC
 
-[[https://github.com/seagle0128/doom-modeline][~doom-modeline~]] is a fancy, fast and minimal mode-line. This required running ~M-x nerd-icons-install-fonts~ to install the required icon font.
+[[https://github.com/seagle0128/doom-modeline][~doom-modeline~]] is a fancy, fast and minimal mode-line. This requires running ~M-x
+nerd-icons-install-fonts~ to install the required icon font.
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package doom-modeline
     :demand t
@@ -582,9 +586,9 @@ Turn off a bunch of frame related functionality for a more minimal experience.
 :ID:       55DF7803-F4D1-43ED-B5EC-F4377C20B52B
 :CUSTOM_ID: keybindings
 :END:
-[[https://github.com/noctuid/general.el][~general.el~]] provides a convenient method for binding
-keys. It also integrates well with ~use-package~. In particular, this allows us to easily setup a
-global leader key, ~my-leader-def~ and chain bindings from that.
+[[https://github.com/noctuid/general.el][~general.el~]] provides a convenient method for binding keys. It also integrates well with
+~use-package~. In particular, this allows us to easily setup a global leader key, ~my-leader-def~ and
+chain bindings from that.
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package general
     :custom
