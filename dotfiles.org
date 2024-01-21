@@ -2866,6 +2866,13 @@ Useful key bindings:
       end
 
       ################################################################################
+      # Python
+      #
+      # Need to run this in each venv seemingly:
+      # python -m pip install virtualfish
+      # eval (python -m virtualfish)
+
+      ################################################################################
       # Update PATH
       #
       fish_add_path ~/.cargo/bin
