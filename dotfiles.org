@@ -2805,6 +2805,7 @@ Useful key bindings:
           cargo install zellij --locked
 
           # Also install room plugin for easier switching between tabs
+          mkdir -p ~/.config/zellij/plugins
           curl -L "https://github.com/rvcas/room/releases/latest/download/room.wasm" -o ~/.config/zellij/plugins/room.wasm
       end
 
