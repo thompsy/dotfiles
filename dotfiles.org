@@ -2930,12 +2930,15 @@ Setup a bunch of useful ~git~ aliases.
 #+end_src
 
 Setup ~go~-related config. I should probably check that ~go~ is actually installed first.
+
+TODO: it would be nice to install Go automatically?
 #+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
+  if test -e /usr/local/go
       set -x GOPATH $HOME/go/
       set -x GO111MODULE on
       fish_add_path $HOME/go/bin
-      # TODO how to get this path automatically?
       fish_add_path /usr/local/go/bin
+  end
 #+end_src
 
 Setup some useful ~k8s~ config.
