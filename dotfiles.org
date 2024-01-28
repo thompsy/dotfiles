@@ -2517,6 +2517,7 @@ manager. The only real downside of this is that the initial setup eats a lot of 
       cargo install lsd
   fi
 
+  # probably make these functions instead. the expansion is a bit annoying
   alias ls='lsd --group-directories-first'
   alias l='ls -l'
   alias la='ls -a'
@@ -2733,47 +2734,115 @@ manager. The only real downside of this is that the initial setup eats a lot of 
 
 Testing out Fish Shell and so far I'm quite impressed. The completions are very nice and need no setup at all.
 
-Useful key bindings:
+Useful key built-in bindings:
 - ~Alt .~ :: cycle through arguments to previous commands
 
 #+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
   if status is-interactive
       # Commands to run in interactive sessions can go here
+#+end_src
 
-      if test -e ~/notebook/local-dotfiles/fishrc
-          echo "Sourcing local config..."
-          source ~/notebook/local-dotfiles/fishrc
-      end
-
+Install the ~rust~ toolchain. I'm basically using ~cargo~ as a cross-platform package manager at the
+moment.
+#+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
       # Install Rust
       if ! type -q cargo
           echo "Installing Rust..."
           curl https://sh.rustup.rs -sSf | sh -s -- -y --no-modify-path --default-toolchain stable --profile minimal
       end
+      fish_add_path ~/.cargo/bin
+#+end_src
 
-      # Install zoxide
+Add the ~fisher~ plugin manager.
+#+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
+      # Install fisher plugin manager
+      if ! test -e ~/.config/fish/functions/fisher.fish
+          curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fisher
+      end
+#+end_src
+
+This emacs plugin gives us the following useful aliases:
+- ~e~ :: open the given file with ~emacsclient~ and return immediately
+- ~ecd~ :: prints the directory of the currently visited buffer
+- ~efile~ :: prints the filename of the currently visited buffer
+- ~eeval~ :: evaluate some lisp from the command line
+- ~ek~ :: kill any currently running emacs instacns
+#+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
+      if ! test -e ~/.config/fish/conf.d/emacs.fish
+          fisher install oh-my-fish/plugin-emacs
+      end
+#+end_src
+
+Install ~fzf~ for fuzzy matching things.
+#+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
+      if ! test -e ~/.fzf/
+          git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+          ~/.fzf/install
+      end
+#+end_src
+
+Install ~fd~ as a modern version of ~find~. This is used ty the ~fzf.fish~ plugin but I should really
+learn how it works outside of that too.
+#+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
+      if ! type -q fd
+          cargo install fd-find
+      end
+#+end_src
+
+Install the useful ~fzf.fish~ plugin. This gives a number of useful keybindings:
+- ~Ctrl r~ :: use ~fzf~ to search through history
+- ~Ctrl Alt F~ :: show fuzzy list of all non-hidden files under the current directory
+- ~Ctrl Alt L~ :: show fuzzy ~git log~. On selection, print the hash of the selected commits.
+- ~Ctrl Alt S~ :: show fuzzy ~git status~.
+- ~Ctrl Alt P~ :: show fuzzy process list. On selection, print the ~pid~ of the selected process.
+#+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
+      if ! test -e ~/.config/fish/conf.d/fzf.fish
+          fisher install PatrickF1/fzf.fish
+      end
+#+end_src
+
+Install ~zoxide~ a great tool for navigating directories in the command line. It learns your history
+then you can just call ~z name~ to jump to a directory that matches that name. The ~zi~ command will
+give a fuzzy list of possible matches.
+#+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
       if ! type -q zoxide
           echo "Installing zoxide..."
           cargo install zoxide --locked
       end
       zoxide init fish | source
 
-      # Install starship
+#+end_src
+
+Install the ~dracula~ theme.
+#+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
+      if ! test -e ~/.config/fish/themes/Dracula\ Official.theme
+          fisher install dracula/fish
+      end
+#+end_src
+
+Install ~starship~ for a nice, informative prompt with minimal config.
+#+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
       if ! type -q starship
           echo "Installing starship..."
           cargo install starship --locked
       end
       starship init fish | source
+#+end_src
 
+Install ~atuin~. I'm acually not using this at the moment since ~fish~'s history commands are more than
+adequate.
+#+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
       # Install atuin
       if ! type -q atuin
           echo "Installing atuin..."
           cargo install atuin
       end
-      atuin init fish | source
-      bind \cr _atuin_search
+      #atuin init fish | source
+      #bind \cr _atuin_search
+#+end_src
 
-      # Install lsd
+Install ~lsd~ as a more modern ~ls~ equivalent.
+#+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
       if ! type -q lsd
           echo "Installing Nerd Fonts..."
           git clone --filter=blob:none --sparse git@github.com:ryanoasis/nerd-fonts ~/.nerd-fonts
@@ -2791,15 +2860,19 @@ Useful key bindings:
       abbr --add la lsd --group-directories-first -a
       abbr --add ll lsd --group-directories-first -la
       abbr --add lt lsd --group-directories-first --tree
+#+end_src
 
-      # # Install bat
+Install ~bat~ as a more modern ~cat~ equivalent.
+#+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
       if ! type -q bat
           echo "Installing bat..."
           cargo install bat --locked
       end
       abbr --add bat cat
+#+end_src
 
-      # Install zellij
+Install ~zellij~ a great, easy-to-use terminal multiplexer.
+#+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
       if ! type -q zellij
           echo "Installing zellij..."
           cargo install zellij --locked
@@ -2808,13 +2881,19 @@ Useful key bindings:
           mkdir -p ~/.config/zellij/plugins
           curl -L "https://github.com/rvcas/room/releases/latest/download/room.wasm" -o ~/.config/zellij/plugins/room.wasm
       end
+#+end_src
 
+Install ~ripgrep~ for fast, easy recursive grepping
+#+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
       # Install ripgrep
       if ! type -q rg
           echo "Installing ripgrep..."
           cargo install ripgrep
       end
+#+end_src
 
+Setup a bunch of useful ~git~ aliases.
+#+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
       ################################################################################
       # Git aliases
       #
@@ -2838,17 +2917,19 @@ Useful key bindings:
       abbr --add glo git log --oneline --decorate
       abbr --add glog git log --oneline --decorate --graph
       abbr --add gloga git log --oneline --decorate --graph --all
+#+end_src
 
-      ###############################################################################
-      # Go
-      #
+Setup ~go~-related config. I should probably check that ~go~ is actually installed first.
+#+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
       set -x GOPATH $HOME/go/
       set -x GO111MODULE on
-      fish_add_path $GOPATH/bin
+      fish_add_path $HOME/go/bin
+      # TODO how to get this path automatically?
+      fish_add_path /usr/local/go/bin
+#+end_src
 
-      ###############################################################################
-      # Kubernetes
-      #
+Setup some useful ~k8s~ config.
+#+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
       if type -q kubectl
           set -x KUBECONFIG $HOME/.kube/config
 
@@ -2869,20 +2950,26 @@ Useful key bindings:
           abbr --add kpf kubectl port-forward
           abbr --add kp kubectl proxy
       end
+#+end_src
 
+Some Python stuff. I'm not sure if I need this.
+#+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
       ################################################################################
       # Python
       #
       # Need to run this in each venv seemingly:
       # python -m pip install virtualfish
       # eval (python -m virtualfish)
+#+end_src
 
-      ################################################################################
-      # Update PATH
-      #
-      fish_add_path ~/.cargo/bin
+Various ~path~ updates.
+#+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
       fish_add_path ~/bin
+      fish_add_path /opt/emacs29/bin
+#+end_src
 
+Some ~brew~ related setup if we're on a Mac.
+#+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
       if type -q brew
           # Add the default homebrew locations to the path
           eval (/opt/homebrew/bin/brew shellenv)
@@ -2892,10 +2979,10 @@ Useful key bindings:
               fish_add_path /opt/homebrew/opt/libpq/bin
           end
       end
+#+end_src
 
-      ################################################################################
-      # Emacs vterm
-      #
+Emacs ~vterm~ setup.
+#+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
       # Taken from: https://github.com/pymander/vfish/
       if test 'vterm' = "$INSIDE_EMACS" \
           -a -n "$EMACS_VTERM_PATH" \
@@ -2924,13 +3011,22 @@ Useful key bindings:
                   set -l dir (zoxide query "$argv[1]")
                   vterm_cmd dired (realpath "$dir")
               else
-                  echo "Install z for fish shell from https://github.com/jethrokuan/z to use this command."
+                  echo "Install zoxide to use this command."
                   return 1
               end
           end
       end
+#+end_src
+
+Source any local config
+#+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
+      if test -e ~/notebook/local-dotfiles/fishrc
+          echo "Sourcing local config..."
+          source ~/notebook/local-dotfiles/fishrc
+      end
   end
 #+end_src
+
 * Zellij
 :PROPERTIES:
 :ID:       0134A24C-061C-40A6-9957-A8A527147D46
