@@ -2772,11 +2772,15 @@ This emacs plugin gives us the following useful aliases:
 - ~ecd~ :: prints the directory of the currently visited buffer
 - ~efile~ :: prints the filename of the currently visited buffer
 - ~eeval~ :: evaluate some lisp from the command line
-- ~ek~ :: kill any currently running emacs instacns
+- ~ek~ :: kill any currently running emacs instances
 #+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
-      if ! test -e ~/.config/fish/conf.d/emacs.fish
-          fisher install oh-my-fish/plugin-emacs
-      end
+  if ! test -e ~/.config/fish/conf.d/emacs.fish
+      fisher install oh-my-fish/plugin-emacs
+  end
+
+  if test -e /opt/emacs29
+      fish_add_path /opt/emacs29/bin
+  end
 #+end_src
 
 Install ~fzf~ for fuzzy matching things.
@@ -2971,7 +2975,6 @@ Some Python stuff. I'm not sure if I need this.
 Various ~path~ updates.
 #+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
       fish_add_path ~/bin
-      fish_add_path /opt/emacs29/bin
 #+end_src
 
 Some ~brew~ related setup if we're on a Mac.
