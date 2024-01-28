@@ -551,10 +551,16 @@ Turn off a bunch of frame related functionality for a more minimal experience.
 
 [[https://draculatheme.com/emacs][Dracula]] is a nice theme that's available for lots of apps.
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
-  (use-package dracula-theme
-    :config
-    (load-theme 'dracula))
+  (use-package dracula-theme)
 
+  ;; If we're running in daemon mode, setup the theme after the frame loads. This is taken from:
+  ;; https://stackoverflow.com/questions/18904529/after-emacs-deamon-i-can-not-see-new-theme-in-emacsclient-frame-it-works-fr
+  (if (daemonp)
+    (add-hook 'after-make-frame-functions
+        (lambda (frame)
+            (with-selected-frame frame
+                (load-theme 'dracula t))))
+    (load-theme 'dracula t))
   (add-to-list 'default-frame-alist '(font . "Fira Code-14"))
 
   (use-package all-the-icons)
