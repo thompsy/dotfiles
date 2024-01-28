@@ -2759,12 +2759,19 @@ moment.
   fish_add_path ~/.cargo/bin
 #+end_src
 
+Install the ~alacritty~ terminal.
+#+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
+  if ! type -q alacritty
+      cargo install alacritty
+  end
+#+end_src
+
 Add the ~fisher~ plugin manager.
 #+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
-  # Install fisher plugin manager
-  if ! test -e ~/.config/fish/functions/fisher.fish
-      curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fisher
-  end
+    # Install fisher plugin manager
+    if ! test -e ~/.config/fish/functions/fisher.fish
+        curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fisher
+    end
 #+end_src
 
 This emacs plugin gives us the following useful aliases:
@@ -2787,7 +2794,7 @@ Install ~fzf~ for fuzzy matching things.
 #+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
   if ! test -e ~/.fzf/
       git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
-      ~/.fzf/install
+      ~/.fzf/install --no-key-bindings --no-update-rc
   end
 #+end_src
 
