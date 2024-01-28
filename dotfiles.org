@@ -3488,3 +3488,57 @@ Source any local config
   enter_accept = "true"
 #+END_SRC
 
+* Alactritty
+:PROPERTIES:
+:ID:       d33f9cdc-af05-4b51-8d7e-a602dc7c61b6
+:END:
+
+Test driving ~alacritty~ as a cross-platform terminal that I can configure.
+#+begin_src toml  :tangle "~/.config/alacritty/alacritty.toml" :mkdirp yes
+  [shell]
+  program = "/usr/bin/fish"
+
+  [cursor]
+  style = "Block"
+
+  [font]
+  size = 14.0
+
+  [font.normal]
+  family = "FiraCode Nerd Font"
+
+  [window]
+  startup_mode = "Windowed"
+  dynamic_padding = true
+  decorations = "None"
+
+  option_as_alt = "Both"
+  opacity = 1.0
+
+  [window.padding]
+  x = 6
+  y = 0
+
+  #[window.dimensions]
+  #columns = 90
+  #lines = 25
+
+  [colors.normal]
+  black = "#21222c"
+  red = "#ff5555"
+  green = "#50fa7b"
+  yellow = "#f1fa8c"
+  blue = "#bd93f9"
+  magenta = "#ff79c6"
+  cyan = "#8be9fd"
+  white = "#f8f8f2"
+
+  [colors.primary]
+  background = "#282a36"
+  foreground = "#f8f8f2"
+
+  [colors.cursor]
+  text = "CellBackground"
+  cursor = "CellForeground"
+
+#+end_src
