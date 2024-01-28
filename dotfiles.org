@@ -2865,11 +2865,11 @@ Install ~lsd~ as a more modern ~ls~ equivalent.
           cargo install lsd
       end
 
-      abbr --add ls lsd --group-directories-first
-      abbr --add l lsd --group-directories-first -l
-      abbr --add la lsd --group-directories-first -a
-      abbr --add ll lsd --group-directories-first -la
-      abbr --add lt lsd --group-directories-first --tree
+      alias ls="lsd --group-directories-first"
+      alias l="lsd --group-directories-first -l"
+      alias la="lsd --group-directories-first -a"
+      alias ll="lsd --group-directories-first -la"
+      alias lt="lsd --group-directories-first --tree"
 #+end_src
 
 Install ~bat~ as a more modern ~cat~ equivalent.
