@@ -3564,3 +3564,44 @@ Test driving ~alacritty~ as a cross-platform terminal that I can configure.
   cursor = "CellForeground"
 
 #+end_src
+
+* Wezterm
+:PROPERTIES:
+:ID:       D87A9FD1-E048-445A-AF6B-2546E73C2297
+:END:
+
+Testing out ~wezterm~ as an alternative to ~alacritty~ since it was giving me some issues on MacOS.
+
+TODO:
+- check window decorations
+- use official dracula theme
+#+begin_src lua :tangle "~/.config/wezterm/wezterm.lua" :mkdirp yes
+-- Pull in the wezterm API
+local wezterm = require 'wezterm'
+
+-- This table will hold the configuration.
+local config = {}
+
+-- In newer versions of wezterm, use the config_builder which will
+-- help provide clearer error messages
+if wezterm.config_builder then
+  config = wezterm.config_builder()
+end
+
+
+config.color_scheme = 'Dracula'
+
+config.font = wezterm.font 'FiraCode Nerd Font'
+config.font_size = 14.0
+
+config.enable_tab_bar = false
+
+config.window_padding = {
+  left = "1cell",
+  right = "1cell",
+  top = 2,
+  bottom = 0,
+}
+
+return config
+#+end_src
