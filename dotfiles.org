@@ -2553,18 +2553,6 @@ Install ~starship~ for a nice, informative prompt with minimal config.
   starship init fish | source
 #+end_src
 
-Install ~atuin~. I'm acually not using this at the moment since ~fish~'s history commands are more than
-adequate.
-#+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
-  # Install atuin
-  if ! type -q atuin
-      echo "Installing atuin..."
-      cargo install atuin
-  end
-  #atuin init fish | source
-  #bind \cr _atuin_search
-#+end_src
-
 Install ~lsd~ as a more modern ~ls~ equivalent.
 #+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
   if ! type -q lsd
