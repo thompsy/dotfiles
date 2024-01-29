@@ -3532,7 +3532,7 @@ Test driving ~alacritty~ as a cross-platform terminal that I can configure.
   [window]
   startup_mode = "Windowed"
   dynamic_padding = true
-  decorations = "None"
+  decorations = "Full"
 
   option_as_alt = "Both"
   opacity = 1.0
