@@ -61,6 +61,7 @@ available. A few places that I've found particularly useful include:
     - [[#rectangles][Rectangles]]
     - [[#whitespace-removal][Whitespace Removal]]
     - [[#move-to-beginning-of-line][Move to beginning of line]]
+    - [[#csv][CSV]]
   - [[#window-management][Window Management]]
   - [[#software-development][Software Development]]
     - [[#treesitter-setup][Treesitter Setup]]
@@ -87,6 +88,7 @@ available. A few places that I've found particularly useful include:
 - [[#zellij][Zellij]]
 - [[#starship][Starship]]
 - [[#atuin][Atuin]]
+- [[#wezterm][Wezterm]]
 :END:
 
 
@@ -1334,6 +1336,7 @@ This snippet provides smarter moving to the beginning of the line. Copied from [
 *** CSV
 :PROPERTIES:
 :ID:       05DE8310-10CB-42D1-BF55-F9B07FAB76C4
+:CUSTOM_ID: csv
 :END:
 #+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package csv-mode)
@@ -3510,64 +3513,10 @@ Source any local config
   enter_accept = "true"
 #+END_SRC
 
-* Alactritty
-:PROPERTIES:
-:ID:       d33f9cdc-af05-4b51-8d7e-a602dc7c61b6
-:END:
-
-Test driving ~alacritty~ as a cross-platform terminal that I can configure.
-#+begin_src toml  :tangle "~/.config/alacritty/alacritty.toml" :mkdirp yes
-  [shell]
-  program = "fish"
-
-  [cursor]
-  style = "Block"
-
-  [font]
-  size = 14.0
-
-  [font.normal]
-  family = "FiraCode Nerd Font"
-
-  [window]
-  startup_mode = "Windowed"
-  dynamic_padding = true
-  decorations = "Full"
-
-  option_as_alt = "Both"
-  opacity = 1.0
-
-  [window.padding]
-  x = 6
-  y = 0
-
-  #[window.dimensions]
-  #columns = 90
-  #lines = 25
-
-  [colors.normal]
-  black = "#21222c"
-  red = "#ff5555"
-  green = "#50fa7b"
-  yellow = "#f1fa8c"
-  blue = "#bd93f9"
-  magenta = "#ff79c6"
-  cyan = "#8be9fd"
-  white = "#f8f8f2"
-
-  [colors.primary]
-  background = "#282a36"
-  foreground = "#f8f8f2"
-
-  [colors.cursor]
-  text = "CellBackground"
-  cursor = "CellForeground"
-
-#+end_src
-
 * Wezterm
 :PROPERTIES:
 :ID:       D87A9FD1-E048-445A-AF6B-2546E73C2297
+:CUSTOM_ID: wezterm
 :END:
 
 Testing out ~wezterm~ as an alternative to ~alacritty~ since it was giving me some issues on MacOS.
