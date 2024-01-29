@@ -3518,7 +3518,7 @@ Source any local config
 Test driving ~alacritty~ as a cross-platform terminal that I can configure.
 #+begin_src toml  :tangle "~/.config/alacritty/alacritty.toml" :mkdirp yes
   [shell]
-  program = "/usr/bin/fish"
+  program = "fish"
 
   [cursor]
   style = "Block"
