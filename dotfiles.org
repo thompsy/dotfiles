@@ -1173,6 +1173,7 @@ What's the workflow that I want here? Two fold:
            ispell-local-dictionary "en_GB"
            ispell-current-dictionary "en_GB"
            ispell-program-name "hunspell"
+           ispell-really-hunspell t
            ispell-silently-savep t
            ispell-personal-dictionary "~/.emacs.d/.aspell.en.pws"
            )
