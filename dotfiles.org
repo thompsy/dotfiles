@@ -1188,8 +1188,8 @@ What's the workflow that I want here? Two fold:
             ^^                  ^^                  ^^
             "
                             ("q" nil)
-                            ("<" flyspell-correct-previous :color pink)
-                            (">" flyspell-correct-next :color pink)
+                            ("<" flyspell-goto-next-error :color pink)
+                            (">" flyspell-goto-next-error :color pink)
                             ("c" ispell)
                             ("d" ispell-change-dictionary)
                             ("f" flyspell-buffer)
