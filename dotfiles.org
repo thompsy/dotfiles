@@ -2605,6 +2605,14 @@ Install ~ripgrep~ for fast, easy recursive grepping
   end
 #+end_src
 
+Add alias for ~ugrep~ if installed.
+#+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
+  if type -q ugrep
+      alias u="ugrep"
+  end
+#+end_src
+
+
 Setup a bunch of useful ~git~ aliases.
 #+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
   abbr --add g git
