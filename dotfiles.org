@@ -2356,6 +2356,7 @@ flavours for easy pasting into other places.
            ("C-c w s" . copy-as-format-slack)
            ("C-c w o" . copy-as-format-org-mode)
            ("C-c w r" . copy-as-format-rst)
+           ("C-c w h" . copy-as-format-html)
            ("C-c w g" . copy-as-format-github)
            ("C-c w w" . copy-as-format))
     :custom
