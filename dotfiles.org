@@ -1764,6 +1764,10 @@ A nice Hydra menu to make things more accessible.
     (setq terraform-format-on-save t))
 
   (use-package fish-mode)
+
+  (use-package sqlformat
+    :config
+    (setq sqlformat-command 'pgformatter))
 #+END_SRC
 
 These packages need to be installed in the Python environment too.
