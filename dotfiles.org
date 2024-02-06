@@ -2061,7 +2061,7 @@ See helpful examples at:
         (string= file-name buffer-file-name)
       (error "Function called from unexpected location"))
     (beginning-of-buffer)
-    (org-todo "DONE")
+    ;;(org-todo "DONE")
     (at/org-refile-to-datetree "~/notebook/meetings.org" nil nil)
     (insert template))
 #+END_SRC
