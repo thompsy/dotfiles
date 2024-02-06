@@ -3244,5 +3244,10 @@ config.window_padding = {
   bottom = 0,
 }
 
+
+config.check_for_updates = true
+
+enable_kitty_graphics=true
+
 return config
 #+end_src
