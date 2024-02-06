@@ -561,7 +561,7 @@ Turn off a bunch of frame related functionality for a more minimal experience.
             (with-selected-frame frame
                 (load-theme 'dracula t))))
     (load-theme 'dracula t))
-  (add-to-list 'default-frame-alist '(font . "Fira Code-14"))
+  (add-to-list 'default-frame-alist '(font . "Fira Code Nerd Font-14"))
 
   (use-package all-the-icons)
 
@@ -1339,6 +1339,13 @@ This snippet provides smarter moving to the beginning of the line. Copied from [
 :END:
 #+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package csv-mode)
+#+end_src
+*** PDFs
+:PROPERTIES:
+:ID:       7f8ae549-ab55-43a1-b075-a9e52271cebc
+:END:
+#+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
+  (use-package pdf-tools)
 #+end_src
 ** Window Management
 :PROPERTIES:
@@ -2384,6 +2391,31 @@ Get fish shell syntax working.
     :config
     (setq org-make-toc-insert-custom-ids t))
 #+end_src
+** Email
+:PROPERTIES:
+:ID:       8293f4e4-87ad-4ea8-9049-84354fb27a1f
+:END:
+#+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
+  ;; (use-package mu4e)
+
+  (use-package mu4e
+  :straight ( :host github 
+              :repo "djcb/mu"  
+              :branch "master"
+              :files ("mu4e/*.el" "build/mu4e/mu4e-meta.el" "build/mu4e/mu4e-config.el" "build/mu4e/mu4e.info")  
+              :pre-build (("./autogen.sh") ("make"))) 
+;;  :custom   (mu4e-mu-binary (expand-file-name "mu/mu" (straight--repos-dir "mu")))
+  :config
+  (setq mu4e-mu-binary (expand-file-name "build/mu/mu" (straight--repos-dir "mu"))))
+    
+  ;; (use-package mu4e
+  ;; :straight ( :host github 
+  ;;             :repo "djcb/mu"  
+  ;;             :branch "master"
+  ;;             :files ("mu4e/*")   
+  ;;             :pre-build (("./autogen.sh") ("make"))) 
+  ;; :custom   (mu4e-mu-binary (expand-file-name "mu/mu" (straight--repos-dir "mu"))))
+#+end_src
 ** Shells
 :PROPERTIES:
 :ID:       C357E950-E226-4B10-83AD-FD2EDEFE4781
@@ -3222,5 +3254,24 @@ config.window_padding = {
   bottom = 0,
 }
 
+enable_kitty_graphics=true
+
 return config
+#+end_src
+
+* Git
+:PROPERTIES:
+:ID:       e8457d80-4fef-4785-af4f-36745d553f69
+:END:
+#+begin_src ini :tangle "~/.gitconfig" 
+[user]
+	email = thompsy@downthewire.co.uk
+	name = Andrew Thompson
+[color]
+	ui = auto
+	diff = auto
+	status = auto
+	branch = auto
+	interactive = auto
+	pager = true
 #+end_src
