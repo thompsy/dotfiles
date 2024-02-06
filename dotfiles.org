@@ -1527,6 +1527,8 @@ Now we've got a hydra to make the various window management functions easily acc
     :general
     ("M-<" 'expreg-contract)
     ("M->" 'expreg-expand))
+
+  (use-package rainbow-delimiters)
 #+END_SRC
 *** Git
 :PROPERTIES:
