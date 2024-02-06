@@ -1340,6 +1340,13 @@ This snippet provides smarter moving to the beginning of the line. Copied from [
 #+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package csv-mode)
 #+end_src
+*** PDFs
+:PROPERTIES:
+:ID:       7f8ae549-ab55-43a1-b075-a9e52271cebc
+:END:
+#+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
+  (use-package pdf-tools)
+#+end_src
 ** Window Management
 :PROPERTIES:
 :ID:       33BDFB30-8D15-49B7-87EC-ED43951373DF
