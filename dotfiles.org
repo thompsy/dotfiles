@@ -913,6 +913,8 @@ smaller to larger screens.
     :straight (:files (:defaults "extensions/*"))
     :init
     (global-corfu-mode)
+    (corfu-history-mode)
+    (corfu-popupinfo-mode)
     :general
     (:keymaps 'corfu-map
       	"SPC" 'corfu-insert-separator
