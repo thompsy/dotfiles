@@ -1349,6 +1349,23 @@ This snippet provides smarter moving to the beginning of the line. Copied from [
 #+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package pdf-tools)
 #+end_src
+
+** Searching
+#+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
+  (use-package rg
+    :config (rg-enable-menu)
+    :init (setq ripgrep-arguments "--ignore-case"))
+#+end_src
+
+This is a useful way to add saved project searches. Taken from https://takeonrules.com/2024/03/02/an-evening-reading-documentation-leads-to-discovery/.
+#+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
+(when (f-dir-p "~/dotfiles/")
+    (rg-define-search rg-projects-dotfiles
+      "Search Dotfiles."
+      :dir "~/dotfiles/"
+      :files "*.*"
+      :menu ("Projects" "d" "Dotfiles")))
+#+end_src
 ** Window Management
 :PROPERTIES:
 :ID:       33BDFB30-8D15-49B7-87EC-ED43951373DF
