@@ -561,7 +561,7 @@ Turn off a bunch of frame related functionality for a more minimal experience.
             (with-selected-frame frame
                 (load-theme 'dracula t))))
     (load-theme 'dracula t))
-  (add-to-list 'default-frame-alist '(font . "Fira Code Nerd Font-14"))
+  (add-to-list 'default-frame-alist '(font . "FiraCode Nerd Font-14"))
 
   (use-package all-the-icons)
 
