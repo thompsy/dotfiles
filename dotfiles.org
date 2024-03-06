@@ -2551,6 +2551,7 @@ Install the useful ~fzf.fish~ plugin. This gives a number of useful keybindings:
   if ! test -e ~/.config/fish/conf.d/fzf.fish
       fisher install PatrickF1/fzf.fish
   end
+  set -x FZF_DEFAULT_OPTS '--height 40% --layout=reverse --border'
 #+end_src
 
 Install ~zoxide~ a great tool for navigating directories in the command line. It learns your history
