@@ -1740,7 +1740,11 @@ A nice Hydra menu to make things more accessible.
 
   (use-package go-ts-mode
     :hook
-    (before-save . eglot-format))
+    (before-save . eglot-format)
+    (before-save . at/eglot-organize-imports))
+
+  (defun at/eglot-organize-imports () (interactive)
+         (eglot-code-actions nil nil "source.organizeImports" t))
 
   (use-package sh-script)
 
