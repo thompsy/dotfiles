@@ -1128,7 +1128,7 @@ smaller to larger screens.
     ("C-S-z" 'undo-fu-only-redo))
 #+END_SRC
 
-[[https://github.com/casouri/vundo][~vundo~]] displays a nice braching undo tree built on top of the default undo system.
+[[https://github.com/casouri/vundo][~vundo~]] displays a nice branching undo tree built on top of the default undo system.
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package vundo
     :config
