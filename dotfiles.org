@@ -2628,9 +2628,9 @@ TODO: it would be nice to install Go automatically?
   if test -e /usr/local/go
       set -x GOPATH $HOME/go/
       set -x GO111MODULE on
-      fish_add_path $HOME/go/bin
-      fish_add_path /usr/local/go/bin
   end
+  fish_add_path $HOME/go/bin
+  fish_add_path /usr/local/go/bin
 #+end_src
 
 Setup some useful ~k8s~ config.
