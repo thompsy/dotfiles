@@ -1152,99 +1152,55 @@ built-in ~fill~ function.
 :ID:       05DF5D12-0C29-44DD-88A5-F25762BC4F85
 :CUSTOM_ID: spelling
 :END:
-~flyspell~ is Emacs' spelling mode. I've added a decent hydra here for convenience.
-
-If I miss-spell something I can hit ~C-;~ and it will auto correct the previous word even if it's a
-few words back.
-
-What's the workflow that I want here? Two fold:
-1. spell as I type and correct works as I go. ~C-;~ is adequate for this, except I can't add to dictionary from there easily. Maybe the flyspell-correct package could help here.
-2. batch spell a buffer or region. The ~ispell~ interface is probably OK for this.
+~spell-fu~ is an easier to setup version of ~flyspell~.
  #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
    (setenv "LANG" "en_GB")
-   (use-package flyspell
-     :general
-     (my-leader-def
-       "s" '(hydra-spelling/body :wk "spell"))
-     :hook ((prog-mode . flyspell-prog-mode)
-            ((org-mode text-mode) . flyspell-mode))
+   (use-package spell-fu
      :config
-     ;;TODO add this to :hook instead maybe in the org use-package
-     (add-hook 'org-mode-hook #'at/org-ispell)
+     (spell-fu-global-mode)
      (setq ispell-dictionary "en_GB"
            ispell-local-dictionary "en_GB"
            ispell-current-dictionary "en_GB"
-           ispell-program-name "hunspell"
-           ispell-really-hunspell t
-           ispell-silently-savep t
            ispell-personal-dictionary "~/.emacs.d/.aspell.en.pws"
-           )
+           spell-fu-faces-exclude
+           '(org-block-begin-line
+             org-block-end-line
+             org-code
+             org-date
+             org-drawer org-document-info-keyword
+             org-ellipsis
+             org-link
+             org-meta-line
+             org-properties
+             org-properties-value
+             org-special-keyword
+             org-src
+             org-tag
+             org-verbatim))
+     :general
+     (my-leader-def
+       "s" '(hydra-spelling/body :wk "spell"))
      :hydra (hydra-spelling (:color blue :hint nil)
                             "
-            ^
-            ^Spelling^          ^Errors^            ^Checker^
-            ^────────^──────────^──────^────────────^───────^───────
-            _q_ quit            _<_ previous        _c_ correction
-            ^^                  _>_ next            _d_ dictionary
-            ^^                  _f_ check           _m_ mode
-            ^^                  ^^                  ^^
-            "
+               ^
+               ^Spelling^          ^Errors^            ^Checker^
+               ^────────^──────────^──────^────────────^───────^───────
+               _q_uit              _p_revious          _c_orrection
+               ^^                  _n_ext              _d_ictionary
+               _r_eset             _s_pell word        _a_dd to dict
+               ^^                  _b_uffer            _m_ode
+               ^^                  ^^                  ^^
+               "
                             ("q" nil)
-                            ("<" flyspell-goto-next-error :color pink)
-                            (">" flyspell-goto-next-error :color pink)
+                            ("r" spell-fu-reset :color pink)
+                            ("p" spell-fu-goto-previous-error :color pink)
+                            ("n" spell-fu-goto-next-error :color pink)
+                            ("s" ispell-word :color pink)
+                            ("b" spell-fu-buffer :color pink)
                             ("c" ispell)
                             ("d" ispell-change-dictionary)
-                            ("f" flyspell-buffer)
-                            ("m" flyspell-mode)))
-
-
-
-   ;; Taken from: https://endlessparentheses.com/ispell-and-org-mode.html
-   (defun at/org-ispell ()
-     "Configure `ispell-skip-region-alist' for `org-mode'."
-     (make-local-variable 'ispell-skip-region-alist)
-     (add-to-list 'ispell-skip-region-alist '(org-property-drawer-re))
-     (add-to-list 'ispell-skip-region-alist '(org-logbook-drawer-re))
-     (add-to-list 'ispell-skip-region-alist '("~" "~"))
-     (add-to-list 'ispell-skip-region-alist '("=" "="))
-     (add-to-list 'ispell-skip-region-alist '(org-babel-src-block-regexp))
-     (add-to-list 'ispell-skip-region-alist '("^#\\+BEGIN_SRC" "^#\\+END_SRC"))
-     (add-to-list 'ispell-skip-region-alist '("^#\\+BEGIN_SRC" "^#\\+END_SRC"))
-     )
-
-
-   ;;(use-package flyspell-correct
-   ;;  :after flyspell)
-
-   (use-package consult-flyspell
-     :after (flyspell consult))
-
-   ;; bundle this config together
-   ;; From: https://codeberg.org/ideasman42/emacs-spell-fu
-   ;; (use-package spell-fu)
-
-   ;; (add-hook 'org-mode-hook
-   ;;           (lambda ()
-   ;;             (setq spell-fu-faces-exclude
-   ;;                   '(org-block-begin-line
-   ;;                     org-block-end-line
-   ;;                     org-code
-   ;;                     org-date
-   ;;                     org-drawer org-document-info-keyword
-   ;;                     org-ellipsis
-   ;;                     org-link
-   ;;                     org-meta-line
-   ;;                     org-properties
-   ;;                     org-properties-value
-   ;;                     org-special-keyword
-   ;;                     org-src
-   ;;                     org-tag
-   ;;                     org-verbatim))
-   ;;             (spell-fu-mode)))
-
-   ;; (add-hook 'emacs-lisp-mode-hook
-   ;;           (lambda ()
-   ;;             (spell-fu-mode)))
+                            ("a" spell-fu-word-add :color pint)
+                            ("m" spell-fu-mode)))
 #+END_SRC
 
 *** Rectangles
