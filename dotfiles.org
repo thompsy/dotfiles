@@ -1307,6 +1307,9 @@ This snippet provides smarter moving to the beginning of the line. Copied from [
 #+end_src
 
 ** Searching
+:PROPERTIES:
+:ID:       1B7EA834-0732-4CAF-B280-0470E5489569
+:END:
 #+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package rg
     :config (rg-enable-menu)
