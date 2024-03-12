@@ -2478,6 +2478,7 @@ This emacs plugin gives us the following useful aliases:
   if test -e /opt/emacs29
       fish_add_path /opt/emacs29/bin
   end
+  set -gx EDITOR emacsclient
 #+end_src
 
 Install ~fzf~ for fuzzy matching things.
