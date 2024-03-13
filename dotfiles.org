@@ -588,6 +588,18 @@ nerd-icons-install-fonts~ to install the required icon font.
     (doom-modeline-buffer-file-name-style 'truncate-upto-project))
 #+END_SRC
 
+Setup emojis!
+#+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
+  (use-package emojify
+    :config
+    (when (member "Segoe UI Emoji" (font-family-list))
+      (set-fontset-font
+       t 'symbol (font-spec :family "Segoe UI Emoji") nil 'prepend))
+    (setq emojify-display-style 'unicode)
+    (setq emojify-emoji-styles '(unicode))
+    (bind-key* (kbd "C-c .") #'emojify-insert-emoji))
+#+end_src
+
 ** Keybindings
 :PROPERTIES:
 :ID:       55DF7803-F4D1-43ED-B5EC-F4377C20B52B
