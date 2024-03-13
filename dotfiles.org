@@ -624,6 +624,7 @@ chain bindings from that.
      ;; Taken from https://www.irreal.org/blog/?p=10424:
      "C-x t" 'beginning-of-buffer
      "C-x e" 'end-of-buffer
+     "C-x C-z" nil
      )
 
     ;; Make general's keybindings take precedence over keys bound to other minor mode keymaps.
