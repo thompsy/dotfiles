@@ -2650,7 +2650,7 @@ Setup some useful ~k8s~ config.
       abbr --add kx "kubectx"
       abbr --add kns "kubens"
 
-      # Get Cmds
+      # Get commands
       abbr --add kg kubectl get
       abbr --add kgp kubectl get pods
       abbr --add kgns kubectl get namespaces
@@ -2658,6 +2658,11 @@ Setup some useful ~k8s~ config.
       abbr --add kgcj kuebctl get cronjobs
       abbr --add kgj kubectl get jobs
       abbr --add kctx kubectx
+
+      # Describe commands
+      abbr --add kd kubectl describe
+      abbr --add kdp kubectl describe pod
+      abbr --add kds kubectl describe service
 
       # Networking
       abbr --add kpf kubectl port-forward
