@@ -2655,6 +2655,11 @@ TODO: it would be nice to install Go automatically?
       set -x GOPATH $HOME/go/
       set -x GO111MODULE on
   end
+
+  if ! type -q $HOME/go/bin/gopls
+      go install golang.org/x/tools/gopls@latest
+  end
+
   fish_add_path $HOME/go/bin
   fish_add_path /usr/local/go/bin
 #+end_src
