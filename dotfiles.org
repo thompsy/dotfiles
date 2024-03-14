@@ -157,6 +157,9 @@ Other useful ideas here:
 - [[https://protesilaos.com/emacs/dotemacs]]
 *** TODO Explore ~embark~ more
 
+* Setup
+See here for a useful way to get Alfred to find Emacs on Macos:
+- https://www.alfredforum.com/topic/16578-alfred-not-finding-homebrew-apps-on-m1-opthomebrew/
 * Emacs
 :PROPERTIES:
 :CUSTOM_ID: emacs
