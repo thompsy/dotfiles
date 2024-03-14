@@ -2666,6 +2666,7 @@ Setup some useful ~k8s~ config.
       # Get commands
       abbr --add kg kubectl get
       abbr --add kgp kubectl get pods
+      abbr --add kgpa kubectl get pods -A
       abbr --add kgns kubectl get namespaces
       abbr --add kgall kubectl get ingress,service,deployment,pod
       abbr --add kgcj kuebctl get cronjobs
