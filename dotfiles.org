@@ -2617,6 +2617,11 @@ Add alias for ~ugrep~ if installed.
   end
 #+end_src
 
+Some basic aliases
+#+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
+  abbr --add ... cd ../..
+#+end_src
+
 
 Setup a bunch of useful ~git~ aliases.
 #+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
