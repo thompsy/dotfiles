@@ -1179,6 +1179,7 @@ built-in ~fill~ function.
            ispell-local-dictionary "en_GB"
            ispell-current-dictionary "en_GB"
            ispell-personal-dictionary "~/.emacs.d/.aspell.en.pws"
+           ispell-silently-savep t
            spell-fu-faces-exclude
            '(org-block-begin-line
              org-block-end-line
