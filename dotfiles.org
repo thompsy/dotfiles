@@ -160,6 +160,10 @@ Other useful ideas here:
 * Setup
 See here for a useful way to get Alfred to find Emacs on Macos:
 - https://www.alfredforum.com/topic/16578-alfred-not-finding-homebrew-apps-on-m1-opthomebrew/
+
+
+This is a better way to do this: https://alfred.app/workflows/alfredapp/alias-homebrew-apps/
+
 * Emacs
 :PROPERTIES:
 :CUSTOM_ID: emacs
