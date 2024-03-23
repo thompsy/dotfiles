@@ -2403,9 +2403,13 @@ flavours for easy pasting into other places.
 
 Get fish shell syntax working.
 #+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((shell . t)))
+  (org-babel-do-load-languages 'org-babel-load-languages
+                             (append org-babel-load-languages
+                              '((python . t)
+                                (shell . t)
+                                (sql . t))))
+
+  (use-package ob-sql-mode)
 #+end_src
 
 #+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
