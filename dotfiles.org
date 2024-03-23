@@ -98,9 +98,9 @@ available. A few places that I've found particularly useful include:
 :PROPERTIES:
 :CUSTOM_ID: homebrew
 :END:
-It would be good to auto install packages if on the Mac
+It would be good to auto install packages if on the Mac. Better just to add the bundle file to this repo.
+
 ** Config Updates
-*** TODO Use PgUp and PgDn in the minibuffer
 *** TODO Set correct buffer type when use Zellij's scroll to editor function
 *** TODO Setup spelling and easy usage
 - https://codeberg.org/ideasman42/emacs-spell-fu
