@@ -941,6 +941,14 @@ smaller to larger screens.
         	    "SPC" 'corfu-insert-separator
         	    "C-n" 'corfu-next
         	    "C-p" 'corfu-previous))
+
+  ;; taken from: https://old.reddit.com/r/emacs/comments/13accue/emacs_29_pixelscrollprecisionmode_seems_to_break/
+  ;; TODO integrate these better
+  ;; this fixes issues with minibuffer scrolling and pixel-scroll mode
+  (keymap-set vertico-map "<remap> <pixel-scroll-interpolate-up>" #'vertico-scroll-down)
+  (keymap-set vertico-map "<remap> <pixel-scroll-interpolate-down>" #'vertico-scroll-up)
+  (keymap-set corfu-map "<remap> <pixel-scroll-interpolate-up>" #'corfu-scroll-down)
+  (keymap-set corfu-map "<remap> <pixel-scroll-interpolate-down>" #'corfu-scroll-up)
   ;; Part of corfu
   (use-package corfu-popupinfo
     :straight nil
