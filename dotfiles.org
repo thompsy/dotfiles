@@ -882,6 +882,15 @@ smaller to larger screens.
     (setf (alist-get ?. avy-dispatch-alist) 'bedrock/avy-action-embark))
 #+END_SRC
 
+*** Searching
+:PROPERTIES:
+:ID:       149a84d6-c76a-4c18-8a93-f4ca8f718840
+:END:
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+  (use-package ctrlf
+    :config (ctrlf-mode +1))
+#+END_SRC
+
 *** Minibuffer
 :PROPERTIES:
 :ID:       2510CFE9-62F4-451B-8971-1CF2452B4A87
