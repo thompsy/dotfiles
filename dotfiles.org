@@ -1750,6 +1750,14 @@ A nice Hydra menu to make things more accessible.
     (fset #'jsonrpc--log-event #'ignore))
 #+END_SRC
 
+*** DevDocs
+:PROPERTIES:
+:ID:       d20f74ab-0a66-4ac8-b56b-7b251f57c5af
+:END:
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+  (use-package devdocs
+    :general ("C-h D" 'devdocs-lookup))
+#+END_SRC
 *** Particular Programming modes
 :PROPERTIES:
 :ID:       8DE130F8-A158-4350-A02F-C99A2EC9A288
