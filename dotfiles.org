@@ -1184,6 +1184,9 @@ built-in ~fill~ function.
            ispell-current-dictionary "en_GB"
            ispell-personal-dictionary "~/.emacs.d/.aspell.en.pws"
            ispell-silently-savep t
+           ;; disable in read-only buffers
+           spell-fu-global-ignore-buffer (lambda (buf) (buffer-local-value 'buffer-read-only buf))
+           spell-fu-ignore-modes (list 'vterm-mode)
            spell-fu-faces-exclude
            '(org-block-begin-line
              org-block-end-line
