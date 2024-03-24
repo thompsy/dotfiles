@@ -1931,6 +1931,9 @@ See helpful examples at:
     :hook (org-mode . org-autolist-mode))
 #+END_SRC
 
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+  (use-package org-sticky-header)
+    #+END_SRC
 *** Task States
 :PROPERTIES:
 :ID:       6E3FBBD2-310E-4EDF-8EA3-CA9C4AA56F08
