@@ -632,6 +632,11 @@ chain bindings from that.
      "C-x t" 'beginning-of-buffer
      "C-x e" 'end-of-buffer
      "C-x C-z" nil
+     ;; Disable zooming with the mouse wheel
+     "C-<wheel-up>" nil
+     "C-<wheel-down>" nil
+     "C-M-<wheel-up>" nil
+     "C-M-<wheel-down>" nil
      )
 
     ;; Make general's keybindings take precedence over keys bound to other minor mode keymaps.
