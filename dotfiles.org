@@ -2713,8 +2713,8 @@ Setup some useful ~k8s~ config.
       set -x KUBECONFIG $HOME/.kube/config
 
       abbr --add k kubectl
-      abbr --add kx "kubectx"
-      abbr --add kns "kubens"
+      abbr --add kx kubectx
+      abbr --add kns kubens
 
       # Get commands
       abbr --add kg kubectl get
