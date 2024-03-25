@@ -2670,6 +2670,7 @@ Setup a bunch of useful ~git~ aliases.
   abbr --add g git
   abbr --add gst git status
   abbr --add ga git add
+  abbr --add gb git branch
   abbr --add gl git pull
   abbr --add gcmsg git commit --message
   abbr --add gco git checkout
