@@ -1198,7 +1198,7 @@ built-in ~fill~ function.
            ispell-silently-savep t
            ;; disable in read-only buffers
            spell-fu-global-ignore-buffer (lambda (buf) (buffer-local-value 'buffer-read-only buf))
-           spell-fu-ignore-modes (list 'vterm-mode 'fundamental-mode)
+           spell-fu-ignore-modes (list 'vterm-mode 'fundamental-mode 'shell-mode)
            spell-fu-word-delimit-camel-case t
            spell-fu-faces-exclude
            '(org-block-begin-line
