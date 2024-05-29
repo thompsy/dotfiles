@@ -101,6 +101,10 @@ available. A few places that I've found particularly useful include:
 It would be good to auto install packages if on the Mac. Better just to add the bundle file to this repo.
 
 ** Config Updates
+*** TODO Have <TAB> complete rather than move out of current context
+In Go, sometimes I want hit <TAB> to complete, rather than move out of the current context.
+
+Tab calls: ~<tab>       ;; yas-next-field-or-maybe-expand~ rather than ~indent-for-tab-command~ which opens the Corfu completion window.
 *** TODO Set correct buffer type when use Zellij's scroll to editor function
 *** TODO Setup spelling and easy usage
 - https://codeberg.org/ideasman42/emacs-spell-fu
@@ -624,6 +628,7 @@ chain bindings from that.
      "C-w" 'backward-kill-word
      "C-c C-k" 'kill-region
      "C-x C-k" 'kill-region
+     ;; Make it easier to run commands
      "C-x C-m" 'execute-extended-command
      "C-x m" 'execute-extended-command
      "C-c C-m" 'execute-extended-command
@@ -631,6 +636,9 @@ chain bindings from that.
      ;; Taken from https://www.irreal.org/blog/?p=10424:
      "C-x t" 'beginning-of-buffer
      "C-x e" 'end-of-buffer
+     ;; ibuffer
+     "C-x C-b" 'ibuffer
+     ;; Disable this keybinding as I keep hitting it accidentially
      "C-x C-z" nil
      ;; Disable zooming with the mouse wheel
      "C-<wheel-up>" nil
@@ -815,6 +823,7 @@ smaller to larger screens.
     ("M-g k" 'consult-global-mark)
     ("M-g i" 'consult-imenu)
     ("M-g I" 'consult-imenu-multi)
+    ("M-g s" 'consult-eglot-symbols)
     ;; M-s bindings in `search-map'
     ("M-s d" 'consult-find)                  ;; Alternative: consult-fd
     ("M-s c" 'consult-locate)
@@ -941,6 +950,8 @@ smaller to larger screens.
     (global-corfu-mode)
     (corfu-history-mode)
     (corfu-popupinfo-mode)
+    :config
+    (setq completion-ignore-case t)
     :general
     (:keymaps 'corfu-map
         	    "SPC" 'corfu-insert-separator
@@ -1057,6 +1068,118 @@ smaller to larger screens.
     :config
     (setq beacon-color "#666600")
     (beacon-mode 1))
+#+end_src
+
+*** ibuffer
+
+
+#+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
+  (use-package ibuffer
+    :straight nil
+    :init
+     (use-package ibuffer-vc
+       :commands (ibuffer-vc-set-filter-groups-by-vc-root)
+       :custom
+       (ibuffer-vc-skip-if-remote 'nil))
+    :hook (ibuffer-mode . '(ibuffer-vc-set-set-filter-groups-by-vc-root))
+    :general
+    ("C-x C-b" 'ibuffer)
+    (:keymaps 'ibuffer-mode-map "." 'hydra-ibuffer-main/body)
+    :hydra (hydra-ibuffer-main (:color pink :hint nil)
+                               "
+  ^Mark^         ^Actions^         ^View^          ^Select^              ^Navigation^
+  _m_: mark      _D_: delete       _g_: refresh    _q_: quit             _i_:   ↑    _n_
+  _u_: unmark    _s_: save marked  _S_: sort       _TAB_: toggle         _RET_: visit
+  _*_: specific  _a_: all actions  _/_: filter     _o_: other window     _e_:   ↓    _o_
+  _t_: toggle    _._: toggle hydra _H_: help       C-o other win no-select
+  "
+                               ("m" ibuffer-mark-forward)
+                               ("u" ibuffer-unmark-forward)
+                               ("*" hydra-ibuffer-mark/body :color blue)
+                               ("t" ibuffer-toggle-marks)
+
+                               ("D" ibuffer-do-delete)
+                               ("s" ibuffer-do-save)
+                               ("a" hydra-ibuffer-action/body :color blue)
+
+                               ("g" ibuffer-update)
+                               ("S" hydra-ibuffer-sort/body :color blue)
+                               ("/" hydra-ibuffer-filter/body :color blue)
+                               ("H" describe-mode :color blue)
+
+                               ("n" ibuffer-backward-filter-group)
+                               ("i" ibuffer-backward-line)
+                               ("o" ibuffer-forward-filter-group)
+                               ("e" ibuffer-forward-line)
+                               ("RET" ibuffer-visit-buffer :color blue)
+
+                               ("TAB" ibuffer-toggle-filter-group)
+
+                               ("O" ibuffer-visit-buffer-other-window :color blue)
+                               ("q" quit-window :color blue)
+                               ("." nil :color blue))
+
+    :hydra (hydra-ibuffer-mark (:color teal :columns 5
+                                       :after-exit (hydra-ibuffer-main/body))
+                               "Mark"
+                               ("*" ibuffer-unmark-all "unmark all")
+                               ("M" ibuffer-mark-by-mode "mode")
+                               ("m" ibuffer-mark-modified-buffers "modified")
+                               ("u" ibuffer-mark-unsaved-buffers "unsaved")
+                               ("s" ibuffer-mark-special-buffers "special")
+                               ("r" ibuffer-mark-read-only-buffers "read-only")
+                               ("/" ibuffer-mark-dired-buffers "dired")
+                               ("e" ibuffer-mark-dissociated-buffers "dissociated")
+                               ("h" ibuffer-mark-help-buffers "help")
+                               ("z" ibuffer-mark-compressed-file-buffers "compressed")
+                               ("b" hydra-ibuffer-main/body "back" :color blue))
+
+    :hydra (hydra-ibuffer-action (:color teal :columns 4
+                                         :after-exit
+                                         (if (eq major-mode 'ibuffer-mode)
+                                             (hydra-ibuffer-main/body)))
+                                 "Action"
+                                 ("A" ibuffer-do-view "view")
+                                 ("E" ibuffer-do-eval "eval")
+                                 ("F" ibuffer-do-shell-command-file "shell-command-file")
+                                 ("I" ibuffer-do-query-replace-regexp "query-replace-regexp")
+                                 ("H" ibuffer-do-view-other-frame "view-other-frame")
+                                 ("N" ibuffer-do-shell-command-pipe-replace "shell-cmd-pipe-replace")
+                                 ("M" ibuffer-do-toggle-modified "toggle-modified")
+                                 ("O" ibuffer-do-occur "occur")
+                                 ("P" ibuffer-do-print "print")
+                                 ("Q" ibuffer-do-query-replace "query-replace")
+                                 ("R" ibuffer-do-rename-uniquely "rename-uniquely")
+                                 ("T" ibuffer-do-toggle-read-only "toggle-read-only")
+                                 ("U" ibuffer-do-replace-regexp "replace-regexp")
+                                 ("V" ibuffer-do-revert "revert")
+                                 ("W" ibuffer-do-view-and-eval "view-and-eval")
+                                 ("X" ibuffer-do-shell-command-pipe "shell-command-pipe")
+                                 ("b" nil "back"))
+
+    :hydra (hydra-ibuffer-sort (:color amaranth :columns 3)
+                               "Sort"
+                               ("i" ibuffer-invert-sorting "invert")
+                               ("a" ibuffer-do-sort-by-alphabetic "alphabetic")
+                               ("v" ibuffer-do-sort-by-recency "recently used")
+                               ("s" ibuffer-do-sort-by-size "size")
+                               ("f" ibuffer-do-sort-by-filename/process "filename")
+                               ("m" ibuffer-do-sort-by-major-mode "mode")
+                               ("b" hydra-ibuffer-main/body "back" :color blue))
+
+    :hydra (hydra-ibuffer-filter (:color amaranth :columns 4)
+                                 "Filter"
+                                 ("m" ibuffer-filter-by-used-mode "mode")
+                                 ("M" ibuffer-filter-by-derived-mode "derived mode")
+                                 ("n" ibuffer-filter-by-name "name")
+                                 ("c" ibuffer-filter-by-content "content")
+                                 ("e" ibuffer-filter-by-predicate "predicate")
+                                 ("f" ibuffer-filter-by-filename "filename")
+                                 (">" ibuffer-filter-by-size-gt "size")
+                                 ("<" ibuffer-filter-by-size-lt "size")
+                                 ("/" ibuffer-filter-disable "disable")
+                                 ("b" hydra-ibuffer-main/body "back" :color blue))
+    )
 #+end_src
 ** Filesystem
 :PROPERTIES:
@@ -1281,20 +1404,6 @@ TODO: I should understand how this works better.
     ("q" nil))
 #+END_SRC
 
-*** Whitespace Removal
-:PROPERTIES:
-:ID:       C2594210-A96C-4018-93BD-0C18BAE953F5
-:CUSTOM_ID: whitespace-removal
-:END:
-[[https://github.com/lewang/ws-butler][~ws-butler~]] automatically removes trailing whitespace from lines that have been editted.
-
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
-  (use-package ws-butler
-    :config
-    (ws-butler-global-mode))
-#+END_SRC
-
-
 *** Move to beginning of line
 :PROPERTIES:
 :ID:       E1E19C91-7B99-452A-8FB2-6AE35A2DF2CD
@@ -1334,7 +1443,9 @@ This snippet provides smarter moving to the beginning of the line. Copied from [
 :CUSTOM_ID: csv
 :END:
 #+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
-  (use-package csv-mode)
+  (use-package csv-mode
+    :config
+    (setq csv-separators '("," "|")))
 #+end_src
 *** PDFs
 :PROPERTIES:
@@ -1579,6 +1690,8 @@ Now we've got a hydra to make the various window management functions easily acc
           (user-error "There is not current branch")))))
 #+END_SRC
 
+TODO: try this https://stackoverflow.com/questions/74113199/magit-show-buffer-with-pre-commit-hooks-output-on-error
+
 [[https://github.com/dandavison/magit-delta][~magit-delta~]] enables improved diffs for Magit using [[https://github.com/dandavison/delta][delta]].
 
 I've disabled this for now since it seemed a bit slow.
@@ -1737,6 +1850,9 @@ A nice Hydra menu to make things more accessible.
     :config
     (global-flycheck-eglot-mode 1))
 
+  (use-package consult-flycheck
+    :after (flycheck eglot consult))
+
   (use-package flycheck-golangci-lint
     :after (flycheck)
     :hook (go-ts-mode . flycheck-golangci-lint-setup)
@@ -1755,6 +1871,7 @@ A nice Hydra menu to make things more accessible.
     :hook
     ((go-ts-mode . eglot-ensure)
      (python-ts-mode . eglot-ensure)
+     (terraform-mode . eglot-ensure)
      (java-ts-mode . eglot-ensure)
      (sh-mode . eglot-ensure))
     :custom
@@ -1764,6 +1881,14 @@ A nice Hydra menu to make things more accessible.
     :config
     ;; massive perf boost---don't log every event
     (fset #'jsonrpc--log-event #'ignore))
+
+  (use-package consult-eglot
+    :after (consult eglot))
+
+  (use-package consult-eglot-embark
+    :after consult-eglot
+    :config (consult-eglot-embark-mode))
+
 #+END_SRC
 
 *** DevDocs
@@ -1920,6 +2045,10 @@ See helpful examples at:
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package org-appear
     :hook (org-mode . org-appear-mode))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+  (use-package ob-restclient)
 #+END_SRC
 
 [[https://github.com/minad/org-modern][~org-modern~]] gives ~org-mode~ a more modern style.
@@ -2426,6 +2555,7 @@ Get fish shell syntax working.
                              (append org-babel-load-languages
                               '((python . t)
                                 (shell . t)
+                                (restclient . t)
                                 (sql . t))))
 
   (use-package ob-sql-mode)
@@ -2730,6 +2860,9 @@ Setup some useful ~k8s~ config.
       abbr --add kd kubectl describe
       abbr --add kdp kubectl describe pod
       abbr --add kds kubectl describe service
+
+      # Describe commands
+      abbr --add kkp kubectl delete pods
 
       # Networking
       abbr --add kpf kubectl port-forward
