@@ -954,6 +954,8 @@ smaller to larger screens.
   (keymap-set vertico-map "<remap> <pixel-scroll-interpolate-down>" #'vertico-scroll-up)
   (keymap-set corfu-map "<remap> <pixel-scroll-interpolate-up>" #'corfu-scroll-down)
   (keymap-set corfu-map "<remap> <pixel-scroll-interpolate-down>" #'corfu-scroll-up)
+
+  (use-package vertico-posframe)
   ;; Part of corfu
   (use-package corfu-popupinfo
     :straight nil
