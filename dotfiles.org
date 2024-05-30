@@ -879,7 +879,16 @@ smaller to larger screens.
   (use-package embark
     :demand t
     :after avy
-    :general ("C-c a" 'embark-act)        ; bind this to an easy key to hit
+    :general
+    ("C-c a" 'embark-act)
+    ("C-c d" 'embark-dwim)
+    :config
+    (define-key embark-identifier-map "r" 'eglot-rename)
+    (define-key embark-identifier-map "i" 'eglot-code-actions)
+    (push 'embark--allow-edit
+          (alist-get 'eglot-rename embark-target-injection-hooks))
+    (push 'embark--ignore-target
+          (alist-get 'eglot-code-actions embark-target-injection-hooks))
     :init
     ;; Add the option to run embark when using avy
     (defun bedrock/avy-action-embark (pt)
