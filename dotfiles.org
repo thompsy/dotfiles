@@ -3404,6 +3404,20 @@ config.window_padding = {
 }
 
 
+config.mouse_bindings = {
+  -- Open URLs with CMD+Click
+  {
+    event = { Up = { streak = 1, button = 'Left' } },
+    mods = 'CMD',
+    action = wezterm.action.OpenLinkAtMouseCursor,
+  }
+}
+
+config.keys = {
+  -- disable creating new tabs.
+  { key = 't', mods = 'CMD', action = wezterm.action.Nop },
+}
+
 config.check_for_updates = true
 
 enable_kitty_graphics=true
