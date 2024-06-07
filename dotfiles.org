@@ -2844,6 +2844,11 @@ TODO: it would be nice to install Go automatically?
 
   fish_add_path $HOME/go/bin
   fish_add_path /usr/local/go/bin
+
+  abbr --add gob go build ./...
+  abbr --add got INTEGRATION_TESTS=true go test ./...
+  abbr --add gotc INTEGRATION_TESTS=true go test ./... -count 1
+  abbr --add goup go get -u all
 #+end_src
 
 Setup some useful ~k8s~ config.
