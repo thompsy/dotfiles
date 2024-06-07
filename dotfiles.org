@@ -2875,7 +2875,7 @@ Setup some useful ~k8s~ config.
       abbr --add kdp kubectl describe pod
       abbr --add kds kubectl describe service
 
-      # Describe commands
+      # Delete (kill) commands
       abbr --add kkp kubectl delete pods
 
       # Networking
@@ -3234,7 +3234,7 @@ Source any local config
 :END:
 [[https://starship.rs/][Starship]] is an easy way to get a decent shell prompt without much messing around.
 #+BEGIN_SRC toml  :tangle "~/.config/starship.toml" :mkdirp yes
-  # I include this so I can keep the dicrectory first, before the kubernetes context
+  # I include this so I can keep the directory first, before the kubernetes context
   format = """
   $username\
   $hostname\
