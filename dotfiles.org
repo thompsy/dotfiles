@@ -1926,6 +1926,8 @@ A nice Hydra menu to make things more accessible.
     (before-save . eglot-format-buffer)
     (before-save . at/eglot-organize-imports))
 
+  (use-package gotest)
+
   (defun at/eglot-organize-imports () (interactive)
          (eglot-code-actions nil nil "source.organizeImports" t))
 
