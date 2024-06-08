@@ -2748,7 +2748,7 @@ Install ~starship~ for a nice, informative prompt with minimal config.
 
 Install ~lsd~ as a more modern ~ls~ equivalent.
 #+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
-  if ! type -q lsd
+  if ! type -q eza
       echo "Installing Nerd Fonts..."
       git clone --filter=blob:none --sparse git@github.com:ryanoasis/nerd-fonts ~/.nerd-fonts
       cd ~/.nerd-fonts
@@ -2756,15 +2756,16 @@ Install ~lsd~ as a more modern ~ls~ equivalent.
       ./install.sh FiraCode
       echo "Don't forget to set this font in the terminal."
 
-      echo "Installing lsd..."
-      cargo install lsd
+      echo "Installing eza..."
+      cargo install eza
   end
 
-  alias ls="lsd --group-directories-first"
-  alias l="lsd --group-directories-first -l"
-  alias la="lsd --group-directories-first -a"
-  alias ll="lsd --group-directories-first -la"
-  alias lt="lsd --group-directories-first --tree"
+  # Use alias here instead of abbr since I don't want these expanded
+  alias ls="eza --group-directories-first --icons"
+  alias l="eza --group-directories-first --icons -l"
+  alias la="eza --group-directories-first --icons -a"
+  alias ll="eza --group-directories-first --icons -la"
+  alias lt="eza --group-directories-first --icons --tree"
 #+end_src
 
 Install ~bat~ as a more modern ~cat~ equivalent.
