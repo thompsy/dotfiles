@@ -2607,6 +2607,10 @@ Some interesting config options:
                             ("ediff-files" ediff-files))
           vterm-keymap-exceptions
           '("M-:" "C-c" "C-x" "C-u" "C-g" "C-h" "C-l" "M-x" "M-o" "C-y" "M-y" "C-t" "M-s")))
+
+  ;; Disable hl-line-mode to reduce flickering: https://github.com/akermu/emacs-libvterm/issues/432
+  (add-hook 'vterm-mode (lambda () (setq-local global-hl-line-mode nil)))
+  (add-hook 'vterm-copy-mode (lambda () (call-interactively 'hl-line-mode)))
 #+end_src
 
 #+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
