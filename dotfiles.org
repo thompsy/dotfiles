@@ -876,6 +876,12 @@ smaller to larger screens.
               "C-x C-d" 'consult-dir
               "C-x C-j" 'consult-dir-jump-file))
 
+  ;; nice package to show the xref stack
+  (use-package consult-xref-stack
+    :straight (consult-xref-stack :type git :host github :repo "brett-lempereur/consult-xref-stack")
+    :bind
+    (("C-," . consult-xref-stack-backward)))
+
   (use-package embark
     :demand t
     :after avy
