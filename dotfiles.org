@@ -2067,6 +2067,7 @@ See helpful examples at:
   (use-package org-modern
     :config
     (global-org-modern-mode))
+  (set-face-attribute 'org-modern-symbol nil :family "Iosevka")
 #+END_SRC
 
 
