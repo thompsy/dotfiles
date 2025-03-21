@@ -1997,6 +1997,10 @@ See URL `http://pypi.python.org/pypi/ruff'."
                 (when (buffer-file-name)
                   (setq-local flycheck-checkers '(python-ruff))
                   (flycheck-mode))))))
+  (use-package python-black
+    :demand t
+    :after python
+    :hook (python-mode . python-black-on-save-mode-enable-dwim))
 #+END_SRC
 
 ** Yasnippets
