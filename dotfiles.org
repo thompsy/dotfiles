@@ -2854,6 +2854,7 @@ Install the useful ~fzf.fish~ plugin. This gives a number of useful keybindings:
       fisher install PatrickF1/fzf.fish
   end
   set -x FZF_DEFAULT_OPTS '--height 40% --layout=reverse --border'
+  set -x fzf_history_time_format %d-%m-%Y
 #+end_src
 
 Install ~zoxide~ a great tool for navigating directories in the command line. It learns your history
