@@ -672,6 +672,9 @@ chain bindings from that.
      "C-<wheel-down>" nil
      "C-M-<wheel-up>" nil
      "C-M-<wheel-down>" nil
+     "s-t" nil
+     "H-t" nil
+     "A-t" nil
      )
 
     ;; Make general's keybindings take precedence over keys bound to other minor mode keymaps.
