@@ -1698,6 +1698,7 @@ Now we've got a hydra to make the various window management functions easily acc
   	  (make "https://github.com/alemuller/tree-sitter-make")
   	  (markdown "https://github.com/ikatyang/tree-sitter-markdown")
   	  (python "https://github.com/tree-sitter/tree-sitter-python")
+            (rust "https://github.com/tree-sitter/tree-sitter-rust")
   	  (toml "https://github.com/tree-sitter/tree-sitter-toml")
   	  (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
   	  (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
@@ -1930,6 +1931,8 @@ A nice Hydra menu to make things more accessible.
      (python-ts-mode . eglot-ensure)
      (terraform-mode . eglot-ensure)
      (java-ts-mode . eglot-ensure)
+     (bash-ts-mode . eglot-ensure)
+     (rust-ts-mode . eglot-ensure)
      (sh-mode . eglot-ensure))
     :custom
     (eglot-send-changes-idle-time 0.1)
@@ -1974,7 +1977,7 @@ A nice Hydra menu to make things more accessible.
     (before-save . eglot-format-buffer)
     (before-save . at/eglot-organize-imports))
 
-  (use-package gotest)
+  (use-package gotest-ts)
 
   (defun at/eglot-organize-imports () (interactive)
          (eglot-code-actions nil nil "source.organizeImports" t))
