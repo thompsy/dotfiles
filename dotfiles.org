@@ -973,6 +973,7 @@ smaller to larger screens.
     	      "DEL" 'vertico-directory-delete-char
     	      "M-DEL" 'vertico-directory-delete-word))
 
+  (use-package vertico-posframe)
   ;; Marginalia: annotations for minibuffer
   (use-package marginalia
     :config
@@ -1128,6 +1129,9 @@ smaller to larger screens.
 #+end_src
 
 *** ibuffer
+:PROPERTIES:
+:ID:       f068ca19-b723-4cf9-9149-83454e25c8d5
+:END:
 
 
 #+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
@@ -1982,6 +1986,10 @@ A nice Hydra menu to make things more accessible.
   (defun at/eglot-organize-imports () (interactive)
          (eglot-code-actions nil nil "source.organizeImports" t))
 
+  (use-package rust-mode
+  :init
+  (setq rust-mode-treesitter-derive t))
+  
   (use-package sh-script)
 
   (use-package terraform-mode
@@ -2004,6 +2012,27 @@ These packages need to be installed in the Python environment too.
   (use-package pyvenv)
 #+END_SRC
 
+*** AI Stuff?
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+  (use-package aider
+  :straight (:host github :repo "tninja/aider.el")
+  :config
+  ;; For latest claude sonnet model
+  (setq aider-args '("--model" "ollama_chat/codellama" "--no-auto-accept-architect"))
+  (setenv "OLLAMA_API_BASE" "http://127.0.0.1:11434")
+  ;; (setenv "GEMINI_API_KEY" "AIzaSyDhs_FDovykUeHOqVCf4ymW7kWs_wtjN_I")
+  ;; Or chatgpt model
+  ;; (setq aider-args '("--model" "o3-mini"))
+  ;; (setenv "OPENAI_API_KEY" <your-openai-api-key>)
+  ;; Or gemini model
+  ;; (setq aider-args '("--model" "gemini-exp"))
+  ;; (setenv "GEMINI_API_KEY" <your-gemini-api-key>)
+  ;; Or use your personal config file
+  ;; (setq aider-args `("--config" ,(expand-file-name "~/.aider.conf.yml")))
+  ;; ;;
+  ;; Optional: Set a key binding for the transient menu
+  (global-set-key (kbd "C-c i") 'aider-transient-menu))
+#+end_src
 ** Yasnippets
 :PROPERTIES:
 :ID:       1A54EDBC-D408-4843-8028-CEE653B9E440
@@ -2018,14 +2047,23 @@ These packages need to be installed in the Python environment too.
 
   (use-package yasnippet-snippets
     :after yasnippet)
+
+  (use-package consult-yasnippet
+    :after (consult yasnippet))
+
+  (use-package yasnippet-capf
+  :after cape
+  :config
+  (add-to-list 'completion-at-point-functions #'yasnippet-capf))
 #+END_SRC
 
 *** Snippets
 :PROPERTIES:
 :CUSTOM_ID: snippets
+:ID:       491e11b9-6024-4270-87c7-2a16d14150e2
 :END:
 These are various snippets for use with Yasnippet.
-#+BEGIN_SRC :tangle "~/.emacs.d/snippets/go-mode/ifen" :eval no :mkdirp yes
+#+BEGIN_SRC text :tangle "~/.emacs.d/snippets/go-mode/ifen" :eval no :mkdirp yes
 # -*- mode: snippet -*-
 # name: if error nil
 # key: ifen
@@ -2804,7 +2842,8 @@ Install ~lsd~ as a more modern ~ls~ equivalent.
       git clone --filter=blob:none --sparse git@github.com:ryanoasis/nerd-fonts ~/.nerd-fonts
       cd ~/.nerd-fonts
       git sparse-checkout add patched-fonts/FiraCode
-      ./install.sh FiraCode
+      git sparse-checkout add patched-fonts/CascadiaCode
+      ./install.sh FiraCode CascadiaCode
       echo "Don't forget to set this font in the terminal."
 
       echo "Installing eza..."
