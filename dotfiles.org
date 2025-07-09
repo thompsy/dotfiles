@@ -2902,7 +2902,9 @@ Install ~lsd~ as a more modern ~ls~ equivalent.
       git clone --filter=blob:none --sparse git@github.com:ryanoasis/nerd-fonts ~/.nerd-fonts
       cd ~/.nerd-fonts
       git sparse-checkout add patched-fonts/FiraCode
+      git sparse-checkout add patched-fonts/CascadiaCode
       ./install.sh FiraCode
+      ./install.sh CascadiaCode
       echo "Don't forget to set this font in the terminal."
 
       echo "Installing eza..."
