@@ -2860,9 +2860,29 @@ Testing out Fish Shell and so far I'm quite impressed. The completions are very 
 Useful key built-in bindings:
 - ~Alt .~ :: cycle through arguments to previous commands
 
+  #+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
+    set -U fish_user_paths ~/.cargo/bin ~/.fzf/bin ~/go/bin /usr/local/go/bin ~/bin
+#+end_src
+
+Install ~zoxide~ a great tool for navigating directories in the command line. It learns your history
+then you can just call ~z name~ to jump to a directory that matches that name. The ~zi~ command will
+give a fuzzy list of possible matches.
+
+Install ~starship~ for a nice, informative prompt with minimal config.
 #+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
   if status is-interactive
       # Commands to run in interactive sessions can go here
+      if ! type -q zoxide
+          echo "Installing zoxide..."
+          cargo install zoxide --locked
+      end
+      zoxide init fish | source
+      if ! type -q starship
+          echo "Installing starship..."
+          cargo install starship --locked
+      end
+      starship init fish | source
+  end
 #+end_src
 
 Install the ~rust~ toolchain. I'm basically using ~cargo~ as a cross-platform package manager at the
@@ -2872,31 +2892,39 @@ moment.
       echo "Installing Rust..."
       curl https://sh.rustup.rs -sSf | sh -s -- -y --no-modify-path --default-toolchain stable --profile minimal
   end
-  if test -e ~/.cargo/bin
-      fish_add_path ~/.cargo/bin
-  end
-
 #+end_src
 
-Add the ~fisher~ plugin manager.
-#+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
-    # Install fisher plugin manager
-    if ! test -e ~/.config/fish/functions/fisher.fish
-        curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fisher
-    end
-#+end_src
+Add the ~fisher~ plugin manager and plugins.
 
-This emacs plugin gives us the following useful aliases:
+The emacs plugin gives us the following useful aliases:
 - ~e~ :: open the given file with ~emacsclient~ and return immediately
 - ~ecd~ :: prints the directory of the currently visited buffer
 - ~efile~ :: prints the filename of the currently visited buffer
 - ~eeval~ :: evaluate some lisp from the command line
 - ~ek~ :: kill any currently running emacs instances
-#+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
-  if ! test -e ~/.config/fish/conf.d/emacs.fish
-      fisher install oh-my-fish/plugin-emacs
-  end
 
+The ~fzf.fish~ plugin. This gives a number of useful keybindings:
+- ~Ctrl r~ :: use ~fzf~ to search through history
+- ~Ctrl Alt F~ :: show fuzzy list of all non-hidden files under the current directory
+- ~Ctrl Alt L~ :: show fuzzy ~git log~. On selection, print the hash of the selected commits.
+- ~Ctrl Alt S~ :: show fuzzy ~git status~.
+- ~Ctrl Alt P~ :: show fuzzy process list. On selection, print the ~pid~ of the selected process.
+
+#+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
+  # Install fisher if it's not found
+  if ! functions -q fisher
+      echo "Installing Fisher..."
+      curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fisher
+      # Install all plugins
+      fisher install \
+          oh-my-fish/plugin-emacs \
+          PatrickF1/fzf.fish \
+          dracula/fish
+  end
+#+end_src
+
+
+#+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
   if test -e /opt/emacs29
       fish_add_path /opt/emacs29/bin
   end
@@ -2908,7 +2936,6 @@ Install ~fzf~ for fuzzy matching things.
   if ! test -e ~/.fzf/
       git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
       ~/.fzf/install --bin
-      fish_add_path ~/.fzf/bin
   end
 #+end_src
 
@@ -2920,45 +2947,10 @@ learn how it works outside of that too.
   end
 #+end_src
 
-Install the useful ~fzf.fish~ plugin. This gives a number of useful keybindings:
-- ~Ctrl r~ :: use ~fzf~ to search through history
-- ~Ctrl Alt F~ :: show fuzzy list of all non-hidden files under the current directory
-- ~Ctrl Alt L~ :: show fuzzy ~git log~. On selection, print the hash of the selected commits.
-- ~Ctrl Alt S~ :: show fuzzy ~git status~.
-- ~Ctrl Alt P~ :: show fuzzy process list. On selection, print the ~pid~ of the selected process.
+Setup some ~FZF~ options:
 #+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
-  if ! test -e ~/.config/fish/conf.d/fzf.fish
-      fisher install PatrickF1/fzf.fish
-  end
-  set -x FZF_DEFAULT_OPTS '--height 40% --layout=reverse --border'
-  set -x fzf_history_time_format %d-%m-%Y
-#+end_src
-
-Install ~zoxide~ a great tool for navigating directories in the command line. It learns your history
-then you can just call ~z name~ to jump to a directory that matches that name. The ~zi~ command will
-give a fuzzy list of possible matches.
-#+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
-  if ! type -q zoxide
-      echo "Installing zoxide..."
-      cargo install zoxide --locked
-  end
-  zoxide init fish | source
-#+end_src
-
-Install the ~dracula~ theme.
-#+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
-  if ! test -e ~/.config/fish/themes/Dracula\ Official.theme
-      fisher install dracula/fish
-  end
-#+end_src
-
-Install ~starship~ for a nice, informative prompt with minimal config.
-#+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
-  if ! type -q starship
-      echo "Installing starship..."
-      cargo install starship --locked
-  end
-  starship init fish | source
+  set -gx FZF_DEFAULT_OPTS '--height 40% --layout=reverse --border'
+  set -gx fzf_history_time_format %d-%m-%Y
 #+end_src
 
 Install ~lsd~ as a more modern ~ls~ equivalent.
@@ -3058,16 +3050,13 @@ Setup ~go~-related config. I should probably check that ~go~ is actually install
 TODO: it would be nice to install Go automatically?
 #+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
   if test -e /usr/local/go
-      set -x GOPATH $HOME/go/
-      set -x GO111MODULE on
+      set -gx GOPATH $HOME/go/
+      set -gx GO111MODULE on
   end
 
   if ! type -q $HOME/go/bin/gopls
       go install golang.org/x/tools/gopls@latest
   end
-
-  fish_add_path $HOME/go/bin
-  fish_add_path /usr/local/go/bin
 
   abbr --add gob go build ./...
   abbr --add got INTEGRATION_TESTS=true go test ./...
@@ -3078,7 +3067,7 @@ TODO: it would be nice to install Go automatically?
 Setup some useful ~k8s~ config.
 #+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
   if type -q kubectl
-      set -x KUBECONFIG $HOME/.kube/config
+      set -gx KUBECONFIG $HOME/.kube/config
 
       abbr --add k kubectl
       abbr --add kx kubectx
@@ -3090,7 +3079,7 @@ Setup some useful ~k8s~ config.
       abbr --add kgpa kubectl get pods -A
       abbr --add kgns kubectl get namespaces
       abbr --add kgall kubectl get ingress,service,deployment,pod
-      abbr --add kgcj kuebctl get cronjobs
+      abbr --add kgcj kubectl get cronjobs
       abbr --add kgj kubectl get jobs
       abbr --add kctx kubectx
 
@@ -3105,34 +3094,6 @@ Setup some useful ~k8s~ config.
       # Networking
       abbr --add kpf kubectl port-forward
       abbr --add kp kubectl proxy
-  end
-#+end_src
-
-Some Python stuff. I'm not sure if I need this.
-#+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
-  ################################################################################
-  # Python
-  #
-  # Need to run this in each venv seemingly:
-  # python -m pip install virtualfish
-  # eval (python -m virtualfish)
-#+end_src
-
-Various ~path~ updates.
-#+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
-  fish_add_path ~/bin
-#+end_src
-
-Some ~brew~ related setup if we're on a Mac.
-#+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
-  if type -q brew
-      # Add the default homebrew locations to the path
-      eval (/opt/homebrew/bin/brew shellenv)
-
-      # if libpq is installed then add it to the path too
-      if brew list libpq > /dev/null
-          fish_add_path /opt/homebrew/opt/libpq/bin
-      end
   end
 #+end_src
 
@@ -3180,10 +3141,6 @@ Source any local config
       source ~/notebook/local-dotfiles/fishrc
   end
 
-#+end_src
-
-#+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
-  end
 #+end_src
 
 * Zellij
