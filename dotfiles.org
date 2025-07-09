@@ -3450,7 +3450,6 @@ Source any local config
   $scala\
   $solidity\
   $swift\
-  $terraform\
   $typst\
   $vlang\
   $vagrant\
