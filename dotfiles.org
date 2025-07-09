@@ -506,14 +506,14 @@ improvement on this by popping up in a floating window.
 :ID:       C7C96A0A-E6EA-4FB1-BD24-9E83A8F7761C
 :CUSTOM_ID: savehist
 :END:
-Save a number of useful varibles so that they persist across emacs sessions.
+Save a number of useful variables so that they persist across Emacs sessions.
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   ;; Save history of minibuffer
   (savehist-mode)
   (setq savehist-additional-variables '(kill-ring search-ring regexp-search-ring))
 #+END_SRC
 
-*** Inteface Enhancements
+*** Interface Enhancements
 :PROPERTIES:
 :ID:       2D0FB78A-3A47-4707-A038-6DD3FCF03DE3
 :CUSTOM_ID: inteface-enhancements
