@@ -3445,8 +3445,8 @@ Source any local config
   style = "bold #ffb86c"
 
   [character]
-  error_symbol = "[λ](bold #ff5555)"
-  success_symbol = "[λ](bold #50fa7b)"
+  error_symbol = "[λ](bold #ff5555) "
+  success_symbol = "[λ](bold #50fa7b) "
 
   [cmd_duration]
   style = "bold #f1fa8c"
@@ -3466,8 +3466,9 @@ Source any local config
 
   [kubernetes]
   disabled = false
-  format = 'in [$symbol$context( \($namespace\))]($style) '
+  format = 'on [$symbol$context/$namespace]($style) '
   style = "bold #bd93f9"
+  symbol = "☸ "
 
   [docker_context]
   disabled = false
