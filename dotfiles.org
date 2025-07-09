@@ -1420,75 +1420,35 @@ built-in ~fill~ function.
 :ID:       05DF5D12-0C29-44DD-88A5-F25762BC4F85
 :CUSTOM_ID: spelling
 :END:
-~spell-fu~ is an easier to setup version of ~flyspell~.
- #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
-   (setenv "LANG" "en_GB")
-   (use-package spell-fu
-     :config
-     (spell-fu-global-mode)
-     (setq ispell-dictionary "en_GB"
-           ispell-local-dictionary "en_GB"
-           ispell-current-dictionary "en_GB"
-           ispell-personal-dictionary "~/.emacs.d/.aspell.en.pws"
-           ispell-silently-savep t
-           ;; disable in read-only buffers
-           spell-fu-global-ignore-buffer (lambda (buf) (buffer-local-value 'buffer-read-only buf))
-           spell-fu-ignore-modes (list 'vterm-mode 'fundamental-mode 'shell-mode 'minibuffer-mode 'compilation-mode 'special-mode 'text-mode 'messages-buffer-mode)
-           spell-fu-word-delimit-camel-case t
-           spell-fu-faces-exclude
-           '(org-block-begin-line
-             org-block-end-line
-             org-code
-             org-date
-             org-drawer org-document-info-keyword
-             org-ellipsis
-             org-link
-             org-meta-line
-             org-properties
-             org-properties-value
-             org-special-keyword
-             org-src
-             org-tag
-             org-verbatim
-             flycheck-error
-             flycheck-warning
-             flycheck-info
-             echo-area
-             message-node
-             font-lock-warning-face
-             error
-             success
-             info
-             flycheck-error
-             flycheck-warning
-             flycheck-info
-             ))
-     :general
-     (my-leader-def
-       "s" '(hydra-spelling/body :wk "spell"))
-     :hydra (hydra-spelling (:color blue :hint nil)
-                            "
-               ^
-               ^Spelling^          ^Errors^            ^Checker^
-               ^────────^──────────^──────^────────────^───────^───────
-               _q_uit              _p_revious          _c_orrection
-               ^^                  _n_ext              _d_ictionary
-               _r_eset             _s_pell word        _a_dd to dict
-               ^^                  _b_uffer            _m_ode
-               ^^                  ^^                  ^^
-               "
-                            ("q" nil)
-                            ("r" spell-fu-reset :color pink)
-                            ("p" spell-fu-goto-previous-error :color pink)
-                            ("n" spell-fu-goto-next-error :color pink)
-                            ("s" ispell-word :color pink)
-                            ("b" spell-fu-buffer :color pink)
-                            ("c" ispell)
-                            ("d" ispell-change-dictionary)
-                            ("a" spell-fu-word-add :color pint)
-                            ("m" spell-fu-mode)))
-#+END_SRC
 
+Moving back to ~flyspell~ for now. 
+#+begin_src  emacs-lisp :tangle "~/.emacs.d/init.el"
+  (add-hook 'text-mode-hook 'flyspell-mode)
+  (add-hook 'prog-mode-hook 'flyspell-prog-mode) ; For code buffers
+  (add-hook 'org-mode-hook 'flyspell-mode) ; Or flyspell-prog-mode, try flyspell-mode first
+
+  (use-package flyspell-correct
+    :after flyspell
+    :bind (:map flyspell-mode-map ("C-;" . flyspell-correct-wrapper)))
+
+  (use-package flyspell-correct-popup
+    :after flyspell-correct)
+
+  (use-package flyspell-correct-avy-menu
+    :after flyspell-correct)
+
+  (defun avy-action-flyspell (pt)
+    (save-excursion
+      (goto-char pt)
+      (when (require 'flyspell nil t)
+        (flyspell-auto-correct-word)))
+    (select-window
+     (cdr (ring-ref avy-ring 0)))
+    t)
+
+  ;; Bind to semicolon (flyspell uses C-;)
+  (setf (alist-get ?\; avy-dispatch-alist) 'avy-action-flyspell)
+#+end_src
 *** Rectangles
 :PROPERTIES:
 :ID:       85B5D4E0-B5D3-408D-A41D-A2BC44E3F029
