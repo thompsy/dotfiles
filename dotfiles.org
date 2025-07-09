@@ -1180,6 +1180,9 @@ smaller to larger screens.
 #+end_src
 
 *** ibuffer
+:PROPERTIES:
+:ID:       D74C6A06-0355-4FF4-AB79-C19A85A586CB
+:END:
 
 
 #+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
