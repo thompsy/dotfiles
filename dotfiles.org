@@ -1928,6 +1928,24 @@ A nice Hydra menu to make things more accessible.
 :CUSTOM_ID: flycheck
 :END:
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+  (defun my/consult-flycheck-errors-only ()
+    "Open consult-flycheck showing only 'error' level messages."
+    (interactive)
+    (let ((consult--initial-input "error "))
+      (call-interactively #'consult-flycheck)))
+
+  (defun my/consult-flycheck-warnings-only ()
+    "Open consult-flycheck showing only 'warning' level messages."
+    (interactive)
+    (let ((consult--initial-input "warning "))
+      (call-interactively #'consult-flycheck)))
+
+  (defun my/consult-flycheck-info-only ()
+    "Open consult-flycheck showing only 'info' level messages."
+    (interactive)
+    (let ((consult--initial-input "info "))
+      (call-interactively #'consult-flycheck)))
+
   (use-package flycheck
     :general
     (my-leader-def
@@ -1936,40 +1954,55 @@ A nice Hydra menu to make things more accessible.
     (global-flycheck-mode +1)
     :hydra
     (hydra-flycheck-mode
-     (:hint nil
-            :color green
-            :pre (flycheck-list-errors)
-            :post (quit-windows-on "*Flycheck errors*"))
+     (:hint nil :color green)
      "
-  Find Errors        Describe Errors
-  -----------------------------------
-  _f_irst error      _s_how error
-  _n_ext error       _e_xplain error
-  _p_rev error       ^ ^
-  _l_ist errors      _q_uit
-  "
+    Navigate Errors    Describe                   Filter List
+    ------------------ --------------------------------------------
+    _f_irst error      _s_how at point            _e_rrors only
+    _n_ext error       _E_xplain at point         _w_arnings only
+    _p_rev error       ^ ^                        _i_nfo only
+    _l_ist errors      _q_uit                     _a_ll project files
+    "
      ("f" flycheck-first-error)
      ("n" flycheck-next-error)
      ("p" flycheck-previous-error)
-     ("l" flycheck-list-errors)
      ("s" flycheck-display-error-at-point)
-     ("e" flycheck-explain-error-at-point)
+     ("E" flycheck-explain-error-at-point)
+
+     ;; Use consult-flycheck for listing and our new helper functions for filtering
+     ("l" consult-flycheck)
+     ("e" my/consult-flycheck-errors-only)
+     ("w" my/consult-flycheck-warnings-only)
+     ("i" my/consult-flycheck-info-only)
+     ("a" flycheck-projectile-list-errors)
+
      ("q" nil :exit t)))
 
-  (use-package flycheck-eglot
-    :after (flycheck eglot)
-    :custom (flycheck-eglot-exclusive nil)
-    :config
-    (global-flycheck-eglot-mode 1))
+    (use-package flycheck-eglot
+      :after (flycheck eglot)
+      :custom (flycheck-eglot-exclusive nil)
+      :config
+      (global-flycheck-eglot-mode 1))
 
-  (use-package consult-flycheck
-    :after (flycheck eglot consult))
+    (use-package consult-flycheck
+      :after (flycheck eglot consult))
 
-  (use-package flycheck-golangci-lint
-    :after (flycheck)
-    :hook (go-ts-mode . flycheck-golangci-lint-setup)
-    :config
-    (setq flycheck-golangci-lint-tests t))
+    (use-package flycheck-golangci-lint
+      :after (flycheck)
+      :hook (go-ts-mode . flycheck-golangci-lint-setup)
+      :config
+      (setq flycheck-golangci-lint-tests t))
+
+  (use-package flycheck-projectile
+  :ensure t
+  :after (flycheck projectile)
+  :config
+  ;; Optional: If you use popwin for better popup window management
+  (add-to-list 'popwin:special-display-config
+               `(,flycheck-projectile-error-list-buffer :regexp nil :dedicated t :position bottom :stick t :noselect nil)))
+
+  ;; TODO explore this a bit
+  (use-package popwin)
 #+END_SRC
 *** LSP Servers
 :PROPERTIES:
