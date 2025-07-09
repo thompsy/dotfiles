@@ -1555,9 +1555,17 @@ This snippet provides smarter moving to the beginning of the line. Copied from [
 :CUSTOM_ID: csv
 :END:
 #+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
-  (use-package csv-mode
-    :config
-    (setq csv-separators '("," "|")))
+    (use-package csv-mode
+      :config
+      (setq csv-separators '("," "|")))
+
+
+  ;; (unless (package-installed-p 'vc-use-package)
+  ;;   (package-vc-install "https://github.com/slotThe/vc-use-package"))
+  ;; (require 'vc-use-package)
+
+  ;;   (use-package rainbow-csv
+  ;;     :vc (:fetcher github :repo  emacs-vs/rainbow-csv))
 #+end_src
 *** PDFs
 :PROPERTIES:
@@ -1772,6 +1780,23 @@ Now we've got a hydra to make the various window management functions easily acc
   	  (css-mode . css-ts-mode)
   	  (python-mode . python-ts-mode)))
     )
+
+  (use-package treesit-fold
+    :straight (treesit-fold :type git :host github :repo "emacs-tree-sitter/treesit-fold")
+    :config
+    (setq global-treesit-fold-indicator-mode t))
+
+  (use-package corral)
+
+  (use-package combobulate
+    :custom
+    ;; You can customize Combobulate's key prefix here.
+    ;; Note that you may have to restart Emacs for this to take effect!
+    (combobulate-key-prefix "C-c o")
+    :hook ((prog-mode . combobulate-mode))
+    ;; Amend this to the directory where you keep Combobulate's source
+    ;; code.
+    :load-path ("path-to-git-checkout-of-combobulate"))
 
   (use-package expreg
     :general
@@ -2061,46 +2086,84 @@ These packages need to be installed in the Python environment too.
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
-  (use-package pyvenv)
 
-  (use-package python-pytest)
+    (use-package python-black)
+    (use-package python-pytest)
+    (use-package python-isort)
+    (use-package pyvenv)
 
-  ;; From https://github.com/flycheck/flycheck/issues/1974#issuecomment-1343495202
-(flycheck-define-checker python-ruff
-  "A Python syntax and style checker using the ruff utility.
-To override the path to the ruff executable, set
-`flycheck-python-ruff-executable'.
-See URL `http://pypi.python.org/pypi/ruff'."
-  :command ("ruff"
-            "check"
-            "--output-format=text"
-            (eval (when buffer-file-name
-                    (concat "--stdin-filename=" buffer-file-name)))
-            "-")
-  :standard-input t
-  :error-filter (lambda (errors)
-                  (let ((errors (flycheck-sanitize-errors errors)))
-                    (seq-map #'flycheck-flake8-fix-error-level errors)))
-  :error-patterns
-  ((warning line-start
-            (file-name) ":" line ":" (optional column ":") " "
-            (id (one-or-more (any alpha)) (one-or-more digit)) " "
-            (message (one-or-more not-newline))
-            line-end))
-  :modes (python-mode python-ts-mode))
+  ;; (use-package auto-virtualenv
+  ;;   :straight (:host github :repo "marcwebbie/auto-virtualenv")
+  ;;   :config
+  ;;   (setq auto-virtualenv-verbose t)
+  ;;   (auto-virtualenv-setup))
 
-;; Use something adapted to your config to add `python-ruff' to `flycheck-checkers'
-;; This is an MVP example:
-(setq python-mode-hook
-      (list (defun my-python-hook ()
-              (unless (bound-and-true-p org-src-mode)
-                (when (buffer-file-name)
-                  (setq-local flycheck-checkers '(python-ruff))
-                  (flycheck-mode))))))
-  (use-package python-black
-    :demand t
-    :after python
-    :hook (python-mode . python-black-on-save-mode-enable-dwim))
+
+    (use-package pet
+    :ensure-system-package (dasel sqlite3)
+    :config
+    (add-hook 'python-base-mode-hook 'pet-mode -10)
+    (add-hook 'python-mode-hook
+              (lambda ()
+                (setq-local python-shell-interpreter (pet-executable-find "python")
+                            python-shell-virtualenv-root (pet-virtualenv-root))
+
+                (pet-eglot-setup)
+                (eglot-ensure)
+
+                (pet-flycheck-setup)
+                (flycheck-mode)
+
+                (setq-local dap-python-executable python-shell-interpreter)
+
+                (setq-local python-pytest-executable (pet-executable-find "pytest"))
+
+                ;; (when-let ((black-executable (pet-executable-find "black")))
+                ;;   (setq-local python-black-command black-executable)
+                ;;   (python-black-on-save-mode))
+
+                ;; (when-let ((isort-executable (pet-executable-find "isort")))
+                ;;   (setq-local python-isort-command isort-executable)
+                ;;     (python-isort-on-save-mode))
+                  )
+                )
+              )
+
+
+
+
+    ;;   ;; From https://github.com/flycheck/flycheck/issues/1974#issuecomment-1343495202
+    ;; (flycheck-define-checker python-ruff
+    ;;   "A Python syntax and style checker using the ruff utility.
+    ;; To override the path to the ruff executable, set
+    ;; `flycheck-python-ruff-executable'.
+    ;; See URL `http://pypi.python.org/pypi/ruff'."
+    ;;   :command ("ruff"
+    ;;             "check"
+    ;;             "--output-format=text"
+    ;;             (eval (when buffer-file-name
+    ;;                     (concat "--stdin-filename=" buffer-file-name)))
+    ;;             "-")
+    ;;   :standard-input t
+    ;;   :error-filter (lambda (errors)
+    ;;                   (let ((errors (flycheck-sanitize-errors errors)))
+    ;;                     (seq-map #'flycheck-flake8-fix-error-level errors)))
+    ;;   :error-patterns
+    ;;   ((warning line-start
+    ;;             (file-name) ":" line ":" (optional column ":") " "
+    ;;             (id (one-or-more (any alpha)) (one-or-more digit)) " "
+    ;;             (message (one-or-more not-newline))
+    ;;             line-end))
+    ;;   :modes (python-mode python-ts-mode))
+
+    ;; ;; Use something adapted to your config to add `python-ruff' to `flycheck-checkers'
+    ;; ;; This is an MVP example:
+    ;; (setq python-mode-hook
+    ;;       (list (defun my-python-hook ()
+    ;;               (unless (bound-and-true-p org-src-mode)
+    ;;                 (when (buffer-file-name)
+    ;;                   (setq-local flycheck-checkers '(python-ruff))
+    ;;                   (flycheck-mode))))))
 #+END_SRC
 
 ** Yasnippets
