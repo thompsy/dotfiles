@@ -1041,8 +1041,10 @@ smaller to larger screens.
   (setopt completion-auto-select 'second-tab)            ; Much more eager
 
   (keymap-set minibuffer-mode-map "TAB" 'minibuffer-complete) ; TAB acts more like how it does in the shell
+#+END_SRC
 
-  ;; Vertico: better vertical completion for minibuffer commands
+Vertico provides a vertical completion UI for the minibuffer.
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package vertico
     :init
     ;; You'll want to make sure that e.g. fido-mode isn't enabled
@@ -1058,7 +1060,10 @@ smaller to larger screens.
     	      "DEL" 'vertico-directory-delete-char
     	      "M-DEL" 'vertico-directory-delete-word))
 
-  ;; Marginalia: annotations for minibuffer
+  #+END_SRC
+
+Marginalia adds helpful documentation annotations to the minibuffer margins.
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package marginalia
     :config
     (marginalia-mode))
@@ -1081,9 +1086,9 @@ smaller to larger screens.
     (setq completion-ignore-case t)
     :general
     (:keymaps 'corfu-map
-        	    "SPC" 'corfu-insert-separator
-        	    "C-n" 'corfu-next
-        	    "C-p" 'corfu-previous))
+              "SPC" 'corfu-insert-separator
+              "C-n" 'corfu-next
+              "C-p" 'corfu-previous))
 
   ;; taken from: https://old.reddit.com/r/emacs/comments/13accue/emacs_29_pixelscrollprecisionmode_seems_to_break/
   ;; TODO integrate these better
@@ -1113,8 +1118,8 @@ smaller to larger screens.
 
   (use-package corfu-candidate-overlay
     :straight (:type git
-               :repo "https://code.bsdgeek.org/adam/corfu-candidate-overlay"
-               :files (:defaults "*.el"))
+                     :repo "https://code.bsdgeek.org/adam/corfu-candidate-overlay"
+                     :files (:defaults "*.el"))
     :after corfu
     :config
     ;; enable corfu-candidate-overlay mode globally
@@ -1139,16 +1144,11 @@ smaller to larger screens.
     :after corfu
     :config
     (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
+  #+END_SRC
 
-  (use-package eshell
-    :init
-    (defun bedrock/setup-eshell ()
-      ;; Something funny is going on with how Eshell sets up its keymaps; this is
-      ;; a work-around to make C-r bound in the keymap
-      (keymap-set eshell-mode-map "C-r" 'consult-history))
-    :hook ((eshell-mode . bedrock/setup-eshell)))
-
-  ;; Orderless: powerful completion style
+Orderless describes itself as a 'completion style' which means that it controls how Emacs filters
+and presents completion candidates.
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package orderless
     :config
     (setq completion-styles '(orderless)))
@@ -1222,25 +1222,26 @@ smaller to larger screens.
 
 
 #+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
+  (use-package ibuffer-vc
+    :after ibuffer
+    :commands (ibuffer-vc-set-filter-groups-by-vc-root)
+    :custom
+    (ibuffer-vc-skip-if-remote nil))
+
   (use-package ibuffer
     :straight nil
-    :init
-     (use-package ibuffer-vc
-       :commands (ibuffer-vc-set-filter-groups-by-vc-root)
-       :custom
-       (ibuffer-vc-skip-if-remote 'nil))
-    :hook (ibuffer-mode . '(ibuffer-vc-set-set-filter-groups-by-vc-root))
+    :hook (ibuffer-mode . '(ibuffer-vc-set-filter-groups-by-vc-root))
     :general
     ("C-x C-b" 'ibuffer)
     (:keymaps 'ibuffer-mode-map "." 'hydra-ibuffer-main/body)
     :hydra (hydra-ibuffer-main (:color pink :hint nil)
                                "
-  ^Mark^         ^Actions^         ^View^          ^Select^              ^Navigation^
-  _m_: mark      _D_: delete       _g_: refresh    _q_: quit             _i_:   ↑    _n_
-  _u_: unmark    _s_: save marked  _S_: sort       _TAB_: toggle         _RET_: visit
-  _*_: specific  _a_: all actions  _/_: filter     _o_: other window     _e_:   ↓    _o_
-  _t_: toggle    _._: toggle hydra _H_: help       C-o other win no-select
-  "
+    ^Mark^         ^Actions^         ^View^          ^Select^              ^Navigation^
+    _m_: mark      _D_: delete       _g_: refresh    _q_: quit             _i_:   ↑    _n_
+    _u_: unmark    _s_: save marked  _S_: sort       _TAB_: toggle         _RET_: visit
+    _*_: specific  _a_: all actions  _/_: filter     _O_: other window     _e_:   ↓    _o_
+    _t_: toggle    _._: toggle hydra _H_: help       C-o other win no-select
+    "
                                ("m" ibuffer-mark-forward)
                                ("u" ibuffer-unmark-forward)
                                ("*" hydra-ibuffer-mark/body :color blue)
