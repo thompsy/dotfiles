@@ -30,6 +30,7 @@ available. A few places that I've found particularly useful include:
   - [[#what-is-this][What is this?]]
 - [[#tasks][Tasks]]
   - [[#homebrew][Homebrew]]
+- [[#setup][Setup]]
 - [[#emacs][Emacs]]
   - [[#local][Local]]
   - [[#early-init][Early Init]]
@@ -37,10 +38,11 @@ available. A few places that I've found particularly useful include:
   - [[#package-manager][Package Manager]]
   - [[#core-configuration][Core Configuration]]
     - [[#exec-path-setup][Exec Path Setup]]
+    - [[#desktop-mode][Desktop Mode]]
     - [[#files][Files]]
     - [[#discoverability][Discoverability]]
     - [[#savehist][Savehist]]
-    - [[#inteface-enhancements][Inteface Enhancements]]
+    - [[#interface-enhancements][Interface Enhancements]]
   - [[#aesthetics][Aesthetics]]
   - [[#keybindings][Keybindings]]
     - [[#hydra][Hydra]]
@@ -52,6 +54,8 @@ available. A few places that I've found particularly useful include:
     - [[#bookmarks][Bookmarks]]
     - [[#help][Help]]
     - [[#beacon][Beacon]]
+    - [[#ibuffer][ibuffer]]
+  - [[#projects][Projects]]
   - [[#filesystem][Filesystem]]
     - [[#dired][Dired]]
   - [[#editing][Editing]]
@@ -59,21 +63,23 @@ available. A few places that I've found particularly useful include:
     - [[#fillunfill-paragraph][Fill/Unfill Paragraph]]
     - [[#spelling][Spelling]]
     - [[#rectangles][Rectangles]]
-    - [[#whitespace-removal][Whitespace Removal]]
     - [[#move-to-beginning-of-line][Move to beginning of line]]
     - [[#csv][CSV]]
+    - [[#pdfs][PDFs]]
+  - [[#searching][Searching]]
   - [[#window-management][Window Management]]
   - [[#software-development][Software Development]]
     - [[#treesitter-setup][Treesitter Setup]]
     - [[#git][Git]]
     - [[#flycheck][Flycheck]]
     - [[#lsp-servers][LSP Servers]]
+    - [[#devdocs][DevDocs]]
     - [[#particular-programming-modes][Particular Programming modes]]
   - [[#yasnippets][Yasnippets]]
     - [[#snippets][Snippets]]
     - [[#kubernetes][Kubernetes]]
   - [[#org][Org]]
-    - [[#setup][Setup]]
+    - [[#setup-0][Setup]]
     - [[#task-states][Task States]]
     - [[#tags][Tags]]
     - [[#capture-templates][Capture Templates]]
@@ -83,6 +89,7 @@ available. A few places that I've found particularly useful include:
     - [[#export-options][Export Options]]
   - [[#shells][Shells]]
   - [[#site-local][Site Local]]
+  - [[#package-versions][Package Versions]]
 - [[#fish][Fish]]
 - [[#zellij][Zellij]]
 - [[#starship][Starship]]
@@ -159,6 +166,9 @@ Other useful ideas here:
 *** TODO Explore ~embark~ more
 
 * Setup
+:PROPERTIES:
+:CUSTOM_ID: setup
+:END:
 See here for a useful way to get Alfred to find Emacs on Macos:
 - https://www.alfredforum.com/topic/16578-alfred-not-finding-homebrew-apps-on-m1-opthomebrew/
 
@@ -424,6 +434,7 @@ a non-shell environment like OSX.
 *** Desktop Mode
 :PROPERTIES:
 :ID:       f5c2d55e-7ab2-4d3a-a174-ed13bc8f5405
+:CUSTOM_ID: desktop-mode
 :END:
 Restore the previously open buffers when restarting.
 #+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
@@ -526,7 +537,7 @@ Save a number of useful variables so that they persist across Emacs sessions.
 *** Interface Enhancements
 :PROPERTIES:
 :ID:       2D0FB78A-3A47-4707-A038-6DD3FCF03DE3
-:CUSTOM_ID: inteface-enhancements
+:CUSTOM_ID: interface-enhancements
 :END:
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   ;; Mode line information
@@ -1192,6 +1203,7 @@ smaller to larger screens.
 *** ibuffer
 :PROPERTIES:
 :ID:       D74C6A06-0355-4FF4-AB79-C19A85A586CB
+:CUSTOM_ID: ibuffer
 :END:
 
 
@@ -1307,6 +1319,7 @@ smaller to larger screens.
 ** Projects
 :PROPERTIES:
 :ID:       320248d2-2db0-4a7a-8500-a9515ca2541a
+:CUSTOM_ID: projects
 :END:
 
 #+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
@@ -1637,6 +1650,7 @@ This snippet provides smarter moving to the beginning of the line. Copied from [
 *** PDFs
 :PROPERTIES:
 :ID:       7f8ae549-ab55-43a1-b075-a9e52271cebc
+:CUSTOM_ID: pdfs
 :END:
 #+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package pdf-tools)
@@ -1645,6 +1659,7 @@ This snippet provides smarter moving to the beginning of the line. Copied from [
 ** Searching
 :PROPERTIES:
 :ID:       1B7EA834-0732-4CAF-B280-0470E5489569
+:CUSTOM_ID: searching
 :END:
 #+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package rg
@@ -2163,6 +2178,7 @@ A nice Hydra menu to make things more accessible.
 *** DevDocs
 :PROPERTIES:
 :ID:       d20f74ab-0a66-4ac8-b56b-7b251f57c5af
+:CUSTOM_ID: devdocs
 :END:
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package devdocs
@@ -2286,7 +2302,7 @@ See helpful examples at:
 *** Setup
 :PROPERTIES:
 :ID:       F8105CAC-7798-4FA9-99AD-A946940C527A
-:CUSTOM_ID: setup
+:CUSTOM_ID: setup-0
 :END:
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package org
@@ -2935,6 +2951,7 @@ Various setup like sensitive tags and functions that deal with them are stored e
 ** Package Versions
 :PROPERTIES:
 :ID:       3e84d692-0f7b-4a12-beac-9628a64ceee9
+:CUSTOM_ID: package-versions
 :END:
 
 #+begin_src emacs-lisp :tangle "~/.emacs.d/straight/versions/default.el" :mkdirp yes
