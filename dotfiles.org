@@ -3034,6 +3034,7 @@ moment.
   if ! type -q cargo
       echo "Installing Rust..."
       curl https://sh.rustup.rs -sSf | sh -s -- -y --no-modify-path --default-toolchain stable --profile minimal
+      cargo install cargo-update
   end
 #+end_src
 
@@ -3199,6 +3200,14 @@ TODO: it would be nice to install Go automatically?
 
   if ! type -q $HOME/go/bin/gopls
       go install golang.org/x/tools/gopls@latest
+  end
+
+  if ! type -q $HOME/go/bin/golangci-lint
+      go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+  end
+
+  if ! type -q $HOME/go/bin/gup
+      go install github.com/nao1215/gup@latest
   end
 
   abbr --add gob go build ./...
