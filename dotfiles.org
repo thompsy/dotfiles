@@ -142,7 +142,6 @@ Other useful ideas here:
 - we can bookmark buffers that aren't backed by files e.g. scratch
 *** TODO ~wgrep~
 *** TODO ~tresitter-context~
-*** TODO ~explain-pause-mode~
 *** TODO ~visible-mark-mode~
 *** TODO ~hyperbole~
 *** TODO Debugging with ~dape~
