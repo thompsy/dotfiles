@@ -148,7 +148,6 @@ Other useful ideas here:
 *** TODO ~visible-mark-mode~
 *** TODO ~hyperbole~
 *** TODO Debugging with ~dape~
-*** TODO ~org-sticky-header~
 ** Future Ideas
 *** TODO Explore these configs
 - [[https://old.reddit.com/r/emacs/comments/ehjcu2/screenshot_polishing_my_emacs_who_said_an_old/]]
@@ -421,6 +420,20 @@ a non-shell environment like OSX.
     (exec-path-from-shell-initialize))
 #+END_SRC
 
+
+*** Desktop Mode
+:PROPERTIES:
+:ID:       f5c2d55e-7ab2-4d3a-a174-ed13bc8f5405
+:END:
+Restore the previously open buffers when restarting.
+#+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
+  (use-package desktop
+    :config
+    (desktop-save-mode 1)
+    (setq desktop-save t
+          desktop-auto-save-timeout 300
+          desktop-restore-eager 2))
+#+end_src
 *** Files
 :PROPERTIES:
 :ID:       A2401A62-B9F5-4A39-8C9B-9BEE0ECCEC17
