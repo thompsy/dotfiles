@@ -2212,6 +2212,17 @@ See helpful examples at:
               (org-agenda-overriding-header "Today's Deadlines "))))))
 #+END_SRC
 
+Use ~org-tidy~ to hide property drawers by default. You can call ~M-x org-tidy-untidy-buffer~ to unhide
+them if you want to manually edit them.
+#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+  (use-package org-tidy
+    :ensure t
+    :hook
+    (org-mode . org-tidy-mode))
+#+end_src
+
+~org-appear~ shows ~org-mode~ hidden elements when the cursor is over them. This makes it easier to edit
+marked-up text.
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package org-appear
     :hook (org-mode . org-appear-mode))
@@ -2236,9 +2247,16 @@ See helpful examples at:
     :hook (org-mode . org-autolist-mode))
 #+END_SRC
 
+~org-stick-header~ pins a breadcrumb navigation structure to the first line of all ~org-mode~ buffers.
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
-  (use-package org-sticky-header)
+  (use-package org-sticky-header
+    :config
+    (setq org-sticky-header-full-path 'full
+          org-sticky-header-prefix "📌: "
+          org-sticky-header-outline-path-separator " > ")
+    :hook (org-mode . org-sticky-header))
     #+END_SRC
+
 *** Task States
 :PROPERTIES:
 :ID:       6E3FBBD2-310E-4EDF-8EA3-CA9C4AA56F08
