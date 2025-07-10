@@ -2430,9 +2430,11 @@ marked-up text.
 :CUSTOM_ID: regular-meetings-example
 :END:
 This is an example of how I process regular meetings like 1 to 1s:
-1. use the capture template below to gather agenda items during the week. These are accumulated into the 'My Agenda' heading in the given file.
+1. use the capture template below to gather agenda items during the week. These are accumulated into
+   the 'My Agenda' heading in the given file.
 2. during the meeting work through the agenda in the file
-3. once the meeting is complete run ~at/complete-meeting-X~ which will refile the meeting into the main ~meetings.org~ file and setup a new empty template for the next one.
+3. once the meeting is complete run ~at/complete-meeting-X~ which will refile the meeting into the
+   main ~meetings.org~ file and setup a new empty template for the next one.
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el" :tangle no
 
 ;; Add local capture settings to main list
