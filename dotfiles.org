@@ -295,9 +295,11 @@ explicitly load it with straight early in the init process. See more details in 
   (straight-use-package 'org)
 #+END_SRC
 
-Load packages immediately by default.
+Install and load packages immediately by default.
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (setq use-package-always-demand t)
+  (setq use-package-always-ensure t)
+
 #+END_SRC
 ** Core Configuration
 :PROPERTIES:
@@ -307,25 +309,27 @@ Load packages immediately by default.
 A few miscellaneous settings. Note that emacs is not really a package strictly speaking which is why
 we include ~:straight nil~ so that our package manager doesn't try to fetch the source.
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
-    (use-package emacs
-      :straight nil
-      :init
-      ;; answer with y/n instead of typing out yes/no
-      (defalias 'yes-or-no-p 'y-or-n-p)
-      :config
-      (setq indent-tabs-mode nil
-            tab-width 4
-            show-trailing-whitespace t
-            fill-column 100)
-      (setq-default indent-tabs-mode nil
-                    fill-column 100)
-      (setopt sentence-end-double-space nil
-              display-time-default-load-average nil)
-      :custom
-      ;; load new source files instead of stale elisp bytecode
-      (load-prefer-newer t)
-      ;; allow emacs to be any size, removes black bars
-      (frame-resize-pixelwise t))
+  (use-package emacs
+    :straight nil
+    :ensure nil
+    :init
+    ;; answer with y/n instead of typing out yes/no
+    (defalias 'yes-or-no-p 'y-or-n-p)
+    :config
+    (setq indent-tabs-mode nil
+          tab-width 4
+          show-trailing-whitespace t
+          fill-column 100)
+    (setq-default indent-tabs-mode nil
+                  fill-column 100)
+    (setopt sentence-end-double-space nil
+            display-time-default-load-average nil)
+    :custom
+    ;; load new source files instead of stale elisp bytecode
+    (load-prefer-newer t)
+    ;; allow emacs to be any size, removes black bars
+    (frame-resize-pixelwise t))
+  (add-hook 'before-save-hook 'delete-trailing-whitespace)
 #+END_SRC
 
 It's useful to have buffers auto-revert when files on disk change especially when using Git branches
@@ -333,6 +337,7 @@ a lot!
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package autorevert
     :straight nil
+    :ensure nil
     :custom
     (global-revert-check-vc-info t)
     :config
@@ -349,6 +354,7 @@ Use the system keyboard when killing and yanking.
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package simple
     :straight nil
+    :ensure nil
     :custom
     ;; killing and yanking uses the system clipboard
     (save-interprogram-paste-before-kill t))
@@ -359,6 +365,7 @@ left off.
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package saveplace
     :straight nil
+    :ensure nil
     :config
     (save-place-mode +1))
 #+END_SRC
@@ -379,6 +386,7 @@ to any themes so that they confirmation code gets stored in ~custom.el~.
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package cus-edit
     :straight nil
+    :ensure nil
     :custom
     (custom-file (expand-file-name "custom.el" user-emacs-directory))
     :config
@@ -433,6 +441,7 @@ Setup some basic file hygiene. Keep some backup files around, but keep them out 
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package files
     :straight nil
+    :ensure nil
     :init
     (recentf-mode 1)
     :config
@@ -455,6 +464,7 @@ Use UTF-8 everywhere.
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package mule
     :straight nil
+    :ensure nil
     :config
     (prefer-coding-system 'utf-8-unix)
     (set-default-coding-systems 'utf-8-unix)
@@ -471,6 +481,7 @@ Use UTF-8 everywhere.
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package uniquify
     :straight nil
+    :ensure nil
     :config
     (setq uniquify-buffer-name-style 'forward
           uniquify-separator "/"
@@ -558,6 +569,7 @@ Turn off a bunch of frame related functionality for a more minimal experience.
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package frame
     :straight nil
+    :ensure nil
     :config
     (blink-cursor-mode -1)
     (setq initial-scratch-message ""
@@ -1019,6 +1031,7 @@ smaller to larger screens.
 
   (use-package vertico-directory
     :straight nil
+    :ensure nil
     :after vertico
     :general (:keymaps 'vertico-map
     	      "C-j" 'vertico-directory-enter
@@ -1060,9 +1073,11 @@ smaller to larger screens.
   (keymap-set vertico-map "<remap> <pixel-scroll-interpolate-down>" #'vertico-scroll-up)
   (keymap-set corfu-map "<remap> <pixel-scroll-interpolate-up>" #'corfu-scroll-down)
   (keymap-set corfu-map "<remap> <pixel-scroll-interpolate-down>" #'corfu-scroll-up)
+
   ;; Part of corfu
   (use-package corfu-popupinfo
     :straight nil
+    :ensure nil
     :after corfu
     :hook (corfu-mode . corfu-popupinfo-mode)
     :custom
@@ -1328,7 +1343,7 @@ smaller to larger screens.
     [_d_] dir           [_S_] replace     [_K_] kill all
     [_o_] other         [_t_] find tag
     [_u_] test file     [_T_] make tags
-    [_h_] root         
+    [_h_] root
                                                                         ╭────────┐
     Other Window      Run             Cache              Do             │ Fixmee │
   ╭──────────────────────────────────────────────────╯ ╭────────────────┴────────╯
@@ -1393,6 +1408,7 @@ smaller to larger screens.
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package dired
     :straight nil
+    :ensure nil
     :defer t
     :general
     (my-leader-def "d" 'dired)
@@ -2438,6 +2454,7 @@ marked-up text.
 #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package org-capture
     :straight nil
+    :ensure nil
     :general
     (my-leader-def
       "c" 'org-capture)
