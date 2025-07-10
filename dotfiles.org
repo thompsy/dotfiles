@@ -1432,7 +1432,7 @@ built-in ~fill~ function.
 :CUSTOM_ID: spelling
 :END:
 
-Moving back to ~flyspell~ for now. 
+Moving back to ~flyspell~ for now.
 #+begin_src  emacs-lisp :tangle "~/.emacs.d/init.el"
   (add-hook 'text-mode-hook 'flyspell-mode)
   (add-hook 'prog-mode-hook 'flyspell-prog-mode) ; For code buffers
@@ -2775,13 +2775,10 @@ Get fish shell syntax working.
 :END:
 [[https://github.com/akermu/emacs-libvterm][~vterm~]] provides a terminal emulator within Emacs.
 
-There's a slight wrinkle here in that trying to add my prefix key, currently "C-t" to the list of
-exceptions doesn't actually work. To get this to work I've needed to edit the actual ~vterm.el~ source
-file and then rebuild the package and module.
-
 Some interesting config options:
 - https://github.com/jeffyql/dotfiles/blob/4484469d36e716dfe9431f1b489015423b63a91f/init-vterm.el
 
+  TODO: it would be nice to get the ~doom-modeline~ to reflect the ~vterm-copy-mode~ status.
 #+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package vterm
     :general
@@ -2789,6 +2786,7 @@ Some interesting config options:
     ("C-c v" 'vterm-copy-mode)
     :config
     (with-eval-after-load 'vterm
+      ;; Note the C-t exclusion below doesn't actually work so I needed to add this.
       (define-key vterm-mode-map (kbd "C-t") (lookup-key global-map (kbd "C-t"))))
 
     (setq vterm-max-scrollback 100000
