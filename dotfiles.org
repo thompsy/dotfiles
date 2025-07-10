@@ -2219,10 +2219,10 @@ These packages need to be installed in the Python environment too.
   (use-package python-pytest)
   (use-package python-isort)
   (use-package pyvenv)
-  (use-package auto-virtualenv
-    :config
-    (setq auto-virtualenv-verbose t)
-    (auto-virtualenv-setup))
+  ;; (use-package auto-virtualenv
+  ;;   :config
+  ;;   (setq auto-virtualenv-verbose t)
+  ;;   (auto-virtualenv-setup))
 
   (use-package pet
     :config
