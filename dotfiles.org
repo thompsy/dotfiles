@@ -2252,7 +2252,7 @@ marked-up text.
     (setq org-sticky-header-full-path 'full
           org-sticky-header-prefix "📌: "
           org-sticky-header-outline-path-separator " > ")
-    :hook (org-mode . org-sticky-header))
+    :hook (org-mode . org-sticky-header-mode))
 #+END_SRC
 
 *** Task States
