@@ -431,8 +431,7 @@ Restore the previously open buffers when restarting.
     :config
     (desktop-save-mode 1)
     (setq desktop-save t
-          desktop-auto-save-timeout 300
-          desktop-restore-eager 2))
+          desktop-auto-save-timeout 300))
 #+end_src
 *** Files
 :PROPERTIES:
@@ -1306,6 +1305,9 @@ smaller to larger screens.
 #+end_src
 
 ** Projects
+:PROPERTIES:
+:ID:       320248d2-2db0-4a7a-8500-a9515ca2541a
+:END:
 
 #+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
 
@@ -2115,7 +2117,7 @@ A nice Hydra menu to make things more accessible.
 
   (use-package flycheck-projectile
   :ensure t
-  :after (flycheck projectile)
+  :after (flycheck projectile popwin)
   :config
   ;; Optional: If you use popwin for better popup window management
   (add-to-list 'popwin:special-display-config
