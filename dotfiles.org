@@ -2804,6 +2804,31 @@ Useful key built-in bindings:
 
   #+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
     set -U fish_user_paths ~/.cargo/bin ~/.fzf/bin ~/go/bin /usr/local/go/bin ~/bin
+
+    if test (uname -s) = Darwin
+        # For Intel Macs, Homebrew's default prefix is /usr/local
+        # For Apple Silicon (M1/M2/etc.) Macs, Homebrew's default prefix is /opt/homebrew
+        # It's good practice to check if the directory exists before adding.
+        if test -d /opt/homebrew/bin
+            fish_add_path /opt/homebrew/bin
+        end
+        if test -d /usr/local/bin
+            fish_add_path /usr/local/bin
+        end
+        if test -d /opt/homebrew/sbin
+            fish_add_path /opt/homebrew/sbin
+        end
+        if test -d /usr/local/sbin
+            fish_add_path /usr/local/sbin
+        end
+
+        # Homebrew also recommends adding their `shellenv` output to your config.fish.
+        # This ensures other Homebrew-managed environment variables (like MANPATH, INFOPATH) are set.
+        # The `type -q brew` checks if brew is in the PATH already.
+        if type -q brew
+            eval (brew shellenv)
+        end
+    end
 #+end_src
 
 Install ~zoxide~ a great tool for navigating directories in the command line. It learns your history
