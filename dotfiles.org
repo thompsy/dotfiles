@@ -3129,6 +3129,7 @@ Useful key built-in bindings:
 - ~Alt .~ :: cycle through arguments to previous commands
 
   #+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
+    set -g fish_greeting ""
     set -U fish_user_paths ~/.cargo/bin ~/.fzf/bin ~/go/bin /usr/local/go/bin ~/bin
 
     if test (uname -s) = Darwin
