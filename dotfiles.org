@@ -118,8 +118,6 @@ e.g. 2nd, 3rd
 *** TODO Experiment with ~treesit-font-lock-level~
 *** TODO Explore ~transient-mark-mode~
 See [[https://www.masteringemacs.org/article/fixing-mark-commands-transient-mark-mode]]
-*** TODO Figure out a way to autoload treesitter grammars
-It would also be good to keep these up to date.
 *** TODO Corfu popup without hitting tab
 - it might be nice to have this always popup with suggestions bars on the context e.g. Go, org etc. This might be Cape rather then Corfu
 - this might be helpful https://emacs.stackexchange.com/questions/78237/automatic-popup-of-words-from-the-buffer-using-corfu-and-dabbrev
@@ -2255,7 +2253,7 @@ marked-up text.
           org-sticky-header-prefix "📌: "
           org-sticky-header-outline-path-separator " > ")
     :hook (org-mode . org-sticky-header))
-    #+END_SRC
+#+END_SRC
 
 *** Task States
 :PROPERTIES:
