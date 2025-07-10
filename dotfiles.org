@@ -2773,18 +2773,22 @@ Some interesting config options:
   (use-package vterm
     :general
     (my-leader-def "x" 'vterm-toggle)
+    ("C-c v" 'vterm-copy-mode)
     :config
+    (with-eval-after-load 'vterm
+      (define-key vterm-mode-map (kbd "C-t") (lookup-key global-map (kbd "C-t"))))
+
     (setq vterm-max-scrollback 100000
           vterm-clear-scrollback t
           vterm-buffer-name-string "vterm-%s"
           vterm-shell "fish"
           vterm-eval-cmds '(("find-file" find-file)
                             ("message" message)
-                            ("vterm-clear-scrollback" vterm-clear-scrollback)
+                            ("vterm-clear-scrollback" vterm-clear-scrollback-command)
                             ("dired" dired)
                             ("ediff-files" ediff-files))
           vterm-keymap-exceptions
-          '("M-:" "C-c" "C-x" "C-u" "C-g" "C-h" "C-l" "M-x" "M-o" "C-y" "M-y" "C-t" "M-s")))
+          '("M-:" "C-c" "C-x" "C-u" "C-g" "C-h" "C-l" "M-x" "M-o" "C-y" "M-y" "M-s")))
 
   ;; Disable hl-line-mode to reduce flickering: https://github.com/akermu/emacs-libvterm/issues/432
   (add-hook 'vterm-mode-hook (lambda () (setq-local global-hl-line-mode nil)))
@@ -2796,9 +2800,6 @@ Some interesting config options:
 #+end_src
 
 [[https://github.com/jixiuf/vterm-toggle][~vterm-toggle~]] allows for easy toggling of vterms.
-
-TODO: get this setup to toggle a vterm in the directory of the current buffer and name the buffer
-after the directory.
 #+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
   (use-package vterm-toggle)
 #+end_src
