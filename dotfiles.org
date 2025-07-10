@@ -2005,6 +2005,10 @@ A nice Hydra menu to make things more accessible.
 
   ;; TODO explore this a bit
   (use-package popwin)
+
+  (use-package consult-projectile
+    :straight (consult-projectile :type git :host gitlab :repo "OlMon/consult-projectile" :branch "master"))
+
 #+END_SRC
 *** LSP Servers
 :PROPERTIES:
