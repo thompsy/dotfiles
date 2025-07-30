@@ -325,6 +325,7 @@ we include ~:straight nil~ so that our package manager doesn't try to fetch the 
     (setopt sentence-end-double-space nil
             display-time-default-load-average nil)
     :custom
+    (global-goto-address-mode 1)
     ;; load new source files instead of stale elisp bytecode
     (load-prefer-newer t)
     ;; allow emacs to be any size, removes black bars
