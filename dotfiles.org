@@ -3358,6 +3358,30 @@ Setup a bunch of useful ~git~ aliases.
   abbr --add gloga git log --oneline --decorate --graph --all
 #+end_src
 
+Some useful ~jujutsu~ aliases.
+#+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
+  abbr --add j jj
+
+  abbr --add jn jj new
+  abbr --add jnr jj new -r
+
+  abbr --add jd jj desc
+  abbr --add jdr jj desc -r
+
+  abbr --add je jj edit
+  abbr --add jer jj edit -r
+
+  abbr --add jst jj status
+  abbr --add jstr jj status -r
+
+  abbr --add jl jj log
+
+  abbr --add jbs jj bookmark set -r
+
+  abbr --add jgp jj git push
+  abbr --add jgf jj git fetch
+#+end_src
+
 Setup ~go~-related config. I should probably check that ~go~ is actually installed first.
 
 TODO: it would be nice to install Go automatically?
