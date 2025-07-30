@@ -3744,14 +3744,7 @@ Source any local config
   $singularity\
   $directory\
   $vcsh\
-  $fossil_branch\
-  $fossil_metrics\
-  $git_branch\
-  $git_commit\
-  $git_state\
-  $git_metrics\
-  $git_status\
-  $hg_branch\
+  ${custom.jj}\
   $pijul_channel\
   $docker_context\
   $package\
@@ -3863,6 +3856,15 @@ Source any local config
 
   [time]
   disabled = false
+
+  [custom.jj]
+  command = "prompt"
+  format = "$output"
+  ignore_timeout = true
+  shell = ["starship-jj", "--ignore-working-copy", "starship"]
+  use_stdin = false
+  when = true
+
 #+END_SRC
 
 * Wezterm
