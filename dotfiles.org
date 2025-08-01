@@ -1986,6 +1986,8 @@ modified.
     :config
     (diff-hl-flydiff-mode)
     (global-diff-hl-mode))
+
+  (setq ediff-window-setup-function 'ediff-setup-windows-plain)
     #+END_SRC
 
 [[https://github.com/rmuslimov/browse-at-remote][~browse-at-remote~]] allows for quick jumping to the relevant Github (or whatever) page corresponding
