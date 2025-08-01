@@ -2033,10 +2033,12 @@ A nice Hydra menu to make things more accessible.
 #+begin_src emacs-lisp  :tangle "~/.emacs.d/init.el"
 
   (use-package smerge-mode
-    :preface
-    (with-eval-after-load 'hydra
-      (defhydra smerge-hydra
-        (:color pink :hint nil :post (smerge-auto-leave))
+    :general
+    (my-leader-def
+      "s" '(smerge-hydra/body :wk "smerge"))
+    :hydra
+    (smerge-hydra
+     (:color pink :hint nil :pre (smerge-mode 1) :post (smerge-auto-leave))
         "
   ^Move^       ^Keep^               ^Diff^                 ^Other^
   ^^-----------^^-------------------^^---------------------^^-------
@@ -2066,7 +2068,8 @@ A nice Hydra menu to make things more accessible.
                 (save-buffer)
                 (bury-buffer))
          "Save and bury buffer" :color blue)
-        ("q" nil "cancel" :color blue))))
+        ("q" nil "cancel" :color blue)))
+
 
 #+end_src
 *** Flycheck
