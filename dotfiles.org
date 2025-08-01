@@ -3483,6 +3483,35 @@ Source any local config
 :PROPERTIES:
 :ID:       5A6C158E-26C3-4F66-8095-1CD519811E85
 :END:
+
+#+begin_src bash :tangle "~/bin/emacs-resolver.sh" :mkdirp yes :tangle-mode (identity #o755)
+  #!/bin/sh
+  #
+  # This script correctly resolves jj conflicts for Emacs.
+  # 1. It receives paths for left, right, base, and an empty output file from jj.
+  # 2. It uses `git merge-file` to create a file with conflict markers at the output path.
+  # 3. It then opens the now-populated output file with emacsclient.
+  #
+
+  # Assign arguments to named variables for clarity
+  output="$1"
+  base="$2"
+  left="$3"
+  right="$4"
+
+  # `git merge-file` modifies its first argument in-place.
+  # So, first we copy one of the versions (e.g., left) to the output path.
+  cp "$left" "$output"
+
+  # Now, run the merge. git merge-file will populate the $output file with
+  # the merged content and standard conflict markers.
+  # The exit code is ignored (|| true) because a conflict is not a script error.
+  git merge-file -L "left" -L "base" -L "right" "$output" "$base" "$right" || true
+
+  # Finally, open the now-populated file in Emacs.
+  exec emacsclient "$output"
+#+end_src
+
 #+begin_src text :tangle "~/.config/jj/config.toml" :mkdirp yes
 [user]
 name = "Andrew Thompson"
@@ -3502,6 +3531,8 @@ diff-formatter = ["difft", "--color=always", "$left", "$right"]
 # conflict-marker-style = "snapshot"
 # conflict-marker-style = "git"
 #log-synthetic-elided-nodes = false  # hides "~ (elided revisions)" lines
+
+merge-editor = ["emacs-resolver.sh", "$output", "$base", "$left", "$right"]
 
 # https://jj-vcs.github.io/jj/latest/config/#pager
 #paginate = "never"
@@ -3524,12 +3555,6 @@ git_refs  = "blue"
 
 [merge-tools.difft]
 diff-args = ["--color=always", "--display=side-by-side-show-both", "$left", "$right"]
-
-# [merge-tools.ediff]
-# program = 'sh'
-# merge-args = ['-c',
-#   'emacsclient -c --eval "(ediff-merge-files-with-ancestor \"$0\" \"$1\" \"$2\" nil \"$3\")"',
-#   '$left', '$right', '$base', '$output']
 
 [git]
 push-new-bookmarks = true
