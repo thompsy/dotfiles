@@ -2028,12 +2028,12 @@ A nice Hydra menu to make things more accessible.
       ("k" git-timemachine-show-previous-revision "prev revision")
       ("c" git-timemachine-show-current-revision "curr revision")
       ("<ESC>" git-timemachine-show-current-revision "quit" :exit t))
-#+END_SRC
+      #+END_SRC
 
 #+begin_src emacs-lisp  :tangle "~/.emacs.d/init.el"
 
-    (use-package smerge-mode
-      :preface
+  (use-package smerge-mode
+    :preface
     (with-eval-after-load 'hydra
       (defhydra smerge-hydra
         (:color pink :hint nil :post (smerge-auto-leave))
@@ -2044,7 +2044,7 @@ A nice Hydra menu to make things more accessible.
   _p_rev       _u_pper              _=_: upper/lower       _r_esolve
   ^^           _l_ower              _>_: base/lower        _k_ill current
   ^^           _a_ll                _R_efine
-  ^^           _RET_: current       _E_diff
+  ^^           ^ ^                  _E_diff
   "
         ("n" smerge-next)
         ("p" smerge-prev)
@@ -2052,7 +2052,6 @@ A nice Hydra menu to make things more accessible.
         ("u" smerge-keep-upper)
         ("l" smerge-keep-lower)
         ("a" smerge-keep-all)
-        ("RET" smerge-keep-current)
         ("\C-m" smerge-keep-current)
         ("<" smerge-diff-base-upper)
         ("=" smerge-diff-upper-lower)
@@ -2066,16 +2065,8 @@ A nice Hydra menu to make things more accessible.
                 (interactive)
                 (save-buffer)
                 (bury-buffer))
-          "Save and bury buffer" :color blue)
-        ("q" nil "cancel" :color blue)))
-    :hook ((find-file . (lambda ()
-                          (save-excursion
-                            (goto-char (point-min))
-                            (when (re-search-forward "^<<<<<<< " nil t)
-                              (smerge-mode 1)))))
-            (magit-diff-visit-file . (lambda ()
-                                       (when smerge-mode
-                                         (smerge-hydra/body))))))
+         "Save and bury buffer" :color blue)
+        ("q" nil "cancel" :color blue))))
 
 #+end_src
 *** Flycheck
@@ -3489,6 +3480,9 @@ Source any local config
 #+end_src
 
 * Jujutsu
+:PROPERTIES:
+:ID:       5A6C158E-26C3-4F66-8095-1CD519811E85
+:END:
 #+begin_src text :tangle "~/.config/jj/config.toml" :mkdirp yes
 [user]
 name = "Andrew Thompson"
