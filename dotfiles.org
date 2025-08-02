@@ -3548,16 +3548,6 @@ cat ~/.email
 
   merge-editor = ["emacs-resolver.sh", "$output", "$base", "$left", "$right"]
 
-  # https://jj-vcs.github.io/jj/latest/config/#pager
-  #paginate = "never"
-  #pager = ":builtin"
-  #pager = "less -EFRSWX --mouse --use-color --wheel-lines=4 --shift=2"
-
-  # https://github.com/jj-vcs/jj/discussions/4690
-  # pager = "delta"
-  # [ui.diff]
-  # format = "git"
-
   [merge-tools.difft]
   diff-args = ["--color=always", "--display=side-by-side-show-both", "$left", "$right"]
 
@@ -3619,10 +3609,7 @@ cat ~/.email
   o          = ["op", "log"]                                      # all operations
   oo         = ["op", "log", "-T", "builtin_op_log_comfortable"]  # all operations, with more whitespace
 
-  #difft = ["diff", "--tool=difft"]
-
-  tug = ["bookmark", "move", "--from", "heads(::@- & bookmarks())", "--to", "@-"]
-  #tug = ["bookmark", "move", "--from", "closest_bookmark(@-)", "--to", "@-"]
+  tug = ["bookmark", "move", "--from", "closest_bookmark(@-)", "--to", "@-"]
 
   abandonempties = ["abandon", "-r", "description(exact:'') ~ root()"]
 
