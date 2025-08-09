@@ -158,6 +158,7 @@ Other useful ideas here:
 * Emacs
 :PROPERTIES:
 :CUSTOM_ID: emacs
+:header-args:emacs-lisp:
 :END:
 ** Local
 :PROPERTIES:
@@ -223,7 +224,7 @@ to disable ~package.el~ in favour of ~straight.el~.
 :CUSTOM_ID: preamble
 :END:
 Some initial comment blurb.
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   ;;; init.el --- Initialization file for Emacs
   ;;; Commentary: Emacs Startup File --- initialization for Emacs
   ;;; Code:
@@ -231,7 +232,7 @@ Some initial comment blurb.
 
 Load some local setup. As noted above, this is generally installation specific, so its easiest to
 keep it in a separate file.
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (require 'local-setup "~/.emacs.d/local.el")
 #+END_SRC
 
@@ -241,7 +242,7 @@ keep it in a separate file.
 :CUSTOM_ID: package-manager
 :END:
 Setup the [[https://github.com/radian-software/straight.el][~straight.el~]] package manager.
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (setq straight-repository-branch "master")
 
   (defvar bootstrap-version)
@@ -268,7 +269,7 @@ performance. No other configuration should be necessary to make this work; howev
 call straight-prune-build occasionally, since otherwise this cache file may grow quite large over
 time.
 #+END_QUOTE
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (setq straight-cache-autoloads t)
 #+END_SRC
 
@@ -278,12 +279,12 @@ You may customize straight-use-package-by-default to make it so that :straight t
 you explicitly override it with :straight nil.
 #+END_QUOTE
 
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (setq straight-use-package-by-default t)
 #+END_SRC
 
 Install [[https://github.com/jwiegley/use-package][~use-package~]] for easily installing other packages.
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   ;; Install use-package to use with straight.el
   (straight-use-package 'use-package)
 #+END_SRC
@@ -291,12 +292,12 @@ Install [[https://github.com/jwiegley/use-package][~use-package~]] for easily in
 I don't want to use the built-in version of org-mode since it's usually pretty old. Instead I want
 straight to pull down the latest version. To avoid the built-in version getting loaded we need to
 explicitly load it with straight early in the init process. See more details in the [[https://github.com/radian-software/straight.el#the-wrong-version-of-my-package-was-loaded][~README.md~]].
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (straight-use-package 'org)
 #+END_SRC
 
 Install and load packages immediately by default.
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (setq use-package-always-demand t)
   (setq use-package-always-ensure t)
 
@@ -308,7 +309,7 @@ Install and load packages immediately by default.
 :END:
 A few miscellaneous settings. Note that emacs is not really a package strictly speaking which is why
 we include ~:straight nil~ so that our package manager doesn't try to fetch the source.
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (use-package emacs
     :straight nil
     :ensure nil
@@ -335,7 +336,7 @@ we include ~:straight nil~ so that our package manager doesn't try to fetch the 
 
 It's useful to have buffers auto-revert when files on disk change especially when using Git branches
 a lot!
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (use-package autorevert
     :straight nil
     :ensure nil
@@ -352,7 +353,7 @@ a lot!
 #+END_SRC
 
 Use the system keyboard when killing and yanking.
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (use-package simple
     :straight nil
     :ensure nil
@@ -363,7 +364,7 @@ Use the system keyboard when killing and yanking.
 
 [[https://github.com/emacs-mirror/emacs/blob/master/lisp/saveplace.el][~saveplace~]] jumps back to the last when later visiting a file. This is handy to pick up where you
 left off.
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (use-package saveplace
     :straight nil
     :ensure nil
@@ -373,7 +374,7 @@ left off.
 
 [[https://github.com/emacscollective/no-littering][~no-littering~]] keeps configuration files and other persistent data under ~user-emacs-directory~ rather
 than spamming them in inconsistent places.
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (use-package no-littering
     :init
     (setq no-littering-etc-directory
@@ -384,7 +385,7 @@ than spamming them in inconsistent places.
 
 Use a separate custom file to remove auto-generated code from ~init.el~. This should be loaded prior
 to any themes so that they confirmation code gets stored in ~custom.el~.
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (use-package cus-edit
     :straight nil
     :ensure nil
@@ -395,7 +396,7 @@ to any themes so that they confirmation code gets stored in ~custom.el~.
         (load-file custom-file)))
 #+END_SRC
 
-#+begin_src  :tangle "~/.emacs.d/init.el"
+#+begin_src 
 (use-package gcmh
   :config
   (gcmh-mode 1)
@@ -408,7 +409,7 @@ to any themes so that they confirmation code gets stored in ~custom.el~.
 #+end_src
 
 An improved ~keyboard-quit~ function courtesy of [[https://emacsredux.com/blog/2025/06/01/let-s-make-keyboard-quit-smarter/][Emacs Redux]].
-#+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
+#+begin_src emacs-lisp
   (defun my/keyboard-quit ()
     "Smater version of the built-in `keyboard-quit'.
 
@@ -432,7 +433,7 @@ An improved ~keyboard-quit~ function courtesy of [[https://emacsredux.com/blog/2
 :END:
 [[https://github.com/purcell/exec-path-from-shell][~exec-path-from-shell~]] loads the ~PATH~ from your shell setup. This is useful when running Emacs from
 a non-shell environment like OSX.
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (use-package exec-path-from-shell
     :config
     (exec-path-from-shell-initialize))
@@ -445,7 +446,7 @@ a non-shell environment like OSX.
 :CUSTOM_ID: desktop-mode
 :END:
 Restore the previously open buffers when restarting.
-#+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
+#+begin_src emacs-lisp
   (use-package desktop
     :config
     (desktop-save-mode 1)
@@ -458,7 +459,7 @@ Restore the previously open buffers when restarting.
 :CUSTOM_ID: files
 :END:
 Setup some basic file hygiene. Keep some backup files around, but keep them out of sight.
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (use-package files
     :straight nil
     :ensure nil
@@ -481,7 +482,7 @@ Setup some basic file hygiene. Keep some backup files around, but keep them out 
 #+END_SRC
 
 Use UTF-8 everywhere.
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (use-package mule
     :straight nil
     :ensure nil
@@ -498,7 +499,7 @@ Use UTF-8 everywhere.
 #+END_SRC
 
 ~uniqify~ renames buffers with the same name so that they're easier to distinguish.
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (use-package uniquify
     :straight nil
     :ensure nil
@@ -525,7 +526,7 @@ The only slight issue with this is that the size of the minibuffer expands a lot
 view of the current buffer to change depending on where the point is. ~which-key-posframe~ provides an
 improvement on this by popping up in a floating window.
 
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (use-package which-key
     :custom
     (which-key-idle-delay 0)
@@ -539,7 +540,7 @@ improvement on this by popping up in a floating window.
 :CUSTOM_ID: savehist
 :END:
 Save a number of useful variables so that they persist across Emacs sessions.
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   ;; Save history of minibuffer
   (savehist-mode)
   (setq savehist-additional-variables '(kill-ring search-ring regexp-search-ring))
@@ -550,7 +551,7 @@ Save a number of useful variables so that they persist across Emacs sessions.
 :ID:       2D0FB78A-3A47-4707-A038-6DD3FCF03DE3
 :CUSTOM_ID: interface-enhancements
 :END:
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   ;; Mode line information
   (setopt line-number-mode t)                        ; Show current line in modeline
   (setopt column-number-mode t)                      ; Show column as well
@@ -586,7 +587,7 @@ Save a number of useful variables so that they persist across Emacs sessions.
 :CUSTOM_ID: aesthetics
 :END:
 Turn off a bunch of frame related functionality for a more minimal experience.
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (use-package frame
     :straight nil
     :ensure nil
@@ -606,7 +607,7 @@ Turn off a bunch of frame related functionality for a more minimal experience.
 #+END_SRC
 
 [[https://draculatheme.com/emacs][Dracula]] is a nice theme that's available for lots of apps.
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (use-package dracula-theme)
 
   ;; If we're running in daemon mode, setup the theme after the frame loads. This is taken from:
@@ -626,7 +627,7 @@ Turn off a bunch of frame related functionality for a more minimal experience.
     (all-the-icons-completion-mode))
 #+END_SRC
 
-#+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
+#+begin_src emacs-lisp
   ;; This assumes you've installed the package via MELPA.
   (use-package ligature
     :config
@@ -655,7 +656,7 @@ Turn off a bunch of frame related functionality for a more minimal experience.
 #+end_src
 [[https://github.com/seagle0128/doom-modeline][~doom-modeline~]] is a fancy, fast and minimal mode-line. This requires running ~M-x
 nerd-icons-install-fonts~ to install the required icon font.
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (use-package doom-modeline
     :demand t
     :init
@@ -671,7 +672,7 @@ nerd-icons-install-fonts~ to install the required icon font.
 #+END_SRC
 
 Setup emojis!
-#+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
+#+begin_src emacs-lisp
   (use-package emojify
     :config
     (when (member "Segoe UI Emoji" (font-family-list))
@@ -690,7 +691,7 @@ Setup emojis!
 [[https://github.com/noctuid/general.el][~general.el~]] provides a convenient method for binding keys. It also integrates well with
 ~use-package~. In particular, this allows us to easily setup a global leader key, ~my-leader-def~ and
 chain bindings from that.
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (use-package general
     :custom
     (general-override-states '(insert emacs hybrid normal visual motion operator replace))
@@ -747,7 +748,7 @@ chain bindings from that.
 #+END_SRC
 
 [[https://github.com/Fuco1/free-keys][~free-keys~]] shows unused key bindings.
-#+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
+#+begin_src emacs-lisp
   (use-package free-keys)
 #+end_src
 
@@ -758,7 +759,7 @@ chain bindings from that.
 :END:
 [[https://github.com/abo-abo/hydra][~hydra~]] allows us to specify related keybindings together in a
 neat way. Note that ~:wk~ allows us to specify the text that is displayed by ~which-key~ for this hydra.
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (use-package hydra)
 
   ;; This allows us to use :hydra within use-package
@@ -766,7 +767,7 @@ neat way. Note that ~:wk~ allows us to specify the text that is displayed by ~wh
 #+END_SRC
 
 This hydra provides easy access to various package management commands.
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (my-leader-def "P" '(hydra-straight-helper/body :wk "pkgs"))
   (defhydra hydra-straight-helper (:hint nil :color green)
     "
@@ -799,7 +800,7 @@ This hydra provides easy access to various package management commands.
 #+END_SRC
 
 This hydra gives easy access to inserting various Unicode characters.
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (defun my/insert-unicode (unicode-name)
     "Same as C-x 8 enter UNICODE-NAME."
     (insert-char (gethash unicode-name (ucs-names))))
@@ -832,7 +833,7 @@ This hydra gives easy access to inserting various Unicode characters.
 
 [[https://www.emacswiki.org/emacs/download/zoom-frm.el][~zoom-frm~]] is a nice way to zoom in and out on a frame basis. This is useful when switching from
 smaller to larger screens.
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (use-package zoom-frm
     :general
     (my-leader-def "z" '(hydra-zoom/body :wk "zoom"))
@@ -844,7 +845,7 @@ smaller to larger screens.
                        ("q" nil "quit")))
 #+END_SRC
 
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (my-leader-def "n" '(hydra-macro/body :wk "macros"))0
   (defhydra hydra-macro (:hint nil :color pink :pre
                                (when defining-kbd-macro
@@ -891,7 +892,7 @@ smaller to larger screens.
 :ID:       6CBC9104-AD62-4843-8C69-EB2223F5903D
 :CUSTOM_ID: avy
 :END:
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (use-package avy
     :demand t
     :config (setq avy-background t
@@ -907,7 +908,7 @@ smaller to larger screens.
 :ID:       49DCD1B7-C7DE-4D49-8E47-D194614FA7EB
 :CUSTOM_ID: consult
 :END:
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (use-package embark-consult
     :after (embark consult))
 
@@ -1028,7 +1029,7 @@ smaller to larger screens.
 :ID:       2510CFE9-62F4-451B-8971-1CF2452B4A87
 :CUSTOM_ID: minibuffer
 :END:
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   ;; For help, see: https://www.masteringemacs.org/article/understanding-minibuffer-completion
   (setopt completion-cycle-threshold 1)                  ; TAB cycles candidates
   (setopt completions-detailed t)                        ; Show annotations
@@ -1045,7 +1046,7 @@ smaller to larger screens.
 #+END_SRC
 
 Vertico provides a vertical completion UI for the minibuffer.
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (use-package vertico
     :init
     ;; You'll want to make sure that e.g. fido-mode isn't enabled
@@ -1064,7 +1065,7 @@ Vertico provides a vertical completion UI for the minibuffer.
   #+END_SRC
 
 Marginalia adds helpful documentation annotations to the minibuffer margins.
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (use-package marginalia
     :config
     (marginalia-mode))
@@ -1075,7 +1076,7 @@ Marginalia adds helpful documentation annotations to the minibuffer margins.
 :ID:       C4C77C86-7E03-4C26-92D9-8A909D35A157
 :CUSTOM_ID: completion
 :END:
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   ;; Popup completion-at-point
   (use-package corfu
     :straight (:files (:defaults "extensions/*"))
@@ -1149,7 +1150,7 @@ Marginalia adds helpful documentation annotations to the minibuffer margins.
 
 Orderless describes itself as a 'completion style' which means that it controls how Emacs filters
 and presents completion candidates.
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (use-package orderless
     :config
     (setq completion-styles '(orderless)))
@@ -1160,7 +1161,7 @@ and presents completion candidates.
 :ID:       07C52099-B065-485D-A22A-832A8E471A76
 :CUSTOM_ID: bookmarks
 :END:
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   ;; disable annoying bookmark icons
   (setq bookmark-fringe-mark nil)
 
@@ -1192,7 +1193,7 @@ and presents completion candidates.
 :CUSTOM_ID: help
 :END:
 [[https://github.com/Wilfred/helpful][~helpful~]] provides a slightly nicer interface to the built-in help files.
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (use-package helpful
     :general
     ("C-h f" 'helpful-callable)
@@ -1222,7 +1223,7 @@ and presents completion candidates.
 :END:
 
 
-#+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
+#+begin_src emacs-lisp
   (use-package ibuffer-vc
     :after ibuffer
     :commands (ibuffer-vc-set-filter-groups-by-vc-root)
@@ -1338,7 +1339,7 @@ and presents completion candidates.
 :CUSTOM_ID: projects
 :END:
 
-#+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
+#+begin_src emacs-lisp
 
   ;; TODO experiment with this!
   (use-package fixmee)
@@ -1426,7 +1427,7 @@ and presents completion candidates.
 :CUSTOM_ID: dired
 :END:
 ~dired~ is basically a file explorer.
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (use-package dired
     :straight nil
     :ensure nil
@@ -1513,7 +1514,7 @@ and presents completion candidates.
 :CUSTOM_ID: undo
 :END:
 [[https://github.com/emacsmirror/undo-fu][~undo-fu~]] improves the default undo experience.
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (use-package undo-fu
     :general
     ("C-z" 'undo-fu-only-undo)
@@ -1521,7 +1522,7 @@ and presents completion candidates.
 #+END_SRC
 
 [[https://github.com/casouri/vundo][~vundo~]] displays a nice branching undo tree built on top of the default undo system.
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (use-package vundo
     :config
     ;; use a nicer unicode font to display the tree
@@ -1534,7 +1535,7 @@ and presents completion candidates.
 :END:
 [[https://github.com/purcell/unfill][~unfill~]] is an ideal little helper function to Emacs'
 built-in ~fill~ function.
-#+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
+#+begin_src emacs-lisp
   (use-package unfill
     :general
     ("M-q" 'unfill-toggle))
@@ -1546,7 +1547,7 @@ built-in ~fill~ function.
 :END:
 
 Moving back to ~flyspell~ for now.
-#+begin_src  emacs-lisp :tangle "~/.emacs.d/init.el"
+#+begin_src  emacs-lisp
   (add-hook 'text-mode-hook 'flyspell-mode)
   (add-hook 'prog-mode-hook 'flyspell-prog-mode) ; For code buffers
   (add-hook 'org-mode-hook 'flyspell-mode) ; Or flyspell-prog-mode, try flyspell-mode first
@@ -1582,7 +1583,7 @@ This is a hydra for working with the ~rectangle~ commands.
 
 TODO: I should understand how this works better.
 
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (my-leader-def "R" '(hydra-rectangle/body :wk "rectangle"))
   (defhydra hydra-rectangle (:body-pre (rectangle-mark-mode 1)
                                        :color pink
@@ -1619,7 +1620,7 @@ TODO: I should understand how this works better.
 :CUSTOM_ID: move-to-beginning-of-line
 :END:
 This snippet provides smarter moving to the beginning of the line. Copied from [[https://emacsredux.com/blog/2013/05/22/smarter-navigation-to-the-beginning-of-a-line/][EmacsRedux]].
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (defun smarter-move-beginning-of-line (arg)
     "Move point back to indentation of beginning of line.
 
@@ -1651,7 +1652,7 @@ This snippet provides smarter moving to the beginning of the line. Copied from [
 :ID:       05DE8310-10CB-42D1-BF55-F9B07FAB76C4
 :CUSTOM_ID: csv
 :END:
-#+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
+#+begin_src emacs-lisp
     (use-package csv-mode
       :config
       (setq csv-separators '("," "|")))
@@ -1669,7 +1670,7 @@ This snippet provides smarter moving to the beginning of the line. Copied from [
 :ID:       7f8ae549-ab55-43a1-b075-a9e52271cebc
 :CUSTOM_ID: pdfs
 :END:
-#+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
+#+begin_src emacs-lisp
   (use-package pdf-tools)
 #+end_src
 
@@ -1678,7 +1679,7 @@ This snippet provides smarter moving to the beginning of the line. Copied from [
 :ID:       1B7EA834-0732-4CAF-B280-0470E5489569
 :CUSTOM_ID: searching
 :END:
-#+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
+#+begin_src emacs-lisp
   (use-package rg
     :ensure t
     :config (rg-enable-menu)
@@ -1709,7 +1710,7 @@ This snippet provides smarter moving to the beginning of the line. Copied from [
 #+end_src
 
 This is a useful way to add saved project searches. Taken from https://takeonrules.com/2024/03/02/an-evening-reading-documentation-leads-to-discovery/.
-#+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
+#+begin_src emacs-lisp
 (when (f-dir-p "~/dotfiles/")
     (rg-define-search rg-projects-dotfiles
       "Search Dotfiles."
@@ -1725,7 +1726,7 @@ This is a useful way to add saved project searches. Taken from https://takeonrul
 
 [[https://github.com/abo-abo/ace-window][~ace-window~]] allows for easy switching between windows within a frame, splitting windows and moving and
 copying windows.
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (use-package ace-window
     :general
     ("C-x o" 'ace-window)
@@ -1736,7 +1737,7 @@ copying windows.
 [[https://github.com/dimitri/switch-window][~switch-window~]] allows for easy switching between windows within a frame. It's slightly better than
 ~ace-window~ for that basic task as the labels for the windows are larger. However, ~ace-window~ is
 worth keeping around for other functionality.
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (use-package switch-window
     :general
     ("M-o" 'switch-window)
@@ -1747,14 +1748,14 @@ worth keeping around for other functionality.
 
 [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Window-Convenience.html#index-winner_002dmode][~winner-mode~]] tracks changes in window configuration for a frame so that they can be undone or
 redone.
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (use-package winner
     :commands winner-mode
     :init (winner-mode t))
 #+END_SRC
 
 These are various functions for manipulating window size.
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (defun hydra-move-splitter-left (delta)
     "Move window splitter left."
     (interactive "p")
@@ -1789,7 +1790,7 @@ These are various functions for manipulating window size.
 #+END_SRC
 
 Now we've got a hydra to make the various window management functions easily accessible.
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (defhydra hydra-window-delux (:hint nil)
     "
       ^Movement^        ^Split^          ^Switch^            ^Resize^
@@ -1865,7 +1866,7 @@ Now we've got a hydra to make the various window management functions easily acc
 :ID:       199394FB-985F-4076-BEF4-2A3139FFFCB9
 :CUSTOM_ID: treesitter-setup
 :END:
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (use-package emacs
     :config
     ;; Treesitter config
@@ -1937,7 +1938,7 @@ Now we've got a hydra to make the various window management functions easily acc
 :ID:       D2862523-93E3-4F58-B975-0AAB2F0955FA
 :CUSTOM_ID: git
 :END:
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (use-package magit
     :general
     ("C-x g" 'magit-status)
@@ -1961,26 +1962,26 @@ TODO: try this https://stackoverflow.com/questions/74113199/magit-show-buffer-wi
 [[https://github.com/dandavison/magit-delta][~magit-delta~]] enables improved diffs for Magit using [[https://github.com/dandavison/delta][delta]].
 
 I've disabled this for now since it seemed a bit slow.
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (use-package magit-delta
     :disabled
     :hook (magit-mode . magit-delta-mode))
 #+END_SRC
 [[https://github.com/emacsmirror/git-timemachine][~git-timemachine~]] allows you to walk through Git revisions of a file to view changes over time.
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (use-package git-timemachine
     :defer t)
 #+END_SRC
 
 [[https://github.com/redguardtoo/vc-msg][~vc-msg~]] shows a popup containing the commit message that last affected the current line.
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (use-package vc-msg
     :defer t)
 #+END_SRC
 
 [[https://github.com/dgutov/diff-hl][~diff-hl~]] shows icons on the buffer fringe for lines that have been added, removed or
 modified.
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (use-package diff-hl
     :hook (magit-post-refresh . diff-hl-magit-post-refresh)
     :config
@@ -1992,12 +1993,12 @@ modified.
 
 [[https://github.com/rmuslimov/browse-at-remote][~browse-at-remote~]] allows for quick jumping to the relevant Github (or whatever) page corresponding
 to the current file.
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (use-package browse-at-remote)
  #+END_SRC
 
 A nice Hydra menu to make things more accessible.
-  #+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+  #+BEGIN_SRC emacs-lisp
     (defhydra hydra-my-git-menu (:color blue
                                         :hint nil)
       "
@@ -2030,7 +2031,7 @@ A nice Hydra menu to make things more accessible.
       ("<ESC>" git-timemachine-show-current-revision "quit" :exit t))
       #+END_SRC
 
-#+begin_src emacs-lisp  :tangle "~/.emacs.d/init.el"
+#+begin_src emacs-lisp 
 
   (use-package smerge-mode
     :general
@@ -2077,7 +2078,7 @@ A nice Hydra menu to make things more accessible.
 :ID:       ED7011C9-4F36-493B-9E80-BB3FF232FF5E
 :CUSTOM_ID: flycheck
 :END:
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (defun my/consult-flycheck-errors-only ()
     "Open consult-flycheck showing only 'error' level messages."
     (interactive)
@@ -2160,7 +2161,7 @@ A nice Hydra menu to make things more accessible.
 :CUSTOM_ID: lsp-servers
 :END:
 
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (use-package eglot
     :straight nil
     :hook
@@ -2193,7 +2194,7 @@ A nice Hydra menu to make things more accessible.
 :ID:       d20f74ab-0a66-4ac8-b56b-7b251f57c5af
 :CUSTOM_ID: devdocs
 :END:
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (use-package devdocs
     :general ("C-h D" 'devdocs-lookup))
 #+END_SRC
@@ -2202,7 +2203,7 @@ A nice Hydra menu to make things more accessible.
 :ID:       8DE130F8-A158-4350-A02F-C99A2EC9A288
 :CUSTOM_ID: particular-programming-modes
 :END:
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (use-package markdown-mode
     :hook ((markdown-mode . visual-line-mode)))
 
@@ -2242,7 +2243,7 @@ These packages need to be installed in the Python environment too.
  pip install "python-lsp-server[all]" pylsp-mypy pylsp-rope python-lsp-ruff python-lsp-black
 #+END_SRC
 
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
 
   (use-package python-black)
   (use-package python-pytest)
@@ -2264,7 +2265,7 @@ These packages need to be installed in the Python environment too.
 :ID:       1A54EDBC-D408-4843-8028-CEE653B9E440
 :CUSTOM_ID: yasnippets
 :END:
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (use-package yasnippet
     :config
     (yas-global-mode +1)
@@ -2295,7 +2296,7 @@ if err != nil {
 :ID:       664E2A07-1DA8-4255-892E-565438153A71
 :CUSTOM_ID: kubernetes
 :END:
-#+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
+#+begin_src emacs-lisp
   (use-package kele)
 
   (use-package kubernetes
@@ -2317,7 +2318,7 @@ See helpful examples at:
 :ID:       F8105CAC-7798-4FA9-99AD-A946940C527A
 :CUSTOM_ID: setup-0
 :END:
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (use-package org
     :general
     ("C-c l" 'org-store-link)
@@ -2361,7 +2362,7 @@ See helpful examples at:
 
 Use ~org-tidy~ to hide property drawers by default. You can call ~M-x org-tidy-untidy-buffer~ to unhide
 them if you want to manually edit them.
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (use-package org-tidy
     :ensure t
     :hook
@@ -2370,17 +2371,17 @@ them if you want to manually edit them.
 
 ~org-appear~ shows ~org-mode~ hidden elements when the cursor is over them. This makes it easier to edit
 marked-up text.
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (use-package org-appear
     :hook (org-mode . org-appear-mode))
 #+END_SRC
 
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (use-package ob-restclient)
 #+END_SRC
 
 [[https://github.com/minad/org-modern][~org-modern~]] gives ~org-mode~ a more modern style.
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (use-package org-modern
     :config
     (global-org-modern-mode))
@@ -2389,13 +2390,13 @@ marked-up text.
 
 
 [[https://github.com/calvinwyoung/org-autolist][~org-autolist~]] modifies the way ~RET~ works when inserting lists to make it a bit more intuitive.
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (use-package org-autolist
     :hook (org-mode . org-autolist-mode))
 #+END_SRC
 
 ~org-stick-header~ pins a breadcrumb navigation structure to the first line of all ~org-mode~ buffers.
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (use-package org-sticky-header
     :config
     (setq org-sticky-header-full-path 'full
@@ -2409,7 +2410,7 @@ marked-up text.
 :ID:       6E3FBBD2-310E-4EDF-8EA3-CA9C4AA56F08
 :CUSTOM_ID: task-states
 :END:
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (setq org-todo-keywords
       '((sequence "TODO(t)"
                   "PLANNING(p)"
@@ -2429,7 +2430,7 @@ marked-up text.
 :ID:       23040127-1D67-4725-90FE-22183BE585E9
 :CUSTOM_ID: tags
 :END:
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (setq org-tag-alist '(
                         ;; Task types
                         (:startgroup . nil)
@@ -2468,7 +2469,7 @@ marked-up text.
 :CUSTOM_ID: capture-templates
 :END:
 
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (use-package org-capture
     :straight nil
     :ensure nil
@@ -2583,7 +2584,7 @@ This is an example of how I process regular meetings like 1 to 1s:
 2. during the meeting work through the agenda in the file
 3. once the meeting is complete run ~at/complete-meeting-X~ which will refile the meeting into the
    main ~meetings.org~ file and setup a new empty template for the next one.
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el" :tangle no
+#+BEGIN_SRC emacs-lisp :tangle no
 
 ;; Add local capture settings to main list
 (setq org-capture-templates (append
@@ -2612,7 +2613,7 @@ This is an example of how I process regular meetings like 1 to 1s:
 :END:
 [[https://github.com/alphapapa/org-super-agenda][~org-super-agenda~]] improves the existing ~org-agenda~ in various ways.
 
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (use-package org-super-agenda
     :after org-agenda
     :config
@@ -2779,7 +2780,7 @@ This is an example of how I process regular meetings like 1 to 1s:
 :END:
 Setup various ~org-mode~ structure templates. When typing ~<~ at the start of a line this will popup
 a menu of various types of blocks that you may want to insert.
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (defun my-org-structure-templates ()
     (require 'org-tempo)
     (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
@@ -2852,14 +2853,14 @@ a menu of various types of blocks that you may want to insert.
 :CUSTOM_ID: export-options
 :END:
 [[https://github.com/hniksic/emacs-htmlize][~htmlize~]] converts a buffer to HTML with nice syntax highlighting.
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (use-package htmlize
     :defer t)
 #+END_SRC
 
 [[https://github.com/sshaw/copy-as-format][~copy-as-format~]] makes it easy to copy a region and convert the markup to a bunch of different
 flavours for easy pasting into other places.
-#+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
+#+begin_src emacs-lisp
   (use-package copy-as-format
     :bind (("C-c w m" . copy-as-format-markdown)
            ("C-c w s" . copy-as-format-slack)
@@ -2878,7 +2879,7 @@ flavours for easy pasting into other places.
 #+end_src
 
 [[https://github.com/titaniumbones/ox-slack][~ox-slack~]] is an ~org-mode~ exporter that converts text to Slack flavoured markdown.
-#+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
+#+begin_src emacs-lisp
   (use-package ox-slack
     :after org
     :bind
@@ -2889,7 +2890,7 @@ flavours for easy pasting into other places.
 #+end_src
 
 Get fish shell syntax working.
-#+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
+#+begin_src emacs-lisp
   (org-babel-do-load-languages 'org-babel-load-languages
                              (append org-babel-load-languages
                               '((python . t)
@@ -2900,7 +2901,7 @@ Get fish shell syntax working.
   (use-package ob-sql-mode)
 #+end_src
 
-#+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
+#+begin_src emacs-lisp
   (use-package org-make-toc
     :config
     (setq org-make-toc-insert-custom-ids t))
@@ -2916,7 +2917,7 @@ Some interesting config options:
 - https://github.com/jeffyql/dotfiles/blob/4484469d36e716dfe9431f1b489015423b63a91f/init-vterm.el
 
   TODO: it would be nice to get the ~doom-modeline~ to reflect the ~vterm-copy-mode~ status.
-#+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
+#+begin_src emacs-lisp
   (use-package vterm
     :general
     (my-leader-def "x" 'vterm-toggle)
@@ -2943,12 +2944,12 @@ Some interesting config options:
   (add-hook 'vterm-copy-mode (lambda () (call-interactively 'hl-line-mode)))
 #+end_src
 
-#+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
+#+begin_src emacs-lisp
   (use-package multi-vterm)
 #+end_src
 
 [[https://github.com/jixiuf/vterm-toggle][~vterm-toggle~]] allows for easy toggling of vterms.
-#+begin_src emacs-lisp :tangle "~/.emacs.d/init.el"
+#+begin_src emacs-lisp
   (use-package vterm-toggle)
 #+end_src
 ** Site Local
@@ -2957,7 +2958,7 @@ Some interesting config options:
 :CUSTOM_ID: site-local
 :END:
 Various setup like sensitive tags and functions that deal with them are stored elsewhere and loaded here.
-#+BEGIN_SRC emacs-lisp :tangle "~/.emacs.d/init.el"
+#+BEGIN_SRC emacs-lisp
   (if (file-exists-p "~/notebook/local-dotfiles/site-local.el")
       (load "~/notebook/local-dotfiles/site-local.el"))
 #+END_SRC
