@@ -3228,7 +3228,8 @@ The ~fzf.fish~ plugin. This gives a number of useful keybindings:
       fisher install \
           oh-my-fish/plugin-emacs \
           PatrickF1/fzf.fish \
-          dracula/fish
+          dracula/fish \
+          jorgebucaran/nvm.fish
   end
 #+end_src
 
