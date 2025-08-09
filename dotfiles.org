@@ -3147,22 +3147,25 @@ Useful key built-in bindings:
     set -g fish_greeting ""
     set -U fish_user_paths ~/.cargo/bin ~/.fzf/bin ~/go/bin /usr/local/go/bin ~/bin
 
+    # Helper function to add path if directory exists
+    function add_path_if_exists
+        if test -d $argv[1]
+            fish_add_path $argv[1]
+        end
+    end
+
+    # Helper function for multiple path additions
+    function add_paths_if_exist
+        for path in $argv
+            add_path_if_exists $path
+        end
+    end
+
     if test (uname -s) = Darwin
         # For Intel Macs, Homebrew's default prefix is /usr/local
         # For Apple Silicon (M1/M2/etc.) Macs, Homebrew's default prefix is /opt/homebrew
         # It's good practice to check if the directory exists before adding.
-        if test -d /opt/homebrew/bin
-            fish_add_path /opt/homebrew/bin
-        end
-        if test -d /usr/local/bin
-            fish_add_path /usr/local/bin
-        end
-        if test -d /opt/homebrew/sbin
-            fish_add_path /opt/homebrew/sbin
-        end
-        if test -d /usr/local/sbin
-            fish_add_path /usr/local/sbin
-        end
+        add_paths_if_exist /opt/homebrew/bin /usr/local/bin /opt/homebrew/sbin /usr/local/sbin
 
         # Homebrew also recommends adding their `shellenv` output to your config.fish.
         # This ensures other Homebrew-managed environment variables (like MANPATH, INFOPATH) are set.
@@ -3236,9 +3239,7 @@ The ~fzf.fish~ plugin. This gives a number of useful keybindings:
 
 
 #+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
-  if test -e /opt/emacs29
-      fish_add_path /opt/emacs29/bin
-  end
+  add_path_if_exists /opt/emacs29/bin
   set -gx EDITOR emacsclient
 #+end_src
 
