@@ -112,7 +112,6 @@ It would be good to auto install packages if on the Mac. Better just to add the 
 In Go, sometimes I want hit <TAB> to complete, rather than move out of the current context.
 
 Tab calls: ~<tab>       ;; yas-next-field-or-maybe-expand~ rather than ~indent-for-tab-command~ which opens the Corfu completion window.
-*** TODO Set correct buffer type when use Zellij's scroll to editor function
 *** TODO Setup spelling and easy usage
 - https://codeberg.org/ideasman42/emacs-spell-fu
   - exclude specific faces. Looks good.
@@ -3143,6 +3142,355 @@ Testing out Fish Shell and so far I'm quite impressed. The completions are very 
 Useful key built-in bindings:
 - ~Alt .~ :: cycle through arguments to previous commands
 
+** Development Tools Setup
+:PROPERTIES:
+:CUSTOM_ID: dev-tools-setup
+:ID:       a7ea3f46-95ba-46bf-a09a-aeea0550b52a
+:END:
+
+This script handles one-time installation of development tools. It's separated from the shell configuration to keep the shell startup fast and clean.
+
+#+begin_src fish :tangle "~/bin/setup-dev-tools.fish" :mkdirp yes :shebang "#!/usr/bin/env fish"
+  set -g TOOL_LOG "/tmp/dotfiles-setup.log"
+
+  function log_step
+      echo (date "+%Y-%m-%d %H:%M:%S") "[$argv[1]]" $argv[2..-1] >> $TOOL_LOG
+      echo "$argv[2..-1]"
+  end
+
+  function check_dependency
+      if ! type -q $argv[1]
+          echo "Missing dependency: $argv[1]"
+          if test (count $argv) -gt 1
+              echo "   Install with: $argv[2..-1]"
+          end
+          return 1
+      end
+      return 0
+  end
+
+  function install_with_retry
+      set -l cmd $argv[1..-1]
+      set -l max_attempts 3
+      
+      for attempt in (seq $max_attempts)
+          log_step "ATTEMPT" "$attempt/$max_attempts: $cmd"
+          
+          if eval $cmd
+              log_step "SUCCESS" "$cmd"
+              return 0
+          else
+              log_step "FAILED" "Attempt $attempt failed: $cmd"
+              if test $attempt -lt $max_attempts
+                  echo "Retrying in 2 seconds..."
+                  sleep 2
+              end
+          end
+      end
+      
+      log_step "ERROR" "All attempts failed: $cmd"
+      return 1
+  end
+
+  function install_rust_toolchain
+      log_step "START" "Installing Rust toolchain"
+      
+      if type -q cargo
+          log_step "SKIP" "Rust already installed"
+          return 0
+      end
+      
+      if not install_with_retry "curl https://sh.rustup.rs -sSf | sh -s -- -y --no-modify-path --default-toolchain stable --profile minimal"
+          return 1
+      end
+      
+      # Source cargo environment
+      if test -f ~/.cargo/env
+          source ~/.cargo/env
+      end
+  end
+
+  function install_rust_tools
+      echo "🦀 Installing Rust tools..."
+      
+      set -l rust_tools zoxide starship fd-find bat ripgrep cargo-update
+      for tool in $rust_tools
+          set -l check_name (string replace -- '-find' '' $tool)
+          if ! type -q $check_name
+              log_step "INSTALL" "Installing $tool..."
+              if not install_with_retry "cargo install $tool --locked"
+                  echo "❌ Failed to install $tool"
+              end
+          else
+              log_step "SKIP" "$tool already installed"
+          end
+      end
+  end
+
+  function install_go_tools
+      echo "🐹 Installing Go tools..."
+      
+      if ! test -e /usr/local/go
+          echo "❌ Go not found at /usr/local/go. Please install Go first."
+          return 1
+      end
+      
+      set -l go_tools \
+          golang.org/x/tools/gopls@latest \
+          github.com/golangci/golangci-lint/cmd/golangci-lint@latest \
+          github.com/nao1215/gup@latest
+      
+      for tool in $go_tools
+          set tool_name (basename $tool | string replace '@latest' '')
+          if ! type -q $HOME/go/bin/$tool_name
+              log_step "INSTALL" "Installing $tool_name..."
+              if not install_with_retry "go install $tool"
+                  echo "❌ Failed to install $tool_name"
+              end
+          else
+              log_step "SKIP" "$tool_name already installed"
+          end
+      end
+  end
+
+  function install_nerd_fonts
+      echo "🔤 Installing Nerd Fonts..."
+      
+      if ! test -d ~/.nerd-fonts
+          log_step "INSTALL" "Cloning Nerd Fonts repository..."
+          if install_with_retry "git clone --filter=blob:none --sparse git@github.com:ryanoasis/nerd-fonts ~/.nerd-fonts"
+              cd ~/.nerd-fonts
+              git sparse-checkout add patched-fonts/FiraCode
+              git sparse-checkout add patched-fonts/CascadiaCode
+              cd -
+              log_step "SUCCESS" "Nerd Fonts repository cloned"
+          end
+      else
+          log_step "SKIP" "Nerd Fonts already cloned"
+      end
+  end
+
+  function install_homebrew
+      echo "🍺 Installing Homebrew..."
+      
+      if type -q brew
+          log_step "SKIP" "Homebrew already installed"
+          return 0
+      end
+      
+      # Install Homebrew for macOS or Linux
+      log_step "INSTALL" "Installing Homebrew package manager..."
+      if not install_with_retry '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"'
+          echo "❌ Failed to install Homebrew"
+          return 1
+      end
+      
+      # Add Homebrew to PATH for this session
+      if test (uname -s) = Darwin
+          # macOS
+          if test -x /opt/homebrew/bin/brew
+              eval (/opt/homebrew/bin/brew shellenv)
+          else if test -x /usr/local/bin/brew
+              eval (/usr/local/bin/brew shellenv)
+          end
+      else
+          # Linux
+          if test -x /home/linuxbrew/.linuxbrew/bin/brew
+              eval (/home/linuxbrew/.linuxbrew/bin/brew shellenv)
+          end
+      end
+      
+      log_step "SUCCESS" "Homebrew installed successfully"
+  end
+
+  function install_brew_packages
+      echo "📦 Installing packages from Brewfile..."
+      
+      if not type -q brew
+          echo "❌ Homebrew not found, skipping package installation"
+          return 1
+      end
+      
+      # Create Brewfile if it doesn't exist
+      if not test -f ~/Brewfile
+          log_step "CREATE" "Creating default Brewfile"
+          create_brewfile
+      end
+      
+      log_step "INSTALL" "Installing packages from ~/Brewfile..."
+      if not install_with_retry "brew bundle --file=~/Brewfile"
+          echo "❌ Failed to install some packages from Brewfile"
+          return 1
+      end
+      
+      log_step "SUCCESS" "Homebrew packages installed successfully"
+  end
+
+  function create_brewfile
+      log_step "CREATE" "Creating ~/Brewfile with essential packages"
+      
+      echo '# Essential development tools
+brew "git"
+brew "curl"
+brew "wget"
+brew "jq"
+brew "yq"
+brew "tree"
+brew "htop"
+brew "fzf"
+brew "gh"
+brew "delta"
+
+# Development languages and tools
+brew "node"
+brew "python@3.11"
+brew "go"
+
+# Modern CLI replacements (commenting these out since we install via Rust/Cargo)
+# Uncomment if you prefer Homebrew versions over Cargo versions
+# brew "fd"
+# brew "bat"
+# brew "ripgrep"
+# brew "zoxide"
+# brew "starship"
+
+# macOS specific packages
+if OS.mac?
+  brew "mas"  # Mac App Store CLI
+  
+  # GUI applications via cask
+  cask "visual-studio-code"
+  cask "docker"
+  cask "firefox"
+  cask "rectangle"
+  cask "alfred"
+  cask "iterm2"
+  cask "wezterm"
+end
+
+# Linux specific packages
+if OS.linux?
+  brew "gcc"
+end' > ~/Brewfile
+      
+      log_step "SUCCESS" "Created ~/Brewfile"
+  end
+
+  function main
+      echo "🚀 Development Tools Setup"
+      echo "📝 Logging to $TOOL_LOG"
+      
+      # Check system dependencies
+      if not check_dependency curl "sudo apt install curl"
+          exit 1
+      end
+      
+      if not check_dependency git "sudo apt install git"
+          exit 1
+      end
+      
+      # Install package managers first
+      install_homebrew || exit 1
+      install_brew_packages
+      
+      # Install Rust toolchain and tools
+      install_rust_toolchain || exit 1
+      install_rust_tools
+      
+      # Install other tools
+      install_go_tools
+      install_nerd_fonts
+      
+      # Update tools if available
+      if type -q gup
+          gup update
+      end
+      
+      if type -q cargo-install-update
+          cargo install-update -a
+      end
+      
+      echo "✅ Setup complete!"
+      echo "📝 Full log available at $TOOL_LOG"
+      echo "🔄 Run 'exec fish' to restart your shell"
+  end
+
+  # Run if called directly
+  if test (basename (status filename)) = "setup-dev-tools.fish"
+      main $argv
+  end
+#+end_src
+
+*** Usage
+
+After tangling, make the script executable and run it:
+
+#+begin_src bash :tangle no
+chmod +x ~/bin/setup-dev-tools.fish
+~/bin/setup-dev-tools.fish
+#+end_src
+
+** Brewfile
+:PROPERTIES:
+:CUSTOM_ID: brewfile
+:END:
+
+A Brewfile for managing packages via Homebrew. The setup script will create a default one if it doesn't exist, but you can customize this as needed.
+
+#+begin_src ruby :tangle "~/Brewfile" :mkdirp yes
+# Essential development tools
+brew "git"
+brew "curl"
+brew "wget"
+brew "jq"
+brew "yq"
+brew "tree"
+brew "htop"
+brew "fzf"
+brew "gh"
+brew "delta"
+
+# Development languages and tools
+brew "node"
+brew "python@3.11"
+brew "go"
+
+# Modern CLI replacements (commenting these out since we install via Rust/Cargo)
+# Uncomment if you prefer Homebrew versions over Cargo versions
+# brew "fd"
+# brew "bat" 
+# brew "ripgrep"
+# brew "zoxide"
+# brew "starship"
+
+# macOS specific packages
+if OS.mac?
+  brew "mas"  # Mac App Store CLI
+  
+  # GUI applications via cask
+  cask "visual-studio-code"
+  cask "docker"
+  cask "firefox"
+  cask "rectangle"
+  cask "alfred"
+  cask "iterm2"
+  cask "wezterm"
+end
+
+# Linux specific packages
+if OS.linux?
+  brew "gcc"
+end
+#+end_src
+
+** Shell Configuration
+:PROPERTIES:
+:CUSTOM_ID: fish-shell-config
+:ID:       f1eac489-d525-488d-aeba-dd7ab3a167c0
+:END:
+
+The actual Fish shell configuration, focused purely on configuration rather than installation.
+
   #+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
     set -g fish_greeting ""
     set -U fish_user_paths ~/.cargo/bin ~/.fzf/bin ~/go/bin /usr/local/go/bin ~/bin
@@ -3161,17 +3509,33 @@ Useful key built-in bindings:
         end
     end
 
+    # Homebrew path setup for macOS and Linux
     if test (uname -s) = Darwin
-        # For Intel Macs, Homebrew's default prefix is /usr/local
+        # macOS: For Intel Macs, Homebrew's default prefix is /usr/local
         # For Apple Silicon (M1/M2/etc.) Macs, Homebrew's default prefix is /opt/homebrew
-        # It's good practice to check if the directory exists before adding.
         add_paths_if_exist /opt/homebrew/bin /usr/local/bin /opt/homebrew/sbin /usr/local/sbin
-
-        # Homebrew also recommends adding their `shellenv` output to your config.fish.
-        # This ensures other Homebrew-managed environment variables (like MANPATH, INFOPATH) are set.
-        # The `type -q brew` checks if brew is in the PATH already.
+        
+        # Initialize Homebrew environment if available
         if type -q brew
             eval (brew shellenv)
+        else
+            # Try to initialize from common locations if not in PATH yet
+            if test -x /opt/homebrew/bin/brew
+                eval (/opt/homebrew/bin/brew shellenv)
+            else if test -x /usr/local/bin/brew
+                eval (/usr/local/bin/brew shellenv)
+            end
+        end
+    else
+        # Linux: Homebrew installs to /home/linuxbrew/.linuxbrew
+        add_path_if_exists /home/linuxbrew/.linuxbrew/bin
+        add_path_if_exists /home/linuxbrew/.linuxbrew/sbin
+        
+        # Initialize Homebrew environment if available
+        if type -q brew
+            eval (brew shellenv)
+        else if test -x /home/linuxbrew/.linuxbrew/bin/brew
+            eval (/home/linuxbrew/.linuxbrew/bin/brew shellenv)
         end
     end
 #+end_src
@@ -3183,29 +3547,19 @@ give a fuzzy list of possible matches.
 Install ~starship~ for a nice, informative prompt with minimal config.
 #+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
   if status is-interactive
-      # Commands to run in interactive sessions can go here
-      if ! type -q zoxide
-          echo "Installing zoxide..."
-          cargo install zoxide --locked
+      # Initialize zoxide for smart directory jumping
+      if type -q zoxide
+          zoxide init fish | source
       end
-      zoxide init fish | source
-      if ! type -q starship
-          echo "Installing starship..."
-          cargo install starship --locked
+      
+      # Initialize starship prompt
+      if type -q starship
+          starship init fish | source
       end
-      starship init fish | source
   end
 #+end_src
 
-Install the ~rust~ toolchain. I'm basically using ~cargo~ as a cross-platform package manager at the
-moment.
-#+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
-  if ! type -q cargo
-      echo "Installing Rust..."
-      curl https://sh.rustup.rs -sSf | sh -s -- -y --no-modify-path --default-toolchain stable --profile minimal
-      cargo install cargo-update
-  end
-#+end_src
+Rust toolchain configuration (installation handled by setup script).
 
 Add the ~fisher~ plugin manager and plugins.
 
@@ -3251,71 +3605,35 @@ Install ~fzf~ for fuzzy matching things.
   end
 #+end_src
 
-Install ~fd~ as a modern version of ~find~. This is used ty the ~fzf.fish~ plugin but I should really
-learn how it works outside of that too.
-#+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
-  if ! type -q fd
-      cargo install fd-find
-  end
-#+end_src
-
-Setup some ~FZF~ options:
+Configure ~FZF~ options and ~fd~ integration:
 #+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
   set -gx FZF_DEFAULT_OPTS '--height 40% --layout=reverse --border'
   set -gx fzf_history_time_format %d-%m-%Y
-#+end_src
-
-Install ~lsd~ as a more modern ~ls~ equivalent.
-#+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
-  if ! type -q eza
-      echo "Installing Nerd Fonts..."
-      git clone --filter=blob:none --sparse git@github.com:ryanoasis/nerd-fonts ~/.nerd-fonts
-      cd ~/.nerd-fonts
-      git sparse-checkout add patched-fonts/FiraCode
-      git sparse-checkout add patched-fonts/CascadiaCode
-      ./install.sh FiraCode
-      ./install.sh CascadiaCode
-      echo "Don't forget to set this font in the terminal."
-
-      echo "Installing eza..."
-      cargo install eza
-  end
-
-  # Use alias here instead of abbr since I don't want these expanded
-  alias ls="eza --group-directories-first --icons"
-  alias l="eza --group-directories-first --icons -l"
-  alias la="eza --group-directories-first --icons -a"
-  alias ll="eza --group-directories-first --icons -la"
-  alias lt="eza --group-directories-first --icons --tree"
-#+end_src
-
-Install ~bat~ as a more modern ~cat~ equivalent.
-#+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
-  if ! type -q bat
-      echo "Installing bat..."
-      cargo install bat --locked
-  end
-  abbr --add bat cat
-#+end_src
-
-Install ~zellij~ a great, easy-to-use terminal multiplexer.
-#+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
-  if ! type -q zellij
-      echo "Installing zellij..."
-      cargo install zellij --locked
-
-      # Also install room plugin for easier switching between tabs
-      mkdir -p ~/.config/zellij/plugins
-      curl -L "https://github.com/rvcas/room/releases/latest/download/room.wasm" -o ~/.config/zellij/plugins/room.wasm
+  
+  # Use fd with fzf if available
+  if type -q fd
+      set -gx FZF_DEFAULT_COMMAND 'fd --type f --hidden --follow --exclude .git'
   end
 #+end_src
 
-Install ~ripgrep~ for fast, easy recursive grepping
+Configure ~eza~ as a modern ~ls~ replacement with icons and better formatting.
 #+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
-  # Install ripgrep
-  if ! type -q rg
-      echo "Installing ripgrep..."
-      cargo install ripgrep
+  # Use eza if available
+  if type -q eza
+      # Use alias here instead of abbr since I don't want these expanded
+      alias ls="eza --group-directories-first --icons"
+      alias l="eza --group-directories-first --icons -l"
+      alias la="eza --group-directories-first --icons -a"
+      alias ll="eza --group-directories-first --icons -la"
+      alias lt="eza --group-directories-first --icons --tree"
+  end
+#+end_src
+
+Configure ~bat~ as a modern ~cat~ replacement with syntax highlighting.
+#+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
+  # Use bat if available
+  if type -q bat
+      abbr --add cat bat
   end
 #+end_src
 
@@ -3388,27 +3706,17 @@ Some useful ~jujutsu~ aliases.
 Setup ~go~-related config. I should probably check that ~go~ is actually installed first.
 
 #+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
+  # Configure Go environment if Go is installed
   if test -e /usr/local/go
       set -gx GOPATH $HOME/go/
       set -gx GO111MODULE on
   end
 
-  if ! type -q $HOME/go/bin/gopls
-      go install golang.org/x/tools/gopls@latest
-  end
-
-  if ! type -q $HOME/go/bin/golangci-lint
-      go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
-  end
-
-  if ! type -q $HOME/go/bin/gup
-      go install github.com/nao1215/gup@latest
-  end
-
-  abbr --add gob go build ./...
-  abbr --add got INTEGRATION_TESTS=true go test ./...
-  abbr --add gotc INTEGRATION_TESTS=true go test ./... -count 1
-  abbr --add goup go get -u all
+  # Go development abbreviations
+  abbr --add gob 'go build ./...'
+  abbr --add got 'INTEGRATION_TESTS=true go test ./...'
+  abbr --add gotc 'INTEGRATION_TESTS=true go test ./... -count 1'
+  abbr --add goup 'go get -u all'
 #+end_src
 
 Setup some useful ~k8s~ config.
