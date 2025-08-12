@@ -1224,26 +1224,19 @@ and presents completion candidates.
 
 
 #+begin_src emacs-lisp
-  (use-package ibuffer-vc
-    :after ibuffer
-    :commands (ibuffer-vc-set-filter-groups-by-vc-root)
-    :custom
-    (ibuffer-vc-skip-if-remote nil))
-
   (use-package ibuffer
     :straight nil
-    :hook (ibuffer-mode . ibuffer-vc-set-filter-groups-by-vc-root)
     :general
     ("C-x C-b" 'ibuffer)
     (:keymaps 'ibuffer-mode-map "." 'hydra-ibuffer-main/body)
     :hydra (hydra-ibuffer-main (:color pink :hint nil)
                                "
-    ^Mark^         ^Actions^         ^View^          ^Select^              ^Navigation^
-    _m_: mark      _D_: delete       _g_: refresh    _q_: quit             _i_:   ↑    _n_
-    _u_: unmark    _s_: save marked  _S_: sort       _TAB_: toggle         _RET_: visit
-    _*_: specific  _a_: all actions  _/_: filter     _O_: other window     _e_:   ↓    _o_
-    _t_: toggle    _._: toggle hydra _H_: help       C-o other win no-select
-    "
+                ^Mark^         ^Actions^         ^View^          ^Select^              ^Navigation^
+                _m_: mark      _D_: delete       _g_: refresh    _q_: quit             _i_:   ↑    _n_
+                _u_: unmark    _s_: save marked  _S_: sort       _TAB_: toggle         _RET_: visit
+                _*_: specific  _a_: all actions  _/_: filter     _O_: other window     _e_:   ↓    _o_
+                _t_: toggle    _._: toggle hydra _H_: help       C-o other win no-select
+                "
                                ("m" ibuffer-mark-forward)
                                ("u" ibuffer-unmark-forward)
                                ("*" hydra-ibuffer-mark/body :color blue)
@@ -1330,7 +1323,32 @@ and presents completion candidates.
                                  ("<" ibuffer-filter-by-size-lt "size")
                                  ("/" ibuffer-filter-disable "disable")
                                  ("b" hydra-ibuffer-main/body "back" :color blue))
-    )
+    :config
+    (defun my/setup-ibuffer ()
+    "Setup ibuffer with projectile groups, custom format, and icons."
+    (ibuffer-projectile-set-filter-groups)
+    (all-the-icons-ibuffer-mode 1)
+    ;; Set format AFTER icons mode is active
+    (setq ibuffer-formats
+          '((mark modified read-only locked " "
+                  (icon 2 2) ; Keep the icon column that all-the-icons-ibuffer adds
+                  (name 50 50 :left :elide) " "
+                  (size-h 9 -1 :right) " " ; Use size-h (human readable) that icons mode provides
+                  (mode+ 16 16 :left :elide) " " ; Use mode+ that icons mode provides
+                  filename-and-process+))) ; Use filename-and-process+ that icons mode provides
+    ;; Force a refresh to apply the new format
+    (ibuffer-update nil t))
+    :hook
+    (ibuffer-mode . my/setup-ibuffer))
+
+  (use-package ibuffer-projectile
+    :ensure t
+    :after ibuffer)
+
+  (use-package all-the-icons-ibuffer
+    :ensure t
+    :after ibuffer)
+
 #+end_src
 
 ** Projects
