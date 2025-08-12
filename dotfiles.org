@@ -1231,7 +1231,7 @@ and presents completion candidates.
 
   (use-package ibuffer
     :straight nil
-    :hook (ibuffer-mode . '(ibuffer-vc-set-filter-groups-by-vc-root))
+    :hook (ibuffer-mode . ibuffer-vc-set-filter-groups-by-vc-root)
     :general
     ("C-x C-b" 'ibuffer)
     (:keymaps 'ibuffer-mode-map "." 'hydra-ibuffer-main/body)
@@ -3441,6 +3441,7 @@ chmod +x ~/bin/setup-dev-tools.fish
 ** Brewfile
 :PROPERTIES:
 :CUSTOM_ID: brewfile
+:ID:       6a814307-3d7c-4337-a7cc-7a8bf7a12c1c
 :END:
 
 A Brewfile for managing packages via Homebrew. The setup script will create a default one if it doesn't exist, but you can customize this as needed.
