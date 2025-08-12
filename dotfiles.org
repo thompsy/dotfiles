@@ -10,8 +10,13 @@
 :CUSTOM_ID: what-is-this
 :END:
 This is my dotfiles configuration in ~org-mode~. To output the source code run ~org-babel-tangle~
-(typically ~C-c~ ~C-v~ ~t~). This will create and populate the various config files to the correct
-locations.
+(typically ~C-c~ ~C-v~ ~t~). You can also run it from the command line like this in ~bash~:
+
+#+begin_src bash
+  $(which emacs) --batch --eval "(require 'org)" --eval '(org-babel-tangle-file "~/dotfiles/dotfiles.org")'
+#+end_src
+
+This will create and populate the various config files to the correct locations.
 
 Many (most!) things in this file have been inspired by others making their configuration
 available. A few places that I've found particularly useful include:
@@ -123,8 +128,6 @@ See [[https://www.masteringemacs.org/article/fixing-mark-commands-transient-mark
 See [[https://www.masteringemacs.org/article/demystifying-emacs-window-manager]]
 
 ** Org-mode
-*** TODO Document tangling from the command line
-See [[https://emacs.stackexchange.com/questions/27126/is-it-possible-to-org-bable-tangle-an-org-file-from-the-command-line]]
 *** Tags
 Ideas here:
 - [[https://karl-voit.at/2022/01/29/How-to-Use-Tags/]]
