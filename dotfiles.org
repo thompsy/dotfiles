@@ -2941,6 +2941,14 @@ Some interesting config options:
   ;; Disable hl-line-mode to reduce flickering: https://github.com/akermu/emacs-libvterm/issues/432
   (add-hook 'vterm-mode-hook (lambda () (setq-local global-hl-line-mode nil)))
   (add-hook 'vterm-copy-mode (lambda () (call-interactively 'hl-line-mode)))
+
+  (add-hook 'vterm-copy-mode-hook
+          (lambda ()
+            (if vterm-copy-mode
+                (setq-local mode-line-process
+                            (list " " (propertize "VTerm[COPY]" 'face 'font-lock-warning-face)))
+              (setq-local mode-line-process
+                          (list " " (propertize "VTerm" 'face 'font-lock-keyword-face))))))
 #+end_src
 
 #+begin_src emacs-lisp
