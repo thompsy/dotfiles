@@ -157,7 +157,7 @@ Other useful ideas here:
 * Emacs
 :PROPERTIES:
 :CUSTOM_ID: emacs
-:header-args:emacs-lisp:
+:header-args:emacs-lisp: :tangle "~/.emacs.d/init.el"
 :END:
 ** Local
 :PROPERTIES:
@@ -1207,6 +1207,7 @@ and presents completion candidates.
 *** Beacon
 :PROPERTIES:
 :CUSTOM_ID: beacon
+:ID:       f0a86a96-4f51-432c-9092-d89cdcbdd1cc
 :END:
 #+begin_src emacs-lisp
   (use-package beacon
