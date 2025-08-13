@@ -3956,6 +3956,8 @@ cat ~/.email
 
   abandonempties = ["abandon", "-r", "description(exact:'') ~ root()"]
 
+  # recent N will give all my changes for the last N days
+  recent = ["util", "exec", "--", "bash", "-c", "days=${1:-2}; jj log -r \"committer_date(after:\\\"$days days ago\\\") & mine()\" \"${@:2}\"", ""]
 
   [revsets]
   # I believe this section is used only for:
