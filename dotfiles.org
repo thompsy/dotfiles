@@ -2943,6 +2943,7 @@ Some interesting config options:
     :general
     (my-leader-def "x" 'vterm-toggle)
     ("C-c v" 'vterm-copy-mode)
+    ("M-y" 'vterm-yank-pop)
     :config
     (with-eval-after-load 'vterm
       ;; Note the C-t exclusion below doesn't actually work so I needed to add this.
