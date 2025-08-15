@@ -2116,36 +2116,62 @@ A nice Hydra menu to make things more accessible.
 
 By default ~flycheck~ only operates on open buffers. I've added a function here to have it run on all project files.
 #+BEGIN_SRC emacs-lisp
-  (defun my/consult-golangci-lint-project ()
-    "Run golangci-lint on entire project and show results in consult interface."
+  (defun my/consult-project-lint ()
+    "Run appropriate linter on entire project and show results in consult interface."
     (interactive)
     (let* ((project-root (or (projectile-project-root)
                              (vc-root-dir)
                              default-directory))
            (default-directory project-root)
-           (output (when (executable-find "golangci-lint")
-                     (shell-command-to-string "golangci-lint run --out-format=tab ./..."))))
-      (if (and output (not (string-empty-p (string-trim output))))
-          (let* ((lines (split-string output "\n" t))
-                 (candidates (delq nil (mapcar
-                                         (lambda (line)
-                                           (when (string-match "\\([^:]+\\):\\([0-9]+\\):\\([0-9]+\\)\\s-+" line)
-                                             ;; Just return the original line with relative path
-                                             line))
-                                         lines))))
-            (when candidates
-              (let ((selected (consult--read candidates
-                                             :prompt "Project lint issues: "
-                                             :sort nil
-                                             :require-match t)))
-                ;; Parse the relative path and line from the selected string (golangci-lint format)
-                (when (string-match "^\\([^:]+\\):\\([0-9]+\\):" selected)
-                  (let ((rel-file (match-string 1 selected))
-                        (line (string-to-number (match-string 2 selected))))
-                    (find-file (expand-file-name rel-file project-root))
-                    (goto-char (point-min))
-                    (forward-line (1- line)))))))
-        (message "No lint issues found in project"))))
+           ;; Detect project type and choose appropriate linter
+           (linter-config (cond
+                           ;; Go projects
+                           ((and (executable-find "golangci-lint")
+                                 (or (file-exists-p "go.mod")
+                                     (directory-files project-root nil "\\.go$")))
+                            '("golangci-lint run --out-format=tab ./..." "golangci-lint"))
+                           ;; Python projects
+                           ((and (executable-find "ruff")
+                                 (or (file-exists-p "pyproject.toml")
+                                     (file-exists-p "requirements.txt")
+                                     (file-exists-p "setup.py")
+                                     (directory-files project-root nil "\\.py$")))
+                            '("ruff check --output-format=concise ." "ruff"))
+                           ;; Fallback to flake8 for Python
+                           ((and (executable-find "flake8")
+                                 (or (file-exists-p "pyproject.toml")
+                                     (file-exists-p "requirements.txt")
+                                     (file-exists-p "setup.py")
+                                     (directory-files project-root nil "\\.py$")))
+                            '("flake8 --format='%(path)s:%(row)d:%(col)d: %(code)s %(text)s'" "flake8"))))
+           (command (car linter-config))
+           (linter-name (cadr linter-config))
+           (output (when command
+                     (shell-command-to-string command))))
+      (if command
+          (if (and output (not (string-empty-p (string-trim output))))
+              (let* ((lines (split-string output "\n" t))
+                     (candidates (delq nil (mapcar
+                                             (lambda (line)
+                                               (when (string-match "\\([^:]+\\):\\([0-9]+\\):\\([0-9]+\\)" line)
+                                                 ;; Just return the original line with relative path
+                                                 line))
+                                             lines))))
+                (if candidates
+                    (let ((selected (consult--read candidates
+                                                   :prompt (format "%s issues: " linter-name)
+                                                   :sort nil
+                                                   :require-match t)))
+                      ;; Parse the relative path and line from the selected string
+                      (when (string-match "^\\([^:]+\\):\\([0-9]+\\):" selected)
+                        (let ((rel-file (match-string 1 selected))
+                              (line (string-to-number (match-string 2 selected))))
+                          (find-file (expand-file-name rel-file project-root))
+                          (goto-char (point-min))
+                          (forward-line (1- line)))))
+                  (message "No lint issues found by %s" linter-name)))
+            (message "No lint issues found by %s" linter-name))
+        (message "No suitable linter found for this project"))))
 
   (use-package flycheck
     :general
@@ -2187,7 +2213,7 @@ By default ~flycheck~ only operates on open buffers. I've added a function here 
      ("i" (lambda () (interactive)
             (minibuffer-with-setup-hook (lambda () (insert "info "))
               (call-interactively #'consult-flycheck))))
-     ("a" my/consult-golangci-lint-project)
+     ("a" my/consult-project-lint)
      ("q" nil :exit t)))
 
   (use-package flycheck-eglot
