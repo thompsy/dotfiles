@@ -2940,39 +2940,35 @@ Some interesting config options:
   TODO: it would be nice to get the ~doom-modeline~ to reflect the ~vterm-copy-mode~ status.
 #+begin_src emacs-lisp
   (use-package vterm
-    :general
-    (my-leader-def "x" 'vterm-toggle)
-    ("C-c v" 'vterm-copy-mode)
-    (:keymaps 'vterm-mode-map
-              "M-y" 'vterm-yank-pop)
-    :config
-    (with-eval-after-load 'vterm
-      ;; Note the C-t exclusion below doesn't actually work so I needed to add this.
-      (define-key vterm-mode-map (kbd "C-t") (lookup-key global-map (kbd "C-t"))))
-
-    (setq vterm-max-scrollback 100000
-          vterm-clear-scrollback t
-          vterm-buffer-name-string "vterm-%s"
-          vterm-shell "fish"
-          vterm-eval-cmds '(("find-file" find-file)
-                            ("message" message)
-                            ("vterm-clear-scrollback" vterm-clear-scrollback-command)
-                            ("dired" dired)
-                            ("ediff-files" ediff-files))
-          vterm-keymap-exceptions
-          '("M-:" "C-c" "C-x" "C-u" "C-g" "C-h" "C-l" "M-x" "M-o" "C-y" "M-y" "M-s")))
-
+  :general
+  (my-leader-def "x" 'vterm-toggle)
+  ("C-c v" 'vterm-copy-mode)
+  (:keymaps 'vterm-mode-map
+            "M-y" 'vterm-yank-pop
+            ;; For some reason the keymap exception below doesn't work as expected.
+            "C-t" (lookup-key global-map (kbd "C-t")))
+  :hook
   ;; Disable hl-line-mode to reduce flickering: https://github.com/akermu/emacs-libvterm/issues/432
-  (add-hook 'vterm-mode-hook (lambda () (setq-local global-hl-line-mode nil)))
-  (add-hook 'vterm-copy-mode (lambda () (call-interactively 'hl-line-mode)))
-
-  (add-hook 'vterm-copy-mode-hook
-          (lambda ()
-            (if vterm-copy-mode
-                (setq-local mode-line-process
-                            (list " " (propertize "VTerm[COPY]" 'face 'font-lock-warning-face)))
-              (setq-local mode-line-process
-                          (list " " (propertize "VTerm" 'face 'font-lock-keyword-face))))))
+  (vterm-mode . (lambda () (setq-local global-hl-line-mode nil)))
+  (vterm-copy-mode . (lambda () (call-interactively 'hl-line-mode)))
+  (vterm-copy-mode . (lambda ()
+                       (if vterm-copy-mode
+                           (setq-local mode-line-process
+                                       (list " " (propertize "VTerm[COPY]" 'face 'font-lock-warning-face)))
+                         (setq-local mode-line-process
+                                     (list " " (propertize "VTerm" 'face 'font-lock-keyword-face))))))
+  :config
+  (setq vterm-max-scrollback 100000
+        vterm-clear-scrollback t
+        vterm-buffer-name-string "vterm-%s"
+        vterm-shell "fish"
+        vterm-eval-cmds '(("find-file" find-file)
+                          ("message" message)
+                          ("vterm-clear-scrollback" vterm-clear-scrollback-command)
+                          ("dired" dired)
+                          ("ediff-files" ediff-files))
+        vterm-keymap-exceptions
+        '("M-:" "C-c" "C-x" "C-u" "C-g" "C-h" "C-l" "M-x" "M-o" "C-y" "M-y" "M-s" "C-t")))
 #+end_src
 
 #+begin_src emacs-lisp
