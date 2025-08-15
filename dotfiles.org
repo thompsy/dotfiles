@@ -2116,62 +2116,126 @@ A nice Hydra menu to make things more accessible.
 
 By default ~flycheck~ only operates on open buffers. I've added a function here to have it run on all project files.
 #+BEGIN_SRC emacs-lisp
+  (defun my/project-has-files-p (project-root pattern)
+    "Check if project has files matching PATTERN recursively."
+    (let ((default-directory project-root))
+      (> (length (split-string (shell-command-to-string 
+                                (format "find . -name '%s' -type f 2>/dev/null | head -1" pattern)) 
+                               "\n" t)) 0)))
+
+  (defun my/get-available-linters (project-root)
+    "Return list of available linters for the project."
+    (let ((linters '()))
+      ;; Check for Go linter - look for any .go files in project
+      (when (and (executable-find "golangci-lint")
+                 (my/project-has-files-p project-root "*.go"))
+        (push '("golangci-lint run --out-format=tab ./..." "golangci-lint" "Go") linters))
+      ;; Check for Python linters - look for any .py files in project
+      (when (and (executable-find "ruff")
+                 (my/project-has-files-p project-root "*.py"))
+        (push '("ruff check --output-format=concise ." "ruff" "Python") linters))
+      ;; Fallback to flake8 for Python (only if ruff not available)
+      (when (and (not (seq-find (lambda (l) (string= (nth 1 l) "ruff")) linters))
+                 (executable-find "flake8")
+                 (my/project-has-files-p project-root "*.py"))
+        (push '("flake8 --format='%(path)s:%(row)d:%(col)d: %(code)s %(text)s'" "flake8" "Python") linters))
+      linters))
+
+  (defun my/run-linters (linters project-root)
+    "Run multiple linters and combine their output."
+    (let ((all-candidates '())
+          (linter-names '()))
+      (dolist (linter-config linters)
+        (let* ((command (nth 0 linter-config))
+               (linter-name (nth 1 linter-config))
+               (lang-type (nth 2 linter-config))
+               (default-directory project-root)
+               (output (shell-command-to-string command)))
+          (when (and output (not (string-empty-p (string-trim output))))
+            (let ((lines (split-string output "\n" t)))
+              (dolist (line lines)
+                (when (string-match "\\([^:]+\\):\\([0-9]+\\):\\([0-9]+\\)" line)
+                  ;; Prefix line with linter info for identification
+                  (push (format "[%s] %s" linter-name line) all-candidates))))
+            (push linter-name linter-names))))
+      (list (nreverse all-candidates) (nreverse linter-names))))
+
   (defun my/consult-project-lint ()
-    "Run appropriate linter on entire project and show results in consult interface."
+    "Run all available linters on project and show combined results."
     (interactive)
     (let* ((project-root (or (projectile-project-root)
                              (vc-root-dir)
                              default-directory))
-           (default-directory project-root)
-           ;; Detect project type and choose appropriate linter
-           (linter-config (cond
-                           ;; Go projects
-                           ((and (executable-find "golangci-lint")
-                                 (or (file-exists-p "go.mod")
-                                     (directory-files project-root nil "\\.go$")))
-                            '("golangci-lint run --out-format=tab ./..." "golangci-lint"))
-                           ;; Python projects
-                           ((and (executable-find "ruff")
-                                 (or (file-exists-p "pyproject.toml")
-                                     (file-exists-p "requirements.txt")
-                                     (file-exists-p "setup.py")
-                                     (directory-files project-root nil "\\.py$")))
-                            '("ruff check --output-format=concise ." "ruff"))
-                           ;; Fallback to flake8 for Python
-                           ((and (executable-find "flake8")
-                                 (or (file-exists-p "pyproject.toml")
-                                     (file-exists-p "requirements.txt")
-                                     (file-exists-p "setup.py")
-                                     (directory-files project-root nil "\\.py$")))
-                            '("flake8 --format='%(path)s:%(row)d:%(col)d: %(code)s %(text)s'" "flake8"))))
-           (command (car linter-config))
-           (linter-name (cadr linter-config))
-           (output (when command
-                     (shell-command-to-string command))))
-      (if command
-          (if (and output (not (string-empty-p (string-trim output))))
-              (let* ((lines (split-string output "\n" t))
-                     (candidates (delq nil (mapcar
-                                             (lambda (line)
-                                               (when (string-match "\\([^:]+\\):\\([0-9]+\\):\\([0-9]+\\)" line)
-                                                 ;; Just return the original line with relative path
-                                                 line))
-                                             lines))))
-                (if candidates
-                    (let ((selected (consult--read candidates
-                                                   :prompt (format "%s issues: " linter-name)
-                                                   :sort nil
-                                                   :require-match t)))
-                      ;; Parse the relative path and line from the selected string
-                      (when (string-match "^\\([^:]+\\):\\([0-9]+\\):" selected)
-                        (let ((rel-file (match-string 1 selected))
-                              (line (string-to-number (match-string 2 selected))))
-                          (find-file (expand-file-name rel-file project-root))
-                          (goto-char (point-min))
-                          (forward-line (1- line)))))
-                  (message "No lint issues found by %s" linter-name)))
-            (message "No lint issues found by %s" linter-name))
-        (message "No suitable linter found for this project"))))
+           (available-linters (my/get-available-linters project-root))
+           (result (my/run-linters available-linters project-root))
+           (candidates (car result))
+           (linter-names (cadr result)))
+      (if candidates
+          (let ((selected (consult--read candidates
+                                         :prompt (format "Lint issues (%s): " 
+                                                         (string-join linter-names ", "))
+                                         :sort nil
+                                         :require-match t)))
+            ;; Remove the [linter] prefix and parse the line
+            (when (string-match "^\\[.*?\\] \\([^:]+\\):\\([0-9]+\\):" selected)
+              (let ((rel-file (match-string 1 selected))
+                    (line (string-to-number (match-string 2 selected))))
+                (find-file (expand-file-name rel-file project-root))
+                (goto-char (point-min))
+                (forward-line (1- line)))))
+        (if available-linters
+            (message "No lint issues found (%s)" (string-join (mapcar #'cadr available-linters) ", "))
+          (message "No suitable linters found for this project")))))
+
+  (defun my/consult-go-lint ()
+    "Run golangci-lint on Go files only."
+    (interactive)
+    (let* ((project-root (or (projectile-project-root)
+                             (vc-root-dir)
+                             default-directory))
+           (go-linters (seq-filter (lambda (linter) (string= (nth 2 linter) "Go"))
+                                   (my/get-available-linters project-root))))
+      (if go-linters
+          (let* ((result (my/run-linters go-linters project-root))
+                 (candidates (car result)))
+            (if candidates
+                (let ((selected (consult--read candidates
+                                               :prompt "Go lint issues: "
+                                               :sort nil
+                                               :require-match t)))
+                  (when (string-match "^\\[.*?\\] \\([^:]+\\):\\([0-9]+\\):" selected)
+                    (let ((rel-file (match-string 1 selected))
+                          (line (string-to-number (match-string 2 selected))))
+                      (find-file (expand-file-name rel-file project-root))
+                      (goto-char (point-min))
+                      (forward-line (1- line)))))
+              (message "No Go lint issues found")))
+        (message "No Go linter available for this project"))))
+
+  (defun my/consult-python-lint ()
+    "Run Python linters (ruff/flake8) on Python files only."
+    (interactive)
+    (let* ((project-root (or (projectile-project-root)
+                             (vc-root-dir)
+                             default-directory))
+           (python-linters (seq-filter (lambda (linter) (string= (nth 2 linter) "Python"))
+                                       (my/get-available-linters project-root))))
+      (if python-linters
+          (let* ((result (my/run-linters python-linters project-root))
+                 (candidates (car result)))
+            (if candidates
+                (let ((selected (consult--read candidates
+                                               :prompt "Python lint issues: "
+                                               :sort nil
+                                               :require-match t)))
+                  (when (string-match "^\\[.*?\\] \\([^:]+\\):\\([0-9]+\\):" selected)
+                    (let ((rel-file (match-string 1 selected))
+                          (line (string-to-number (match-string 2 selected))))
+                      (find-file (expand-file-name rel-file project-root))
+                      (goto-char (point-min))
+                      (forward-line (1- line)))))
+              (message "No Python lint issues found")))
+        (message "No Python linter available for this project"))))
 
   (use-package flycheck
     :general
@@ -2189,12 +2253,12 @@ By default ~flycheck~ only operates on open buffers. I've added a function here 
     (hydra-flycheck-mode
      (:hint nil :color green)
      "
-    Navigate Errors    Describe                   Filter List
-    ------------------ --------------------------------------------
-    _f_irst error      _s_how at point            _e_rrors only
-    _n_ext error       _E_xplain at point         _w_arnings only
-    _p_rev error       ^ ^                        _i_nfo only
-    _l_ist errors      _q_uit                     _a_ll project files
+    Navigate Errors    Describe                   Filter List              Language Tools
+    ------------------ -------------------------- ----------------------- ---------------
+    _f_irst error      _s_how at point            _e_rrors only           _g_o linting
+    _n_ext error       _E_xplain at point         _w_arnings only         _P_ython linting
+    _p_rev error       ^ ^                        _i_nfo only             ^ ^
+    _l_ist errors      _q_uit                     _a_ll project files     ^ ^
     "
      ("f" flycheck-first-error)
      ("n" flycheck-next-error)
@@ -2214,7 +2278,10 @@ By default ~flycheck~ only operates on open buffers. I've added a function here 
             (minibuffer-with-setup-hook (lambda () (insert "info "))
               (call-interactively #'consult-flycheck))))
      ("a" my/consult-project-lint)
+     ("g" my/consult-go-lint)
+     ("P" my/consult-python-lint)
      ("q" nil :exit t)))
+
 
   (use-package flycheck-eglot
     :after (flycheck eglot)
