@@ -2113,24 +2113,39 @@ A nice Hydra menu to make things more accessible.
 :ID:       ED7011C9-4F36-493B-9E80-BB3FF232FF5E
 :CUSTOM_ID: flycheck
 :END:
+
+By default ~flycheck~ only operates on open buffers. I've added a function here to have it run on all project files.
 #+BEGIN_SRC emacs-lisp
-  (defun my/consult-flycheck-errors-only ()
-    "Open consult-flycheck showing only 'error' level messages."
+  (defun my/consult-golangci-lint-project ()
+    "Run golangci-lint on entire project and show results in consult interface."
     (interactive)
-    (let ((consult--initial-input "error "))
-      (call-interactively #'consult-flycheck)))
-
-  (defun my/consult-flycheck-warnings-only ()
-    "Open consult-flycheck showing only 'warning' level messages."
-    (interactive)
-    (let ((consult--initial-input "warning "))
-      (call-interactively #'consult-flycheck)))
-
-  (defun my/consult-flycheck-info-only ()
-    "Open consult-flycheck showing only 'info' level messages."
-    (interactive)
-    (let ((consult--initial-input "info "))
-      (call-interactively #'consult-flycheck)))
+    (let* ((project-root (or (projectile-project-root)
+                             (vc-root-dir)
+                             default-directory))
+           (default-directory project-root)
+           (output (when (executable-find "golangci-lint")
+                     (shell-command-to-string "golangci-lint run --out-format=tab ./..."))))
+      (if (and output (not (string-empty-p (string-trim output))))
+          (let* ((lines (split-string output "\n" t))
+                 (candidates (delq nil (mapcar
+                                         (lambda (line)
+                                           (when (string-match "\\([^:]+\\):\\([0-9]+\\):\\([0-9]+\\)\\s-+" line)
+                                             ;; Just return the original line with relative path
+                                             line))
+                                         lines))))
+            (when candidates
+              (let ((selected (consult--read candidates
+                                             :prompt "Project lint issues: "
+                                             :sort nil
+                                             :require-match t)))
+                ;; Parse the relative path and line from the selected string (golangci-lint format)
+                (when (string-match "^\\([^:]+\\):\\([0-9]+\\):" selected)
+                  (let ((rel-file (match-string 1 selected))
+                        (line (string-to-number (match-string 2 selected))))
+                    (find-file (expand-file-name rel-file project-root))
+                    (goto-char (point-min))
+                    (forward-line (1- line)))))))
+        (message "No lint issues found in project"))))
 
   (use-package flycheck
     :general
@@ -2161,13 +2176,18 @@ A nice Hydra menu to make things more accessible.
      ("s" flycheck-display-error-at-point)
      ("E" flycheck-explain-error-at-point)
 
-     ;; Use consult-flycheck for listing and our new helper functions for filtering
+     ;; Use consult-flycheck for listing with inline filtering
      ("l" consult-flycheck)
-     ("e" my/consult-flycheck-errors-only)
-     ("w" my/consult-flycheck-warnings-only)
-     ("i" my/consult-flycheck-info-only)
-     ("a" flycheck-projectile-list-errors)
-
+     ("e" (lambda () (interactive)
+            (minibuffer-with-setup-hook (lambda () (insert "error "))
+              (call-interactively #'consult-flycheck))))
+     ("w" (lambda () (interactive)
+            (minibuffer-with-setup-hook (lambda () (insert "warning "))
+              (call-interactively #'consult-flycheck))))
+     ("i" (lambda () (interactive)
+            (minibuffer-with-setup-hook (lambda () (insert "info "))
+              (call-interactively #'consult-flycheck))))
+     ("a" my/consult-golangci-lint-project)
      ("q" nil :exit t)))
 
   (use-package flycheck-eglot
