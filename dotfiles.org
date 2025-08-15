@@ -2133,6 +2133,12 @@ A nice Hydra menu to make things more accessible.
       "f" '(hydra-flycheck-mode/body :wk "flycheck"))
     :config
     (global-flycheck-mode +1)
+    ;; Use built-in golangci-lint checker
+    (when (executable-find "golangci-lint")
+      (add-hook 'go-ts-mode-hook 
+                (lambda ()
+                  (setq-local flycheck-checkers '(golangci-lint)
+                              flycheck-golangci-lint-tests t))))
     :hydra
     (hydra-flycheck-mode
      (:hint nil :color green)
@@ -2168,11 +2174,6 @@ A nice Hydra menu to make things more accessible.
     (use-package consult-flycheck
       :after (flycheck eglot consult))
 
-    (use-package flycheck-golangci-lint
-      :after (flycheck)
-      :hook (go-ts-mode . flycheck-golangci-lint-setup)
-      :config
-      (setq flycheck-golangci-lint-tests t))
 
   (use-package flycheck-projectile
   :ensure t
