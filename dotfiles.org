@@ -1059,7 +1059,12 @@ Vertico provides a vertical completion UI for the minibuffer.
   (use-package vertico
     :init
     ;; You'll want to make sure that e.g. fido-mode isn't enabled
-    (vertico-mode))
+    (vertico-mode)
+    :custom
+    ;; Enable cycling through candidates
+    (vertico-cycle t)
+    ;; Increase the number of visible candidates to see more context
+    (vertico-count 20))
 
   (use-package vertico-directory
     :straight nil
@@ -2135,7 +2140,7 @@ A nice Hydra menu to make things more accessible.
     (global-flycheck-mode +1)
     ;; Use built-in golangci-lint checker
     (when (executable-find "golangci-lint")
-      (add-hook 'go-ts-mode-hook 
+      (add-hook 'go-ts-mode-hook
                 (lambda ()
                   (setq-local flycheck-checkers '(golangci-lint)
                               flycheck-golangci-lint-tests t))))
@@ -2165,23 +2170,33 @@ A nice Hydra menu to make things more accessible.
 
      ("q" nil :exit t)))
 
-    (use-package flycheck-eglot
-      :after (flycheck eglot)
-      :custom (flycheck-eglot-exclusive nil)
-      :config
-      (global-flycheck-eglot-mode 1))
+  (use-package flycheck-eglot
+    :after (flycheck eglot)
+    :custom (flycheck-eglot-exclusive nil)
+    :config
+    (global-flycheck-eglot-mode 1))
+  #+END_SRC
 
-    (use-package consult-flycheck
-      :after (flycheck eglot consult))
+Use ~flycheck-pos-tip~ to show flycheck errors in popup tooltips.
+  #+BEGIN_SRC emacs-lisp
+  (use-package flycheck-pos-tip
+    :after flycheck
+    :config
+    (flycheck-pos-tip-mode)
+    (setq flycheck-pos-tip-max-width 80
+          pos-tip-tab-width 4
+          pos-tip-use-relative-coordinates t))
 
+  (use-package consult-flycheck
+    :after (flycheck eglot consult))
 
   (use-package flycheck-projectile
-  :ensure t
-  :after (flycheck projectile popwin)
-  :config
-  ;; Optional: If you use popwin for better popup window management
-  (add-to-list 'popwin:special-display-config
-               `(,flycheck-projectile-error-list-buffer :regexp nil :dedicated t :position bottom :stick t :noselect nil)))
+    :ensure t
+    :after (flycheck projectile popwin)
+    :config
+    ;; Optional: If you use popwin for better popup window management
+    (add-to-list 'popwin:special-display-config
+                 `(,flycheck-projectile-error-list-buffer :regexp nil :dedicated t :position bottom :stick t :noselect nil)))
 
   ;; TODO explore this a bit
   (use-package popwin)
@@ -2243,14 +2258,14 @@ A nice Hydra menu to make things more accessible.
   (use-package json-mode)
 
 
-  (defun at/eglot-organize-imports () 
+  (defun at/eglot-organize-imports ()
     "Organize imports via eglot, with error handling."
     (interactive)
     (condition-case err
         (when (and (fboundp 'eglot-code-action-organize-imports)
                    (eglot-current-server))
           (eglot-code-action-organize-imports))
-      (error 
+      (error
        (message "Eglot organize imports failed: %s" (error-message-string err)))))
 
   (defun at/safe-eglot-format-buffer ()
@@ -2259,7 +2274,7 @@ A nice Hydra menu to make things more accessible.
         (when (and (fboundp 'eglot-format-buffer)
                    (eglot-current-server))
           (eglot-format-buffer))
-      (error 
+      (error
        (message "Eglot format failed: %s" (error-message-string err)))))
 
   (defun at/setup-go-before-save-hooks ()
