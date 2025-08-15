@@ -318,6 +318,9 @@ we include ~:straight nil~ so that our package manager doesn't try to fetch the 
     :init
     ;; answer with y/n instead of typing out yes/no
     (defalias 'yes-or-no-p 'y-or-n-p)
+    ;; Set up trailing whitespace deletion after init
+    (add-hook 'after-init-hook
+              (lambda () (add-hook 'before-save-hook 'delete-trailing-whitespace)))
     :config
     (setq indent-tabs-mode nil
           tab-width 4
@@ -333,7 +336,6 @@ we include ~:straight nil~ so that our package manager doesn't try to fetch the 
     (load-prefer-newer t)
     ;; allow emacs to be any size, removes black bars
     (frame-resize-pixelwise t))
-  (add-hook 'before-save-hook 'delete-trailing-whitespace)
 #+END_SRC
 
 It's useful to have buffers auto-revert when files on disk change especially when using Git branches
@@ -398,7 +400,7 @@ to any themes so that they confirmation code gets stored in ~custom.el~.
         (load-file custom-file)))
 #+END_SRC
 
-#+begin_src 
+#+begin_src
 (use-package gcmh
   :config
   (gcmh-mode 1)
@@ -571,16 +573,21 @@ Save a number of useful variables so that they persist across Emacs sessions.
   (blink-cursor-mode -1)                                ; Steady cursor
   (pixel-scroll-precision-mode)                         ; Smooth scrolling
 
-  ;; Display line numbers in programming mode
-  (add-hook 'prog-mode-hook 'display-line-numbers-mode)
-  (setopt display-line-numbers-width 3)           ; Set a minimum width
+  ;; Programming mode setup
+  (use-package prog-mode
+    :straight nil
+    :ensure nil
+    :hook ((prog-mode . display-line-numbers-mode)
+           (prog-mode . hl-line-mode))
+    :custom
+    (display-line-numbers-width 3))
 
-  ;; Nice line wrapping when working with text
-  (add-hook 'text-mode-hook 'visual-line-mode)
-
-  ;; Modes to highlight the current line with
-  (let ((hl-line-hooks '(text-mode-hook prog-mode-hook)))
-    (mapc (lambda (hook) (add-hook hook 'hl-line-mode)) hl-line-hooks))
+  ;; Text mode setup
+  (use-package text-mode
+    :straight nil
+    :ensure nil
+    :hook ((text-mode . visual-line-mode)
+           (text-mode . hl-line-mode)))
 #+END_SRC
 
 ** Aesthetics
@@ -1364,7 +1371,7 @@ and presents completion candidates.
 
   ;; TODO experiment with this!
   (use-package fixmee)
-  
+
   (use-package projectile
     :ensure t
     :init
@@ -1516,14 +1523,13 @@ and presents completion candidates.
     (diredfl-global-mode +1))
 
   (use-package dired-git-info
+    :hook (dired-after-readin . dired-git-info-auto-enable)
     :config
-    (setq dgi-auto-hide-details-p nil)
-    (add-hook 'dired-after-readin-hook 'dired-git-info-auto-enable))
+    (setq dgi-auto-hide-details-p nil))
 
   (use-package all-the-icons-dired
     :after all-the-icons
-    :config
-    (add-hook 'dired-mode-hook 'all-the-icons-dired-mode))
+    :hook (dired-mode . all-the-icons-dired-mode))
 #+END_SRC
 ** Editing
 :PROPERTIES:
@@ -1569,9 +1575,12 @@ built-in ~fill~ function.
 
 Moving back to ~flyspell~ for now.
 #+begin_src  emacs-lisp
-  (add-hook 'text-mode-hook 'flyspell-mode)
-  (add-hook 'prog-mode-hook 'flyspell-prog-mode) ; For code buffers
-  (add-hook 'org-mode-hook 'flyspell-mode) ; Or flyspell-prog-mode, try flyspell-mode first
+  (use-package flyspell
+    :straight nil
+    :ensure nil
+    :hook ((text-mode . flyspell-mode)
+           (prog-mode . flyspell-prog-mode)
+           (org-mode . flyspell-mode)))
 
   (use-package flyspell-correct
     :after flyspell
@@ -2052,7 +2061,7 @@ A nice Hydra menu to make things more accessible.
       ("<ESC>" git-timemachine-show-current-revision "quit" :exit t))
       #+END_SRC
 
-#+begin_src emacs-lisp 
+#+begin_src emacs-lisp
 
   (use-package smerge-mode
     :general
@@ -2232,15 +2241,36 @@ A nice Hydra menu to make things more accessible.
 
   (use-package json-mode)
 
+
+  (defun at/eglot-organize-imports () 
+    "Organize imports via eglot, with error handling."
+    (interactive)
+    (condition-case err
+        (when (and (fboundp 'eglot-code-action-organize-imports)
+                   (eglot-current-server))
+          (eglot-code-action-organize-imports))
+      (error 
+       (message "Eglot organize imports failed: %s" (error-message-string err)))))
+
+  (defun at/safe-eglot-format-buffer ()
+    "Format buffer via eglot, with error handling."
+    (condition-case err
+        (when (and (fboundp 'eglot-format-buffer)
+                   (eglot-current-server))
+          (eglot-format-buffer))
+      (error 
+       (message "Eglot format failed: %s" (error-message-string err)))))
+
+  (defun at/setup-go-before-save-hooks ()
+    "Set up before-save hooks for Go buffers."
+    (add-hook 'before-save-hook 'delete-trailing-whitespace nil t)
+    (add-hook 'before-save-hook 'at/eglot-organize-imports nil t)
+    (add-hook 'before-save-hook 'at/safe-eglot-format-buffer nil t))
+
   (use-package go-ts-mode
-    :hook
-    (before-save . eglot-format-buffer)
-    (before-save . at/eglot-organize-imports))
+    :hook (go-ts-mode . at/setup-go-before-save-hooks))
 
   (use-package gotest-ts)
-
-  (defun at/eglot-organize-imports () (interactive)
-         (eglot-code-actions nil nil "source.organizeImports" t))
 
   (use-package rust-mode
     :init
@@ -2276,8 +2306,7 @@ These packages need to be installed in the Python environment too.
   ;;   (auto-virtualenv-setup))
 
   (use-package pet
-    :config
-    (add-hook 'python-base-mode-hook 'pet-mode -10))
+    :hook (python-base-mode . pet-mode))
 
 #+END_SRC
 
@@ -3200,10 +3229,10 @@ This script handles one-time installation of development tools. It's separated f
   function install_with_retry
       set -l cmd $argv[1..-1]
       set -l max_attempts 3
-      
+
       for attempt in (seq $max_attempts)
           log_step "ATTEMPT" "$attempt/$max_attempts: $cmd"
-          
+
           if eval $cmd
               log_step "SUCCESS" "$cmd"
               return 0
@@ -3215,23 +3244,23 @@ This script handles one-time installation of development tools. It's separated f
               end
           end
       end
-      
+
       log_step "ERROR" "All attempts failed: $cmd"
       return 1
   end
 
   function install_rust_toolchain
       log_step "START" "Installing Rust toolchain"
-      
+
       if type -q cargo
           log_step "SKIP" "Rust already installed"
           return 0
       end
-      
+
       if not install_with_retry "curl https://sh.rustup.rs -sSf | sh -s -- -y --no-modify-path --default-toolchain stable --profile minimal"
           return 1
       end
-      
+
       # Source cargo environment
       if test -f ~/.cargo/env
           source ~/.cargo/env
@@ -3240,7 +3269,7 @@ This script handles one-time installation of development tools. It's separated f
 
   function install_rust_tools
       echo "🦀 Installing Rust tools..."
-      
+
       set -l rust_tools zoxide starship fd-find bat ripgrep cargo-update
       for tool in $rust_tools
           set -l check_name (string replace -- '-find' '' $tool)
@@ -3257,17 +3286,17 @@ This script handles one-time installation of development tools. It's separated f
 
   function install_go_tools
       echo "🐹 Installing Go tools..."
-      
+
       if ! test -e /usr/local/go
           echo "❌ Go not found at /usr/local/go. Please install Go first."
           return 1
       end
-      
+
       set -l go_tools \
           golang.org/x/tools/gopls@latest \
           github.com/golangci/golangci-lint/cmd/golangci-lint@latest \
           github.com/nao1215/gup@latest
-      
+
       for tool in $go_tools
           set tool_name (basename $tool | string replace '@latest' '')
           if ! type -q $HOME/go/bin/$tool_name
@@ -3283,7 +3312,7 @@ This script handles one-time installation of development tools. It's separated f
 
   function install_nerd_fonts
       echo "🔤 Installing Nerd Fonts..."
-      
+
       if ! test -d ~/.nerd-fonts
           log_step "INSTALL" "Cloning Nerd Fonts repository..."
           if install_with_retry "git clone --filter=blob:none --sparse git@github.com:ryanoasis/nerd-fonts ~/.nerd-fonts"
@@ -3300,19 +3329,19 @@ This script handles one-time installation of development tools. It's separated f
 
   function install_homebrew
       echo "🍺 Installing Homebrew..."
-      
+
       if type -q brew
           log_step "SKIP" "Homebrew already installed"
           return 0
       end
-      
+
       # Install Homebrew for macOS or Linux
       log_step "INSTALL" "Installing Homebrew package manager..."
       if not install_with_retry '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"'
           echo "❌ Failed to install Homebrew"
           return 1
       end
-      
+
       # Add Homebrew to PATH for this session
       if test (uname -s) = Darwin
           # macOS
@@ -3327,36 +3356,36 @@ This script handles one-time installation of development tools. It's separated f
               eval (/home/linuxbrew/.linuxbrew/bin/brew shellenv)
           end
       end
-      
+
       log_step "SUCCESS" "Homebrew installed successfully"
   end
 
   function install_brew_packages
       echo "📦 Installing packages from Brewfile..."
-      
+
       if not type -q brew
           echo "❌ Homebrew not found, skipping package installation"
           return 1
       end
-      
+
       # Create Brewfile if it doesn't exist
       if not test -f ~/Brewfile
           log_step "CREATE" "Creating default Brewfile"
           create_brewfile
       end
-      
+
       log_step "INSTALL" "Installing packages from ~/Brewfile..."
       if not install_with_retry "brew bundle --file=~/Brewfile"
           echo "❌ Failed to install some packages from Brewfile"
           return 1
       end
-      
+
       log_step "SUCCESS" "Homebrew packages installed successfully"
   end
 
   function create_brewfile
       log_step "CREATE" "Creating ~/Brewfile with essential packages"
-      
+
       echo '# Essential development tools
 brew "git"
 brew "curl"
@@ -3385,7 +3414,7 @@ brew "go"
 # macOS specific packages
 if OS.mac?
   brew "mas"  # Mac App Store CLI
-  
+
   # GUI applications via cask
   cask "visual-studio-code"
   cask "docker"
@@ -3400,44 +3429,44 @@ end
 if OS.linux?
   brew "gcc"
 end' > ~/Brewfile
-      
+
       log_step "SUCCESS" "Created ~/Brewfile"
   end
 
   function main
       echo "🚀 Development Tools Setup"
       echo "📝 Logging to $TOOL_LOG"
-      
+
       # Check system dependencies
       if not check_dependency curl "sudo apt install curl"
           exit 1
       end
-      
+
       if not check_dependency git "sudo apt install git"
           exit 1
       end
-      
+
       # Install package managers first
       install_homebrew || exit 1
       install_brew_packages
-      
+
       # Install Rust toolchain and tools
       install_rust_toolchain || exit 1
       install_rust_tools
-      
+
       # Install other tools
       install_go_tools
       install_nerd_fonts
-      
+
       # Update tools if available
       if type -q gup
           gup update
       end
-      
+
       if type -q cargo-install-update
           cargo install-update -a
       end
-      
+
       echo "✅ Setup complete!"
       echo "📝 Full log available at $TOOL_LOG"
       echo "🔄 Run 'exec fish' to restart your shell"
@@ -3487,7 +3516,7 @@ brew "go"
 # Modern CLI replacements (commenting these out since we install via Rust/Cargo)
 # Uncomment if you prefer Homebrew versions over Cargo versions
 # brew "fd"
-# brew "bat" 
+# brew "bat"
 # brew "ripgrep"
 # brew "zoxide"
 # brew "starship"
@@ -3495,7 +3524,7 @@ brew "go"
 # macOS specific packages
 if OS.mac?
   brew "mas"  # Mac App Store CLI
-  
+
   # GUI applications via cask
   cask "visual-studio-code"
   cask "docker"
@@ -3543,7 +3572,7 @@ The actual Fish shell configuration, focused purely on configuration rather than
         # macOS: For Intel Macs, Homebrew's default prefix is /usr/local
         # For Apple Silicon (M1/M2/etc.) Macs, Homebrew's default prefix is /opt/homebrew
         add_paths_if_exist /opt/homebrew/bin /usr/local/bin /opt/homebrew/sbin /usr/local/sbin
-        
+
         # Initialize Homebrew environment if available
         if type -q brew
             eval (brew shellenv)
@@ -3559,7 +3588,7 @@ The actual Fish shell configuration, focused purely on configuration rather than
         # Linux: Homebrew installs to /home/linuxbrew/.linuxbrew
         add_path_if_exists /home/linuxbrew/.linuxbrew/bin
         add_path_if_exists /home/linuxbrew/.linuxbrew/sbin
-        
+
         # Initialize Homebrew environment if available
         if type -q brew
             eval (brew shellenv)
@@ -3580,7 +3609,7 @@ Install ~starship~ for a nice, informative prompt with minimal config.
       if type -q zoxide
           zoxide init fish | source
       end
-      
+
       # Initialize starship prompt
       if type -q starship
           starship init fish | source
@@ -3638,7 +3667,7 @@ Configure ~FZF~ options and ~fd~ integration:
 #+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
   set -gx FZF_DEFAULT_OPTS '--height 40% --layout=reverse --border'
   set -gx fzf_history_time_format %d-%m-%Y
-  
+
   # Use fd with fzf if available
   if type -q fd
       set -gx FZF_DEFAULT_COMMAND 'fd --type f --hidden --follow --exclude .git'
