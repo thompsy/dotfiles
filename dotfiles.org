@@ -2114,133 +2114,11 @@ A nice Hydra menu to make things more accessible.
 :CUSTOM_ID: flycheck
 :END:
 
-By default ~flycheck~ only operates on open buffers. I've added a function here to have it run on all project files.
+~flycheck~ operates on open buffers, while ~flymake~ integrates with eglot for real-time LSP diagnostics.
 #+BEGIN_SRC emacs-lisp
-  (defun my/project-has-files-p (project-root pattern)
-    "Check if project has files matching PATTERN recursively."
-    (let ((default-directory project-root))
-      (> (length (split-string (shell-command-to-string 
-                                (format "find . -name '%s' -type f 2>/dev/null | head -1" pattern)) 
-                               "\n" t)) 0)))
 
-  (defun my/get-available-linters (project-root)
-    "Return list of available linters for the project."
-    (let ((linters '()))
-      ;; Check for Go linter - look for any .go files in project
-      (when (and (executable-find "golangci-lint")
-                 (my/project-has-files-p project-root "*.go"))
-        (push '("golangci-lint run --out-format=tab ./..." "golangci-lint" "Go") linters))
-      ;; Check for Python linters - look for any .py files in project
-      (when (and (executable-find "ruff")
-                 (my/project-has-files-p project-root "*.py"))
-        (push '("ruff check --output-format=concise ." "ruff" "Python") linters))
-      ;; Fallback to flake8 for Python (only if ruff not available)
-      (when (and (not (seq-find (lambda (l) (string= (nth 1 l) "ruff")) linters))
-                 (executable-find "flake8")
-                 (my/project-has-files-p project-root "*.py"))
-        (push '("flake8 --format='%(path)s:%(row)d:%(col)d: %(code)s %(text)s'" "flake8" "Python") linters))
-      linters))
-
-  (defun my/run-linters (linters project-root)
-    "Run multiple linters and combine their output."
-    (let ((all-candidates '())
-          (linter-names '()))
-      (dolist (linter-config linters)
-        (let* ((command (nth 0 linter-config))
-               (linter-name (nth 1 linter-config))
-               (lang-type (nth 2 linter-config))
-               (default-directory project-root)
-               (output (shell-command-to-string command)))
-          (when (and output (not (string-empty-p (string-trim output))))
-            (let ((lines (split-string output "\n" t)))
-              (dolist (line lines)
-                (when (string-match "\\([^:]+\\):\\([0-9]+\\):\\([0-9]+\\)" line)
-                  ;; Prefix line with linter info for identification
-                  (push (format "[%s] %s" linter-name line) all-candidates))))
-            (push linter-name linter-names))))
-      (list (nreverse all-candidates) (nreverse linter-names))))
-
-  (defun my/consult-project-lint ()
-    "Run all available linters on project and show combined results."
-    (interactive)
-    (let* ((project-root (or (projectile-project-root)
-                             (vc-root-dir)
-                             default-directory))
-           (available-linters (my/get-available-linters project-root))
-           (result (my/run-linters available-linters project-root))
-           (candidates (car result))
-           (linter-names (cadr result)))
-      (if candidates
-          (let ((selected (consult--read candidates
-                                         :prompt (format "Lint issues (%s): " 
-                                                         (string-join linter-names ", "))
-                                         :sort nil
-                                         :require-match t)))
-            ;; Remove the [linter] prefix and parse the line
-            (when (string-match "^\\[.*?\\] \\([^:]+\\):\\([0-9]+\\):" selected)
-              (let ((rel-file (match-string 1 selected))
-                    (line (string-to-number (match-string 2 selected))))
-                (find-file (expand-file-name rel-file project-root))
-                (goto-char (point-min))
-                (forward-line (1- line)))))
-        (if available-linters
-            (message "No lint issues found (%s)" (string-join (mapcar #'cadr available-linters) ", "))
-          (message "No suitable linters found for this project")))))
-
-  (defun my/consult-go-lint ()
-    "Run golangci-lint on Go files only."
-    (interactive)
-    (let* ((project-root (or (projectile-project-root)
-                             (vc-root-dir)
-                             default-directory))
-           (go-linters (seq-filter (lambda (linter) (string= (nth 2 linter) "Go"))
-                                   (my/get-available-linters project-root))))
-      (if go-linters
-          (let* ((result (my/run-linters go-linters project-root))
-                 (candidates (car result)))
-            (if candidates
-                (let ((selected (consult--read candidates
-                                               :prompt "Go lint issues: "
-                                               :sort nil
-                                               :require-match t)))
-                  (when (string-match "^\\[.*?\\] \\([^:]+\\):\\([0-9]+\\):" selected)
-                    (let ((rel-file (match-string 1 selected))
-                          (line (string-to-number (match-string 2 selected))))
-                      (find-file (expand-file-name rel-file project-root))
-                      (goto-char (point-min))
-                      (forward-line (1- line)))))
-              (message "No Go lint issues found")))
-        (message "No Go linter available for this project"))))
-
-  (defun my/consult-python-lint ()
-    "Run Python linters (ruff/flake8) on Python files only."
-    (interactive)
-    (let* ((project-root (or (projectile-project-root)
-                             (vc-root-dir)
-                             default-directory))
-           (python-linters (seq-filter (lambda (linter) (string= (nth 2 linter) "Python"))
-                                       (my/get-available-linters project-root))))
-      (if python-linters
-          (let* ((result (my/run-linters python-linters project-root))
-                 (candidates (car result)))
-            (if candidates
-                (let ((selected (consult--read candidates
-                                               :prompt "Python lint issues: "
-                                               :sort nil
-                                               :require-match t)))
-                  (when (string-match "^\\[.*?\\] \\([^:]+\\):\\([0-9]+\\):" selected)
-                    (let ((rel-file (match-string 1 selected))
-                          (line (string-to-number (match-string 2 selected))))
-                      (find-file (expand-file-name rel-file project-root))
-                      (goto-char (point-min))
-                      (forward-line (1- line)))))
-              (message "No Python lint issues found")))
-        (message "No Python linter available for this project"))))
 
   (use-package flycheck
-    :general
-    (my-leader-def
-      "f" '(hydra-flycheck-mode/body :wk "flycheck"))
     :config
     (global-flycheck-mode +1)
     ;; Use built-in golangci-lint checker
@@ -2249,38 +2127,11 @@ By default ~flycheck~ only operates on open buffers. I've added a function here 
                 (lambda ()
                   (setq-local flycheck-checkers '(golangci-lint)
                               flycheck-golangci-lint-tests t))))
-    :hydra
-    (hydra-flycheck-mode
-     (:hint nil :color green)
-     "
-    Navigate Errors    Describe                   Filter List              Language Tools
-    ------------------ -------------------------- ----------------------- ---------------
-    _f_irst error      _s_how at point            _e_rrors only           _g_o linting
-    _n_ext error       _E_xplain at point         _w_arnings only         _P_ython linting
-    _p_rev error       ^ ^                        _i_nfo only             ^ ^
-    _l_ist errors      _q_uit                     _a_ll project files     ^ ^
-    "
-     ("f" flycheck-first-error)
-     ("n" flycheck-next-error)
-     ("p" flycheck-previous-error)
-     ("s" flycheck-display-error-at-point)
-     ("E" flycheck-explain-error-at-point)
-
-     ;; Use consult-flycheck for listing with inline filtering
-     ("l" consult-flycheck)
-     ("e" (lambda () (interactive)
-            (minibuffer-with-setup-hook (lambda () (insert "error "))
-              (call-interactively #'consult-flycheck))))
-     ("w" (lambda () (interactive)
-            (minibuffer-with-setup-hook (lambda () (insert "warning "))
-              (call-interactively #'consult-flycheck))))
-     ("i" (lambda () (interactive)
-            (minibuffer-with-setup-hook (lambda () (insert "info "))
-              (call-interactively #'consult-flycheck))))
-     ("a" my/consult-project-lint)
-     ("g" my/consult-go-lint)
-     ("P" my/consult-python-lint)
-     ("q" nil :exit t)))
+    ;; Configure Python checkers - use ruff for linting, python-check for syntax
+    (when (executable-find "ruff")
+      (add-hook 'python-ts-mode-hook
+                (lambda ()
+                  (setq-local flycheck-checkers '(python-ruff python-check))))))
 
 
   (use-package flycheck-eglot
@@ -2323,6 +2174,8 @@ Use ~flycheck-pos-tip~ to show flycheck errors in popup tooltips.
 #+BEGIN_SRC emacs-lisp
   (use-package eglot
     :straight nil
+    :general
+    (my-leader-def "l" '(hydra-code/body :wk "code"))
     :hook
     ((go-ts-mode . eglot-ensure)
      (python-ts-mode . eglot-ensure)
@@ -2332,12 +2185,185 @@ Use ~flycheck-pos-tip~ to show flycheck errors in popup tooltips.
      (rust-ts-mode . eglot-ensure)
      (sh-mode . eglot-ensure))
     :custom
+    ;; Performance tuning
     (eglot-send-changes-idle-time 0.1)
+    (eglot-events-buffer-size 0)
+    (eglot-sync-connect nil)
+    (eglot-connect-timeout 10)
+    (eglot-autoshutdown t)
+    (eglot-confirm-server-initiated-edits nil)
     ;; activate Eglot in referenced non-project files
     (eglot-extend-to-xref t)
+    ;; Better integration with flymake
+    (eglot-stay-out-of '())
     :config
     ;; massive perf boost---don't log every event
-    (fset #'jsonrpc--log-event #'ignore))
+    (fset #'jsonrpc--log-event #'ignore)
+    ;; Configure gopls with workspace diagnostics
+    (add-to-list 'eglot-server-programs
+                 `(go-ts-mode . ("gopls"
+                                 :initializationOptions
+                                 (:gofumpt t
+                                  :local ""  ; Will be auto-detected from go.mod
+                                  :analyses (:nilness t
+                                             :unusedparams t
+                                             :unusedwrite t
+                                             :useany t)
+                                  :staticcheck t
+                                  :diagnosticsDelay "500ms"
+                                  :annotations (:bounds t :escape t :inline t :nil t)
+                                  :hints (:assignVariableTypes t
+                                          :compositeLiteralFields t
+                                          :compositeLiteralTypes t
+                                          :constantValues t
+                                          :functionTypeParameters t
+                                          :parameterNames t
+                                          :rangeVariableTypes t)
+                                  :codelenses (:gc_details t
+                                               :generate t
+                                               :regenerate_cgo t
+                                               :test t
+                                               :tidy t
+                                               :upgrade_dependency t
+                                               :vendor t)))))
+    ;; Configure Python LSP - use pyright for full language features + syntax checking
+    ;; and let flycheck handle ruff for additional linting
+    (add-to-list 'eglot-server-programs
+                 `(python-ts-mode . ("pyright-langserver" "--stdio"))))
+
+  ;; Configure flymake for better LSP integration
+  (use-package flymake
+    :straight nil
+    :hook (prog-mode . flymake-mode)
+    :bind (:map flymake-mode-map
+                ("M-n" . flymake-goto-next-error)
+                ("M-p" . flymake-goto-prev-error))
+    :custom
+    ;; Performance tuning
+    (flymake-no-changes-timeout 0.5)
+    (flymake-start-on-flymake-mode t)
+    (flymake-fringe-indicator-position 'left-fringe)
+    (flymake-suppress-zero-counters t)
+    (flymake-proc-compilation-prevents-syntax-check t)
+    (flymake-wrap-around nil)
+    ;; Show more context in minibuffer
+    (flymake-show-diagnostics-at-end-of-line t)
+    :config
+    ;; Better visual indicators
+    (set-face-attribute 'flymake-error nil :underline '(:style wave :color "red"))
+    (set-face-attribute 'flymake-warning nil :underline '(:style wave :color "orange"))
+    (set-face-attribute 'flymake-note nil :underline '(:style wave :color "lightblue")))
+
+  ;; Enhanced eglot integration functions
+  (defun my/eglot-organize-imports-and-format ()
+    "Organize imports and format buffer using eglot."
+    (interactive)
+    (when (eglot-current-server)
+      (condition-case err
+          (call-interactively #'eglot-code-action-organize-imports)
+        (error (message "No organize imports action available")))
+      (call-interactively #'eglot-format-buffer)))
+
+  (defun my/toggle-eglot-diagnostics ()
+    "Toggle eglot diagnostics reporting to flymake."
+    (interactive)
+    (if (memq 'eglot flymake-diagnostic-functions)
+        (progn
+          (remove-hook 'flymake-diagnostic-functions 'eglot-flymake-backend t)
+          (message "Eglot diagnostics disabled"))
+      (progn
+        (add-hook 'flymake-diagnostic-functions 'eglot-flymake-backend nil t)
+        (message "Eglot diagnostics enabled"))))
+
+
+  (defhydra hydra-code (:hint nil :color blue)
+    "
+    Code Assistant (_q_uit)
+    ────────────────────────────────────────────────────────────────────────────────────────────
+    LSP Actions        Diagnostics              Navigation             Project Analysis      Utils
+    ─────────────────  ──────────────────────  ─────────────────────  ───────────────────   ──────
+    _a_ctions          _l_ive (flymake)         _f_irst error          _L_int project        _R_estart LSP
+    _r_ename           _c_heck (flycheck)       _n_ext error           _s_ymbols             _x_refs
+    _F_ormat           ^ ^                      _p_rev error           ^ ^                   _d_efinition
+    _o_rganize+format  _e_rrors only            _g_oto error           ^ ^                   _I_mplementation
+    _t_oggle LSP       _w_arnings only          _E_xplain error        ^ ^                   _T_ype definition
+    ^ ^                _i_nfo only              ^ ^                    ^ ^                   _h_elp/docs
+    "
+    ;; LSP Actions
+    ("a" eglot-code-actions)
+    ("r" eglot-rename)
+    ("F" eglot-format-buffer)
+    ("o" my/eglot-organize-imports-and-format)
+    ("t" my/toggle-eglot-diagnostics)
+
+    ;; Diagnostics
+    ("l" consult-flymake)
+    ("c" consult-flycheck)
+    ("e" (lambda () (interactive)
+           (minibuffer-with-setup-hook (lambda () (insert "error "))
+             (call-interactively #'consult-flycheck))))
+    ("w" (lambda () (interactive)
+           (minibuffer-with-setup-hook (lambda () (insert "warning "))
+             (call-interactively #'consult-flycheck))))
+    ("i" (lambda () (interactive)
+           (minibuffer-with-setup-hook (lambda () (insert "info "))
+             (call-interactively #'consult-flycheck))))
+
+    ;; Navigation
+    ("f" flycheck-first-error)
+    ("n" flycheck-next-error)
+    ("p" flycheck-previous-error)
+    ("g" flycheck-display-error-at-point)
+    ("E" flycheck-explain-error-at-point)
+
+    ;; Project Analysis
+    ("L" consult-flycheck)
+    ("s" consult-eglot-symbols)
+
+    ;; Utils
+    ("R" eglot-reconnect)
+    ("x" xref-find-references)
+    ("d" xref-find-definitions)
+    ("I" eglot-find-implementation)
+    ("T" eglot-find-typeDefinition)
+    ("h" my/show-documentation-and-switch)
+
+    ("q" nil :exit t))
+
+  ;; Custom documentation function that tries multiple approaches
+  (defun my/show-documentation-and-switch ()
+    "Show documentation in buffer and switch to it, trying multiple methods."
+    (interactive)
+    (cond
+     ;; Try eglot hover documentation
+     ((and (eglot-current-server) (eglot-managed-p))
+      (let ((symbol (thing-at-point 'symbol)))
+        (if symbol
+            (progn
+              ;; Force eldoc to run and populate buffer
+              (eldoc-print-current-symbol-info)
+              (sit-for 0.1) ; Give eldoc time to populate
+              (eldoc-doc-buffer)
+              ;; Force display of eldoc buffer in a new window
+              (let ((eldoc-buf (get-buffer "*eldoc*")))
+                (if (and eldoc-buf (> (buffer-size eldoc-buf) 0))
+                    (progn
+                      (pop-to-buffer eldoc-buf)
+                      (select-window (get-buffer-window eldoc-buf)))
+                  ;; If no eldoc content, try describe-symbol
+                  (describe-symbol (intern symbol))
+                  (when-let ((help-window (get-buffer-window "*Help*")))
+                    (select-window help-window)))))
+          (message "No symbol at point"))))
+     ;; Fallback to describe-symbol
+     (t
+      (let ((symbol (thing-at-point 'symbol)))
+        (if symbol
+            (progn
+              (describe-symbol (intern symbol))
+              (when-let ((help-window (get-buffer-window "*Help*")))
+                (select-window help-window)))
+          (message "No symbol at point"))))))
 
   (use-package consult-eglot
     :after (consult eglot))
