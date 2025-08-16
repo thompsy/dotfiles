@@ -1074,7 +1074,10 @@ Vertico provides a vertical completion UI for the minibuffer.
     	      "C-j" 'vertico-directory-enter
     	      "C-l" 'vertico-directory-up
     	      "DEL" 'vertico-directory-delete-char
-    	      "M-DEL" 'vertico-directory-delete-word))
+    	      "M-DEL" 'vertico-directory-delete-word
+    	      ;; Fix pixel-scroll-precision-mode conflicts
+    	      "<remap> <pixel-scroll-interpolate-up>" 'vertico-scroll-down
+    	      "<remap> <pixel-scroll-interpolate-down>" 'vertico-scroll-up))
 
   #+END_SRC
 
@@ -1104,15 +1107,10 @@ Marginalia adds helpful documentation annotations to the minibuffer margins.
     (:keymaps 'corfu-map
               "SPC" 'corfu-insert-separator
               "C-n" 'corfu-next
-              "C-p" 'corfu-previous))
-
-  ;; taken from: https://old.reddit.com/r/emacs/comments/13accue/emacs_29_pixelscrollprecisionmode_seems_to_break/
-  ;; TODO integrate these better
-  ;; this fixes issues with minibuffer scrolling and pixel-scroll mode
-  (keymap-set vertico-map "<remap> <pixel-scroll-interpolate-up>" #'vertico-scroll-down)
-  (keymap-set vertico-map "<remap> <pixel-scroll-interpolate-down>" #'vertico-scroll-up)
-  (keymap-set corfu-map "<remap> <pixel-scroll-interpolate-up>" #'corfu-scroll-down)
-  (keymap-set corfu-map "<remap> <pixel-scroll-interpolate-down>" #'corfu-scroll-up)
+              "C-p" 'corfu-previous
+              ;; Fix pixel-scroll-precision-mode conflicts
+              "<remap> <pixel-scroll-interpolate-up>" 'corfu-scroll-down
+              "<remap> <pixel-scroll-interpolate-down>" 'corfu-scroll-up))
 
   ;; Part of corfu
   (use-package corfu-popupinfo
@@ -1137,15 +1135,13 @@ Marginalia adds helpful documentation annotations to the minibuffer margins.
                      :repo "https://code.bsdgeek.org/adam/corfu-candidate-overlay"
                      :files (:defaults "*.el"))
     :after corfu
+    :general
+    ("C-<tab>" 'completion-at-point
+     "C-<iso-lefttab>" 'corfu-candidate-overlay-complete-at-point)
     :config
     ;; enable corfu-candidate-overlay mode globally
     ;; this relies on having corfu-auto set to nil
-    (corfu-candidate-overlay-mode +1)
-    ;; bind Ctrl + TAB to trigger the completion popup of corfu
-    (global-set-key (kbd "C-<tab>") 'completion-at-point)
-    ;; bind Ctrl + Shift + Tab to trigger completion of the first candidate
-    ;; (keybing <iso-lefttab> may not work for your keyboard model)
-    (global-set-key (kbd "C-<iso-lefttab>") 'corfu-candidate-overlay-complete-at-point))
+    (corfu-candidate-overlay-mode +1))
 
   ;; Fancy completion-at-point functions; there's too much in the cape package to
   ;; configure here; dive in when you're comfortable!
@@ -1616,8 +1612,6 @@ Moving back to ~flyspell~ for now.
 :END:
 This is a hydra for working with the ~rectangle~ commands.
 
-TODO: I should understand how this works better.
-
 #+BEGIN_SRC emacs-lisp
   (my-leader-def "R" '(hydra-rectangle/body :wk "rectangle"))
   (defhydra hydra-rectangle (:body-pre (rectangle-mark-mode 1)
@@ -1992,16 +1986,7 @@ Now we've got a hydra to make the various window management functions easily acc
           (user-error "There is not current branch")))))
 #+END_SRC
 
-TODO: try this https://stackoverflow.com/questions/74113199/magit-show-buffer-with-pre-commit-hooks-output-on-error
 
-[[https://github.com/dandavison/magit-delta][~magit-delta~]] enables improved diffs for Magit using [[https://github.com/dandavison/delta][delta]].
-
-I've disabled this for now since it seemed a bit slow.
-#+BEGIN_SRC emacs-lisp
-  (use-package magit-delta
-    :disabled
-    :hook (magit-mode . magit-delta-mode))
-#+END_SRC
 [[https://github.com/emacsmirror/git-timemachine][~git-timemachine~]] allows you to walk through Git revisions of a file to view changes over time.
 #+BEGIN_SRC emacs-lisp
   (use-package git-timemachine
@@ -3289,7 +3274,6 @@ Get fish shell syntax working.
 Some interesting config options:
 - https://github.com/jeffyql/dotfiles/blob/4484469d36e716dfe9431f1b489015423b63a91f/init-vterm.el
 
-  TODO: it would be nice to get the ~doom-modeline~ to reflect the ~vterm-copy-mode~ status.
 #+begin_src emacs-lisp
   (use-package vterm
   :general
