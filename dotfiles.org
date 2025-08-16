@@ -2712,6 +2712,7 @@ See helpful examples at:
           org-archive-location "archive.org::datetree/"
           org-duration-format 'h:mm ;; show hours at max, not days
           org-agenda-compact-blocks t
+          org-confirm-babel-evaluate nil
           org-cycle-separator-lines 0
           ;; hide empty agenda sections
           org-agenda-clockreport-parameter-plist '(:stepskip0 t :link t :maxlevel 2 :fileskip0 t)
