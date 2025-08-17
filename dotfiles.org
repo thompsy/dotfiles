@@ -1726,30 +1726,11 @@ This snippet provides smarter moving to the beginning of the line. Copied from [
   (use-package rg
     :ensure t
     :config (rg-enable-menu)
+    (add-to-list 'rg-finish-functions
+               (lambda (buffer status)
+                 "Move the cursor to the ripgrep results window."
+                 (pop-to-buffer "*rg*")))
     :init (setq ripgrep-arguments "--ignore-case"))
-
-  (defun my/rg-finish-function (buffer status)
-    "Move the cursor to the ripgrep results window."
-    (my/move-cursor-to-visible-buffer "*rg*"))
-
-  (add-to-list 'rg-finish-functions 'my/rg-finish-function)
-
-
-  (defun my/move-cursor-to-visible-buffer (buffer-name)
-    "If BUFFER-NAME is visible in a window, move the cursor there.
-  This function finds the window displaying the target buffer and
-  selects it, effectively moving the cursor without changing
-  which buffers are displayed in which windows. If the buffer
-  is not currently visible, this function has no effect."
-    ;; Find the window where the buffer is displayed.
-    (let ((window (get-buffer-window buffer-name)))
-      ;; If a window was found (i.e., it's not nil), select it.
-      (when window
-        (select-window window))))
-
-  (defun my/switch-to-named-buffer (buffer-name)
-    "Switch the current view to the buffer specified by the BUFFER-NAME argument."
-    (switch-to-buffer buffer-name))
 #+end_src
 
 This is a useful way to add saved project searches. Taken from https://takeonrules.com/2024/03/02/an-evening-reading-documentation-leads-to-discovery/.
