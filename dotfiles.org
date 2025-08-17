@@ -921,6 +921,13 @@ smaller to larger screens.
   (use-package embark-consult
     :after (embark consult))
 
+  ;; Safe wrapper for consult-compile-error to avoid minibuffer conflicts
+  (defun my/consult-compile-error-safe ()
+    "Safe version of consult-compile-error that avoids minibuffer conflicts."
+    (interactive)
+    (let ((enable-recursive-minibuffers t))
+      (consult-compile-error)))
+
   ;; Consult: Misc. enhanced commands
   (use-package consult
     :general
@@ -936,7 +943,7 @@ smaller to larger screens.
     ("C-x r b" 'consult-bookmark)            ;; orig. bookmark-jump
     ("C-x p b" 'consult-project-buffer)      ;; orig. project-switch-to-buffer
     ;; M-g bindings in `goto-map'
-    ("M-g e" 'consult-compile-error)
+    ("M-g e" 'my/consult-compile-error-safe)
     ("M-g f" 'consult-flycheck)              ;; Alternative: consult-flymake
     ("M-g g" 'consult-goto-line)             ;; orig. goto-line
     ("M-g M-g" 'consult-goto-line)           ;; orig. goto-line
@@ -2136,8 +2143,8 @@ A nice Hydra menu to make things more accessible.
     ("p" flycheck-previous-error)
 
     ;; Project Lint
-    ("g" my/consult-project-golangci-lint)
-    ("P" my/consult-project-ruff)
+    ("g" my/lint-golangci)
+    ("P" my/lint-ruff)
 
     ("q" nil :exit t))
     :config
@@ -2148,11 +2155,7 @@ A nice Hydra menu to make things more accessible.
                 (lambda ()
                   (setq-local flycheck-checkers '(golangci-lint)
                               flycheck-golangci-lint-tests t))))
-    ;; Configure Python checkers - use ruff for linting, python-check for syntax
-    (when (executable-find "ruff")
-      (add-hook 'python-ts-mode-hook
-                (lambda ()
-                  (setq-local flycheck-checkers '(python-ruff python-check))))))
+    )
 
 
   (use-package flycheck-eglot
@@ -2362,166 +2365,35 @@ Use ~flycheck-pos-tip~ to show flycheck errors in popup tooltips.
 
   #+END_SRC
 
-These functions run ~golangci-lint~ and ~ruff~, collect the results and display them using consult.
+Simple linter functions using compile-mode for built-in error navigation.
   #+BEGIN_SRC emacs-lisp
-  ;; Project-wide linting functions using external tools
-  (defvar my/lint-file-lookup nil
-    "Hash table mapping lint result strings to absolute file paths.")
+  ;; Enable ANSI color support in compilation buffers
+  (require 'ansi-color)
+  (add-hook 'compilation-filter-hook 'ansi-color-compilation-filter)
 
-
-  (defun my/run-project-linter-json (command linter-name file-pattern)
-    "Run a JSON-based linter command on project and return parsed results for consult."
-    (let* ((project-root (or (projectile-project-root) (vc-root-dir) default-directory))
-           (default-directory project-root)
-           (files (directory-files-recursively project-root file-pattern))
-           (candidates '()))
-      ;; Initialize lookup table
-      (setq my/lint-file-lookup (make-hash-table :test 'equal))
-      (if files
-          (progn
-            (message "Running %s on %d files..." linter-name (length files))
-            (let ((output (shell-command-to-string command)))
-              (when (and output (not (string-empty-p (string-trim output))))
-                (condition-case err
-                    ;; Try to extract JSON part (handle tools that prefix warnings)
-                    (let* ((json-start (string-match "\\[\\|{" output))
-                           (json-part (if json-start (substring output json-start) output))
-                           (json-data (json-parse-string json-part :object-type 'alist)))
-                      (cond
-                       ;; Handle golangci-lint format (has Issues object)
-                       ((and json-data (listp json-data) (assoc 'Issues json-data))
-                        (let ((issues (alist-get 'Issues json-data)))
-                          (when (vectorp issues)
-                            (seq-doseq (issue issues)
-                              (when (listp issue)
-                                (let* ((pos (alist-get 'Pos issue))
-                                       (file (alist-get 'Filename pos))
-                                       (line (alist-get 'Line pos))
-                                       (col (alist-get 'Column pos))
-                                       (linter (alist-get 'FromLinter issue))
-                                       (msg (alist-get 'Text issue))
-                                       ;; Handle both relative and absolute file paths
-                                   (abs-file (if (file-name-absolute-p file)
-                                               file
-                                             (expand-file-name file project-root)))
-                                   (rel-file (file-relative-name abs-file project-root)))
-                                  (when (and file line msg)
-                                    (let ((formatted (format "%s:%d:%d: [%s] %s"
-                                                           rel-file line (or col 1) (or linter "unknown") msg)))
-                                      ;; Store mapping in lookup table
-                                      (puthash formatted abs-file my/lint-file-lookup)
-                                      (push (my/colorize-lint-result formatted) candidates)))))))))
-                       ;; Handle ruff format (array of issues directly)
-                       ((vectorp json-data)
-                        (seq-doseq (issue json-data)
-                          (when (listp issue)
-                            (let* ((file (alist-get 'filename issue))
-                                   (location (alist-get 'location issue))
-                                   (line (alist-get 'row location))
-                                   (col (alist-get 'column location))
-                                   (code (alist-get 'code issue))
-                                   (msg (alist-get 'message issue))
-                                   ;; Handle both relative and absolute file paths
-                                   (abs-file (if (file-name-absolute-p file)
-                                               file
-                                             (expand-file-name file project-root)))
-                                   (rel-file (file-relative-name abs-file project-root)))
-                              (when (and file line msg)
-                                (let ((formatted (format "%s:%d:%d: [%s] %s"
-                                                       rel-file line (or col 1) (or code "ruff") msg)))
-                                  ;; Store mapping in lookup table
-                                  (puthash formatted abs-file my/lint-file-lookup)
-                                  (push (my/colorize-lint-result formatted) candidates)))))))))
-                  (error
-                   (message "Failed to parse JSON output from %s: %s" linter-name (error-message-string err))
-                   (push (format "Failed to parse %s output" linter-name) candidates))))
-              (if candidates
-                  (nreverse candidates)
-                (list (format "No issues found with %s" linter-name)))))
-        (list (format "No %s files found in project" file-pattern)))))
-
-
-  (defun my/colorize-lint-result (formatted-string)
-    "Add colorization to a formatted lint result string, preserving existing text properties."
-    (let ((result (substring formatted-string 0)))  ; This preserves all text properties
-      ;; Colorize file path (everything before first colon)
-      (when (string-match "^\\([^:]+\\):" result)
-        (add-text-properties (match-beginning 1) (match-end 1) '(face font-lock-string-face) result))
-      ;; Colorize line and column numbers
-      (when (string-match ":\\([0-9]+\\):\\([0-9]+\\):" result)
-        (add-text-properties (match-beginning 1) (match-end 1) '(face font-lock-constant-face) result)
-        (add-text-properties (match-beginning 2) (match-end 2) '(face font-lock-constant-face) result))
-      ;; Colorize linter name in brackets
-      (when (string-match "\\[\\([^]]+\\)\\]" result)
-        (add-text-properties (match-beginning 1) (match-end 1) '(face font-lock-type-face) result))
-      result))
-
-  (defun my/consult-project-golangci-lint ()
-    "Run golangci-lint on entire Go project and show results with consult."
+  (defun my/lint-golangci ()
+    "Run golangci-lint on entire Go project using compile-mode and pop to compilation buffer."
     (interactive)
     (if (executable-find "golangci-lint")
-        (let ((candidates (my/run-project-linter-json
-                          "golangci-lint run --out-format=json ./..."
-                          "golangci-lint"
-                          "\\.go$")))
-          (if (and candidates (not (string-match "No issues\\|No.*files" (car candidates))))
-              (let ((selected (consult--read candidates
-                                             :prompt "Go lint issues: "
-                                             :sort nil
-                                             :require-match t)))
-                (when (string-match "^\\([^:]+\\):\\([0-9]+\\):" selected)
-                  (let* ((line (string-to-number (match-string 2 selected)))
-                         ;; Try to get absolute file from lookup table first
-                         (abs-file (gethash selected my/lint-file-lookup)))
-                    (if (and abs-file (stringp abs-file))
-                        (progn
-                          (find-file abs-file)
-                          (goto-char (point-min))
-                          (forward-line (1- line)))
-                      ;; Fallback to old method if not in lookup table
-                      (let* ((project-root (or (projectile-project-root) (vc-root-dir) default-directory))
-                             (file (match-string 1 selected)))
-                        (if (and file (stringp file))
-                            (progn
-                              (find-file (expand-file-name file project-root))
-                              (goto-char (point-min))
-                              (forward-line (1- line)))
-                          (message "Unable to determine file path from selection: %s" selected)))))))
-            (message (car candidates))))
+        (let ((default-directory (or (projectile-project-root) 
+                                     (vc-root-dir) 
+                                     default-directory)))
+          ;; Use --color=always for colored output in compilation buffer
+          (compile "golangci-lint run --color=always")
+          ;; Jump to compilation window
+          (pop-to-buffer "*compilation*"))
       (message "golangci-lint not found")))
 
-  (defun my/consult-project-ruff ()
-    "Run ruff on entire Python project and show results with consult."
+  (defun my/lint-ruff ()
+    "Run ruff on entire Python project using compile-mode and pop to compilation buffer."
     (interactive)
     (if (executable-find "ruff")
-        (let ((candidates (my/run-project-linter-json
-                          "ruff check --output-format=json ."
-                          "ruff"
-                          "\\.py$")))
-          (if (and candidates (not (string-match "No issues\\|No.*files" (car candidates))))
-              (let ((selected (consult--read candidates
-                                             :prompt "Python lint issues: "
-                                             :sort nil
-                                             :require-match t)))
-                (when (string-match "^\\([^:]+\\):\\([0-9]+\\):" selected)
-                  (let* ((line (string-to-number (match-string 2 selected)))
-                         ;; Try to get absolute file from lookup table first
-                         (abs-file (gethash selected my/lint-file-lookup)))
-                    (if (and abs-file (stringp abs-file))
-                        (progn
-                          (find-file abs-file)
-                          (goto-char (point-min))
-                          (forward-line (1- line)))
-                      ;; Fallback to old method if not in lookup table
-                      (let* ((project-root (or (projectile-project-root) (vc-root-dir) default-directory))
-                             (file (match-string 1 selected)))
-                        (if (and file (stringp file))
-                            (progn
-                              (find-file (expand-file-name file project-root))
-                              (goto-char (point-min))
-                              (forward-line (1- line)))
-                          (message "Unable to determine file path from selection: %s" selected)))))))
-            (message (car candidates))))
+        (let ((default-directory (or (projectile-project-root) 
+                                     (vc-root-dir) 
+                                     default-directory)))
+          ;; Use --force-exclude to respect .gitignore, no --color flag needed (ruff auto-detects)
+          (compile "ruff check --force-exclude --output-format concise")
+          (pop-to-buffer "*compilation*"))
       (message "ruff not found")))
 
 #+END_SRC
