@@ -921,12 +921,19 @@ smaller to larger screens.
   (use-package embark-consult
     :after (embark consult))
 
-  ;; Safe wrapper for consult-compile-error to avoid minibuffer conflicts
+  ;; Safe wrapper for consult-compile-error to prevent minibuffer conflicts
   (defun my/consult-compile-error-safe ()
-    "Safe version of consult-compile-error that avoids minibuffer conflicts."
+    "Run consult-compile-error without auto-navigation interference."
     (interactive)
-    (let ((enable-recursive-minibuffers t))
-      (consult-compile-error)))
+    (let ((compilation-auto-jump-to-first-error nil)
+          (compilation-auto-jump-to-next nil)
+          (compilation-skip-to-next-location nil)
+          (next-error-hook nil)
+          (compilation-finish-functions nil))
+      ;; Temporarily disable all compilation navigation hooks
+      (cl-letf (((symbol-function 'compilation-auto-jump) (lambda (&rest _) nil))
+                ((symbol-function 'compilation-goto-locus) (lambda (&rest _) nil)))
+        (consult-compile-error))))
 
   ;; Consult: Misc. enhanced commands
   (use-package consult
@@ -944,7 +951,7 @@ smaller to larger screens.
     ("C-x p b" 'consult-project-buffer)      ;; orig. project-switch-to-buffer
     ;; M-g bindings in `goto-map'
     ("M-g e" 'my/consult-compile-error-safe)
-    ("M-g f" 'consult-flycheck)              ;; Alternative: consult-flymake
+    ("M-g f" 'consult-flycheck)
     ("M-g g" 'consult-goto-line)             ;; orig. goto-line
     ("M-g M-g" 'consult-goto-line)           ;; orig. goto-line
     ("M-g o" 'consult-outline)               ;; Alternative: consult-org-heading
@@ -2106,7 +2113,7 @@ A nice Hydra menu to make things more accessible.
 :CUSTOM_ID: flycheck
 :END:
 
-~flycheck~ operates on open buffers, while ~flymake~ integrates with eglot for real-time LSP diagnostics.
+~flycheck~ operates on open buffers and integrates with eglot via flycheck-eglot for real-time LSP diagnostics.
 #+BEGIN_SRC emacs-lisp
   (use-package flycheck
     :general
@@ -2251,7 +2258,7 @@ Use ~flycheck-pos-tip~ to show flycheck errors in popup tooltips.
     (eglot-confirm-server-initiated-edits nil)
     ;; activate Eglot in referenced non-project files
     (eglot-extend-to-xref t)
-    ;; Better integration with flymake
+    ;; Better integration with flycheck
     (eglot-stay-out-of '())
     :config
     ;; massive perf boost---don't log every event
@@ -2288,28 +2295,6 @@ Use ~flycheck-pos-tip~ to show flycheck errors in popup tooltips.
     (add-to-list 'eglot-server-programs
                  `(python-ts-mode . ("pyright-langserver" "--stdio"))))
 
-  ;; Configure flymake for better LSP integration
-  (use-package flymake
-    :straight nil
-    :hook (prog-mode . flymake-mode)
-    :bind (:map flymake-mode-map
-                ("M-n" . flymake-goto-next-error)
-                ("M-p" . flymake-goto-prev-error))
-    :custom
-    ;; Performance tuning
-    (flymake-no-changes-timeout 0.5)
-    (flymake-start-on-flymake-mode t)
-    (flymake-fringe-indicator-position 'left-fringe)
-    (flymake-suppress-zero-counters t)
-    (flymake-proc-compilation-prevents-syntax-check t)
-    (flymake-wrap-around nil)
-    ;; Show more context in minibuffer
-    (flymake-show-diagnostics-at-end-of-line t)
-    :config
-    ;; Better visual indicators
-    (set-face-attribute 'flymake-error nil :underline '(:style wave :color "red"))
-    (set-face-attribute 'flymake-warning nil :underline '(:style wave :color "orange"))
-    (set-face-attribute 'flymake-note nil :underline '(:style wave :color "lightblue")))
 
   ;; Enhanced eglot integration functions
   (defun my/eglot-organize-imports-and-format ()
@@ -2377,10 +2362,11 @@ Simple linter functions using compile-mode for built-in error navigation.
     (if (executable-find "golangci-lint")
         (let ((default-directory (or (projectile-project-root) 
                                      (vc-root-dir) 
-                                     default-directory)))
+                                     default-directory))
+              (compilation-auto-jump-to-first-error nil))
           ;; Use --color=always for colored output in compilation buffer
           (compile "golangci-lint run --color=always")
-          ;; Jump to compilation window
+          ;; Jump to compilation window without auto-navigation
           (pop-to-buffer "*compilation*"))
       (message "golangci-lint not found")))
 
@@ -2390,9 +2376,11 @@ Simple linter functions using compile-mode for built-in error navigation.
     (if (executable-find "ruff")
         (let ((default-directory (or (projectile-project-root) 
                                      (vc-root-dir) 
-                                     default-directory)))
+                                     default-directory))
+              (compilation-auto-jump-to-first-error nil))
           ;; Use --force-exclude to respect .gitignore, no --color flag needed (ruff auto-detects)
           (compile "ruff check --force-exclude --output-format concise")
+          ;; Jump to compilation window without auto-navigation
           (pop-to-buffer "*compilation*"))
       (message "ruff not found")))
 
@@ -3269,7 +3257,6 @@ Various setup like sensitive tags and functions that deal with them are stored e
    ("flycheck-eglot" . "0d7f0afc9bf08fce4a3ee225ec6540a91f8cfd76")
    ("flycheck-golangci-lint" . "14bf143ea7ae190544326576a156de9c915a4751")
    ("flycheck-projectile" . "ce6e9e8793a55dace13d5fa13badab2dca3b5ddb")
-   ("flymake" . "9550c2c7d9809559f8db7507927d0931a7a666b3")
    ("flyspell-correct" . "1e7a5a56362dd875dddf848b9a9e25d1395b9d37")
    ("frame-cmds" . "5f845c06f1913ecda33c87b2b36b9e590a6f8870")
    ("frame-fns" . "b675ee568c0133709c2c39a125395486cdf1c610")
