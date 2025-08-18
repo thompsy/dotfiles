@@ -1114,9 +1114,17 @@ Marginalia adds helpful documentation annotations to the minibuffer margins.
     :init
     (global-corfu-mode)
     (corfu-history-mode)
-    (corfu-popupinfo-mode)
     :config
     (setq completion-ignore-case t)
+    :custom
+    (corfu-cycle t)
+    (corfu-auto t)
+    (corfu-auto-delay 0.3)
+    (corfu-auto-prefix 2)
+    ;; Enhanced completion behavior
+    (corfu-preview-current 'insert)        ; VS Code-like preview
+    (corfu-on-exact-match 'insert)         ; Auto-insert exact matches
+    (corfu-quit-at-boundary nil)           ; Keep completion open longer
     :general
     (:keymaps 'corfu-map
               "SPC" 'corfu-insert-separator
@@ -1131,7 +1139,6 @@ Marginalia adds helpful documentation annotations to the minibuffer margins.
     :straight nil
     :ensure nil
     :after corfu
-    :hook (corfu-mode . corfu-popupinfo-mode)
     :custom
     (corfu-popupinfo-delay '(0.25 . 0.1))
     (corfu-popupinfo-hide nil)
@@ -1157,12 +1164,16 @@ Marginalia adds helpful documentation annotations to the minibuffer margins.
     ;; this relies on having corfu-auto set to nil
     (corfu-candidate-overlay-mode +1))
 
-  ;; Fancy completion-at-point functions; there's too much in the cape package to
-  ;; configure here; dive in when you're comfortable!
+  ;; Enhanced completion-at-point functions using Cape
   (use-package cape
     :init
-    (add-to-list 'completion-at-point-functions #'cape-dabbrev)
-    (add-to-list 'completion-at-point-functions #'cape-file))
+    ;; Add completion functions in order of preference
+    (add-to-list 'completion-at-point-functions (cape-capf-buster #'yas-expand))  ; Yasnippet snippets
+    (add-to-list 'completion-at-point-functions #'cape-keyword)  ; Programming keywords
+    (add-to-list 'completion-at-point-functions #'cape-symbol)   ; Elisp symbols  
+    (add-to-list 'completion-at-point-functions #'cape-dabbrev)  ; Dynamic abbreviations
+    (add-to-list 'completion-at-point-functions #'cape-file)     ; File paths
+    (add-to-list 'completion-at-point-functions #'cape-dict))    ; Dictionary words
 
   ;; Pretty icons for corfu
   (use-package kind-icon
