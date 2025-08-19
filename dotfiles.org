@@ -2157,15 +2157,14 @@ A nice Hydra menu to make things more accessible.
     (global-flycheck-eglot-mode 1))
   #+END_SRC
 
-Use ~flycheck-pos-tip~ to show flycheck errors in popup tooltips.
+Show flycheck errors in echo area instead of popup tooltips to avoid Corfu conflicts.
   #+BEGIN_SRC emacs-lisp
   (use-package flycheck-pos-tip
     :after flycheck
     :config
-    (flycheck-pos-tip-mode)
-    (setq flycheck-pos-tip-max-width 80
-          pos-tip-tab-width 4
-          pos-tip-use-relative-coordinates t))
+    ;; Disable pos-tip mode and use echo area instead
+    ;; (flycheck-pos-tip-mode)
+    (setq flycheck-display-errors-function #'flycheck-display-error-messages-unless-error-list))
 
   (use-package consult-flycheck
     :after (flycheck eglot consult))
