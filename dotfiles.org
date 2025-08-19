@@ -1929,10 +1929,6 @@ Now we've got a hydra to make the various window management functions easily acc
   	  (python-mode . python-ts-mode)))
     )
 
-  (use-package treesit-auto
-    :config
-    (global-treesit-auto-mode))
-
   (use-package treesit-fold
     :straight (treesit-fold :type git :host github :repo "emacs-tree-sitter/treesit-fold")
     :config
@@ -2341,8 +2337,8 @@ Simple linter functions using compile-mode for built-in error navigation.
     "Run golangci-lint on entire Go project using compile-mode and pop to compilation buffer."
     (interactive)
     (if (executable-find "golangci-lint")
-        (let ((default-directory (or (projectile-project-root) 
-                                     (vc-root-dir) 
+        (let ((default-directory (or (projectile-project-root)
+                                     (vc-root-dir)
                                      default-directory))
               (compilation-auto-jump-to-first-error nil))
           ;; Use --color=always for colored output in compilation buffer
@@ -2355,8 +2351,8 @@ Simple linter functions using compile-mode for built-in error navigation.
     "Run ruff on entire Python project using compile-mode and pop to compilation buffer."
     (interactive)
     (if (executable-find "ruff")
-        (let ((default-directory (or (projectile-project-root) 
-                                     (vc-root-dir) 
+        (let ((default-directory (or (projectile-project-root)
+                                     (vc-root-dir)
                                      default-directory))
               (compilation-auto-jump-to-first-error nil))
           ;; Use --force-exclude to respect .gitignore, no --color flag needed (ruff auto-detects)
