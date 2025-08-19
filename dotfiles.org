@@ -3889,11 +3889,13 @@ Some useful ~jujutsu~ aliases.
   abbr --add jna jj new -A
   abbr --add jnb jj new -B
 
-  abbr --add jd jj desc
+  abbr --add jdm jj desc -m
   abbr --add jdr jj desc -r
 
   abbr --add je jj edit
   abbr --add jer jj edit -r
+
+  abbr --add jr jj rebase
 
   abbr --add jf jj diff
 
@@ -3902,10 +3904,13 @@ Some useful ~jujutsu~ aliases.
 
   abbr --add jl jj log
 
-  abbr --add jbs jj bookmark set -r
+  abbr --add jbs jj bookmark set
+  abbr --add jbsr jj bookmark set -r
 
   abbr --add jgp jj git push
   abbr --add jgf jj git fetch
+
+  abbr --add pc pre-commit run --all-files
 #+end_src
 
 Setup ~go~-related config. I should probably check that ~go~ is actually installed first.
