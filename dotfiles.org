@@ -405,7 +405,7 @@ to any themes so that they confirmation code gets stored in ~custom.el~.
   :config
   (gcmh-mode 1)
   ;; You can customize these, but the defaults are often good
-  (setq gcmh-high-cons-threshold (* 200 1024 1024)) ; e.g., 128MB when active
+  (setq gcmh-high-cons-threshold (* 500 1024 1024)) ; e.g., 128MB when active
   (setq gcmh-idle-delay 1) ; Run GC after 1 seconds of idle time
   (setq gcmh-auto-mode-enable t) ; Enable for all modes
   (setq gcmh-verbose t) ; For debugging/monitoring
@@ -533,7 +533,7 @@ improvement on this by popping up in a floating window.
 #+BEGIN_SRC emacs-lisp
   (use-package which-key
     :custom
-    (which-key-idle-delay 0)
+    (which-key-idle-delay 1.0)
     :config
     (which-key-mode +1))
 #+END_SRC
@@ -2141,6 +2141,7 @@ A nice Hydra menu to make things more accessible.
     ("q" nil :exit t))
     :config
     (global-flycheck-mode +1)
+    (setq flycheck-idle-change-delay 1.5)
     ;; Use built-in golangci-lint checker
     (when (executable-find "golangci-lint")
       (add-hook 'go-ts-mode-hook
@@ -2149,6 +2150,7 @@ A nice Hydra menu to make things more accessible.
                               flycheck-golangci-lint-tests t))))
     )
 
+  (setq eldoc-idle-delay 0.5)
 
   (use-package flycheck-eglot
     :after (flycheck eglot)
@@ -2472,7 +2474,7 @@ These packages need to be installed in the Python environment too.
     (yas-global-mode +1)
     (setq yas-snippet-dirs (append yas-snippet-dirs
   				 '("~/.emacs.d/snippets/")))
-    
+
     ;; Smart tab function that handles both yasnippet and completion
     (defun my/smart-tab ()
       "Try yasnippet expansion, then completion, then indent."
@@ -2490,7 +2492,7 @@ These packages need to be installed in the Python environment too.
        ((completion-at-point))
        ;; Fall back to regular tab behavior
        (t (indent-for-tab-command))))
-    
+
     ;; Bind the smart tab function
     :general
     (:keymaps 'yas-keymap
@@ -3935,6 +3937,7 @@ Some useful ~jujutsu~ aliases.
   abbr --add jbsr jj bookmark set -r
 
   abbr --add jgp jj git push
+  abbr --add jgpb jj git push -b
   abbr --add jgf jj git fetch
 
   abbr --add pc pre-commit run --all-files
