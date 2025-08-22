@@ -400,7 +400,7 @@ to any themes so that they confirmation code gets stored in ~custom.el~.
         (load-file custom-file)))
 #+END_SRC
 
-#+begin_src
+#+begin_src emacs-lisp
 (use-package gcmh
   :config
   (gcmh-mode 1)
@@ -451,11 +451,11 @@ a non-shell environment like OSX.
 :END:
 Restore the previously open buffers when restarting.
 #+begin_src emacs-lisp
-  (use-package desktop
-    :config
-    (desktop-save-mode 1)
-    (setq desktop-save t
-          desktop-auto-save-timeout 300))
+  ;; (use-package desktop
+  ;;   :config
+  ;;   (desktop-save-mode 1)
+  ;;   (setq desktop-save t
+  ;;         desktop-auto-save-timeout 300))
 #+end_src
 *** Files
 :PROPERTIES:
