@@ -1244,10 +1244,50 @@ and presents completion candidates.
 :ID:       f0a86a96-4f51-432c-9092-d89cdcbdd1cc
 :END:
 #+begin_src emacs-lisp
-  (use-package beacon
+  (use-package pulsar
+    :general
+    ("C-t h p" 'pulsar-pulse-line)
+    ("C-t h h" 'pulsar-highlight-line)
+
     :config
-    (setq beacon-color "#666600")
-    (beacon-mode 1))
+    (setq pulsar-pulse t
+          pulsar-delay 0.055
+          pulsar-iterations 10
+          pulsar-face 'pulsar-magenta
+          pulsar-highlight-face 'pulsar-yellow)
+
+    ;; Enable pulsar globally
+    (pulsar-global-mode 1)
+
+    ;; Pulse on standard Emacs navigation commands like `next-error`.
+    (add-hook 'next-error-hook #'pulsar-pulse-line)
+
+    ;; For `consult', `pulsar-reveal-entry` is often preferred as it both recenters and pulses the
+    ;; line.
+    (add-hook 'consult-after-jump-hook #'pulsar-reveal-entry)
+
+    ;; For `imenu', same as above.
+    (add-hook 'imenu-after-jump-hook #'pulsar-reveal-entry)
+
+    ;; Pulse when switching windows
+    (add-hook 'window-selection-change-functions #'pulsar-pulse-line)
+
+    ;; Pulse when switching buffers in the current window
+    (add-hook 'buffer-list-update-hook #'pulsar-pulse-line)
+
+    (add-hook 'magit-post-refresh-hook #'pulsar-pulse-line)
+
+    ;; Add diff-hl and flycheck functions to pulsar-pulse-functions
+    (with-eval-after-load 'diff-hl
+      (add-to-list 'pulsar-pulse-functions 'diff-hl-next-hunk)
+      (add-to-list 'pulsar-pulse-functions 'diff-hl-previous-hunk))
+
+    (with-eval-after-load 'flycheck
+      (add-to-list 'pulsar-pulse-functions 'flycheck-next-error)
+      (add-to-list 'pulsar-pulse-functions 'flycheck-previous-error))
+
+    (add-hook 'avy-post-action-hook #'pulsar-pulse-line)
+    )
 #+end_src
 
 *** ibuffer
