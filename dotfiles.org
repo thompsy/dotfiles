@@ -1269,11 +1269,13 @@ and presents completion candidates.
     ;; For `imenu', same as above.
     (add-hook 'imenu-after-jump-hook #'pulsar-reveal-entry)
 
-    ;; Pulse when switching windows
-    (add-hook 'window-selection-change-functions #'pulsar-pulse-line)
+    ;; Pulse when switching windows (but only if pulsar-mode is active)
+    (add-hook 'window-selection-change-functions
+              (lambda (&rest _) (when pulsar-mode (pulsar-pulse-line))))
 
-    ;; Pulse when switching buffers in the current window
-    (add-hook 'buffer-list-update-hook #'pulsar-pulse-line)
+    ;; Pulse when switching buffers in the current window (but only if pulsar-mode is active)
+    (add-hook 'buffer-list-update-hook
+              (lambda (&rest _) (when pulsar-mode (pulsar-pulse-line))))
 
     (add-hook 'magit-post-refresh-hook #'pulsar-pulse-line)
 
@@ -1287,6 +1289,25 @@ and presents completion candidates.
       (add-to-list 'pulsar-pulse-functions 'flycheck-previous-error))
 
     (add-hook 'avy-post-action-hook #'pulsar-pulse-line)
+
+    ;; Create a list of major modes where pulsar should be disabled
+    (defvar my/pulsar-excluded-modes '(vterm-mode)
+      "Major modes where pulsar should be disabled.")
+
+    ;; Override pulsar--on to respect our exclusion list
+    (defun my/pulsar--on-with-exclusions ()
+      "Enable `pulsar-mode' unless in an excluded major mode or copy mode context."
+      (unless (or pulsar-mode
+                  (minibufferp)
+                  (and pulsar-inhibit-hidden-buffers (string-prefix-p " " (buffer-name)))
+                  ;; Our custom exclusions
+                  (and (memq major-mode my/pulsar-excluded-modes)
+                       (not (and (eq major-mode 'vterm-mode)
+                                 (bound-and-true-p vterm-copy-mode)))))
+        (pulsar-mode 1)))
+
+    ;; Replace the original function
+    (advice-add 'pulsar--on :override #'my/pulsar--on-with-exclusions)
     )
 #+end_src
 
@@ -3192,18 +3213,29 @@ Some interesting config options:
   ("C-c v" 'vterm-copy-mode)
   (:keymaps 'vterm-mode-map
             "M-y" 'vterm-yank-pop
-            ;; For some reason the keymap exception below doesn't work as expected.
+            ;; Send C-c to terminal when C-g is pressed
+            "C-g" (lambda () (interactive) (vterm-send-key "c" nil nil t))
+            ;; Preserve global C-t binding
             "C-t" (lookup-key global-map (kbd "C-t")))
+
   :hook
-  ;; Disable hl-line-mode to reduce flickering: https://github.com/akermu/emacs-libvterm/issues/432
+  ;; Disable hl-line-mode to reduce flickering in regular vterm
   (vterm-mode . (lambda () (setq-local global-hl-line-mode nil)))
-  (vterm-copy-mode . (lambda () (call-interactively 'hl-line-mode)))
+  ;; Handle hl-line and mode-line changes in copy mode
   (vterm-copy-mode . (lambda ()
                        (if vterm-copy-mode
-                           (setq-local mode-line-process
-                                       (list " " (propertize "VTerm[COPY]" 'face 'font-lock-warning-face)))
-                         (setq-local mode-line-process
-                                     (list " " (propertize "VTerm" 'face 'font-lock-keyword-face))))))
+                           ;; Entering copy mode
+                           (progn
+                             (setq-local mode-line-process (list " " (propertize "VTerm[COPY]" 'face 'font-lock-warning-face)))
+                             (hl-line-mode 1)
+                             ;; Enable pulsar for copy mode
+                             (pulsar-mode 1))
+                         ;; Exiting copy mode
+                         (progn
+                           (setq-local mode-line-process (list " " (propertize "VTerm" 'face 'font-lock-keyword-face)))
+                           (hl-line-mode -1)
+                           ;; Explicitly disable pulsar when returning to vterm-mode
+                           (pulsar-mode -1)))))
   :config
   (setq vterm-max-scrollback 100000
         vterm-clear-scrollback t
@@ -3215,7 +3247,7 @@ Some interesting config options:
                           ("dired" dired)
                           ("ediff-files" ediff-files))
         vterm-keymap-exceptions
-        '("M-:" "C-c" "C-x" "C-u" "C-g" "C-h" "C-l" "M-x" "M-o" "C-y" "M-y" "M-s" "C-t")))
+        '("M-:" "C-c" "C-x" "C-u" "C-h" "C-l" "M-x" "M-o" "C-y" "M-y" "M-s" "C-t")))
 #+end_src
 
 #+begin_src emacs-lisp
