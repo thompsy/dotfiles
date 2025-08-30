@@ -3913,6 +3913,8 @@ Some useful ~jujutsu~ aliases.
 #+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
   abbr --add j jj
 
+  abbr --add jft jj file track
+
   abbr --add jn jj new
   abbr --add jnr jj new -r
   abbr --add jna jj new -A
@@ -3931,7 +3933,7 @@ Some useful ~jujutsu~ aliases.
   abbr --add jst jj status
   abbr --add jstr jj status -r
 
-  abbr --add jl jj log
+  abbr --add jl jj ll
 
   abbr --add jbs jj bookmark set
   abbr --add jbsr jj bookmark set -r
@@ -4091,8 +4093,8 @@ cat ~/.email
   auto-track = "none()"
 
   [ui]
-  default-command = "log"
-  diff-formatter = ["difft", "--color=always", "$left", "$right"]
+  default-command = "ll"
+  diff-formatter = ["difft", "--color=always", "--context=20", "$left", "$right"]
   # conflict-marker-style = "diff"
   # conflict-marker-style = "snapshot"
   # conflict-marker-style = "git"
