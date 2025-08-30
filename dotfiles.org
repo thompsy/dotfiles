@@ -4459,7 +4459,7 @@ config.color_scheme = 'Dracula'
 config.font = wezterm.font 'FiraCode Nerd Font'
 config.font_size = 14.0
 
-config.enable_tab_bar = false
+config.enable_tab_bar = true
 
 config.window_padding = {
   left = "1cell",
