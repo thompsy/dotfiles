@@ -1119,12 +1119,13 @@ Marginalia adds helpful documentation annotations to the minibuffer margins.
     (setq completion-ignore-case t)
     :custom
     (corfu-cycle t)
-    (corfu-auto t)
+    (corfu-auto nil)
     (corfu-auto-delay 0.3)
     (corfu-auto-prefix 2)
     (corfu-preview-current 'insert)
     (corfu-on-exact-match 'insert)
-    (corfu-quit-at-boundary nil)
+    (corfu-quit-no-match t)
+    (corfu-quit-at-boundary t)
     :general
     (:keymaps 'corfu-map
               "SPC" 'corfu-insert-separator
@@ -1185,7 +1186,7 @@ and presents completion candidates.
 #+BEGIN_SRC emacs-lisp
   (use-package orderless
     :config
-    (setq completion-styles '(orderless)))
+    (setq completion-styles '(orderless basic)))
 #+END_SRC
 
 *** Bookmarks
