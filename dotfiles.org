@@ -294,9 +294,8 @@ Install [[https://github.com/jwiegley/use-package][~use-package~]] for easily in
   (straight-use-package 'use-package)
 #+END_SRC
 
-I don't want to use the built-in version of org-mode since it's usually pretty old. Instead I want
-straight to pull down the latest version. To avoid the built-in version getting loaded we need to
-explicitly load it with straight early in the init process. See more details in the [[https://github.com/radian-software/straight.el#the-wrong-version-of-my-package-was-loaded][~README.md~]].
+Using straight.el to install org-mode instead of the built-in version to get the latest features.
+To avoid conflicts, we need to load it early in the init process. See the [[https://github.com/radian-software/straight.el#the-wrong-version-of-my-package-was-loaded][straight.el documentation]] for details.
 #+BEGIN_SRC emacs-lisp
   (straight-use-package 'org)
 #+END_SRC
@@ -1457,7 +1456,7 @@ and presents completion candidates.
 
 #+begin_src emacs-lisp
 
-  ;; TODO experiment with this!
+  ;; Package for highlighting TODO/FIXME keywords in code
   (use-package fixmee)
 
   (use-package projectile
@@ -2244,7 +2243,7 @@ Show flycheck errors in echo area instead of popup tooltips to avoid Corfu confl
     (add-to-list 'popwin:special-display-config
                  `(,flycheck-projectile-error-list-buffer :regexp nil :dedicated t :position bottom :stick t :noselect nil)))
 
-  ;; TODO explore this a bit
+  ;; Window popup management
   (use-package popwin)
 
 #+END_SRC
@@ -3079,7 +3078,7 @@ a menu of various types of blocks that you may want to insert.
     (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
     (add-to-list 'org-structure-template-alist '("sh" . "src sh")))
 
-  ;; todo this shuold be part of the org setup
+  ;; Hydra for org-mode templates (note: could be moved to org section)
   (defhydra hydra-org-template (:color blue :hint nil)
     "
    _c_enter  _Q_uote     _e_macs-lisp    _L_aTeX:
