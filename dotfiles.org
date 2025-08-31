@@ -35,7 +35,6 @@ available. A few places that I've found particularly useful include:
   - [[#what-is-this][What is this?]]
 - [[#tasks][Tasks]]
   - [[#homebrew][Homebrew]]
-- [[#setup][Setup]]
 - [[#emacs][Emacs]]
   - [[#local][Local]]
   - [[#early-init][Early Init]]
@@ -84,7 +83,7 @@ available. A few places that I've found particularly useful include:
     - [[#snippets][Snippets]]
     - [[#kubernetes][Kubernetes]]
   - [[#org][Org]]
-    - [[#setup-0][Setup]]
+    - [[#setup][Setup]]
     - [[#task-states][Task States]]
     - [[#tags][Tags]]
     - [[#capture-templates][Capture Templates]]
@@ -96,7 +95,11 @@ available. A few places that I've found particularly useful include:
   - [[#site-local][Site Local]]
   - [[#package-versions][Package Versions]]
 - [[#fish][Fish]]
-- [[#zellij][Zellij]]
+  - [[#development-tools-setup][Development Tools Setup]]
+    - [[#usage][Usage]]
+  - [[#brewfile][Brewfile]]
+  - [[#shell-configuration][Shell Configuration]]
+- [[#jujutsu][Jujutsu]]
 - [[#starship][Starship]]
 - [[#wezterm][Wezterm]]
 :END:
@@ -2605,7 +2608,7 @@ See helpful examples at:
 *** Setup
 :PROPERTIES:
 :ID:       F8105CAC-7798-4FA9-99AD-A946940C527A
-:CUSTOM_ID: setup-0
+:CUSTOM_ID: setup
 :END:
 #+BEGIN_SRC emacs-lisp
   (use-package org
@@ -3450,7 +3453,7 @@ Useful key built-in bindings:
 
 ** Development Tools Setup
 :PROPERTIES:
-:CUSTOM_ID: dev-tools-setup
+:CUSTOM_ID: development-tools-setup
 :ID:       a7ea3f46-95ba-46bf-a09a-aeea0550b52a
 :END:
 
@@ -3728,6 +3731,9 @@ end' > ~/Brewfile
 #+end_src
 
 *** Usage
+:PROPERTIES:
+:CUSTOM_ID: usage
+:END:
 
 After tangling, make the script executable and run it:
 
@@ -3792,7 +3798,7 @@ end
 
 ** Shell Configuration
 :PROPERTIES:
-:CUSTOM_ID: fish-shell-config
+:CUSTOM_ID: shell-configuration
 :ID:       f1eac489-d525-488d-aeba-dd7ab3a167c0
 :END:
 
@@ -4115,6 +4121,7 @@ Source any local config
 * Jujutsu
 :PROPERTIES:
 :ID:       5A6C158E-26C3-4F66-8095-1CD519811E85
+:CUSTOM_ID: jujutsu
 :END:
 
 
