@@ -1,4 +1,4 @@
-#+TITLE: dotfiles.org
+#+TITLE: Literate Dotfiles Configuration
 
 * Dotfiles
 :PROPERTIES:
@@ -9,17 +9,23 @@
 :TOC:      :include all :depth 9 :force (depth) :ignore (nothing) :local (nothing)
 :CUSTOM_ID: what-is-this
 :END:
-This is my dotfiles configuration in ~org-mode~. To output the source code run ~org-babel-tangle~
-(typically ~C-c~ ~C-v~ ~t~). You can also run it from the command line like this in ~bash~:
+This is a comprehensive literate configuration for Emacs and related development tools, written in ~org-mode~. This approach allows for detailed documentation alongside configuration code, making it easier to understand, maintain, and share.
+
+The configuration includes settings for Emacs itself, shell environments (Fish), terminal emulators (WezTerm), version control (Jujutsu), and various development tools. Each package and setting is documented with explanations of its purpose and usage.
+
+To generate the actual configuration files, run ~org-babel-tangle~ (typically ~C-c C-v t~) from within Emacs, or use this command line approach:
 
 #+begin_src bash
   $(which emacs) --batch --eval "(require 'org)" --eval '(org-babel-tangle-file "~/dotfiles/dotfiles.org")'
 #+end_src
 
-This will create and populate the various config files to the correct locations.
+This will extract and create all configuration files in their correct locations throughout your system.
 
-Many (most!) things in this file have been inspired by others making their configuration
-available. A few places that I've found particularly useful include:
+** Acknowledgments
+:PROPERTIES:
+:CUSTOM_ID: acknowledgments
+:END:
+This configuration has been greatly influenced by the generous Emacs community sharing their configurations. Particularly useful references include:
 - [[https://github.com/kwpav/dotfiles/blob/master/emacs.org][kwpav's config]]
 - [[http://pages.sachachua.com/.emacs.d/Sacha.html][Sacha Chua's config]]
 - [[https://github.com/TheBB/dotemacs][TheBB's config]]
@@ -228,15 +234,16 @@ to disable ~package.el~ in favour of ~straight.el~.
 :ID:       C189F4FE-CACC-4BE4-BBCE-BC1D44D6653E
 :CUSTOM_ID: preamble
 :END:
-Some initial comment blurb.
+Standard Emacs Lisp file headers for the generated ~init.el~ file. These headers help with package management tools and provide basic file documentation.
+
 #+BEGIN_SRC emacs-lisp
   ;;; init.el --- Initialization file for Emacs
   ;;; Commentary: Emacs Startup File --- initialization for Emacs
   ;;; Code:
 #+END_SRC
 
-Load some local setup. As noted above, this is generally installation specific, so its easiest to
-keep it in a separate file.
+Load machine-specific configuration from a separate local setup file. This allows for system-specific customizations without modifying the main configuration.
+
 #+BEGIN_SRC emacs-lisp
   (require 'local-setup "~/.emacs.d/local.el")
 #+END_SRC
@@ -246,7 +253,7 @@ keep it in a separate file.
 :ID:       B3B9D84C-661E-457F-9282-421A1B12060E
 :CUSTOM_ID: package-manager
 :END:
-Setup the [[https://github.com/radian-software/straight.el][~straight.el~]] package manager.
+Configure [[https://github.com/radian-software/straight.el][~straight.el~]] as the package manager. Unlike the built-in ~package.el~, straight.el provides reproducible, version-controlled package management by cloning packages directly from their Git repositories.
 #+BEGIN_SRC emacs-lisp
   (setq straight-repository-branch "master")
 
@@ -264,55 +271,43 @@ Setup the [[https://github.com/radian-software/straight.el][~straight.el~]] pack
     (load bootstrap-file nil 'nomessage))
 #+END_SRC
 
-From the straight docs:
-#+BEGIN_QUOTE
-By setting the variable straight-cache-autoloads to a non-nil value, you can cause straight.el to
-cache the autoloads of all used packages in a single file on disk, and load them from there instead
-of from the individual package files if they are still up to date. This reduces the number of disk
-IO operations during startup from O(number of packages) to O(1), so it should improve
-performance. No other configuration should be necessary to make this work; however, you may wish to
-call straight-prune-build occasionally, since otherwise this cache file may grow quite large over
-time.
-#+END_QUOTE
+Enable autoload caching to improve startup performance by reducing disk I/O operations:
+
 #+BEGIN_SRC emacs-lisp
   (setq straight-cache-autoloads t)
 #+END_SRC
 
-In addition:
-#+BEGIN_QUOTE
-You may customize straight-use-package-by-default to make it so that :straight t is assumed unless
-you explicitly override it with :straight nil.
-#+END_QUOTE
+Configure straight.el to be the default package manager for use-package declarations:
 
 #+BEGIN_SRC emacs-lisp
   (setq straight-use-package-by-default t)
 #+END_SRC
 
-Install [[https://github.com/jwiegley/use-package][~use-package~]] for easily installing other packages.
+Install [[https://github.com/jwiegley/use-package][~use-package~]] for declarative package configuration. This provides a cleaner, more organized way to configure packages with built-in support for lazy loading, key bindings, and conditional loading.
+
 #+BEGIN_SRC emacs-lisp
-  ;; Install use-package to use with straight.el
   (straight-use-package 'use-package)
 #+END_SRC
 
-Using straight.el to install org-mode instead of the built-in version to get the latest features.
-To avoid conflicts, we need to load it early in the init process. See the [[https://github.com/radian-software/straight.el#the-wrong-version-of-my-package-was-loaded][straight.el documentation]] for details.
+Install the latest version of Org mode rather than using the built-in version. This ensures access to the newest features and bug fixes. This must be done early to avoid conflicts with the built-in version.
+
 #+BEGIN_SRC emacs-lisp
   (straight-use-package 'org)
 #+END_SRC
 
-Install and load packages immediately by default.
+Configure use-package to load packages immediately by default and ensure they are installed:
+
 #+BEGIN_SRC emacs-lisp
   (setq use-package-always-demand t)
   (setq use-package-always-ensure t)
-
 #+END_SRC
 ** Core Configuration
 :PROPERTIES:
 :ID:       58236767-8AD4-4A25-A2A9-02BDEDC9E6D4
 :CUSTOM_ID: core-configuration
 :END:
-A few miscellaneous settings. Note that emacs is not really a package strictly speaking which is why
-we include ~:straight nil~ so that our package manager doesn't try to fetch the source.
+Built-in ~emacs~ package provides core Emacs functionality. We configure basic settings for a better editing experience. Note that ~:straight nil~ prevents our package manager from trying to fetch the source.
+
 #+BEGIN_SRC emacs-lisp
   (use-package emacs
     :straight nil
@@ -340,8 +335,8 @@ we include ~:straight nil~ so that our package manager doesn't try to fetch the 
     (frame-resize-pixelwise t))
 #+END_SRC
 
-It's useful to have buffers auto-revert when files on disk change especially when using Git branches
-a lot!
+Built-in ~autorevert~ automatically refreshes buffers when their corresponding files change on disk. This is especially useful when using Git branches or when files are modified by external tools.
+
 #+BEGIN_SRC emacs-lisp
   (use-package autorevert
     :straight nil
@@ -358,7 +353,8 @@ a lot!
     (setopt auto-revert-check-vc-info t))
 #+END_SRC
 
-Use the system keyboard when killing and yanking.
+Built-in ~simple~ package provides basic editing commands. Configure it to integrate better with the system clipboard for killing and yanking text.
+
 #+BEGIN_SRC emacs-lisp
   (use-package simple
     :straight nil
@@ -368,8 +364,8 @@ Use the system keyboard when killing and yanking.
     (save-interprogram-paste-before-kill t))
 #+END_SRC
 
-[[https://github.com/emacs-mirror/emacs/blob/master/lisp/saveplace.el][~saveplace~]] jumps back to the last when later visiting a file. This is handy to pick up where you
-left off.
+[[https://github.com/emacs-mirror/emacs/blob/master/lisp/saveplace.el][~saveplace~]] jumps back to the last when later visiting a file. This is handy to pick up where you left off.
+
 #+BEGIN_SRC emacs-lisp
   (use-package saveplace
     :straight nil
@@ -378,8 +374,8 @@ left off.
     (save-place-mode +1))
 #+END_SRC
 
-[[https://github.com/emacscollective/no-littering][~no-littering~]] keeps configuration files and other persistent data under ~user-emacs-directory~ rather
-than spamming them in inconsistent places.
+[[https://github.com/emacscollective/no-littering][~no-littering~]] keeps configuration files and other persistent data under ~user-emacs-directory~ rather than spamming them in inconsistent places.
+
 #+BEGIN_SRC emacs-lisp
   (use-package no-littering
     :init
@@ -389,8 +385,8 @@ than spamming them in inconsistent places.
           (expand-file-name "var/" user-emacs-directory)))
 #+END_SRC
 
-Use a separate custom file to remove auto-generated code from ~init.el~. This should be loaded prior
-to any themes so that they confirmation code gets stored in ~custom.el~.
+Built-in ~cus-edit~ handles Emacs customization interface. Configure it to use a separate custom file to keep auto-generated customization code out of ~init.el~.
+
 #+BEGIN_SRC emacs-lisp
   (use-package cus-edit
     :straight nil
@@ -401,6 +397,8 @@ to any themes so that they confirmation code gets stored in ~custom.el~.
     (if (file-exists-p custom-file)
         (load-file custom-file)))
 #+END_SRC
+
+[[https://github.com/emacsmirror/gcmh][~gcmh~]] (Garbage Collector Magic Hack) intelligently manages Emacs garbage collection to reduce pauses during interactive use by temporarily increasing the GC threshold when Emacs is active and running GC during idle time.
 
 #+begin_src emacs-lisp
 (use-package gcmh
@@ -414,7 +412,8 @@ to any themes so that they confirmation code gets stored in ~custom.el~.
   (setq gcmh-verbose nil)) ; Disable verbose logging
 #+end_src
 
-An improved ~keyboard-quit~ function courtesy of [[https://emacsredux.com/blog/2025/06/01/let-s-make-keyboard-quit-smarter/][Emacs Redux]].
+An improved ~keyboard-quit~ function courtesy of [[https://emacsredux.com/blog/2025/06/01/let-s-make-keyboard-quit-smarter/][Emacs Redux]]. This function provides smarter behavior when pressing C-g, especially when the minibuffer is open.
+
 #+begin_src emacs-lisp
   (defun my/keyboard-quit ()
     "Smater version of the built-in `keyboard-quit'.
@@ -430,15 +429,14 @@ An improved ~keyboard-quit~ function courtesy of [[https://emacsredux.com/blog/2
       (keyboard-quit)))
 
 (global-set-key [remap keyboard-quit] #'my/keyboard-quit)
-
 #+end_src
 *** Exec Path Setup
 :PROPERTIES:
 :ID:       0C607D19-2464-4AC0-8FDC-BB6A2420ED3F
 :CUSTOM_ID: exec-path-setup
 :END:
-[[https://github.com/purcell/exec-path-from-shell][~exec-path-from-shell~]] loads the ~PATH~ from your shell setup. This is useful when running Emacs from
-a non-shell environment like OSX.
+[[https://github.com/purcell/exec-path-from-shell][~exec-path-from-shell~]] loads the ~PATH~ from your shell setup. This is useful when running Emacs from a non-shell environment like macOS GUI applications, ensuring that Emacs can find command-line tools installed via package managers.
+
 #+BEGIN_SRC emacs-lisp
   (use-package exec-path-from-shell
     :config
@@ -451,7 +449,8 @@ a non-shell environment like OSX.
 :ID:       f5c2d55e-7ab2-4d3a-a174-ed13bc8f5405
 :CUSTOM_ID: desktop-mode
 :END:
-Restore the previously open buffers when restarting.
+Built-in ~desktop~ mode can restore previously open buffers and window configurations when restarting Emacs. Currently disabled.
+
 #+begin_src emacs-lisp
   ;; (use-package desktop
   ;;   :config
@@ -464,7 +463,8 @@ Restore the previously open buffers when restarting.
 :ID:       A2401A62-B9F5-4A39-8C9B-9BEE0ECCEC17
 :CUSTOM_ID: files
 :END:
-Setup some basic file hygiene. Keep some backup files around, but keep them out of sight.
+Built-in ~files~ package handles file operations and backup settings. Configure backup file management and enable recentf mode to track recently opened files.
+
 #+BEGIN_SRC emacs-lisp
   (use-package files
     :straight nil
@@ -487,7 +487,8 @@ Setup some basic file hygiene. Keep some backup files around, but keep them out 
           `((".*" "~/.emacs.d/auto-saves/" t))))
 #+END_SRC
 
-Use UTF-8 everywhere.
+Built-in ~mule~ (MUlti-Lingual Enhancement) handles character encoding and internationalization. Configure it to use UTF-8 everywhere for consistent text handling.
+
 #+BEGIN_SRC emacs-lisp
   (use-package mule
     :straight nil
@@ -504,7 +505,8 @@ Use UTF-8 everywhere.
     (setenv "LANG" "en_US.UTF-8"))
 #+END_SRC
 
-~uniqify~ renames buffers with the same name so that they're easier to distinguish.
+Built-in ~uniquify~ automatically renames buffers with the same name so that they're easier to distinguish by including parts of their directory paths.
+
 #+BEGIN_SRC emacs-lisp
   (use-package uniquify
     :straight nil
@@ -523,14 +525,9 @@ Use UTF-8 everywhere.
 :ID:       97DB78E1-C522-4A0E-9AC2-6FBA15253B26
 :CUSTOM_ID: discoverability
 :END:
-[[https://github.com/justbur/emacs-which-key][~which-key~]] displays all of the available keybindings following a incompletely entered command. For
-example, pressing ~C-x~ and waiting a moment will cause ~which-key~ to populate the minibuffer with all
-the available next keys along with their corresponding commands. This makes discovery of new
-commands very easy.
+[[https://github.com/justbur/emacs-which-key][~which-key~]] displays all of the available keybindings following a incompletely entered command. For example, pressing ~C-x~ and waiting a moment will cause ~which-key~ to populate the minibuffer with all the available next keys along with their corresponding commands. This makes discovery of new commands very easy.
 
-The only slight issue with this is that the size of the minibuffer expands a lot which can cause the
-view of the current buffer to change depending on where the point is. ~which-key-posframe~ provides an
-improvement on this by popping up in a floating window.
+The only slight issue with this is that the size of the minibuffer expands a lot which can cause the view of the current buffer to change depending on where the point is. ~which-key-posframe~ provides an improvement on this by popping up in a floating window.
 
 #+BEGIN_SRC emacs-lisp
   (use-package which-key
@@ -545,11 +542,16 @@ improvement on this by popping up in a floating window.
 :ID:       C7C96A0A-E6EA-4FB1-BD24-9E83A8F7761C
 :CUSTOM_ID: savehist
 :END:
-Save a number of useful variables so that they persist across Emacs sessions.
+Built-in ~savehist~ saves minibuffer and other useful variables so that they persist across Emacs sessions, providing continuity in your command history.
+
 #+BEGIN_SRC emacs-lisp
-  ;; Save history of minibuffer
-  (savehist-mode)
-  (setq savehist-additional-variables '(kill-ring search-ring regexp-search-ring))
+  (use-package savehist
+    :straight nil
+    :ensure nil
+    :config
+    ;; Save history of minibuffer
+    (savehist-mode)
+    (setq savehist-additional-variables '(kill-ring search-ring regexp-search-ring)))
 #+END_SRC
 
 *** Interface Enhancements
@@ -557,6 +559,9 @@ Save a number of useful variables so that they persist across Emacs sessions.
 :ID:       2D0FB78A-3A47-4707-A038-6DD3FCF03DE3
 :CUSTOM_ID: interface-enhancements
 :END:
+
+General UI improvements and mode-line enhancements to make Emacs more visually appealing and functional.
+
 #+BEGIN_SRC emacs-lisp
   ;; Mode line information
   (setopt line-number-mode t)                        ; Show current line in modeline
@@ -574,8 +579,11 @@ Save a number of useful variables so that they persist across Emacs sessions.
   ;; Misc. UI tweaks
   (blink-cursor-mode -1)                                ; Steady cursor
   (pixel-scroll-precision-mode)                         ; Smooth scrolling
+#+END_SRC
 
-  ;; Programming mode setup
+Built-in ~prog-mode~ provides the base for all programming language modes. This configuration enables line numbers and highlights the current line in programming buffers.
+
+#+BEGIN_SRC emacs-lisp
   (use-package prog-mode
     :straight nil
     :ensure nil
@@ -583,8 +591,11 @@ Save a number of useful variables so that they persist across Emacs sessions.
            (prog-mode . hl-line-mode))
     :custom
     (display-line-numbers-width 3))
+#+END_SRC
 
-  ;; Text mode setup
+Built-in ~text-mode~ provides the base for text editing modes. This configuration enables visual line mode for better handling of long lines and highlights the current line.
+
+#+BEGIN_SRC emacs-lisp
   (use-package text-mode
     :straight nil
     :ensure nil
@@ -597,7 +608,9 @@ Save a number of useful variables so that they persist across Emacs sessions.
 :ID:       6984A6E9-A3A7-4673-8A6A-64E17B687898
 :CUSTOM_ID: aesthetics
 :END:
-Turn off a bunch of frame related functionality for a more minimal experience.
+
+Built-in ~frame~ package controls frame appearance. Turn off various UI elements for a more minimal, distraction-free experience.
+
 #+BEGIN_SRC emacs-lisp
   (use-package frame
     :straight nil
@@ -617,7 +630,8 @@ Turn off a bunch of frame related functionality for a more minimal experience.
     (global-hl-line-mode 1))
 #+END_SRC
 
-[[https://draculatheme.com/emacs][Dracula]] is a nice theme that's available for lots of apps.
+[[https://draculatheme.com/emacs][~dracula-theme~]] is a dark theme that's available for many applications, providing a consistent visual experience across different tools.
+
 #+BEGIN_SRC emacs-lisp
   (use-package dracula-theme)
 
@@ -630,16 +644,25 @@ Turn off a bunch of frame related functionality for a more minimal experience.
                 (load-theme 'dracula t))))
     (load-theme 'dracula t))
   (add-to-list 'default-frame-alist '(font . "FiraCode Nerd Font-14"))
+#+END_SRC
 
+[[https://github.com/domtronn/all-the-icons.el][~all-the-icons~]] provides a comprehensive icon font package for Emacs, enabling beautiful icons throughout the interface.
+
+#+BEGIN_SRC emacs-lisp
   (use-package all-the-icons)
+#+END_SRC
 
+[[https://github.com/iyefrat/all-the-icons-completion][~all-the-icons-completion~]] integrates all-the-icons with completion frameworks, adding icons to minibuffer completion candidates.
+
+#+BEGIN_SRC emacs-lisp
   (use-package all-the-icons-completion
     :init
     (all-the-icons-completion-mode))
 #+END_SRC
 
+[[https://github.com/mickeynp/ligature.el][~ligature~]] enables support for programming font ligatures, which are special character combinations that are rendered as single glyphs (like >= displayed as ≥).
+
 #+begin_src emacs-lisp
-  ;; This assumes you've installed the package via MELPA.
   (use-package ligature
     :config
     ;; Enable the "www" ligature in every possible major mode
@@ -665,8 +688,8 @@ Turn off a bunch of frame related functionality for a more minimal experience.
     ;; per mode with `ligature-mode'.
     (global-ligature-mode t))
 #+end_src
-[[https://github.com/seagle0128/doom-modeline][~doom-modeline~]] is a fancy, fast and minimal mode-line. This requires running ~M-x
-nerd-icons-install-fonts~ to install the required icon font.
+[[https://github.com/seagle0128/doom-modeline][~doom-modeline~]] provides a fancy, fast and minimal mode-line inspired by the Doom Emacs modeline. This requires running ~M-x nerd-icons-install-fonts~ to install the required icon font.
+
 #+BEGIN_SRC emacs-lisp
   (use-package doom-modeline
     :demand t
@@ -682,15 +705,19 @@ nerd-icons-install-fonts~ to install the required icon font.
     (doom-modeline-buffer-file-name-style 'truncate-upto-project))
 #+END_SRC
 
-Setup emojis!
+[[https://github.com/iqbalansari/emacs-emojify][~emojify~]] enables emoji support in Emacs, allowing you to display and insert emojis in your text.
+
 #+begin_src emacs-lisp
   (use-package emojify
     :config
+    ;; Use system emoji font if available for better emoji rendering
     (when (member "Segoe UI Emoji" (font-family-list))
       (set-fontset-font
        t 'symbol (font-spec :family "Segoe UI Emoji") nil 'prepend))
+    ;; Display emojis as Unicode characters rather than images
     (setq emojify-display-style 'unicode)
     (setq emojify-emoji-styles '(unicode))
+    ;; Bind C-c : to insert emoji interactively
     (bind-key* (kbd "C-c :") #'emojify-insert-emoji))
 #+end_src
 
@@ -699,9 +726,8 @@ Setup emojis!
 :ID:       55DF7803-F4D1-43ED-B5EC-F4377C20B52B
 :CUSTOM_ID: keybindings
 :END:
-[[https://github.com/noctuid/general.el][~general.el~]] provides a convenient method for binding keys. It also integrates well with
-~use-package~. In particular, this allows us to easily setup a global leader key, ~my-leader-def~ and
-chain bindings from that.
+[[https://github.com/noctuid/general.el][~general.el~]] provides a convenient method for binding keys with excellent integration with ~use-package~. This allows us to easily setup a global leader key (~my-leader-def~) and chain bindings from that.
+
 #+BEGIN_SRC emacs-lisp
   (use-package general
     :custom
@@ -758,7 +784,8 @@ chain bindings from that.
       "qr" 'restart-emacs))
 #+END_SRC
 
-[[https://github.com/Fuco1/free-keys][~free-keys~]] shows unused key bindings.
+[[https://github.com/Fuco1/free-keys][~free-keys~]] shows unused key bindings, helping you find available key combinations for new shortcuts.
+
 #+begin_src emacs-lisp
   (use-package free-keys)
 #+end_src
@@ -768,12 +795,15 @@ chain bindings from that.
 :ID:       1845AD20-50EC-468B-99C6-19808C288DF1
 :CUSTOM_ID: hydra
 :END:
-[[https://github.com/abo-abo/hydra][~hydra~]] allows us to specify related keybindings together in a
-neat way. Note that ~:wk~ allows us to specify the text that is displayed by ~which-key~ for this hydra.
+[[https://github.com/abo-abo/hydra][~hydra~]] allows us to specify related keybindings together in a neat way, creating transient key maps. Note that ~:wk~ allows us to specify the text that is displayed by ~which-key~ for this hydra.
+
 #+BEGIN_SRC emacs-lisp
   (use-package hydra)
+#+END_SRC
 
-  ;; This allows us to use :hydra within use-package
+[[https://github.com/Fuco1/use-package-hydra][~use-package-hydra~]] provides integration between use-package and hydra, allowing us to use the ~:hydra~ keyword within use-package declarations.
+
+#+BEGIN_SRC emacs-lisp
   (use-package use-package-hydra)
 #+END_SRC
 
@@ -903,6 +933,9 @@ smaller to larger screens.
 :ID:       6CBC9104-AD62-4843-8C69-EB2223F5903D
 :CUSTOM_ID: avy
 :END:
+
+[[https://github.com/abo-abo/avy][~avy~]] provides fast navigation by jumping to visible text using character-based decision trees. Type a character and quickly jump to any instance of it on screen.
+
 #+BEGIN_SRC emacs-lisp
   (use-package avy
     :demand t
@@ -919,10 +952,16 @@ smaller to larger screens.
 :ID:       49DCD1B7-C7DE-4D49-8E47-D194614FA7EB
 :CUSTOM_ID: consult
 :END:
+[[https://github.com/oantolin/embark/][~embark-consult~]] provides integration between embark and consult, allowing embark actions to work with consult commands.
+
 #+BEGIN_SRC emacs-lisp
   (use-package embark-consult
     :after (embark consult))
+#+END_SRC
 
+Helper function for consult-compile-error to prevent minibuffer conflicts.
+
+#+BEGIN_SRC emacs-lisp
   ;; Safe wrapper for consult-compile-error to prevent minibuffer conflicts
   (defun my/consult-compile-error-safe ()
     "Run consult-compile-error without auto-navigation interference."
@@ -936,8 +975,11 @@ smaller to larger screens.
       (cl-letf (((symbol-function 'compilation-auto-jump) (lambda (&rest _) nil))
                 ((symbol-function 'compilation-goto-locus) (lambda (&rest _) nil)))
         (consult-compile-error))))
+#+END_SRC
 
-  ;; Consult: Misc. enhanced commands
+[[https://github.com/minad/consult][~consult~]] provides enhanced commands and completion UI with preview, filtering, and narrowing capabilities. This replaces many built-in commands with more powerful alternatives.
+
+#+BEGIN_SRC emacs-lisp
   (use-package consult
     :general
     ("C-c M-x" 'consult-mode-command)
@@ -999,13 +1041,21 @@ smaller to larger screens.
     (setq xref-show-xrefs-function #'consult-xref
           xref-show-definitions-function #'consult-xref)
     )
+#+END_SRC
 
+[[https://github.com/Qkessler/consult-project-extra][~consult-project-extra~]] provides additional project-related consult commands for enhanced project navigation.
+
+#+BEGIN_SRC emacs-lisp
   (use-package consult-project-extra
     :straight t
     :general
     ("C-x p f" 'consult-project-extra-find)
     ("C-x p o" 'consult-project-extra-find-other-window))
+#+END_SRC
 
+[[https://github.com/karthink/consult-dir][~consult-dir~]] provides directory navigation with consult, allowing quick directory switching and file access.
+
+#+BEGIN_SRC emacs-lisp
   (use-package consult-dir
     :after vertico
     :general
@@ -1013,13 +1063,20 @@ smaller to larger screens.
     (:keymaps 'vertico-map
               "C-x C-d" 'consult-dir
               "C-x C-j" 'consult-dir-jump-file))
+#+END_SRC
 
-  ;; nice package to show the xref stack
+[[https://github.com/brett-lempereur/consult-xref-stack][~consult-xref-stack~]] provides a nice way to navigate the xref stack, showing the history of cross-references you've visited.
+
+#+BEGIN_SRC emacs-lisp
   (use-package consult-xref-stack
     :straight (consult-xref-stack :type git :host github :repo "brett-lempereur/consult-xref-stack")
     :bind
     (("C-," . consult-xref-stack-backward)))
+#+END_SRC
 
+[[https://github.com/oantolin/embark][~embark~]] provides contextual actions on targets determined by point or region. It allows you to run commands on things at point, like files, buffers, symbols, etc.
+
+#+BEGIN_SRC emacs-lisp
   (use-package embark
     :demand t
     :after avy
@@ -1070,7 +1127,8 @@ smaller to larger screens.
   (keymap-set minibuffer-mode-map "TAB" 'minibuffer-complete) ; TAB acts more like how it does in the shell
 #+END_SRC
 
-Vertico provides a vertical completion UI for the minibuffer.
+[[https://github.com/minad/vertico][~vertico~]] provides a vertical completion UI for the minibuffer with fast, minimal, and flexible design.
+
 #+BEGIN_SRC emacs-lisp
   (use-package vertico
     :init
@@ -1081,7 +1139,11 @@ Vertico provides a vertical completion UI for the minibuffer.
     (vertico-cycle t)
     ;; Increase the number of visible candidates to see more context
     (vertico-count 20))
+#+END_SRC
 
+Built-in ~vertico-directory~ enhances vertico with directory navigation features.
+
+#+BEGIN_SRC emacs-lisp
   (use-package vertico-directory
     :straight nil
     :ensure nil
@@ -1094,10 +1156,10 @@ Vertico provides a vertical completion UI for the minibuffer.
     	      ;; Fix pixel-scroll-precision-mode conflicts
     	      "<remap> <pixel-scroll-interpolate-up>" 'vertico-scroll-down
     	      "<remap> <pixel-scroll-interpolate-down>" 'vertico-scroll-up))
+#+END_SRC
 
-  #+END_SRC
+[[https://github.com/minad/marginalia][~marginalia~]] enriches existing commands with completion annotations. It adds helpful documentation and context information in the margins of completion candidates, making it easier to understand what each option does.
 
-Marginalia adds helpful documentation annotations to the minibuffer margins.
 #+BEGIN_SRC emacs-lisp
   (use-package marginalia
     :config
@@ -1109,8 +1171,10 @@ Marginalia adds helpful documentation annotations to the minibuffer margins.
 :ID:       C4C77C86-7E03-4C26-92D9-8A909D35A157
 :CUSTOM_ID: completion
 :END:
+
+[[https://github.com/minad/corfu][~corfu~]] provides in-buffer completion with a small popup. It enhances the default completion-at-point experience with a modern, fast interface.
+
 #+BEGIN_SRC emacs-lisp
-  ;; Popup completion-at-point
   (use-package corfu
     :straight (:files (:defaults "extensions/*"))
     :init
@@ -1137,7 +1201,11 @@ Marginalia adds helpful documentation annotations to the minibuffer margins.
               "<remap> <pixel-scroll-interpolate-up>" 'corfu-scroll-down
               "<remap> <pixel-scroll-interpolate-down>" 'corfu-scroll-up))
 
-  ;; Part of corfu
+#+END_SRC
+
+Built-in ~corfu-popupinfo~ provides documentation popups for completion candidates, showing additional context information about the selected item.
+
+#+BEGIN_SRC emacs-lisp
   (use-package corfu-popupinfo
     :straight nil
     :ensure nil
@@ -1148,13 +1216,20 @@ Marginalia adds helpful documentation annotations to the minibuffer margins.
     (corfu-popupinfo-hide nil)
     :config
     (corfu-popupinfo-mode))
+#+END_SRC
 
-  ;; Make corfu popup come up in terminal overlay
+[[https://codeberg.org/akib/emacs-corfu-terminal][~corfu-terminal~]] enables corfu completion in terminal environments by providing text-based popup rendering.
+
+#+BEGIN_SRC emacs-lisp
   (use-package corfu-terminal
     :if (not (display-graphic-p))
     :config
     (corfu-terminal-mode))
+#+END_SRC
 
+[[https://code.bsdgeek.org/adam/corfu-candidate-overlay][~corfu-candidate-overlay~]] provides ghost text completion overlay for corfu, showing completion candidates inline as you type.
+
+#+BEGIN_SRC emacs-lisp
   (use-package corfu-candidate-overlay
     :straight (:type git
                      :repo "https://code.bsdgeek.org/adam/corfu-candidate-overlay"
@@ -1167,21 +1242,26 @@ Marginalia adds helpful documentation annotations to the minibuffer margins.
     ;; enable corfu-candidate-overlay mode globally
     ;; this relies on having corfu-auto set to nil
     (corfu-candidate-overlay-mode +1))
+#+END_SRC
 
-  ;; Fancy completion-at-point functions; there's too much in the cape package to
-  ;; configure here; dive in when you're comfortable!
+[[https://github.com/minad/cape][~cape~]] (Completion At Point Extensions) provides additional completion sources beyond what LSP servers offer, including file paths and dynamic abbreviations.
+
+#+BEGIN_SRC emacs-lisp
   (use-package cape
     :init
     (add-to-list 'completion-at-point-functions #'cape-dabbrev)
     (add-to-list 'completion-at-point-functions #'cape-file))
+#+END_SRC
 
-  ;; Pretty icons for corfu
+[[https://github.com/jdtsmith/kind-icon][~kind-icon~]] adds pretty icons to corfu completion candidates, making it easier to visually distinguish between different types of completions.
+
+#+BEGIN_SRC emacs-lisp
   (use-package kind-icon
     :if (display-graphic-p)
     :after corfu
     :config
     (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
-  #+END_SRC
+#+END_SRC
 
 Orderless describes itself as a 'completion style' which means that it controls how Emacs filters
 and presents completion candidates.
@@ -1296,7 +1376,16 @@ and presents completion candidates.
     (defvar my/pulsar-excluded-modes '(vterm-mode)
       "Major modes where pulsar should be disabled.")
 
-    ;; Override pulsar--on to respect our exclusion list
+    ;; Custom override for pulsar-mode activation logic to handle edge cases:
+    ;; - Respects standard pulsar exclusion rules (minibuffer, hidden buffers)
+    ;; - Adds custom mode exclusions (defined in my/pulsar-excluded-modes)
+    ;; - Special handling for vterm: disable in normal vterm-mode but allow in copy-mode
+    ;;
+    ;; The vterm exception is needed because:
+    ;; - Normal vterm mode has rapid buffer changes that cause flickering
+    ;; - vterm copy-mode is static and benefits from line highlighting
+    ;;
+    ;; Uses advice-add to completely replace the original pulsar--on function
     (defun my/pulsar--on-with-exclusions ()
       "Enable `pulsar-mode' unless in an excluded major mode or copy mode context."
       (unless (or pulsar-mode
@@ -1421,6 +1510,20 @@ and presents completion candidates.
                                  ("/" ibuffer-filter-disable "disable")
                                  ("b" hydra-ibuffer-main/body "back" :color blue))
     :config
+    ;; IBuffer setup function with careful package integration ordering.
+    ;;
+    ;; Setup sequence is critical:
+    ;; 1. First: Set projectile filter groups (organizes buffers by project)
+    ;; 2. Second: Enable all-the-icons-ibuffer-mode (adds icon column and enhanced formats)
+    ;; 3. Third: Set custom format (must come after icons mode to access enhanced columns)
+    ;;
+    ;; Format specification uses enhanced column types provided by all-the-icons-ibuffer:
+    ;; - 'icon': file type icons (width 2)
+    ;; - 'size-h': human-readable file sizes
+    ;; - 'mode+': enhanced mode display with icons
+    ;; - 'filename-and-process+': enhanced filename with process info
+    ;;
+    ;; The final ibuffer-update call ensures the new format is applied immediately.
     (defun my/setup-ibuffer ()
     "Setup ibuffer with projectile groups, custom format, and icons."
     (ibuffer-projectile-set-filter-groups)
@@ -1437,11 +1540,19 @@ and presents completion candidates.
     (ibuffer-update nil t))
     :hook
     (ibuffer-mode . my/setup-ibuffer))
+#+END_SRC
 
+[[https://github.com/purcell/ibuffer-projectile][~ibuffer-projectile~]] groups ibuffer entries by projectile projects, making it easier to navigate buffers organized by project.
+
+#+BEGIN_SRC emacs-lisp
   (use-package ibuffer-projectile
     :ensure t
     :after ibuffer)
+#+END_SRC
 
+[[https://github.com/seagle0128/all-the-icons-ibuffer][~all-the-icons-ibuffer~]] adds file type icons to ibuffer, providing visual context for different buffer types.
+
+#+BEGIN_SRC emacs-lisp
   (use-package all-the-icons-ibuffer
     :ensure t
     :after ibuffer)
@@ -1454,11 +1565,15 @@ and presents completion candidates.
 :CUSTOM_ID: projects
 :END:
 
+[[https://github.com/rolandwalker/fixmee][~fixmee~]] highlights TODO/FIXME keywords and other notes in code comments to help you keep track of work that needs to be done.
+
 #+begin_src emacs-lisp
-
-  ;; Package for highlighting TODO/FIXME keywords in code
   (use-package fixmee)
+#+end_src
 
+[[https://github.com/bbatsov/projectile][~projectile~]] provides project interaction library for Emacs, offering powerful project management features like project-aware commands and navigation.
+
+#+begin_src emacs-lisp
   (use-package projectile
     :ensure t
     :init
@@ -1526,9 +1641,12 @@ and presents completion candidates.
         ("v"   projectile-display-buffer)
         ("V"   projectile-ibuffer)
         ("X"   fixmee-mode)
-        ("x"   fixmee-view-listing))
-    )
+        ("x"   fixmee-view-listing)))
+#+end_src
 
+[[https://github.com/emacs-straight/consult-projectile][~consult-projectile~]] integrates Consult with Projectile, providing enhanced project navigation and search capabilities through the Consult interface.
+
+#+begin_src emacs-lisp
   (use-package consult-projectile)
 #+end_src
 
@@ -1602,18 +1720,29 @@ and presents completion candidates.
                  ("Z" dired-do-compress)
                  ("q" nil)
                  ("." nil :color blue)))
+#+END_SRC
 
-  ;; Colourful columns.
+[[https://github.com/purcell/diredfl][~diredfl~]] provides syntax highlighting for dired buffers, making different file types and permissions more visually distinct with colorful columns.
+
+#+BEGIN_SRC emacs-lisp
   (use-package diredfl
     :after dired
     :config
     (diredfl-global-mode +1))
+#+END_SRC
 
+[[https://github.com/clemera/dired-git-info][~dired-git-info~]] shows git information in dired buffers, displaying commit messages and other git metadata for files.
+
+#+BEGIN_SRC emacs-lisp
   (use-package dired-git-info
     :hook (dired-after-readin . dired-git-info-auto-enable)
     :config
     (setq dgi-auto-hide-details-p nil))
+#+END_SRC
 
+[[https://github.com/jtbm37/all-the-icons-dired][~all-the-icons-dired~]] adds file type icons to dired buffers, making it easier to visually identify different file types at a glance.
+
+#+BEGIN_SRC emacs-lisp
   (use-package all-the-icons-dired
     :after all-the-icons
     :hook (dired-mode . all-the-icons-dired-mode))
@@ -1647,8 +1776,7 @@ and presents completion candidates.
 :ID:       AD567D1B-47AC-456E-A711-87039063F48C
 :CUSTOM_ID: fillunfill-paragraph
 :END:
-[[https://github.com/purcell/unfill][~unfill~]] is an ideal little helper function to Emacs'
-built-in ~fill~ function.
+[[https://github.com/purcell/unfill][~unfill~]] is an ideal little helper function to Emacs' built-in ~fill~ function.
 #+begin_src emacs-lisp
   (use-package unfill
     :general
@@ -1667,15 +1795,29 @@ Moving back to ~flyspell~ for now.
     :ensure nil
     :hook ((text-mode . flyspell-mode)
            (prog-mode . flyspell-prog-mode)
-           (org-mode . flyspell-mode)))
+           (org-mode . flyspell-mode))
+    :bind (:map flyspell-mode-map
+                ("C-," . nil))) ; Unbind C-, to avoid overriding xref
+#+END_SRC
 
+[[https://github.com/d12frosted/flyspell-correct][~flyspell-correct~]] provides an improved interface for correcting spelling mistakes with flyspell, offering multiple correction interfaces.
+
+#+BEGIN_SRC emacs-lisp
   (use-package flyspell-correct
     :after flyspell
     :bind (:map flyspell-mode-map ("C-;" . flyspell-correct-wrapper)))
+#+END_SRC
 
+[[https://github.com/d12frosted/flyspell-correct][~flyspell-correct-popup~]] provides a popup-based interface for flyspell corrections, showing spelling suggestions in a popup menu.
+
+#+BEGIN_SRC emacs-lisp
   (use-package flyspell-correct-popup
     :after flyspell-correct)
+#+END_SRC
 
+[[https://github.com/d12frosted/flyspell-correct][~flyspell-correct-avy-menu~]] integrates flyspell corrections with avy, allowing quick selection of corrections using avy's jump interface.
+
+#+BEGIN_SRC emacs-lisp
   (use-package flyspell-correct-avy-menu
     :after flyspell-correct)
 
@@ -1820,8 +1962,7 @@ This is a useful way to add saved project searches. Taken from https://takeonrul
 :CUSTOM_ID: window-management
 :END:
 
-[[https://github.com/abo-abo/ace-window][~ace-window~]] allows for easy switching between windows within a frame, splitting windows and moving and
-copying windows.
+[[https://github.com/abo-abo/ace-window][~ace-window~]] allows for easy switching between windows within a frame, splitting windows and moving and copying windows.
 #+BEGIN_SRC emacs-lisp
   (use-package ace-window
     :general
@@ -1830,9 +1971,7 @@ copying windows.
     (setq aw-keys '(?a ?r ?s ?t ?n ?e ?i ?o)))
 #+END_SRC
 
-[[https://github.com/dimitri/switch-window][~switch-window~]] allows for easy switching between windows within a frame. It's slightly better than
-~ace-window~ for that basic task as the labels for the windows are larger. However, ~ace-window~ is
-worth keeping around for other functionality.
+[[https://github.com/dimitri/switch-window][~switch-window~]] allows for easy switching between windows within a frame. It's slightly better than ~ace-window~ for that basic task as the labels for the windows are larger. However, ~ace-window~ is worth keeping around for other functionality.
 #+BEGIN_SRC emacs-lisp
   (use-package switch-window
     :general
@@ -1842,8 +1981,7 @@ worth keeping around for other functionality.
 #+END_SRC
 
 
-[[https://www.gnu.org/software/emacs/manual/html_node/emacs/Window-Convenience.html#index-winner_002dmode][~winner-mode~]] tracks changes in window configuration for a frame so that they can be undone or
-redone.
+[[https://www.gnu.org/software/emacs/manual/html_node/emacs/Window-Convenience.html#index-winner_002dmode][~winner-mode~]] tracks changes in window configuration for a frame so that they can be undone or redone.
 #+BEGIN_SRC emacs-lisp
   (use-package winner
     :commands winner-mode
@@ -1962,10 +2100,12 @@ Now we've got a hydra to make the various window management functions easily acc
 :ID:       199394FB-985F-4076-BEF4-2A3139FFFCB9
 :CUSTOM_ID: treesitter-setup
 :END:
+Configure built-in Tree-sitter support for better syntax highlighting, indentation, and navigation. Tree-sitter provides fast, incremental parsing for many programming languages.
+
 #+BEGIN_SRC emacs-lisp
   (use-package emacs
     :config
-    ;; Treesitter config
+    ;; Define language grammar sources for automatic installation
     (setq treesit-language-source-alist
   	'((bash "https://github.com/tree-sitter/tree-sitter-bash")
   	  (cmake "https://github.com/uyha/tree-sitter-cmake")
@@ -2000,14 +2140,26 @@ Now we've got a hydra to make the various window management functions easily acc
   	  (css-mode . css-ts-mode)
   	  (python-mode . python-ts-mode)))
     )
+#+END_SRC
 
+[[https://github.com/emacs-tree-sitter/treesit-fold][~treesit-fold~]] provides code folding functionality using tree-sitter, allowing you to collapse and expand code blocks for better navigation.
+
+#+BEGIN_SRC emacs-lisp
   (use-package treesit-fold
     :straight (treesit-fold :type git :host github :repo "emacs-tree-sitter/treesit-fold")
     :config
     (setq global-treesit-fold-indicator-mode t))
+#+END_SRC
 
+[[https://github.com/nivekuil/corral][~corral~]] provides commands for corralling (enclosing) text with delimiters like parentheses, brackets, or quotes.
+
+#+BEGIN_SRC emacs-lisp
   (use-package corral)
+#+END_SRC
 
+[[https://github.com/mickeynp/combobulate][~combobulate~]] provides structured editing commands for tree-sitter enabled modes, allowing you to navigate and manipulate code based on its syntactic structure.
+
+#+BEGIN_SRC emacs-lisp
   (use-package combobulate
     :custom
     ;; You can customize Combobulate's key prefix here.
@@ -2017,12 +2169,20 @@ Now we've got a hydra to make the various window management functions easily acc
     ;; Amend this to the directory where you keep Combobulate's source
     ;; code.
     :load-path ("path-to-git-checkout-of-combobulate"))
+#+END_SRC
 
+[[https://github.com/casouri/expreg][~expreg~]] provides commands to expand and contract the region based on syntactic units, making it easy to select code blocks.
+
+#+BEGIN_SRC emacs-lisp
   (use-package expreg
     :general
     ("M-<" 'expreg-contract)
     ("M->" 'expreg-expand))
+#+END_SRC
 
+[[https://github.com/Fanael/rainbow-delimiters][~rainbow-delimiters~]] highlights matching delimiters (parentheses, brackets, braces) in different colors, making it easier to match nested expressions.
+
+#+BEGIN_SRC emacs-lisp
   (use-package rainbow-delimiters)
 #+END_SRC
 *** Git
@@ -2030,6 +2190,9 @@ Now we've got a hydra to make the various window management functions easily acc
 :ID:       D2862523-93E3-4F58-B975-0AAB2F0955FA
 :CUSTOM_ID: git
 :END:
+
+[[https://magit.vc/][~magit~]] is a complete text-based user interface to Git. It provides intuitive and efficient Git operations directly within Emacs, making version control seamless and powerful.
+
 #+BEGIN_SRC emacs-lisp
   (use-package magit
     :general
@@ -2062,8 +2225,8 @@ Now we've got a hydra to make the various window management functions easily acc
     :defer t)
 #+END_SRC
 
-[[https://github.com/dgutov/diff-hl][~diff-hl~]] shows icons on the buffer fringe for lines that have been added, removed or
-modified.
+[[https://github.com/dgutov/diff-hl][~diff-hl~]] shows icons on the buffer fringe for lines that have been added, removed or modified.
+
 #+BEGIN_SRC emacs-lisp
   (use-package diff-hl
     :hook (magit-post-refresh . diff-hl-magit-post-refresh)
@@ -2072,16 +2235,17 @@ modified.
     (global-diff-hl-mode))
 
   (setq ediff-window-setup-function 'ediff-setup-windows-plain)
-    #+END_SRC
+#+END_SRC
 
-[[https://github.com/rmuslimov/browse-at-remote][~browse-at-remote~]] allows for quick jumping to the relevant Github (or whatever) page corresponding
-to the current file.
+[[https://github.com/rmuslimov/browse-at-remote][~browse-at-remote~]] allows for quick jumping to the relevant Github (or whatever) page corresponding to the current file.
+
 #+BEGIN_SRC emacs-lisp
   (use-package browse-at-remote)
- #+END_SRC
+#+END_SRC
 
 A nice Hydra menu to make things more accessible.
-  #+BEGIN_SRC emacs-lisp
+
+#+BEGIN_SRC emacs-lisp
     (defhydra hydra-my-git-menu (:color blue
                                         :hint nil)
       "
@@ -2112,7 +2276,7 @@ A nice Hydra menu to make things more accessible.
       ("k" git-timemachine-show-previous-revision "prev revision")
       ("c" git-timemachine-show-current-revision "curr revision")
       ("<ESC>" git-timemachine-show-current-revision "quit" :exit t))
-      #+END_SRC
+#+END_SRC
 
 #+begin_src emacs-lisp
 
@@ -2221,20 +2385,29 @@ A nice Hydra menu to make things more accessible.
     :custom (flycheck-eglot-exclusive nil)
     :config
     (global-flycheck-eglot-mode 1))
-  #+END_SRC
+#+END_SRC
 
 Show flycheck errors in echo area instead of popup tooltips to avoid Corfu conflicts.
-  #+BEGIN_SRC emacs-lisp
+
+#+BEGIN_SRC emacs-lisp
   (use-package flycheck-pos-tip
     :after flycheck
     :config
     ;; Disable pos-tip mode and use echo area instead
     ;; (flycheck-pos-tip-mode)
     (setq flycheck-display-errors-function #'flycheck-display-error-messages-unless-error-list))
+#+END_SRC
 
+[[https://github.com/kaushalmodi/emacs-consult-flycheck][~consult-flycheck~]] integrates flycheck with consult, providing a searchable interface for navigating through flycheck errors.
+
+#+BEGIN_SRC emacs-lisp
   (use-package consult-flycheck
     :after (flycheck eglot consult))
+#+END_SRC
 
+[[https://github.com/nbfalcon/flycheck-projectile][~flycheck-projectile~]] extends flycheck with projectile integration, allowing project-wide error checking and navigation.
+
+#+BEGIN_SRC emacs-lisp
   (use-package flycheck-projectile
     :ensure t
     :after (flycheck projectile popwin)
@@ -2242,8 +2415,11 @@ Show flycheck errors in echo area instead of popup tooltips to avoid Corfu confl
     ;; Optional: If you use popwin for better popup window management
     (add-to-list 'popwin:special-display-config
                  `(,flycheck-projectile-error-list-buffer :regexp nil :dedicated t :position bottom :stick t :noselect nil)))
+#+END_SRC
 
-  ;; Window popup management
+[[https://github.com/m2ym/popwin-el][~popwin~]] provides window popup management, controlling how temporary buffers and windows appear and behave.
+
+#+BEGIN_SRC emacs-lisp
   (use-package popwin)
 
 #+END_SRC
@@ -2253,8 +2429,9 @@ Show flycheck errors in echo area instead of popup tooltips to avoid Corfu confl
 :CUSTOM_ID: lsp-servers
 :END:
 
-#+BEGIN_SRC emacs-lisp
+Built-in ~eglot~ provides Language Server Protocol (LSP) support for Emacs. It enables features like code completion, error checking, go-to-definition, and refactoring for many programming languages through their respective language servers.
 
+#+BEGIN_SRC emacs-lisp
   (use-package eglot
     :straight nil
     :general
@@ -2390,18 +2567,26 @@ Show flycheck errors in echo area instead of popup tooltips to avoid Corfu confl
               (when-let ((help-window (get-buffer-window "*Help*")))
                 (select-window help-window)))
           (message "No symbol at point"))))))
+#+END_SRC
 
+[[https://github.com/mohkale/consult-eglot][~consult-eglot~]] integrates eglot with consult, providing enhanced interfaces for LSP features like symbol search and workspace navigation.
+
+#+BEGIN_SRC emacs-lisp
   (use-package consult-eglot
     :after (consult eglot))
+#+END_SRC
 
+[[https://github.com/mohkale/consult-eglot][~consult-eglot-embark~]] extends consult-eglot with embark integration, adding contextual actions to LSP-powered completion candidates.
+
+#+BEGIN_SRC emacs-lisp
   (use-package consult-eglot-embark
     :after consult-eglot
     :config (consult-eglot-embark-mode))
-
-  #+END_SRC
+#+END_SRC
 
 Simple linter functions using compile-mode for built-in error navigation.
-  #+BEGIN_SRC emacs-lisp
+
+#+BEGIN_SRC emacs-lisp
   ;; Enable ANSI color support in compilation buffers
   (require 'ansi-color)
   (add-hook 'compilation-filter-hook 'ansi-color-compilation-filter)
@@ -2441,6 +2626,9 @@ Simple linter functions using compile-mode for built-in error navigation.
 :ID:       d20f74ab-0a66-4ac8-b56b-7b251f57c5af
 :CUSTOM_ID: devdocs
 :END:
+
+[[https://github.com/astoff/devdocs.el][~devdocs~]] provides access to DevDocs.io documentation directly within Emacs, allowing you to browse API documentation for various programming languages and frameworks.
+
 #+BEGIN_SRC emacs-lisp
   (use-package devdocs
     :general ("C-h D" 'devdocs-lookup))
@@ -2450,15 +2638,28 @@ Simple linter functions using compile-mode for built-in error navigation.
 :ID:       8DE130F8-A158-4350-A02F-C99A2EC9A288
 :CUSTOM_ID: particular-programming-modes
 :END:
+[[https://github.com/jrblevin/markdown-mode][~markdown-mode~]] provides a major mode for editing Markdown files with syntax highlighting, preview capabilities, and proper formatting.
+
 #+BEGIN_SRC emacs-lisp
   (use-package markdown-mode
     :hook ((markdown-mode . visual-line-mode)))
+#+END_SRC
 
+[[https://github.com/yoshiki/yaml-mode][~yaml-mode~]] provides a major mode for editing YAML files with proper indentation and syntax highlighting.
+
+#+BEGIN_SRC emacs-lisp
   (use-package yaml-mode)
+#+END_SRC
 
+[[https://github.com/joshwnj/json-mode][~json-mode~]] provides a major mode for editing JSON files with syntax highlighting and formatting capabilities.
+
+#+BEGIN_SRC emacs-lisp
   (use-package json-mode)
+#+END_SRC
 
+Helper functions for eglot integration with error handling.
 
+#+BEGIN_SRC emacs-lisp
   (defun at/eglot-organize-imports ()
     "Organize imports via eglot, with error handling."
     (interactive)
@@ -2483,24 +2684,52 @@ Simple linter functions using compile-mode for built-in error navigation.
     (add-hook 'before-save-hook 'delete-trailing-whitespace nil t)
     (add-hook 'before-save-hook 'at/eglot-organize-imports nil t)
     (add-hook 'before-save-hook 'at/safe-eglot-format-buffer nil t))
+#+END_SRC
 
+Built-in ~go-ts-mode~ provides Go language support using tree-sitter for improved syntax highlighting and navigation.
+
+#+BEGIN_SRC emacs-lisp
   (use-package go-ts-mode
     :hook (go-ts-mode . at/setup-go-before-save-hooks))
+#+END_SRC
 
+[[https://github.com/cnngimenez/gotest-ts][~gotest-ts~]] provides Go testing support for tree-sitter based Go mode.
+
+#+BEGIN_SRC emacs-lisp
   (use-package gotest-ts)
+#+END_SRC
 
+[[https://github.com/rust-lang/rust-mode][~rust-mode~]] provides a major mode for the Rust programming language with syntax highlighting, formatting, and compilation support.
+
+#+BEGIN_SRC emacs-lisp
   (use-package rust-mode
     :init
     (setq rust-mode-treesitter-derive t))
+#+END_SRC
 
+Built-in ~sh-script~ provides shell script editing support with syntax highlighting for various shell dialects.
+
+#+BEGIN_SRC emacs-lisp
   (use-package sh-script)
+#+END_SRC
 
+[[https://github.com/syohex/emacs-terraform-mode][~terraform-mode~]] provides a major mode for editing Terraform configuration files with syntax highlighting and formatting.
+
+#+BEGIN_SRC emacs-lisp
   (use-package terraform-mode
     :config
     (setq terraform-format-on-save t))
+#+END_SRC
 
+[[https://github.com/wwwjfy/emacs-fish][~fish-mode~]] provides a major mode for editing Fish shell scripts with proper syntax highlighting.
+
+#+BEGIN_SRC emacs-lisp
   (use-package fish-mode)
+#+END_SRC
 
+[[https://github.com/purcell/sqlformat][~sqlformat~]] provides SQL formatting capabilities using external formatters.
+
+#+BEGIN_SRC emacs-lisp
   (use-package sqlformat
     :config
     (setq sqlformat-command 'pgformatter))
@@ -2511,20 +2740,39 @@ These packages need to be installed in the Python environment too.
  pip install "python-lsp-server[all]" pylsp-mypy pylsp-rope python-lsp-ruff python-lsp-black
 #+END_SRC
 
-#+BEGIN_SRC emacs-lisp
+[[https://github.com/wbolster/emacs-python-black][~python-black~]] provides integration with the Black Python code formatter for automatic code formatting.
 
+#+BEGIN_SRC emacs-lisp
   (use-package python-black)
+#+END_SRC
+
+[[https://github.com/wbolster/emacs-python-pytest][~python-pytest~]] provides integration with pytest for running Python tests directly from Emacs.
+
+#+BEGIN_SRC emacs-lisp
   (use-package python-pytest)
+#+END_SRC
+
+[[https://github.com/paetzke/py-isort.el][~python-isort~]] provides integration with isort for sorting Python imports automatically.
+
+#+BEGIN_SRC emacs-lisp
   (use-package python-isort)
+#+END_SRC
+
+[[https://github.com/jorgenschaefer/pyvenv][~pyvenv~]] provides Python virtual environment support within Emacs, allowing you to activate and manage virtual environments.
+
+#+BEGIN_SRC emacs-lisp
   (use-package pyvenv)
   ;; (use-package auto-virtualenv
   ;;   :config
   ;;   (setq auto-virtualenv-verbose t)
   ;;   (auto-virtualenv-setup))
+#+END_SRC
 
+[[https://github.com/wyuenho/emacs-pet][~pet~]] (Python Executable Tracker) automatically detects and uses the correct Python executable and virtual environment for your projects.
+
+#+BEGIN_SRC emacs-lisp
   (use-package pet
     :hook (python-base-mode . pet-mode))
-
 #+END_SRC
 
 ** Yasnippets
@@ -2539,7 +2787,14 @@ These packages need to be installed in the Python environment too.
     (setq yas-snippet-dirs (append yas-snippet-dirs
   				 '("~/.emacs.d/snippets/")))
 
-    ;; Smart tab function that handles both yasnippet and completion
+    ;; Smart tab function that integrates multiple completion systems:
+    ;; 1. If currently in a yasnippet field, advance to next field
+    ;; 2. If Corfu completion popup is active, complete the selection
+    ;; 3. If completion-at-point has candidates, trigger completion
+    ;; 4. Otherwise, fall back to normal indentation behavior
+    ;;
+    ;; This provides a unified TAB experience across different completion modes
+    ;; while respecting the context-sensitive nature of each system.
     (defun my/smart-tab ()
       "Try yasnippet expansion, then completion, then indent."
       (interactive)
@@ -2562,7 +2817,11 @@ These packages need to be installed in the Python environment too.
     (:keymaps 'yas-keymap
               "<tab>" 'my/smart-tab
               "TAB" 'my/smart-tab))
+#+END_SRC
 
+[[https://github.com/AndreaCrotti/yasnippet-snippets][~yasnippet-snippets~]] provides a collection of pre-built snippets for various programming languages and modes to use with yasnippet.
+
+#+BEGIN_SRC emacs-lisp
   (use-package yasnippet-snippets
     :after yasnippet)
 #+END_SRC
@@ -2570,9 +2829,10 @@ These packages need to be installed in the Python environment too.
 *** Snippets
 :PROPERTIES:
 :CUSTOM_ID: snippets
+:ID:       729354BC-48F1-4D48-A096-A9EB0A99A37E
 :END:
 These are various snippets for use with Yasnippet.
-#+BEGIN_SRC :tangle "~/.emacs.d/snippets/go-mode/ifen" :eval no :mkdirp yes
+#+BEGIN_SRC snippet :tangle "~/.emacs.d/snippets/go-mode/ifen" :eval no :mkdirp yes
 # -*- mode: snippet -*-
 # name: if error nil
 # key: ifen
@@ -2581,21 +2841,6 @@ if err != nil {
   $1
 }
 #+END_SRC
-
-*** Kubernetes
-:PROPERTIES:
-:ID:       664E2A07-1DA8-4255-892E-565438153A71
-:CUSTOM_ID: kubernetes
-:END:
-#+begin_src emacs-lisp
-  (use-package kele)
-
-  (use-package kubernetes
-    :commands (kubernetes-overview)
-    :config
-    (setq kubernetes-poll-frequency 3600
-          kubernetes-redraw-frequency 3600))
-#+end_src
 
 ** Org
 :PROPERTIES:
@@ -2652,8 +2897,8 @@ See helpful examples at:
               (org-agenda-overriding-header "Today's Deadlines "))))))
 #+END_SRC
 
-Use ~org-tidy~ to hide property drawers by default. You can call ~M-x org-tidy-untidy-buffer~ to unhide
-them if you want to manually edit them.
+[[https://github.com/jxq0/org-tidy][~org-tidy~]] hides property drawers by default to reduce visual clutter. You can call ~M-x org-tidy-untidy-buffer~ to unhide them if you want to manually edit them.
+
 #+BEGIN_SRC emacs-lisp
   (use-package org-tidy
     :ensure t
@@ -2661,12 +2906,14 @@ them if you want to manually edit them.
     (org-mode . org-tidy-mode))
 #+end_src
 
-~org-appear~ shows ~org-mode~ hidden elements when the cursor is over them. This makes it easier to edit
-marked-up text.
+[[https://github.com/awth13/org-appear][~org-appear~]] shows ~org-mode~ hidden elements when the cursor is over them. This makes it easier to edit marked-up text by temporarily showing formatting characters.
+
 #+BEGIN_SRC emacs-lisp
   (use-package org-appear
     :hook (org-mode . org-appear-mode))
 #+END_SRC
+
+[[https://github.com/alf/ob-restclient][~ob-restclient~]] provides support for executing REST API calls in org-babel code blocks using restclient syntax.
 
 #+BEGIN_SRC emacs-lisp
   (use-package ob-restclient)
@@ -2687,7 +2934,8 @@ marked-up text.
     :hook (org-mode . org-autolist-mode))
 #+END_SRC
 
-~org-stick-header~ pins a breadcrumb navigation structure to the first line of all ~org-mode~ buffers.
+[[https://github.com/alphapapa/org-sticky-header][~org-sticky-header~]] pins a breadcrumb navigation structure to the first line of all ~org-mode~ buffers, showing your current location in the document hierarchy.
+
 #+BEGIN_SRC emacs-lisp
   (use-package org-sticky-header
     :config
@@ -2818,7 +3066,24 @@ marked-up text.
         (with-current-buffer (org-capture-get :original-buffer) (thing-at-point 'line t))
       (plist-get org-store-link-plist :initial)))
 
+  ;; Complex org-mode refiling function that moves subtrees to date-based trees.
   ;; Heavily inspired by: https://emacs.stackexchange.com/questions/10597/how-to-refile-into-a-datetree
+  ;;
+  ;; Process flow:
+  ;; 1. Determine target date (parameter > entry timestamp > current date)
+  ;; 2. Cut the current subtree from its location
+  ;; 3. Switch to target file (if specified) or stay in current buffer
+  ;; 4. Navigate to or create the appropriate datetree location
+  ;; 5. Paste the subtree at the correct hierarchical level (level 4)
+  ;; 6. Execute optional post-paste action
+  ;;
+  ;; Buffer state changes:
+  ;; - May switch files (affects current-buffer)
+  ;; - Temporarily narrows to subtree for manipulation
+  ;; - Restores full buffer view with (widen)
+  ;;
+  ;; Used primarily for moving completed meeting notes to archived locations
+  ;; while preserving the chronological organization structure.
   (defun at/org-refile-to-datetree (&optional file date action)
     "Refile a subtree to a datetree corresponding to a date.
     If FILE is nil, refile in the current file. If DATE is nil
@@ -3070,8 +3335,7 @@ This is an example of how I process regular meetings like 1 to 1s:
 :ID:       FF254A72-BC0A-4F8E-B857-D72250D95EC7
 :CUSTOM_ID: blocks
 :END:
-Setup various ~org-mode~ structure templates. When typing ~<~ at the start of a line this will popup
-a menu of various types of blocks that you may want to insert.
+Setup various ~org-mode~ structure templates. When typing ~<~ at the start of a line this will popup a menu of various types of blocks that you may want to insert.
 #+BEGIN_SRC emacs-lisp
   (defun my-org-structure-templates ()
     (require 'org-tempo)
@@ -3111,6 +3375,18 @@ a menu of various types of blocks that you may want to insert.
   (require 'org-tempo) ; Required from org 9 onwards for old template expansion
   ;; Reset the org-template expnsion system, this is need after upgrading to org 9 for some reason
   (setq org-structure-template-alist (eval (car (get 'org-structure-template-alist 'standard-value))))
+  ;; Dynamic org-mode template expansion with intelligent region handling.
+  ;;
+  ;; Expansion process:
+  ;; 1. If region is active, capture and delete the selected text
+  ;; 2. Insert optional header line (#+HEADER: ...) if provided
+  ;; 3. Insert the template string (e.g., "<s" for source block)
+  ;; 4. Trigger org-tempo completion to expand the template
+  ;; 5. Add optional modifiers to the begin line (e.g., language specification)
+  ;; 6. Restore previously selected text within the expanded template
+  ;;
+  ;; This provides context-sensitive template expansion that preserves
+  ;; region content while creating structured org-mode blocks around it.
   (defun hot-expand (str &optional mod header)
     "Expand org template.
 
@@ -3129,6 +3405,12 @@ a menu of various types of blocks that you may want to insert.
       (when mod (insert mod) (forward-line))
       (when text (insert text))))
 
+  ;; The dynamic keybinding for '<' key provides context-sensitive behavior:
+  ;; - At beginning of line OR with active region: show template hydra
+  ;; - Otherwise: insert literal '<' character
+  ;;
+  ;; This provides natural template expansion while preserving normal typing
+  ;; behavior when templates aren't wanted.
   (general-define-key
    :keymaps 'org-mode-map
    ;; disable this agenda key since I use it for avy
@@ -3150,8 +3432,7 @@ a menu of various types of blocks that you may want to insert.
     :defer t)
 #+END_SRC
 
-[[https://github.com/sshaw/copy-as-format][~copy-as-format~]] makes it easy to copy a region and convert the markup to a bunch of different
-flavours for easy pasting into other places.
+[[https://github.com/sshaw/copy-as-format][~copy-as-format~]] makes it easy to copy a region and convert the markup to a bunch of different flavours for easy pasting into other places.
 #+begin_src emacs-lisp
   (use-package copy-as-format
     :bind (("C-c w m" . copy-as-format-markdown)
@@ -3181,7 +3462,8 @@ flavours for easy pasting into other places.
                 :after #'(lambda () (deactivate-mark))))
 #+end_src
 
-Get fish shell syntax working.
+Configure org-babel to support multiple programming languages for code block execution.
+
 #+begin_src emacs-lisp
   (org-babel-do-load-languages 'org-babel-load-languages
                              (append org-babel-load-languages
@@ -3189,7 +3471,11 @@ Get fish shell syntax working.
                                 (shell . t)
                                 (restclient . t)
                                 (sql . t))))
+#+end_src
 
+[[https://github.com/niels-s/ob-sql-mode][~ob-sql-mode~]] provides enhanced SQL code block execution in org-babel with better syntax highlighting and formatting.
+
+#+begin_src emacs-lisp
   (use-package ob-sql-mode)
 #+end_src
 
@@ -3251,6 +3537,8 @@ Some interesting config options:
         vterm-keymap-exceptions
         '("M-:" "C-c" "C-x" "C-u" "C-h" "C-l" "M-x" "M-o" "C-y" "M-y" "M-s" "C-t")))
 #+end_src
+
+[[https://github.com/suonlight/multi-vterm][~multi-vterm~]] provides multiple vterm buffer management, allowing you to create and switch between multiple terminal sessions easily.
 
 #+begin_src emacs-lisp
   (use-package multi-vterm)
@@ -3852,9 +4140,7 @@ The actual Fish shell configuration, focused purely on configuration rather than
     end
 #+end_src
 
-Install ~zoxide~ a great tool for navigating directories in the command line. It learns your history
-then you can just call ~z name~ to jump to a directory that matches that name. The ~zi~ command will
-give a fuzzy list of possible matches.
+Install ~zoxide~ a great tool for navigating directories in the command line. It learns your history then you can just call ~z name~ to jump to a directory that matches that name. The ~zi~ command will give a fuzzy list of possible matches.
 
 Install ~starship~ for a nice, informative prompt with minimal config.
 #+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
