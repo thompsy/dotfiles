@@ -15,6 +15,7 @@ The configuration includes settings for Emacs itself, shell environments (Fish),
 
 To generate the actual configuration files, run ~org-babel-tangle~ (typically ~C-c C-v t~) from within Emacs, or use this command line approach:
 
+Adding some great which should be in PR1 but edited in 2!
 #+begin_src bash
   $(which emacs) --batch --eval "(require 'org)" --eval '(org-babel-tangle-file "~/dotfiles/dotfiles.org")'
 #+end_src
