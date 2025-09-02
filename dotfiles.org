@@ -15,6 +15,9 @@ The configuration includes settings for Emacs itself, shell environments (Fish),
 
 To generate the actual configuration files, run ~org-babel-tangle~ (typically ~C-c C-v t~) from within Emacs, or use this command line approach:
 
+
+Some new text here for testing!!!!
+
 #+begin_src bash
   $(which emacs) --batch --eval "(require 'org)" --eval '(org-babel-tangle-file "~/dotfiles/dotfiles.org")'
 #+end_src
@@ -4473,6 +4476,8 @@ cat ~/.email
   push-new-bookmarks = true
 
   [aliases]
+  # Setup SPR
+  spr = ["util", "exec", "--", "jj-spr"]
   # Custom jj commands.
   # Some things to watch out for with jj aliases:
   # - Keep them minimal; remain familiar with the builtin commands and defaults.
