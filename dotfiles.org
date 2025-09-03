@@ -3484,6 +3484,36 @@ Configure org-babel to support multiple programming languages for code block exe
     :config
     (setq org-make-toc-insert-custom-ids t))
 #+end_src
+
+** Obsidian
+#+begin_src emacs-lisp
+
+(use-package obsidian
+  :config
+  (global-obsidian-mode t)
+  (obsidian-backlinks-mode t)
+  :custom
+  ;; location of obsidian vault
+  (obsidian-directory "~/dropbox/Andrew/notes")
+  ;; Default location for new notes from `obsidian-capture'
+  (obsidian-inbox-directory "_inbox")
+  ;; Useful if you're going to be using wiki links
+  (markdown-enable-wiki-links t)
+
+  ;; These bindings are only suggestions; it's okay to use other bindings
+  :bind (:map obsidian-mode-map
+              ;; Create note
+              ("C-c C-n" . obsidian-capture)
+              ;; If you prefer you can use `obsidian-insert-wikilink'
+              ("C-c C-l" . obsidian-insert-link)
+              ;; Open file pointed to by link at point
+              ("C-c C-o" . obsidian-follow-link-at-point)
+              ;; Open a different note from vault
+              ("C-c C-p" . obsidian-jump)
+              ;; Follow a backlink for the current file
+              ("C-c C-b" . obsidian-backlink-jump)))
+
+#+end_src
 ** Shells
 :PROPERTIES:
 :ID:       C357E950-E226-4B10-83AD-FD2EDEFE4781
@@ -3803,49 +3833,6 @@ This script handles one-time installation of development tools. It's separated f
       # Source cargo environment
       if test -f ~/.cargo/env
           source ~/.cargo/env
-      end
-  end
-
-  function install_rust_tools
-      echo "🦀 Installing Rust tools..."
-
-      set -l rust_tools zoxide starship fd-find bat ripgrep cargo-update
-      for tool in $rust_tools
-          set -l check_name (string replace -- '-find' '' $tool)
-          if ! type -q $check_name
-              log_step "INSTALL" "Installing $tool..."
-              if not install_with_retry "cargo install $tool --locked"
-                  echo "❌ Failed to install $tool"
-              end
-          else
-              log_step "SKIP" "$tool already installed"
-          end
-      end
-  end
-
-  function install_go_tools
-      echo "🐹 Installing Go tools..."
-
-      if ! test -e /usr/local/go
-          echo "❌ Go not found at /usr/local/go. Please install Go first."
-          return 1
-      end
-
-      set -l go_tools \
-          golang.org/x/tools/gopls@latest \
-          github.com/golangci/golangci-lint/cmd/golangci-lint@latest \
-          github.com/nao1215/gup@latest
-
-      for tool in $go_tools
-          set tool_name (basename $tool | string replace '@latest' '')
-          if ! type -q $HOME/go/bin/$tool_name
-              log_step "INSTALL" "Installing $tool_name..."
-              if not install_with_retry "go install $tool"
-                  echo "❌ Failed to install $tool_name"
-              end
-          else
-              log_step "SKIP" "$tool_name already installed"
-          end
       end
   end
 
@@ -4440,10 +4427,10 @@ First setup a script to allow Emacs to be used to resolve conflicts in Jujutsu!
 #+end_src
 
 
-This is a pretty nasty way to work around this issue. But it works!
+Get the user's email from git configuration.
 #+NAME: email
 #+begin_src sh :results raw
-cat ~/.email
+git config --get user.email
 #+end_src
 
 #+begin_src toml :tangle "~/.config/jj/config.toml" :mkdirp yes :noweb yes
