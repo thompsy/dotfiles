@@ -1,0 +1,36 @@
+FROM ubuntu:22.04
+
+# Prevent interactive prompts during package installation
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install basic dependencies that the script needs
+RUN apt-get update && apt-get install -y \
+    curl \
+    wget \
+    git \
+    sudo \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create a non-root user for testing (more realistic)
+RUN useradd -m -s /bin/bash testuser && \
+    echo 'testuser ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+
+# Switch to test user
+USER testuser
+WORKDIR /home/testuser
+
+# Copy the install script
+COPY install.sh /home/testuser/
+COPY dotfiles.org /home/testuser/
+
+# Make script executable
+RUN sudo chown testuser:testuser install.sh dotfiles.org && \
+    chmod +x install.sh
+
+# Set up shell environment
+ENV HOME=/home/testuser
+ENV USER=testuser
+
+# Default command to run the script
+CMD ["./install.sh"]
