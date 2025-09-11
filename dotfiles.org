@@ -4403,6 +4403,13 @@ Emacs ~vterm~ setup.
   end
 #+end_src
 
+
+#+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
+  function my-prs --description 'List my open Github PRs'
+      gh pr list --author "@me" --json number,title,url,labels | jq -r '.[] | "- [\(.number)](\(.url)) - \(.title)" + (if .labels | length > 0 then " [`" + (.labels | map(.name) | join("`][`")) + "`]" else "" end)'
+  end
+#+end_src
+
 Source any local config
 #+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
   if test -e ~/notebook/local-dotfiles/fishrc
