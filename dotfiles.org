@@ -721,6 +721,14 @@ Built-in ~frame~ package controls frame appearance. Turn off various UI elements
     (bind-key* (kbd "C-c :") #'emojify-insert-emoji))
 #+end_src
 
+#+begin_src emacs-lisp
+  (use-package ansi-color
+    :config
+    (defun display-ansi-colors ()
+      (interactive)
+      (ansi-color-apply-on-region (point-min) (point-max))))
+#+end_src
+
 ** Keybindings
 :PROPERTIES:
 :ID:       55DF7803-F4D1-43ED-B5EC-F4377C20B52B
