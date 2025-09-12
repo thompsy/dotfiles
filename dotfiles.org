@@ -350,7 +350,7 @@ Built-in ~autorevert~ automatically refreshes buffers when their corresponding f
     ;; Some systems don't do file notifications well; see
     ;; https://todo.sr.ht/~ashton314/emacs-bedrock/11
     (setopt auto-revert-interval 5)
-    (setopt auto-revert-check-vc-info t))
+    (setopt auto-revert-check-vc-info nil)) ;; turning this off as its slow!!
 #+END_SRC
 
 Built-in ~simple~ package provides basic editing commands. Configure it to integrate better with the system clipboard for killing and yanking text.
@@ -1257,7 +1257,7 @@ Built-in ~corfu-popupinfo~ provides documentation popups for completion candidat
 #+BEGIN_SRC emacs-lisp
   (use-package cape
     :init
-    (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+    ;;(add-to-list 'completion-at-point-functions #'cape-dabbrev) ;; disabling this as it is slow with lots of files open
     (add-to-list 'completion-at-point-functions #'cape-file))
 #+END_SRC
 
@@ -1274,9 +1274,23 @@ Built-in ~corfu-popupinfo~ provides documentation popups for completion candidat
 Orderless describes itself as a 'completion style' which means that it controls how Emacs filters
 and presents completion candidates.
 #+BEGIN_SRC emacs-lisp
+  ;; (use-package orderless
+  ;;   :config
+  ;;   (setq completion-styles '(orderless basic)))
+
   (use-package orderless
     :config
-    (setq completion-styles '(orderless basic)))
+    (setq completion-styles '(orderless basic))
+
+    ;; Use basic (prefix) completion for commands, orderless for everything else
+    (setq completion-category-overrides
+          '((command (styles basic))
+            (file (styles basic partial-completion))
+            (buffer (styles basic))
+            (info-menu (styles basic))))
+
+    ;; Only match on 2+ characters to reduce candidate set
+    (setq orderless-matching-styles '(orderless-literal orderless-regexp)))
 #+END_SRC
 
 *** Bookmarks
@@ -4838,8 +4852,8 @@ end
 
 config.color_scheme = 'Dracula'
 
-config.font = wezterm.font 'FiraCode Nerd Font'
-config.font_size = 16.0
+config.font = wezterm.font 'Fira Code'
+config.font_size = 14.0
 
 config.enable_tab_bar = true
 
