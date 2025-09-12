@@ -4314,6 +4314,8 @@ Some useful ~jujutsu~ aliases.
   abbr --add jgpb jj git push -b
   abbr --add jgf jj git fetch
 
+  abbr --add jab jj abandon -r
+
   abbr --add pc pre-commit run --all-files
 #+end_src
 
