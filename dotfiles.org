@@ -779,7 +779,6 @@ Built-in ~frame~ package controls frame appearance. Turn off various UI elements
     ;; Setup some initial bindings.
     ;; TODO some of these should probably live elsewhere
     (my-leader-def
-      "m" '(execute-extended-command :wk "exec")
       "a" 'org-agenda
       "b" '(:ignore t :wk "bookmarks")
       "bs" 'bookmark-set
@@ -3037,7 +3036,9 @@ See helpful examples at:
     :ensure nil
     :general
     (my-leader-def
-      "c" 'org-capture)
+      "c" 'org-capture
+      "m" '(:ignore t :wk "meetings")
+      "ms" 'at/start-upcoming-meeting)
     :config
     (setq org-refile-targets '((nil :maxlevel . 9)
                                (org-agenda-files :maxlevel . 9))
@@ -3072,6 +3073,11 @@ See helpful examples at:
              :tree-type week
              :clock-in t
              :clock-resume t
+             :empty-lines 0)
+
+            ("mu" "Upcoming Meeting"
+             entry (file+headline "~/notebook/meetings.org" "Upcoming Meetings")
+             "* TODO %? :meeting:%^g\nSCHEDULED: %^t\n:Created: %T\n** Attendees\n** Notes\n** Action Items\n*** TODO [#A] "
              :empty-lines 0)
 
             )))
@@ -3151,6 +3157,44 @@ See helpful examples at:
     ;;(org-todo "DONE")
     (at/org-refile-to-datetree "~/notebook/meetings.org" nil nil)
     (insert template))
+
+  (defun at/start-upcoming-meeting ()
+    "Select and start an upcoming meeting - clocks in and narrows to entry."
+    (interactive)
+    (let ((meetings '()))
+      ;; Collect all scheduled TODO meetings from agenda files
+      (dolist (file (org-agenda-files))
+        (with-current-buffer (find-file-noselect file)
+          (org-map-entries
+           (lambda ()
+             (when (and (member (org-get-todo-state) '("TODO"))
+                       (member "meeting" (org-get-tags))
+                       (org-get-scheduled-time (point)))
+               (let* ((heading (org-get-heading t t t t))
+                      (scheduled (org-get-scheduled-time (point)))
+                      (scheduled-str (when scheduled
+                                      (format-time-string "%Y-%m-%d %a %H:%M" scheduled)))
+                      (display-str (format "%s  [%s]" heading (or scheduled-str "no time")))
+                      (marker (point-marker)))
+                 (push (cons display-str marker) meetings))))
+           nil 'file)))
+      ;; Sort meetings by scheduled time (most recent first)
+      (setq meetings (sort meetings
+                          (lambda (a b)
+                            (let ((time-a (org-get-scheduled-time (cdr a)))
+                                  (time-b (org-get-scheduled-time (cdr b))))
+                              (time-less-p time-a time-b)))))
+      (if (null meetings)
+          (message "No upcoming scheduled meetings found")
+        (let* ((selected (completing-read "Start meeting: "
+                                         (mapcar #'car meetings) nil t))
+               (marker (cdr (assoc selected meetings))))
+          (when marker
+            (switch-to-buffer (marker-buffer marker))
+            (goto-char marker)
+            (org-narrow-to-subtree)
+            (org-clock-in)
+            (message "Started meeting: %s" (org-get-heading t t t t)))))))
 #+END_SRC
 
 *** Regular Meetings Example
@@ -3240,6 +3284,13 @@ This is an example of how I process regular meetings like 1 to 1s:
                                 :todo "BLOCKED"
                                 :tag "obstacle"
                                 :order 3
+                                )
+                         ;; Filter for upcoming scheduled meetings
+                         (:name "Upcoming Meetings"
+                                :and (:tag "meeting"
+                                      :todo "TODO"
+                                      :scheduled future)
+                                :order 4
                                 )
                          ;; Filter where tag is meeting and priority is A (only want TODOs from meetings)
                          (:name "Meeting Action Items"
