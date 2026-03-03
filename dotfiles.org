@@ -3068,7 +3068,7 @@ See helpful examples at:
 
             ("ma" "Adhoc Meeting"
              entry (file+olp+datetree "~/notebook/meetings.org")
-             "* %? :meeting:%^g \n:Created: %T\n** Attendees\n- \n** Notes\n** Action Items\n*** TODO [#A] "
+             "* %? :meeting:%^g\n:Created: %T\n** Attendees\n** Notes\n** Action Items\n*** TODO [#A] "
              :tree-type week
              :clock-in t
              :clock-resume t
@@ -4115,7 +4115,7 @@ The actual Fish shell configuration, focused purely on configuration rather than
 
   #+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
     set -g fish_greeting ""
-    set -U fish_user_paths ~/.cargo/bin ~/.fzf/bin ~/go/bin /usr/local/go/bin ~/bin
+    set -U fish_user_paths ~/.cargo/bin ~/.fzf/bin ~/go/bin /usr/local/go/bin ~/bin ~/.local/bin
 
     # Helper function to add path if directory exists
     function add_path_if_exists
