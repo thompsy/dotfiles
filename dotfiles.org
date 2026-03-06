@@ -1,4 +1,4 @@
-#+TITLE: Literate Dotfiles Configuration
+#+Title: Literate Dotfiles Configuration
 
 * Dotfiles
 :PROPERTIES:
@@ -3019,6 +3019,10 @@ See helpful examples at:
                         ;; Meeting tags
                         ("meeting" . ?m)
 
+                        ;; People tags
+                        ("person" . ?p)
+                        ("direct_report" . ?D)
+
                         ;; Work Log Tags
                         ("accomplishment" . ?A)
                         ))
@@ -3038,7 +3042,10 @@ See helpful examples at:
     (my-leader-def
       "c" 'org-capture
       "m" '(:ignore t :wk "meetings")
-      "ms" 'at/start-upcoming-meeting)
+      "ms" 'at/start-upcoming-meeting
+      "mc" 'at/conclude-meeting
+      "mp" 'at/open-person-file
+      "m1" 'at/start-1-to-1)
     :config
     (setq org-refile-targets '((nil :maxlevel . 9)
                                (org-agenda-files :maxlevel . 9))
@@ -3079,6 +3086,12 @@ See helpful examples at:
              entry (file+headline "~/notebook/meetings.org" "Upcoming Meetings")
              "* TODO %? :meeting:%^g\nSCHEDULED: %^t\n:Created: %T\n** Attendees\n** Notes\n** Action Items\n*** TODO [#A] "
              :empty-lines 0)
+
+            ("p" "Person Note"
+             entry (file (lambda () (at/select-person-file)))
+             "* %U - %?\n"
+             :empty-lines 0
+             :jump-to-captured t)
 
             )))
 
@@ -3195,6 +3208,105 @@ See helpful examples at:
             (org-narrow-to-subtree)
             (org-clock-in)
             (message "Started meeting: %s" (org-get-heading t t t t)))))))
+
+  (defun at/conclude-meeting ()
+    "Conclude the current meeting - clock out, mark done, widen, and refile to datetree."
+    (interactive)
+    (save-excursion
+      ;; Go to the headline level to ensure we're at the top of the subtree
+      (org-back-to-heading t)
+      (let ((heading (org-get-heading t t t t)))
+        ;; Clock out if a clock is running
+        (when (org-clock-is-active)
+          (org-clock-out))
+        ;; Mark as DONE
+        (org-todo "DONE")
+        ;; Widen to show full buffer
+        (widen)
+        ;; Refile to meetings.org datetree using the scheduled date
+        (let ((scheduled-date (org-get-scheduled-time (point))))
+          (at/org-refile-to-datetree
+           "~/notebook/meetings.org"
+           (when scheduled-date
+             (format-time-string "%Y-%m-%d" scheduled-date))
+           nil))
+        (message "Concluded meeting: %s" heading))))
+
+  ;; Direct Reports Management Functions
+
+  (defconst at/people-directory (expand-file-name "~/notebook/people/")
+    "Directory containing person files for direct reports.")
+
+  (defun at/get-people-files ()
+    "Return a list of all .org files in the people directory."
+    (when (file-directory-p at/people-directory)
+      (directory-files at/people-directory nil "\\.org$")))
+
+  (defun at/select-person-file ()
+    "Prompt for a person and return the path to their file.
+    If the person doesn't exist, create a new file from template."
+    (let* ((people (at/get-people-files))
+           (person-names (mapcar (lambda (f) (file-name-sans-extension f)) people))
+           (selection (completing-read "Person: " person-names nil nil))
+           (file-path (expand-file-name (concat selection ".org") at/people-directory)))
+      (unless (file-exists-p file-path)
+        (at/create-person-file file-path selection))
+      file-path))
+
+  (defun at/create-person-file (file-path name)
+    "Create a new person file at FILE-PATH with NAME using the template."
+    (with-temp-file file-path
+      (insert (format "#+TITLE: %s\n" name))
+      (insert "#+FILETAGS: :person:direct_report:\n\n")
+      (insert "* About\n")
+      (insert "** Role & Team\n\n")
+      (insert "** Start Date\n\n")
+      (insert "** Work Style & Preferences\n\n")
+      (insert "* Career & Goals\n")
+      (insert "** Current Goals\n\n")
+      (insert "** Long-term Aspirations\n\n")
+      (insert "** Skills to Develop\n\n")
+      (insert "* Feedback Log\n\n")
+      (insert "* 1:1 Meeting History\n\n")
+      (insert "* Notes\n\n"))
+    (message "Created new person file: %s" file-path))
+
+  (defun at/open-person-file ()
+    "Open a person file with completion."
+    (interactive)
+    (let ((file-path (at/select-person-file)))
+      (find-file file-path)))
+
+  (defun at/start-1-to-1 ()
+    "Start a 1:1 meeting with a direct report.
+    Opens their person file and starts a new meeting entry."
+    (interactive)
+    (let* ((people (at/get-people-files))
+           (person-names (mapcar (lambda (f) (file-name-sans-extension f)) people))
+           (selection (completing-read "1:1 with: " person-names nil t))
+           (person-file (expand-file-name (concat selection ".org") at/people-directory)))
+      ;; Open the person file
+      (find-file person-file)
+      ;; Create a new meeting entry in meetings.org with 1_to_1 tag
+      (org-capture nil "ma")
+      ;; Add the 1_to_1 tag
+      (org-set-tags ":meeting:1_to_1:")))
+
+  (defun at/add-meeting-link-to-person (person-name meeting-headline meeting-date)
+    "Add a link to a completed 1:1 meeting in the person's file.
+    PERSON-NAME is the name (file name without .org).
+    MEETING-HEADLINE is the headline text of the meeting.
+    MEETING-DATE is the date string (YYYY-MM-DD)."
+    (let ((person-file (expand-file-name (concat person-name ".org") at/people-directory)))
+      (when (file-exists-p person-file)
+        (with-current-buffer (find-file-noselect person-file)
+          (save-excursion
+            (goto-char (point-min))
+            (when (re-search-forward "^\\* 1:1 Meeting History" nil t)
+              (forward-line 1)
+              (insert (format "- [[file:~/notebook/meetings.org::*%s][%s: %s]]\n"
+                            meeting-headline meeting-date meeting-headline)))
+            (save-buffer))))))
 #+END_SRC
 
 *** Regular Meetings Example
