@@ -415,7 +415,7 @@ An improved ~keyboard-quit~ function courtesy of [[https://emacsredux.com/blog/2
 
 #+begin_src emacs-lisp
   (defun my/keyboard-quit ()
-    "Smater version of the built-in `keyboard-quit'.
+    "Smarter version of the built-in `keyboard-quit'.
 
   The generic `keyboard-quit' does not do the expected thing when
   the minibuffer is open.  Whereas we want it to close the
@@ -3542,7 +3542,7 @@ Setup various ~org-mode~ structure templates. When typing ~<~ at the start of a 
     ("q" nil "quit"))
 
   (require 'org-tempo) ; Required from org 9 onwards for old template expansion
-  ;; Reset the org-template expnsion system, this is need after upgrading to org 9 for some reason
+  ;; Reset the org-template expansion system, this is needed after upgrading to org 9 for some reason
   (setq org-structure-template-alist (eval (car (get 'org-structure-template-alist 'standard-value))))
   ;; Dynamic org-mode template expansion with intelligent region handling.
   ;;
