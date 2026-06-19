@@ -855,18 +855,18 @@ This hydra gives easy access to inserting various Unicode characters.
   (my-leader-def "u" '(hydra-unicode/body :wk "unicode"))
   (defhydra hydra-unicode (:hint nil)
     "
-          Unicode  _e_ €  _g_ £
+          Unicode  _E_ €  _g_ £
                    _f_ ♀  _r_ ♂
-                   _o_ °  _m_ µ  _z_ ë  _Z_ Ë
+                   _O_ °  _m_ µ  _z_ ë  _Z_ Ë
                    _n_ ←  _e_ ↓  _i_ ↑  _o_ →
           "
-    ("e" (my/insert-unicode "EURO SIGN"))
+    ("E" (my/insert-unicode "EURO SIGN"))
     ("g" (my/insert-unicode "POUND SIGN"))
 
     ("r" (my/insert-unicode "MALE SIGN"))
     ("f" (my/insert-unicode "FEMALE SIGN"))
 
-    ("o" (my/insert-unicode "DEGREE SIGN"))
+    ("O" (my/insert-unicode "DEGREE SIGN"))
     ("m" (my/insert-unicode "MICRO SIGN"))
 
     ("z" (my/insert-unicode "LATIN SMALL LETTER E DIAERESIS"))
