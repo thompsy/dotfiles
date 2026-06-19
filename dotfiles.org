@@ -2390,6 +2390,7 @@ A nice Hydra menu to make things more accessible.
     :config
     (global-flycheck-mode +1)
     (setq flycheck-idle-change-delay 1.5)
+    (setq flycheck-display-errors-function #'flycheck-display-error-messages-unless-error-list)
     ;; Use built-in golangci-lint checker
     (when (executable-find "golangci-lint")
       (add-hook 'go-ts-mode-hook
@@ -2405,17 +2406,6 @@ A nice Hydra menu to make things more accessible.
     :custom (flycheck-eglot-exclusive nil)
     :config
     (global-flycheck-eglot-mode 1))
-#+END_SRC
-
-Show flycheck errors in echo area instead of popup tooltips to avoid Corfu conflicts.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package flycheck-pos-tip
-    :after flycheck
-    :config
-    ;; Disable pos-tip mode and use echo area instead
-    ;; (flycheck-pos-tip-mode)
-    (setq flycheck-display-errors-function #'flycheck-display-error-messages-unless-error-list))
 #+END_SRC
 
 [[https://github.com/kaushalmodi/emacs-consult-flycheck][~consult-flycheck~]] integrates flycheck with consult, providing a searchable interface for navigating through flycheck errors.
