@@ -893,7 +893,7 @@ smaller to larger screens.
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-  (my-leader-def "n" '(hydra-macro/body :wk "macros"))0
+  (my-leader-def "n" '(hydra-macro/body :wk "macros"))
   (defhydra hydra-macro (:hint nil :color pink :pre
                                (when defining-kbd-macro
                                  (kmacro-end-macro 1)))
@@ -3908,7 +3908,6 @@ Various setup like sensitive tags and functions that deal with them are stored e
    ("yasnippet" . "c1e6ff23e9af16b856c88dfaab9d3ad7b746ad37")
    ("yasnippet-snippets" . "f2fdb1693719ec906c683037c5031ca1f3230d91")
    ("zoom-frm" . "8f7ee71cb8d346112bb1cb029f363120dd587f1c"))
-  :gamma
 
 #+end_src
 * Fish
