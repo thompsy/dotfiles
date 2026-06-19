@@ -2181,14 +2181,10 @@ Configure built-in Tree-sitter support for better syntax highlighting, indentati
 
 #+BEGIN_SRC emacs-lisp
   (use-package combobulate
+    :straight (combobulate :type git :host github :repo "mickeynp/combobulate")
     :custom
-    ;; You can customize Combobulate's key prefix here.
-    ;; Note that you may have to restart Emacs for this to take effect!
     (combobulate-key-prefix "C-c o")
-    :hook ((prog-mode . combobulate-mode))
-    ;; Amend this to the directory where you keep Combobulate's source
-    ;; code.
-    :load-path ("path-to-git-checkout-of-combobulate"))
+    :hook ((prog-mode . combobulate-mode)))
 #+END_SRC
 
 [[https://github.com/casouri/expreg][~expreg~]] provides commands to expand and contract the region based on syntactic units, making it easy to select code blocks.
