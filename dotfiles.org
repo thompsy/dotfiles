@@ -2093,7 +2093,7 @@ Now we've got a hydra to make the various window management functions easily acc
 
     ;; Switch
     ("b" consult-buffer)
-    ("f" find-files)
+    ("f" find-file)
     ("a" (lambda ()
            (interactive)
            (ace-window 1)
