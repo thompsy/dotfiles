@@ -295,10 +295,9 @@ Install the latest version of Org mode rather than using the built-in version. T
   (straight-use-package 'org)
 #+END_SRC
 
-Configure use-package to load packages immediately by default and ensure they are installed:
+Configure use-package to ensure packages are installed by default:
 
 #+BEGIN_SRC emacs-lisp
-  (setq use-package-always-demand t)
   (setq use-package-always-ensure t)
 #+END_SRC
 ** Core Configuration
