@@ -2907,7 +2907,7 @@ See helpful examples at:
              ((agenda "" ((org-agenda-span 'day)
                           (org-agenda-skip-function '(org-agenda-skip-deadline-if-not-today))
                           (org-agenda-entry-types '(:deadline))
-                          (org-agenda-overriding-header "Today's Deadlines ")))))))))
+                          (org-agenda-overriding-header "Today's Deadlines "))))))))
 #+END_SRC
 
 [[https://github.com/jxq0/org-tidy][~org-tidy~]] hides property drawers by default to reduce visual clutter. You can call ~M-x org-tidy-untidy-buffer~ to unhide them if you want to manually edit them.
