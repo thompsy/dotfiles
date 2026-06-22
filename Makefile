@@ -1,14 +1,22 @@
 .PHONY: tangle clean install bootstrap setup-tools update-tools emacs-app precompile
 
+# Emacs is installed via the d12frosted/emacs-plus tap.
+EMACS_PLUS_TAP = d12frosted/emacs-plus
+EMACS_PLUS = emacs-plus@30
+
 # Tangle all config files from the org file
 tangle:
 	emacs --batch --eval "(require 'org)" --eval "(require 'ob-shell)" --eval "(setq org-confirm-babel-evaluate nil)" --eval '(org-babel-tangle-file "dotfiles.org")'
 
-# Bootstrap on a fresh machine: install Emacs via brew, then tangle
+# Bootstrap on a fresh machine: install Emacs (emacs-plus) via brew, tangle
+# configs, create the app shortcut, and pre-build packages.
 bootstrap:
 	@command -v brew >/dev/null || (echo "Install Homebrew first" && exit 1)
-	brew install emacs
+	brew tap $(EMACS_PLUS_TAP)
+	brew trust --formula $(EMACS_PLUS_TAP)/$(EMACS_PLUS)
+	brew install $(EMACS_PLUS)
 	$(MAKE) tangle
+	$(MAKE) emacs-app
 	$(MAKE) precompile
 
 # Remove generated files (careful - lists what would be removed first)
@@ -28,7 +36,7 @@ update-tools:
 # shortcut goes stale.
 emacs-app:
 	rm -f /Applications/Emacs.app
-	osascript -e 'tell application "Finder" to make alias file to posix file "/opt/homebrew/opt/emacs-plus@30/Emacs.app" at posix file "/Applications" with properties {name:"Emacs.app"}'
+	osascript -e 'tell application "Finder" to make alias file to posix file "/opt/homebrew/opt/$(EMACS_PLUS)/Emacs.app" at posix file "/Applications" with properties {name:"Emacs.app"}'
 
 # Pre-build all Emacs packages from the CLI so the first GUI start is fast.
 # Phase 1: load init headless so straight.el clones/byte-compiles packages.

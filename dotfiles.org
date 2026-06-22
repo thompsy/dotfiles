@@ -181,6 +181,8 @@ Emacs is installed via [[https://github.com/d12frosted/homebrew-emacs-plus][~ema
   brew install emacs-plus@30
 #+end_src
 
+~emacs-plus~ is a third-party tap, so ~brew~ may refuse to install the formula until it is trusted. If you see a "not trusted tap" error, run ~brew trust --formula d12frosted/emacs-plus/emacs-plus@30~ first (this is done automatically by ~make bootstrap~).
+
 The ~brew~ formula builds the app under ~/opt/homebrew/opt/emacs-plus@30/Emacs.app~ but does *not* place a launchable shortcut in ~/Applications~. To get one (so Spotlight/Dock/Launchpad can find it) we create a Finder alias pointing at the stable ~opt~ symlink path:
 #+begin_src bash :tangle no
   rm -f /Applications/Emacs.app
