@@ -1699,7 +1699,7 @@ and presents completion candidates.
   _r_ename           _M_ chmod        _t_oggle           _g_ revert buf     _e_ ediff          C-c ESC : abort
   _Y_ rel symlink    _G_ chgrp        _E_xtension mark   _s_ort             _=_ pdiff
   _S_ymlink          ^ ^              _F_ind marked      _._ toggle hydra   \\ flyspell
-  _R_sync            ^ ^              ^ ^                ^ ^                _?_ summary
+  ^ ^                ^ ^                ^ ^                ^ ^                _?_ summary
   _z_ compress-file  _A_ find regexp
   _Z_ compress       _Q_ repl regexp
   T - tag prefix
@@ -1727,7 +1727,6 @@ and presents completion candidates.
                  ("o" dired-find-file-other-window)
                  ("Q" dired-do-find-regexp-and-replace)
                  ("r" dired-do-rename)
-                 ("R" dired-do-rsynch)
                  ("S" dired-do-symlink)
                  ("s" dired-sort-toggle-or-edit)
                  ("t" dired-toggle-marks)
