@@ -3737,6 +3737,49 @@ Various setup like sensitive tags and functions that deal with them are stored e
       (load "~/notebook/local-dotfiles/site-local.el"))
 #+END_SRC
 
+** Precompiling Packages
+:PROPERTIES:
+:CUSTOM_ID: precompiling-packages
+:END:
+Emacs native-compiles packages into ~~/.emacs.d/eln-cache/<emacs-version>/~. Because that cache is keyed by Emacs version, every time Emacs is upgraded (e.g. a ~brew~ upgrade of ~emacs-plus@30~) the packages have to be recompiled, which makes the first GUI start after an upgrade slow as compilation happens lazily in the background.
+
+To avoid that, we can pre-build everything from the command line. This script native-compiles the whole ~straight~ build tree synchronously, using all cores. Run it via ~make precompile~ after an Emacs upgrade (it is also run automatically as part of ~make bootstrap~). Note that ~--batch~ does not native-compile on its own, so the explicit ~native-compile-async~ pass is required.
+
+The selector skips non-existent files (stale ~straight~ symlinks) and the ~-pkg.el~/~-autoloads.el~ helper files, which are not worth compiling.
+
+#+begin_src emacs-lisp :tangle "~/.emacs.d/precompile.el" :eval no :mkdirp yes
+  ;;; precompile.el --- Native-compile all straight packages -*- lexical-binding: t; -*-
+  ;;; Commentary:
+  ;; Run headless via `make precompile' to pre-warm the version-specific
+  ;; eln-cache so the next GUI start is fast.
+  ;;; Code:
+
+  (require 'comp)
+
+  ;; 0 = use all available cores.
+  (setq native-comp-async-jobs-number 0)
+
+  (defun my/precompile-selector (file)
+    "Return non-nil if FILE should be native-compiled.
+  Skips non-existent files (stale straight symlinks) and the
+  -pkg.el / -autoloads.el helper files."
+    (and (file-exists-p file)
+         (not (string-match-p "\\(-pkg\\|-autoloads\\)\\.el\\'" file))))
+
+  (let ((build-dir (expand-file-name "straight/build/" user-emacs-directory)))
+    (message "precompile: native-compiling %s" build-dir)
+    (native-compile-async build-dir 'recursively nil #'my/precompile-selector)
+    ;; Block until the async queue has drained so the batch process does
+    ;; not exit while compilation is still in flight.
+    (while (or (and (boundp 'comp-files-queue) comp-files-queue)
+               (and (fboundp 'comp-async-runnings) (> (comp-async-runnings) 0)))
+      (sleep-for 1)))
+
+  (message "precompile: native compilation complete")
+  (provide 'precompile)
+  ;;; precompile.el ends here
+#+end_src
+
 ** Package Versions
 :PROPERTIES:
 :ID:       3e84d692-0f7b-4a12-beac-9628a64ceee9
