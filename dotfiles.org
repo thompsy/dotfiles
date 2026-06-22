@@ -1125,7 +1125,6 @@ Helper function for consult-compile-error to prevent minibuffer conflicts.
 
   (setopt completion-auto-help 'always)                  ; Open completion always; `lazy' another option
   (setopt completions-max-height 20)                     ; This is arbitrary
-  (setopt completions-detailed t)
   (setopt completions-format 'one-column)
   (setopt completions-group t)
   (setopt completion-auto-select 'second-tab)            ; Much more eager
@@ -1287,7 +1286,7 @@ and presents completion candidates.
             (buffer (styles basic))
             (info-menu (styles basic))))
 
-    ;; Only match on 2+ characters to reduce candidate set
+    ;; Match using literal substrings and regexp
     (setq orderless-matching-styles '(orderless-literal orderless-regexp)))
 #+END_SRC
 
@@ -2476,7 +2475,7 @@ Built-in ~eglot~ provides Language Server Protocol (LSP) support for Emacs. It e
     :custom
     ;; Performance tuning
     (eglot-send-changes-idle-time 0.1)
-    (eglot-events-buffer-size 0)
+    (eglot-events-buffer-config '(:size 0 :format full))
     (eglot-sync-connect nil)
     (eglot-connect-timeout 10)
     (eglot-autoshutdown t)
@@ -3138,7 +3137,7 @@ See helpful examples at:
     (unless
         (string= file-name buffer-file-name)
       (error "Function called from unexpected location"))
-    (beginning-of-buffer)
+    (goto-char (point-min))
     ;;(org-todo "DONE")
     (at/org-refile-to-datetree "~/notebook/meetings.org" nil nil)
     (insert template))
@@ -3574,7 +3573,7 @@ Setup various ~org-mode~ structure templates. When typing ~<~ at the start of a 
    ;; disable this agenda key since I use it for avy
    "C-'" nil
    "<" '(lambda () (interactive)
-          (if (or (region-active-p) (looking-back "^"))
+          (if (or (region-active-p) (bolp))
               (hydra-org-template/body)
             (self-insert-command 1))))
 #+END_SRC
@@ -5032,7 +5031,7 @@ config.keys = {
 
 config.check_for_updates = true
 
-enable_kitty_graphics=true
+config.enable_kitty_graphics = true
 
 return config
 #+end_src
