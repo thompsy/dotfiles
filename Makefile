@@ -1,4 +1,4 @@
-.PHONY: tangle clean install bootstrap setup-tools update-tools
+.PHONY: tangle clean install bootstrap setup-tools update-tools emacs-app
 
 # Tangle all config files from the org file
 tangle:
@@ -21,3 +21,10 @@ setup-tools:
 # Update already-installed dev tools (gup update, cargo install-update -a)
 update-tools:
 	fish ~/bin/setup-dev-tools.fish --update
+
+# (Re)create the /Applications/Emacs.app shortcut as a Finder alias to the
+# emacs-plus@30 app bundle. Re-run after a brew reinstall/upgrade if the
+# shortcut goes stale.
+emacs-app:
+	rm -f /Applications/Emacs.app
+	osascript -e 'tell application "Finder" to make alias file to posix file "/opt/homebrew/opt/emacs-plus@30/Emacs.app" at posix file "/Applications" with properties {name:"Emacs.app"}'
