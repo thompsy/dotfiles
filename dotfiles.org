@@ -3948,8 +3948,14 @@ This script handles one-time installation of development tools. It's separated f
   function install_rust_toolchain
       log_step "START" "Installing Rust toolchain"
 
+      if type -q rustup
+          log_step "UPDATE" "Updating Rust toolchain via rustup"
+          install_with_retry "rustup update stable"
+          return 0
+      end
+
       if type -q cargo
-          log_step "SKIP" "Rust already installed"
+          log_step "SKIP" "Rust already installed (rustup not found, skipping toolchain update)"
           return 0
       end
 
@@ -3966,16 +3972,26 @@ This script handles one-time installation of development tools. It's separated f
   function install_rust_tools
       echo "🦀 Installing Rust tools..."
 
-      set -l rust_tools zoxide starship fd-find bat ripgrep cargo-update
-      for tool in $rust_tools
-          set -l check_name (string replace -- '-find' '' $tool)
-          if ! type -q $check_name
-              log_step "INSTALL" "Installing $tool..."
-              if not install_with_retry "cargo install $tool --locked"
-                  echo "❌ Failed to install $tool"
+      # crate:binary pairs - the binary name is what `cargo install <crate>`
+      # actually produces, which differs from the crate name for some tools
+      # (e.g. ripgrep -> rg, cargo-update -> cargo-install-update).
+      set -l rust_tools \
+          zoxide:zoxide \
+          starship:starship \
+          fd-find:fd \
+          bat:bat \
+          ripgrep:rg \
+          cargo-update:cargo-install-update
+      for entry in $rust_tools
+          set -l crate (string split -f1 ':' $entry)
+          set -l binary (string split -f2 ':' $entry)
+          if ! type -q $binary
+              log_step "INSTALL" "Installing $crate..."
+              if not install_with_retry "cargo install $crate --locked"
+                  echo "❌ Failed to install $crate"
               end
           else
-              log_step "SKIP" "$tool already installed"
+              log_step "SKIP" "$crate already installed"
           end
       end
   end
@@ -3983,8 +3999,8 @@ This script handles one-time installation of development tools. It's separated f
   function install_go_tools
       echo "🐹 Installing Go tools..."
 
-      if ! test -e /usr/local/go
-          echo "❌ Go not found at /usr/local/go. Please install Go first."
+      if ! type -q go
+          echo "❌ Go not found on PATH. Please install Go first."
           return 1
       end
 
@@ -4113,7 +4129,7 @@ if OS.mac?
 
   # GUI applications via cask
   cask "visual-studio-code"
-  cask "docker"
+  cask "docker-desktop"
   cask "firefox"
   cask "rectangle"
   cask "alfred"
@@ -4154,13 +4170,16 @@ end' > ~/Brewfile
       install_go_tools
       install_nerd_fonts
 
-      # Update tools if available
-      if type -q gup
-          gup update
-      end
+      # Update installed tools only when explicitly requested with --update
+      if contains -- --update $argv
+          echo "🔄 Updating installed tools..."
+          if type -q gup
+              gup update
+          end
 
-      if type -q cargo-install-update
-          cargo install-update -a
+          if type -q cargo-install-update
+              cargo install-update -a
+          end
       end
 
       echo "✅ Setup complete!"
@@ -4192,7 +4211,7 @@ chmod +x ~/bin/setup-dev-tools.fish
 :ID:       6a814307-3d7c-4337-a7cc-7a8bf7a12c1c
 :END:
 
-A Brewfile for managing packages via Homebrew. The setup script will create a default one if it doesn't exist, but you can customize this as needed.
+A Brewfile for managing packages via Homebrew. Note that the setup script only creates a default ~/Brewfile if one does not already exist - it will *not* overwrite an existing ~/Brewfile. Once you have a local copy, this block serves as a starting template rather than the authoritative source; edit ~/Brewfile directly (or delete it and re-tangle) to change what gets installed.
 
 #+begin_src ruby :tangle "~/Brewfile" :mkdirp yes
 # Essential development tools
@@ -4226,7 +4245,7 @@ if OS.mac?
 
   # GUI applications via cask
   cask "visual-studio-code"
-  cask "docker"
+  cask "docker-desktop"
   cask "firefox"
   cask "rectangle"
   cask "alfred"
