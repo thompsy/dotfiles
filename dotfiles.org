@@ -183,13 +183,46 @@ Emacs is installed via [[https://github.com/d12frosted/homebrew-emacs-plus][~ema
 
 ~emacs-plus~ is a third-party tap, so ~brew~ may refuse to install the formula until it is trusted. If you see a "not trusted tap" error, run ~brew trust --formula d12frosted/emacs-plus/emacs-plus@30~ first (this is done automatically by ~make bootstrap~).
 
-The ~brew~ formula builds the app under ~/opt/homebrew/opt/emacs-plus@30/Emacs.app~ but does *not* place a launchable shortcut in ~/Applications~. To get one (so Spotlight/Dock/Launchpad can find it) we create a Finder alias pointing at the stable ~opt~ symlink path:
-#+begin_src bash :tangle no
-  rm -f /Applications/Emacs.app
-  osascript -e 'tell application "Finder" to make alias file to posix file "/opt/homebrew/opt/emacs-plus@30/Emacs.app" at posix file "/Applications" with properties {name:"Emacs.app"}'
+The ~brew~ formula builds the app under ~/opt/homebrew/opt/emacs-plus@30/Emacs.app~ but does *not* place a launchable shortcut in ~/Applications~. To get one (so Spotlight/Dock/Launchpad can find it) we create a Finder alias pointing at the stable ~opt~ symlink path.
+
+This is fiddly on a managed Mac: ~/Applications~ carries the BSD ~sunlnk~ flag, so a plain ~rm /Applications/Emacs.app~ fails with "Permission denied" for non-root users (even when you own the file and ~test -w~ reports it writable). Finder itself *can* delete/replace items there without ~sudo~, so we drive the whole replace through ~osascript~. The following script (tangled to ~~/bin/emacs-app-shortcut.sh~ and run by ~make emacs-app~) skips work if the shortcut is already current, otherwise asks Finder to delete any existing alias and create a fresh one:
+#+begin_src bash :tangle "~/bin/emacs-app-shortcut.sh" :mkdirp yes :tangle-mode (identity #o755) :shebang "#!/bin/sh"
+  # (Re)create /Applications/Emacs.app as a Finder alias to the emacs-plus app.
+  # /Applications is sunlnk-protected, so we use Finder (not rm) to replace it,
+  # which works without sudo.
+  set -e
+
+  EMACS_PLUS="${EMACS_PLUS:-emacs-plus@30}"
+  target="/opt/homebrew/opt/$EMACS_PLUS/Emacs.app"
+
+  if [ ! -d "$target" ]; then
+      echo "emacs-app: $target not found; is $EMACS_PLUS installed?" >&2
+      exit 1
+  fi
+
+  # Resolve the real bundle path the alias should point at.
+  want="$(cd "$target" && pwd -P)"
+
+  # If the alias already resolves to the current bundle, do nothing.
+  current="$(osascript -e 'tell application "Finder" to get POSIX path of (original item of (alias file "Emacs.app" of (path to applications folder)) as alias)' 2>/dev/null || true)"
+  current="${current%/}"
+  if [ "$current" = "$want" ]; then
+      echo "emacs-app: shortcut already current ($want)"
+      exit 0
+  fi
+
+  echo "emacs-app: (re)creating /Applications/Emacs.app -> $target"
+  osascript <<EOF
+  tell application "Finder"
+      if (exists alias file "Emacs.app" of (path to applications folder)) then
+          delete (alias file "Emacs.app" of (path to applications folder))
+      end if
+      make alias file to (POSIX file "$target") at (POSIX file "/Applications" as alias) with properties {name:"Emacs.app"}
+  end tell
+EOF
 #+end_src
 
-Note: after a ~brew reinstall~ or major upgrade of ~emacs-plus@30~, the underlying app bundle is recreated and the alias can go stale. If the shortcut stops working, just re-run the command above (or ~make emacs-app~). If macOS still launches a stale copy, refresh Launch Services:
+Note: after a ~brew reinstall~ or major upgrade of ~emacs-plus@30~, the underlying app bundle is recreated and the alias can go stale. If the shortcut stops working, just re-run ~make emacs-app~. If macOS still launches a stale copy, refresh Launch Services:
 #+begin_src bash :tangle no
   /System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/LaunchServices.framework/Versions/A/Support/lsregister -f /Applications/Emacs.app
 #+end_src

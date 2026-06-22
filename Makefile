@@ -16,7 +16,7 @@ bootstrap:
 	brew trust --formula $(EMACS_PLUS_TAP)/$(EMACS_PLUS)
 	brew install $(EMACS_PLUS)
 	$(MAKE) tangle
-	$(MAKE) emacs-app
+	-$(MAKE) emacs-app
 	$(MAKE) precompile
 
 # Remove generated files (careful - lists what would be removed first)
@@ -32,11 +32,11 @@ update-tools:
 	fish ~/bin/setup-dev-tools.fish --update
 
 # (Re)create the /Applications/Emacs.app shortcut as a Finder alias to the
-# emacs-plus@30 app bundle. Re-run after a brew reinstall/upgrade if the
+# emacs-plus app bundle. /Applications is sunlnk-protected, so the replace is
+# driven through Finder (no sudo). Re-run after a brew reinstall/upgrade if the
 # shortcut goes stale.
 emacs-app:
-	rm -f /Applications/Emacs.app
-	osascript -e 'tell application "Finder" to make alias file to posix file "/opt/homebrew/opt/$(EMACS_PLUS)/Emacs.app" at posix file "/Applications" with properties {name:"Emacs.app"}'
+	EMACS_PLUS=$(EMACS_PLUS) ~/bin/emacs-app-shortcut.sh
 
 # Pre-build all Emacs packages from the CLI so the first GUI start is fast.
 # Phase 1: load init headless so straight.el clones/byte-compiles packages.
