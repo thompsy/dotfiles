@@ -2895,10 +2895,10 @@ See helpful examples at:
           org-agenda-custom-commands
           '(("d" "Done tasks" tags "/DONE|CANCELED")
             ("g" "Plan Today"
-             ((agenda "" ((org-agenda-span 'day)))
-              (org-agenda-skip-function '(org-agenda-skip-deadline-if-not-today))
-              (org-agenda-entry-types '(:deadline))
-              (org-agenda-overriding-header "Today's Deadlines "))))))
+             ((agenda "" ((org-agenda-span 'day)
+                          (org-agenda-skip-function '(org-agenda-skip-deadline-if-not-today))
+                          (org-agenda-entry-types '(:deadline))
+                          (org-agenda-overriding-header "Today's Deadlines ")))))))))
 #+END_SRC
 
 [[https://github.com/jxq0/org-tidy][~org-tidy~]] hides property drawers by default to reduce visual clutter. You can call ~M-x org-tidy-untidy-buffer~ to unhide them if you want to manually edit them.
@@ -3339,6 +3339,7 @@ This is an example of how I process regular meetings like 1 to 1s:
     (org-super-agenda-mode))
 
   (setq org-agenda-custom-commands
+        (append org-agenda-custom-commands
         '(
           ("j" "Andrew's Super View"
            (
@@ -3411,8 +3412,8 @@ This is an example of how I process regular meetings like 1 to 1s:
                          (:name "Currently Being Verified"
                                 :todo "VERIFYING"
                                 :order 20
-                                )
-                     ))))))))
+                                 )
+                     )))))))))
 
   (defhydra hydra-org-agenda (:pre (setq which-key-inhibit t)
                                    :post (setq which-key-inhibit nil)
