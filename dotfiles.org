@@ -3972,16 +3972,14 @@ This script handles one-time installation of development tools. It's separated f
   function install_rust_tools
       echo "🦀 Installing Rust tools..."
 
-      # crate:binary pairs - the binary name is what `cargo install <crate>`
-      # actually produces, which differs from the crate name for some tools
-      # (e.g. ripgrep -> rg, cargo-update -> cargo-install-update).
+      # crate:binary pairs for tools NOT available as Homebrew bottles.
+      # Everything else (fd, bat, ripgrep, zoxide, starship, eza, lsd, zellij)
+      # is installed via brew - see the Brewfile.
+      # The binary name is what `cargo install <crate>` produces, which differs
+      # from the crate name for some tools (e.g. cargo-update -> cargo-install-update).
       set -l rust_tools \
-          zoxide:zoxide \
-          starship:starship \
-          fd-find:fd \
-          bat:bat \
-          ripgrep:rg \
-          cargo-update:cargo-install-update
+          cargo-update:cargo-install-update \
+          starship-jj:starship-jj
       for entry in $rust_tools
           set -l crate (string split -f1 ':' $entry)
           set -l binary (string split -f2 ':' $entry)
@@ -4115,25 +4113,25 @@ brew "node"
 brew "python@3.11"
 brew "go"
 
-# Modern CLI replacements (commenting these out since we install via Rust/Cargo)
-# Uncomment if you prefer Homebrew versions over Cargo versions
-# brew "fd"
-# brew "bat"
-# brew "ripgrep"
-# brew "zoxide"
-# brew "starship"
+# Modern CLI replacements (prebuilt bottles - faster, no rustc version coupling)
+brew "fd"
+brew "bat"
+brew "ripgrep"
+brew "zoxide"
+brew "starship"
+brew "eza"
+brew "lsd"
+brew "zellij"
 
 # macOS specific packages
 if OS.mac?
   brew "mas"  # Mac App Store CLI
 
   # GUI applications via cask
-  cask "visual-studio-code"
   cask "docker-desktop"
   cask "firefox"
   cask "rectangle"
   cask "alfred"
-  cask "iterm2"
   cask "wezterm"
 end
 
@@ -4211,7 +4209,7 @@ chmod +x ~/bin/setup-dev-tools.fish
 :ID:       6a814307-3d7c-4337-a7cc-7a8bf7a12c1c
 :END:
 
-A Brewfile for managing packages via Homebrew. Note that the setup script only creates a default ~/Brewfile if one does not already exist - it will *not* overwrite an existing ~/Brewfile. Once you have a local copy, this block serves as a starting template rather than the authoritative source; edit ~/Brewfile directly (or delete it and re-tangle) to change what gets installed.
+A Brewfile for managing packages via Homebrew. CLI tools like ~fd~, ~bat~, ~ripgrep~, ~zoxide~, ~starship~, ~eza~, ~lsd~ and ~zellij~ are installed here as prebuilt bottles (faster, and not coupled to the active ~rustc~ version). Only Rust tools that aren't available as Homebrew bottles (~cargo-update~, ~starship-jj~) are installed via ~cargo~ in the setup script. Note that the setup script only creates a default ~/Brewfile if one does not already exist - it will *not* overwrite an existing ~/Brewfile. Once you have a local copy, this block serves as a starting template rather than the authoritative source; edit ~/Brewfile directly (or delete it and re-tangle) to change what gets installed.
 
 #+begin_src ruby :tangle "~/Brewfile" :mkdirp yes
 # Essential development tools
@@ -4231,25 +4229,24 @@ brew "node"
 brew "python@3.11"
 brew "go"
 
-# Modern CLI replacements (commenting these out since we install via Rust/Cargo)
-# Uncomment if you prefer Homebrew versions over Cargo versions
-# brew "fd"
-# brew "bat"
-# brew "ripgrep"
-# brew "zoxide"
-# brew "starship"
+# Modern CLI replacements (prebuilt bottles - faster, no rustc version coupling)
+brew "fd"
+brew "bat"
+brew "ripgrep"
+brew "zoxide"
+brew "starship"
+brew "eza"
+brew "lsd"
+brew "zellij"
 
 # macOS specific packages
 if OS.mac?
   brew "mas"  # Mac App Store CLI
 
   # GUI applications via cask
-  cask "visual-studio-code"
   cask "docker-desktop"
   cask "firefox"
   cask "rectangle"
-  cask "alfred"
-  cask "iterm2"
   cask "wezterm"
 end
 
