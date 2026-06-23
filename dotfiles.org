@@ -2570,10 +2570,13 @@ Built-in ~eglot~ provides Language Server Protocol (LSP) support for Emacs. It e
                                                :tidy t
                                                :upgrade_dependency t
                                                :vendor t)))))
-    ;; Configure Python LSP - use pyright for full language features + syntax checking.
+    ;; Configure Python LSP - use basedpyright (a pyright fork) for full
+    ;; language features + syntax checking. basedpyright is installed globally
+    ;; via brew; pet (below) tells it each project's venv (pythonPath/venvPath)
+    ;; so imports resolve per-project without activating the venv manually.
     ;; ruff is available on-demand via `my/lint-ruff' (flycheck hydra `P').
     (add-to-list 'eglot-server-programs
-                 `(python-ts-mode . ("pyright-langserver" "--stdio"))))
+                 `(python-ts-mode . ("basedpyright-langserver" "--stdio"))))
 
 
   ;; Enhanced eglot integration functions
@@ -2820,6 +2823,10 @@ Built-in ~sh-script~ provides shell script editing support with syntax highlight
 
 #+BEGIN_SRC emacs-lisp
   (use-package pet
+    :config
+    ;; Make eglot resolve the project's venv (pythonPath/venvPath) via pet, so
+    ;; the global basedpyright server gets per-project import resolution.
+    (add-hook 'pet-mode-hook #'pet-eglot-setup)
     :hook (python-base-mode . pet-mode))
 #+END_SRC
 
@@ -4221,6 +4228,9 @@ brew "eza"
 brew "lsd"
 brew "zellij"
 
+# Python language server (used globally by eglot; pet handles per-project venvs)
+brew "basedpyright"
+
 # macOS specific packages
 if OS.mac?
   brew "mas"  # Mac App Store CLI
@@ -4336,6 +4346,9 @@ brew "starship"
 brew "eza"
 brew "lsd"
 brew "zellij"
+
+# Python language server (used globally by eglot; pet handles per-project venvs)
+brew "basedpyright"
 
 # macOS specific packages
 if OS.mac?
