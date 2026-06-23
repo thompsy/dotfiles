@@ -4325,7 +4325,6 @@ The actual Fish shell configuration, focused purely on configuration rather than
 
   #+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
     set -g fish_greeting ""
-    set -U fish_user_paths ~/.cargo/bin ~/.fzf/bin ~/go/bin /usr/local/go/bin ~/bin ~/.local/bin
 
     # Helper function to add path if directory exists
     function add_path_if_exists
@@ -4340,6 +4339,9 @@ The actual Fish shell configuration, focused purely on configuration rather than
             add_path_if_exists $path
         end
     end
+
+    # Core user paths (only added if the directory exists)
+    add_paths_if_exist ~/.cargo/bin ~/go/bin /usr/local/go/bin ~/bin ~/.local/bin
 
     # Homebrew path setup for macOS and Linux
     if test (uname -s) = Darwin
@@ -4427,13 +4429,7 @@ The ~fzf.fish~ plugin. This gives a number of useful keybindings:
   set -gx EDITOR emacsclient
 #+end_src
 
-Install ~fzf~ for fuzzy matching things.
-#+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
-  if ! test -e ~/.fzf/
-      git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
-      ~/.fzf/install --bin
-  end
-#+end_src
+~fzf~ (for fuzzy matching) is installed via Homebrew (see the [[#brewfile][Brewfile]]), so no manual bootstrap is needed here.
 
 Configure ~FZF~ options and ~fd~ integration:
 #+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
@@ -4547,9 +4543,8 @@ Setup ~go~-related config. I should probably check that ~go~ is actually install
 
 #+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
   # Configure Go environment if Go is installed
-  if test -e /usr/local/go
+  if type -q go
       set -gx GOPATH $HOME/go/
-      set -gx GO111MODULE on
   end
 
   # Go development abbreviations
@@ -4660,6 +4655,11 @@ First setup a script to allow Emacs to be used to resolve conflicts in Jujutsu!
   # 2. It uses `git merge-file` to create a file with conflict markers at the output path.
   # 3. It then opens the now-populated output file with emacsclient.
   #
+
+  # Sanity checks: required tools and argument count.
+  command -v git >/dev/null 2>&1 || { echo "emacs-resolver: git not found" >&2; exit 1; }
+  command -v emacsclient >/dev/null 2>&1 || { echo "emacs-resolver: emacsclient not found" >&2; exit 1; }
+  [ "$#" -eq 4 ] || { echo "usage: emacs-resolver.sh OUTPUT BASE LEFT RIGHT" >&2; exit 1; }
 
   # Assign arguments to named variables for clarity
   output="$1"
