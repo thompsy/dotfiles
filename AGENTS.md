@@ -46,20 +46,10 @@ make tangle
 - `make install-ghostty` — (Linux only) install latest Ghostty AppImage + desktop launcher
 - `make clean` — intentionally a no-op (no manifest of tangled files)
 
-## Tests
-
-The `test-*.sh` scripts use Docker to exercise `install.sh` in a clean Ubuntu
-container:
-
-- `test-quick.sh` — syntax check + basic run
-- `test-core.sh` — core path with the slow Emacs build stubbed out
-- `test-fast.sh` — faster variant
-
-These require Docker and pull `ubuntu:22.04`.
-
 ## Conventions
 
 - Keep config and its prose documentation together in `dotfiles.org`; new
   settings should be documented alongside their code block, matching the
   surrounding style.
-- Brew packages live in `Brewfile`.
+- Homebrew packages are defined in the Brewfile source block in `dotfiles.org`
+  (tangled to `~/Brewfile`) — edit that block, not `~/Brewfile` directly.
