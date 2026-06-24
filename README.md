@@ -47,6 +47,7 @@ make setup-tools
 | `make emacs-app` | (Re)create the `/Applications/Emacs.app` Finder alias to the emacs-plus bundle. Re-run if the shortcut goes stale after a `brew reinstall`/upgrade. |
 | `make setup-tools` | Install CLI dev tools (Rust toolchain, Go tools, Nerd Fonts, Homebrew packages from the Brewfile). |
 | `make update-tools` | Update already-installed dev tools (`gup update`, `cargo install-update -a`). |
+| `make install-ghostty` | (Linux only) Install the latest Ghostty AppImage to `~/bin` and register a desktop launcher. |
 
 ## Generated files
 
@@ -65,6 +66,13 @@ Tangling `dotfiles.org` writes, among others:
 - `~/bin/setup-dev-tools.fish` — dev tools installer (run by `make setup-tools`)
 - `~/bin/emacs-app-shortcut.sh` — `/Applications/Emacs.app` alias helper (run by `make emacs-app`)
 - `~/bin/emacs-resolver.sh` — Emacs-based merge conflict resolver for jj
+
+## Ghostty (Linux)
+
+On Linux, `make install-ghostty` downloads the latest [Ghostty AppImage](https://github.com/pkgforge-dev/ghostty-appimage/releases)
+to `~/bin/ghostty.AppImage` and registers a desktop launcher (with the app icon) at
+`~/.local/share/applications/ghostty.desktop`. Re-run it any time to update to the latest release.
+On non-Linux machines the target is a no-op.
 
 ## Making changes
 
