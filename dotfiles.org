@@ -3150,9 +3150,9 @@ See helpful examples at:
 
             ("m" "Meeting")
 
-            ("ma" "Adhoc Meeting"
-             entry (file+olp+datetree "~/notebook/meetings.org")
-             "* %? :meeting:%^g\n:Created: %T\n** Attendees\n** Notes\n** Action Items\n*** TODO [#A] "
+             ("ma" "Adhoc Meeting"
+              entry (file+olp+datetree "~/notebook/meetings.org")
+              "* %? :meeting:\n:Created: %T\n** Attendees\n** Notes\n** Action Items\n*** TODO [#A] "
              :tree-type week
              :clock-in t
              :clock-resume t
