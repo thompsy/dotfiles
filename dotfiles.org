@@ -63,7 +63,6 @@ This configuration has been greatly influenced by the generous Emacs community s
     - [[#completion][Completion]]
     - [[#bookmarks][Bookmarks]]
     - [[#help][Help]]
-    - [[#beacon][Beacon]]
     - [[#ibuffer][ibuffer]]
   - [[#projects][Projects]]
   - [[#filesystem][Filesystem]]
@@ -1431,88 +1430,6 @@ and presents completion candidates.
     ("C-h v" 'helpful-variable)
     ("C-h C-d" 'helpful-at-point))
 #+END_SRC
-
-*** Beacon
-:PROPERTIES:
-:CUSTOM_ID: beacon
-:ID:       f0a86a96-4f51-432c-9092-d89cdcbdd1cc
-:END:
-#+begin_src emacs-lisp
-  (use-package pulsar
-    :general
-    ("C-t h p" 'pulsar-pulse-line)
-    ("C-t h h" 'pulsar-highlight-line)
-
-    :config
-    (setq pulsar-pulse t
-          pulsar-delay 0.055
-          pulsar-iterations 10
-          pulsar-face 'pulsar-magenta
-          pulsar-highlight-face 'pulsar-yellow)
-
-    ;; Enable pulsar globally
-    (pulsar-global-mode 1)
-
-    ;; Pulse on standard Emacs navigation commands like `next-error`.
-    (add-hook 'next-error-hook #'pulsar-pulse-line)
-
-    ;; For `consult', `pulsar-reveal-entry` is often preferred as it both recenters and pulses the
-    ;; line.
-    (add-hook 'consult-after-jump-hook #'pulsar-reveal-entry)
-
-    ;; For `imenu', same as above.
-    (add-hook 'imenu-after-jump-hook #'pulsar-reveal-entry)
-
-    ;; Pulse when switching windows (but only if pulsar-mode is active)
-    (add-hook 'window-selection-change-functions
-              (lambda (&rest _) (when pulsar-mode (pulsar-pulse-line))))
-
-    ;; Pulse when switching buffers in the current window (but only if pulsar-mode is active)
-    (add-hook 'buffer-list-update-hook
-              (lambda (&rest _) (when pulsar-mode (pulsar-pulse-line))))
-
-    (add-hook 'magit-post-refresh-hook #'pulsar-pulse-line)
-
-    ;; Add diff-hl and flycheck functions to pulsar-pulse-functions
-    (with-eval-after-load 'diff-hl
-      (add-to-list 'pulsar-pulse-functions 'diff-hl-next-hunk)
-      (add-to-list 'pulsar-pulse-functions 'diff-hl-previous-hunk))
-
-    (with-eval-after-load 'flycheck
-      (add-to-list 'pulsar-pulse-functions 'flycheck-next-error)
-      (add-to-list 'pulsar-pulse-functions 'flycheck-previous-error))
-
-    (add-hook 'avy-post-action-hook #'pulsar-pulse-line)
-
-    ;; Create a list of major modes where pulsar should be disabled
-    (defvar my/pulsar-excluded-modes '(vterm-mode)
-      "Major modes where pulsar should be disabled.")
-
-    ;; Custom override for pulsar-mode activation logic to handle edge cases:
-    ;; - Respects standard pulsar exclusion rules (minibuffer, hidden buffers)
-    ;; - Adds custom mode exclusions (defined in my/pulsar-excluded-modes)
-    ;; - Special handling for vterm: disable in normal vterm-mode but allow in copy-mode
-    ;;
-    ;; The vterm exception is needed because:
-    ;; - Normal vterm mode has rapid buffer changes that cause flickering
-    ;; - vterm copy-mode is static and benefits from line highlighting
-    ;;
-    ;; Uses advice-add to completely replace the original pulsar--on function
-    (defun my/pulsar--on-with-exclusions ()
-      "Enable `pulsar-mode' unless in an excluded major mode or copy mode context."
-      (unless (or pulsar-mode
-                  (minibufferp)
-                  (and pulsar-inhibit-hidden-buffers (string-prefix-p " " (buffer-name)))
-                  ;; Our custom exclusions
-                  (and (memq major-mode my/pulsar-excluded-modes)
-                       (not (and (eq major-mode 'vterm-mode)
-                                 (bound-and-true-p vterm-copy-mode)))))
-        (pulsar-mode 1)))
-
-    ;; Replace the original function
-    (advice-add 'pulsar--on :override #'my/pulsar--on-with-exclusions)
-    )
-#+end_src
 
 *** ibuffer
 :PROPERTIES:
@@ -3866,15 +3783,11 @@ Some interesting config options:
                            ;; Entering copy mode
                            (progn
                              (setq-local mode-line-process (list " " (propertize "VTerm[COPY]" 'face 'font-lock-warning-face)))
-                             (hl-line-mode 1)
-                             ;; Enable pulsar for copy mode
-                             (pulsar-mode 1))
+                             (hl-line-mode 1))
                          ;; Exiting copy mode
                          (progn
                            (setq-local mode-line-process (list " " (propertize "VTerm" 'face 'font-lock-keyword-face)))
-                           (hl-line-mode -1)
-                           ;; Explicitly disable pulsar when returning to vterm-mode
-                           (pulsar-mode -1)))))
+                           (hl-line-mode -1)))))
   :config
   (setq vterm-max-scrollback 100000
         vterm-clear-scrollback t
