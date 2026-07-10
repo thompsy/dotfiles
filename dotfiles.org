@@ -521,6 +521,24 @@ An improved ~keyboard-quit~ function courtesy of [[https://emacsredux.com/blog/2
 
 (global-set-key [remap keyboard-quit] #'my/keyboard-quit)
 #+end_src
+
+When a frame is raised while a minibuffer prompt is active (for example a popup ~emacsclient~ frame), the OS focus can land on the frame without the minibuffer window actually being selected, so keystrokes go nowhere useful. This forces input focus into the minibuffer whenever a focused frame has one open. The zero-second timer defers the work until after the triggering mouse click has finished processing.
+
+#+begin_src emacs-lisp
+  (add-function :after after-focus-change-function
+    (lambda ()
+      (when (and (frame-focus-state)
+                 (active-minibuffer-window))
+        ;; A 0-second timer forces this to run AFTER the mouse click finishes processing
+        (run-with-timer 0 nil
+                        (lambda ()
+                          (let ((mb-win (active-minibuffer-window)))
+                            (when mb-win
+                              ;; 1. Force the OS to switch to the minibuffer's frame
+                              (select-frame-set-input-focus (window-frame mb-win))
+                              ;; 2. Select the minibuffer window itself
+                              (select-window mb-win))))))))
+#+end_src
 *** Exec Path Setup
 :PROPERTIES:
 :ID:       0C607D19-2464-4AC0-8FDC-BB6A2420ED3F
@@ -3757,61 +3775,40 @@ Configure org-babel to support multiple programming languages for code block exe
 :ID:       C357E950-E226-4B10-83AD-FD2EDEFE4781
 :CUSTOM_ID: shells
 :END:
-[[https://github.com/akermu/emacs-libvterm][~vterm~]] provides a terminal emulator within Emacs.
-
-Some interesting config options:
-- https://github.com/jeffyql/dotfiles/blob/4484469d36e716dfe9431f1b489015423b63a91f/init-vterm.el
+[[https://github.com/dakra/ghostel][~ghostel~]] provides a terminal emulator within Emacs, powered by libghostty-vt (the VT engine behind [[https://ghostty.org/][Ghostty]]). Unlike ~vterm~, the native module is a prebuilt binary that auto-downloads on first use, so there is no local build step. It also brings true color, the Kitty graphics protocol (inline image previews), OSC 133 prompt navigation and desktop notifications.
 
 #+begin_src emacs-lisp
-  (use-package vterm
+  (use-package ghostel
   :general
-  (my-leader-def "x" 'vterm-toggle)
-  ("C-c v" 'vterm-copy-mode)
-  (:keymaps 'vterm-mode-map
-            "M-y" 'vterm-yank-pop
+  (my-leader-def "x" 'my/ghostel-toggle)
+  ("C-c v" 'ghostel-copy-mode)
+  (:keymaps 'ghostel-semi-char-mode-map
+            "M-y" 'ghostel-yank-pop
             ;; Send C-c to terminal when C-g is pressed
-            "C-g" (lambda () (interactive) (vterm-send-key "c" nil nil t))
+            "C-g" (lambda () (interactive) (ghostel-send-key "c" "ctrl"))
             ;; Preserve global C-t binding
             "C-t" (lookup-key global-map (kbd "C-t")))
 
   :hook
-  ;; Disable hl-line-mode to reduce flickering in regular vterm
-  (vterm-mode . (lambda () (setq-local global-hl-line-mode nil)))
-  ;; Handle hl-line and mode-line changes in copy mode
-  (vterm-copy-mode . (lambda ()
-                       (if vterm-copy-mode
-                           ;; Entering copy mode
-                           (progn
-                             (setq-local mode-line-process (list " " (propertize "VTerm[COPY]" 'face 'font-lock-warning-face)))
-                             (hl-line-mode 1))
-                         ;; Exiting copy mode
-                         (progn
-                           (setq-local mode-line-process (list " " (propertize "VTerm" 'face 'font-lock-keyword-face)))
-                           (hl-line-mode -1)))))
+  ;; Disable hl-line-mode to reduce flickering
+  (ghostel-mode . (lambda () (setq-local global-hl-line-mode nil)))
+
   :config
-  (setq vterm-max-scrollback 100000
-        vterm-clear-scrollback t
-        vterm-buffer-name-string "vterm-%s"
-        vterm-shell "fish"
-        vterm-eval-cmds '(("find-file" find-file)
-                          ("message" message)
-                          ("vterm-clear-scrollback" vterm-clear-scrollback-command)
-                          ("dired" dired)
-                          ("ediff-files" ediff-files))
-        vterm-keymap-exceptions
-        '("M-:" "C-c" "C-x" "C-u" "C-h" "C-l" "M-x" "M-o" "C-y" "M-y" "M-s" "C-t")))
+  (defun my/ghostel-toggle ()
+    "Toggle a Ghostel terminal, à la `vterm-toggle'."
+    (interactive)
+    (if (derived-mode-p 'ghostel-mode)
+        (if (one-window-p) (bury-buffer) (delete-window))
+      (ghostel)))
+
+  (setq ghostel-shell "fish"
+        ghostel-eval-cmds '(("find-file" find-file)
+                            ("message" message)
+                            ("dired" dired)
+                            ("ediff-files" ediff-files))))
 #+end_src
 
-[[https://github.com/suonlight/multi-vterm][~multi-vterm~]] provides multiple vterm buffer management, allowing you to create and switch between multiple terminal sessions easily.
-
-#+begin_src emacs-lisp
-  (use-package multi-vterm)
-#+end_src
-
-[[https://github.com/jixiuf/vterm-toggle][~vterm-toggle~]] allows for easy toggling of vterms.
-#+begin_src emacs-lisp
-  (use-package vterm-toggle)
-#+end_src
+Multiple terminals and project-scoped terminals are built in, so no separate multi-terminal or toggle package is needed: ~ghostel-list-buffers~ picks a terminal to switch to, ~ghostel-next~/~ghostel-previous~ cycle through them, and ~ghostel-project~ (nice to bind under ~project-prefix-map~) opens a terminal rooted in the current project.
 ** Site Local
 :PROPERTIES:
 :ID:       07C27D9E-4EE9-424B-8D36-AD2FCE24B14E
@@ -3916,7 +3913,6 @@ The selector skips non-existent files (stale ~straight~ symlinks) and the ~-pkg.
    ("emacs-async" . "bb3f31966ed65a76abe6fa4f80a960a2917f554e")
    ("emacs-emojify" . "1b726412f19896abf5e4857d4c32220e33400b55")
    ("emacs-fish" . "2526b1803b58cf145bc70ff6ce2adb3f6c246f89")
-   ("emacs-libvterm" . "056ad74653704bc353d8ec8ab52ac75267b7d373")
    ("emacs-memoize" . "51b075935ca7070f62fae1d69fe0ff7d8fa56fdd")
    ("emacs-pet" . "1abf16ebe1f4280fc2f875b4e99d8c26756d0f36")
    ("emacs-python-black" . "4da1519345b3d5c513d82ef0d39536dd9c626d42")
@@ -3969,7 +3965,6 @@ The selector skips non-existent files (stale ~straight~ symlinks) and the ~-pkg.
    ("markdown-mode" . "7c51a2167c5a1330e0ab52fe5b2d03c1ead122ca")
    ("mathjax" . "84e5fd902d83c11460e008de8ed0aef74cb9a62a")
    ("melpa" . "0eb4c5156848d2334f440d0d4d295c4826b8590a")
-   ("multi-vterm" . "36746d85870dac5aaee6b9af4aa1c3c0ef21a905")
    ("nav-flash" . "5d4b48567862f6be0ca973d6b1dca90e4815cb9b")
    ("nerd-icons.el" . "4476b4cabe63f5efafa3c0a8b370db4f6a92e90c")
    ("no-littering" . "57a7b63fe467eb89b716fdd1729d47f0b789727b")
@@ -4022,7 +4017,6 @@ The selector skips non-existent files (stale ~straight~ symlinks) and the ~-pkg.
    ("use-package-hydra" . "8cd55a1128fbdf6327bb38a199d206225896d146")
    ("vc-msg" . "d55a128616a876936f085e5af486924062e57d66")
    ("vertico" . "d8dc49a3520ab908c2b0f62a4a8ae32ca23f2726")
-   ("vterm-toggle" . "06cb4f3c565e46470a3c4505c11e26066d869715")
    ("vundo" . "f57937d7f57e6d081f567debf14f11d87a28962f")
    ("with-editor" . "f32cd7b09d518b629bfaa3eeb92b539891c6b9bc")
    ("xref" . "63b5875528e9c8dba3abbc76dae1b49351273c1c")
@@ -4631,35 +4625,26 @@ Setup some useful ~k8s~ config.
   end
 #+end_src
 
-Emacs ~vterm~ setup.
+Emacs ~ghostel~ setup. Directory tracking and the ~ghostel_cmd~ helper are auto-injected when running inside a Ghostel buffer, so we only add our own convenience functions.
 #+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
-  # Taken from: https://github.com/pymander/vfish/
-  if test 'vterm' = "$INSIDE_EMACS" \
-      -a -n "$EMACS_VTERM_PATH" \
-      -a -f "$EMACS_VTERM_PATH/etc/emacs-vterm.fish"
+  if string match -qr '^ghostel(,|$)' -- "$INSIDE_EMACS"
 
-  # Clean up old junk functions just in case.
-  functions --erase vterm_old_fish_prompt
-
-  # Load the setup that comes with vterm.
-  source "$EMACS_VTERM_PATH/etc/emacs-vterm.fish"
-
-  function vf --description 'Open a file for editing in Emacs from vterm'
-      vterm_cmd find-file (realpath "$argv")
+  function vf --description 'Open a file for editing in Emacs from ghostel'
+      ghostel_cmd find-file (realpath "$argv")
   end
 
-  function vd --description 'Run dired on a directory from vterm'
+  function vd --description 'Run dired on a directory from ghostel'
       set -f dir "$argv"
       if test "x" = "x$dir"
           set dir (pwd)
       end
-      vterm_cmd dired (realpath "$dir")
+      ghostel_cmd dired (realpath "$dir")
   end
 
-  function vz --description 'Use "zoxide" to run dired directly from vterm'
+  function vz --description 'Use "zoxide" to run dired directly from ghostel'
       if functions --query __zoxide_z
           set -l dir (zoxide query "$argv[1]")
-          vterm_cmd dired (realpath "$dir")
+          ghostel_cmd dired (realpath "$dir")
       else
           echo "Install zoxide to use this command."
           return 1
