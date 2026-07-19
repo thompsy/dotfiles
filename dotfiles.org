@@ -532,19 +532,22 @@ An improved ~keyboard-quit~ function courtesy of [[https://emacsredux.com/blog/2
 When a frame is raised while a minibuffer prompt is active (for example a popup ~emacsclient~ frame), the OS focus can land on the frame without the minibuffer window actually being selected, so keystrokes go nowhere useful. This forces input focus into the minibuffer whenever a focused frame has one open. The zero-second timer defers the work until after the triggering mouse click has finished processing.
 
 #+begin_src emacs-lisp
+  (defun my/focus-minibuffer-on-frame-focus ()
+    "Give input focus to an open minibuffer when its frame is focused."
+    (when (and (frame-focus-state)
+               (active-minibuffer-window))
+      ;; A 0-second timer forces this to run AFTER the mouse click finishes processing
+      (run-with-timer 0 nil
+                      (lambda ()
+                        (let ((mb-win (active-minibuffer-window)))
+                          (when mb-win
+                            ;; 1. Force the OS to switch to the minibuffer's frame
+                            (select-frame-set-input-focus (window-frame mb-win))
+                            ;; 2. Select the minibuffer window itself
+                            (select-window mb-win)))))))
+
   (add-function :after after-focus-change-function
-    (lambda ()
-      (when (and (frame-focus-state)
-                 (active-minibuffer-window))
-        ;; A 0-second timer forces this to run AFTER the mouse click finishes processing
-        (run-with-timer 0 nil
-                        (lambda ()
-                          (let ((mb-win (active-minibuffer-window)))
-                            (when mb-win
-                              ;; 1. Force the OS to switch to the minibuffer's frame
-                              (select-frame-set-input-focus (window-frame mb-win))
-                              ;; 2. Select the minibuffer window itself
-                              (select-window mb-win))))))))
+                #'my/focus-minibuffer-on-frame-focus)
 #+end_src
 *** Exec Path Setup
 :PROPERTIES:
