@@ -53,6 +53,12 @@ make tangle
   surrounding style.
 - Homebrew packages are defined in the Brewfile source block in `dotfiles.org`
   (tangled to `~/Brewfile`) — edit that block, not `~/Brewfile` directly.
+- Pinned versions of externally-installed CLI tools (Go/Rust tools, Homebrew
+  language runtimes) live in the committed `tool-versions` file (`KEY=VALUE`) at
+  the repo root — *not* in `dotfiles.org`. The tangled Brewfile and dev-tools
+  setup script read it at runtime (from `~/dotfiles/tool-versions`), so bumping a
+  version needs no tangle: edit `tool-versions`, then `make setup-tools` (Go/Rust)
+  or `brew bundle` (runtimes). It is hand-edited, unlike the generated files.
 - `straight-versions.el` (Emacs package lockfile) is the one committed file that
   is **not** tangled from `dotfiles.org` and **not** hand-edited. It is written
   by `straight-freeze-versions` (`make freeze`) and consumed by

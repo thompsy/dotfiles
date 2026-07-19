@@ -3894,6 +3894,15 @@ Testing out Fish Shell and so far I'm quite impressed. The completions are very 
 Useful key built-in bindings:
 - ~Alt .~ :: cycle through arguments to previous commands
 
+** Pinned Tool Versions
+:PROPERTIES:
+:CUSTOM_ID: pinned-tool-versions
+:END:
+
+Pinned versions of externally-installed CLI tools live in a plain ~KEY=VALUE~ file at the repo root, ~tool-versions~. It is read at runtime by the [[#brewfile][Brewfile]] and the [[#development-tools-setup][dev-tools setup script]], so a version can be bumped by editing that one file. Re-run ~make setup-tools~ (Go/Rust tools) or ~brew bundle~ (Homebrew runtimes) to apply. Emacs packages are pinned separately in [[#package-versions][~straight-versions.el~]].
+
+The file covers the Go tools (~gopls~, ~golangci-lint~, ~gup~), the Rust crates (~cargo-update~, ~starship-jj~), and the Homebrew language runtimes (~node~, ~go~, ~python~, each pinned to a major series). ~golangci-lint~ stays on the last v1 — v2 uses a ~/v2~ module path and a different config format, so upgrading is a deliberate migration.
+
 ** Development Tools Setup
 :PROPERTIES:
 :CUSTOM_ID: development-tools-setup
@@ -3905,9 +3914,34 @@ This script handles one-time installation of development tools. It's separated f
 #+begin_src fish :tangle "~/bin/setup-dev-tools.fish" :mkdirp yes :shebang "#!/usr/bin/env fish"
   set -g TOOL_LOG "/tmp/dotfiles-setup.log"
 
+  # Pinned tool versions live in a KEY=VALUE file at the dotfiles repo root.
+  set -g TOOL_VERSIONS_FILE "$HOME/dotfiles/tool-versions"
+
   function log_step
       echo (date "+%Y-%m-%d %H:%M:%S") "[$argv[1]]" $argv[2..-1] >> $TOOL_LOG
       echo "$argv[2..-1]"
+  end
+
+  # Look up a pinned version by key from $TOOL_VERSIONS_FILE. Prints the value on
+  # stdout, or an error to stderr and returns non-zero if the key is missing.
+  function tool_version --argument-names key
+      if not test -f $TOOL_VERSIONS_FILE
+          echo "❌ tool-versions file not found at $TOOL_VERSIONS_FILE" >&2
+          return 1
+      end
+      for line in (cat $TOOL_VERSIONS_FILE)
+          set -l trimmed (string trim -- $line)
+          if test -z "$trimmed"; or string match -q '#*' -- $trimmed
+              continue
+          end
+          set -l parts (string split -m1 '=' -- $trimmed)
+          if test "$parts[1]" = "$key"
+              echo $parts[2]
+              return 0
+          end
+      end
+      echo "❌ No version pinned for '$key' in $TOOL_VERSIONS_FILE" >&2
+      return 1
   end
 
   function check_dependency
@@ -3976,15 +4010,17 @@ This script handles one-time installation of development tools. It's separated f
       # is installed via brew - see the Brewfile.
       # The binary name is what `cargo install <crate>` produces, which differs
       # from the crate name for some tools (e.g. cargo-update -> cargo-install-update).
+      # Versions are read from $TOOL_VERSIONS_FILE; bump them there.
       set -l rust_tools \
-          cargo-update:cargo-install-update \
-          starship-jj:starship-jj
+          cargo-update:cargo-install-update:(tool_version cargo-update) \
+          starship-jj:starship-jj:(tool_version starship-jj)
       for entry in $rust_tools
           set -l crate (string split -f1 ':' $entry)
           set -l binary (string split -f2 ':' $entry)
+          set -l ver (string split -f3 ':' $entry)
           if ! type -q $binary
-              log_step "INSTALL" "Installing $crate..."
-              if not install_with_retry "cargo install $crate --locked"
+              log_step "INSTALL" "Installing $crate $ver..."
+              if not install_with_retry "cargo install $crate --version $ver --locked"
                   echo "❌ Failed to install $crate"
               end
           else
@@ -4001,13 +4037,16 @@ This script handles one-time installation of development tools. It's separated f
           return 1
       end
 
+      # Versions are read from $TOOL_VERSIONS_FILE; bump them there. golangci-lint
+      # stays on the last v1 — v2 uses a /v2 module path and a different config
+      # format, so upgrading is a deliberate migration.
       set -l go_tools \
-          golang.org/x/tools/gopls@latest \
-          github.com/golangci/golangci-lint/cmd/golangci-lint@latest \
-          github.com/nao1215/gup@latest
+          golang.org/x/tools/gopls@(tool_version gopls) \
+          github.com/golangci/golangci-lint/cmd/golangci-lint@(tool_version golangci-lint) \
+          github.com/nao1215/gup@(tool_version gup)
 
       for tool in $go_tools
-          set tool_name (basename $tool | string replace '@latest' '')
+          set tool_name (basename (string split -f1 '@' $tool))
           if ! type -q $HOME/go/bin/$tool_name
               log_step "INSTALL" "Installing $tool_name..."
               if not install_with_retry "go install $tool"
@@ -4162,6 +4201,17 @@ chmod +x ~/bin/setup-dev-tools.fish
 A Brewfile for managing packages via Homebrew. CLI tools like ~fd~, ~bat~, ~ripgrep~, ~zoxide~, ~starship~, ~eza~, ~lsd~ and ~zellij~ are installed here as prebuilt bottles (faster, and not coupled to the active ~rustc~ version). Only Rust tools that aren't available as Homebrew bottles (~cargo-update~, ~starship-jj~) are installed via ~cargo~ in the setup script. This block is the single source of truth for ~~/Brewfile~: it is (re)generated every time the config is tangled, and the setup script reads it (running ~make tangle~ first if needed). Edit this block - not ~~/Brewfile~ directly - to change what gets installed.
 
 #+begin_src ruby :tangle "~/Brewfile" :mkdirp yes
+# Pinned language-runtime versions are read at runtime from the repo's
+# tool-versions file, so they can be bumped without re-tangling. See the
+# "Pinned Tool Versions" section of dotfiles.org.
+tool_versions = {}
+File.foreach(File.expand_path("~/dotfiles/tool-versions")) do |line|
+  line = line.strip
+  next if line.empty? || line.start_with?("#")
+  key, value = line.split("=", 2)
+  tool_versions[key] = value
+end
+
 # Essential development tools
 brew "git"
 brew "curl"
@@ -4174,12 +4224,14 @@ brew "fzf"
 brew "gh"
 brew "delta"
 
-# Development languages and tools
-brew "node"
-brew "python@3.11"
-brew "go"
+# Development languages and tools. Pinned to a major series (see tool-versions)
+# so upgrades don't jump a major version unexpectedly; all are non-keg-only, so
+# they still link into PATH normally.
+brew "node@#{tool_versions.fetch('node')}"
+brew "python@#{tool_versions.fetch('python')}"
+brew "go@#{tool_versions.fetch('go')}"
 
-# Modern CLI replacements (prebuilt bottles - faster, no rustc version coupling)
+# Modern CLI replacements
 brew "fd"
 brew "bat"
 brew "ripgrep"
@@ -4189,7 +4241,7 @@ brew "eza"
 brew "lsd"
 brew "zellij"
 
-# Python language server (used globally by eglot; pet handles per-project venvs)
+# Python language server, used globally by eglot
 brew "basedpyright"
 
 # macOS specific packages

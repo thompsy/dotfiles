@@ -1,0 +1,20 @@
+# Pinned versions of externally-installed CLI tools (KEY=VALUE).
+#
+# Single source of truth, read at runtime by the tangled Brewfile (~/Brewfile)
+# and dev-tools setup script (~/bin/setup-dev-tools.fish). Bump a value here and
+# re-run `make setup-tools` (Go/Rust tools) or `brew bundle` (runtimes) — no
+# `make tangle` needed. Emacs packages are pinned separately in straight-versions.el.
+
+# Go tools (go install <path>@VERSION)
+gopls=v0.20.0
+golangci-lint=v1.64.8
+gup=v0.27.8
+
+# Rust crates (cargo install <crate> --version VERSION --locked)
+cargo-update=17.0.0
+starship-jj=0.7.0
+
+# Homebrew language runtimes, pinned to a major series (formula name@SERIES)
+node=26
+go=1.26
+python=3.11
