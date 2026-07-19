@@ -1,4 +1,4 @@
-.PHONY: tangle clean install bootstrap setup-tools update-tools emacs-app precompile install-ghostty
+.PHONY: tangle clean install bootstrap setup-tools update-tools emacs-app precompile install-ghostty freeze thaw
 
 # Run each recipe in a single bash shell so multi-line scripts share state
 SHELL := /bin/bash
@@ -21,7 +21,20 @@ bootstrap:
 	brew install $(EMACS_PLUS)
 	$(MAKE) tangle
 	-$(MAKE) emacs-app
+	$(MAKE) thaw
 	$(MAKE) precompile
+
+# Restore packages to the commits pinned in straight-versions.el. Loading init
+# clones every package (at HEAD), then straight-thaw-versions checks out the
+# pinned commit for each. Runs before precompile so native compilation targets
+# the pinned sources, not whatever HEAD happened to be.
+thaw:
+	emacs --batch --load ~/.emacs.d/init.el --eval '(straight-thaw-versions)'
+
+# Re-pin: write the currently-installed package commits into straight-versions.el.
+# Run after updating packages (and testing), then commit the changed lockfile.
+freeze:
+	emacs --batch --load ~/.emacs.d/init.el --eval '(straight-freeze-versions t)'
 
 # Remove generated files (careful - lists what would be removed first)
 clean:

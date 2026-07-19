@@ -53,3 +53,8 @@ make tangle
   surrounding style.
 - Homebrew packages are defined in the Brewfile source block in `dotfiles.org`
   (tangled to `~/Brewfile`) — edit that block, not `~/Brewfile` directly.
+- `straight-versions.el` (Emacs package lockfile) is the one committed file that
+  is **not** tangled from `dotfiles.org` and **not** hand-edited. It is written
+  by `straight-freeze-versions` (`make freeze`) and consumed by
+  `straight-thaw-versions` (`make thaw`, run during bootstrap). Re-pin by running
+  `make freeze` and committing the result, never by editing it directly.
