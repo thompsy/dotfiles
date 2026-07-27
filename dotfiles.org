@@ -3816,6 +3816,7 @@ Configure org-babel to support multiple programming languages for code block exe
 
 #+begin_src emacs-lisp
   (use-package ghostel
+  :straight (ghostel :type git :host github :repo "dakra/ghostel")
   :general
   (my-leader-def "x" 'my/ghostel-toggle)
   ("C-c v" 'ghostel-copy-mode)
