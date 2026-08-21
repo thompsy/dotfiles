@@ -11,6 +11,7 @@
  ("browse-at-remote" . "38e5ffd77493c17c821fd88f938dbf42705a5158")
  ("button-lock" . "1f7a89ca05b6167af7d1337ad23a5d923486caac")
  ("cape" . "73e0023e7fd9f224babfe8795eb9334dba8eec47")
+ ("catppuccin-emacs" . "56c3cbe1fee8b04dd7331738df1a0b9bdc6f71bd")
  ("combobulate" . "171abd0034285499d1be42c6e7945a34fbb2d641")
  ("compat" . "d3be8ee1b12809d6171c4384139a531de71343a5")
  ("cond-let" . "c48600dfab6372670225f046cace263700c78eab")

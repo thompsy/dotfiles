@@ -767,6 +767,18 @@ Built-in ~frame~ package controls frame appearance. Turn off various UI elements
   (add-to-list 'default-frame-alist '(font . "FiraCode Nerd Font-14"))
 #+END_SRC
 
+[[https://github.com/catppuccin/emacs][~catppuccin-theme~]] is an alternative theme, installed but not loaded at startup — switch to it with ~M-x load-theme RET catppuccin~. It ships four flavours (~latte~, ~frappe~, ~macchiato~, ~mocha~); ~mocha~ is the darkest. Changing ~catppuccin-flavor~ after the theme is loaded requires ~M-x catppuccin-reload~ to take effect.
+
+~:local-repo~ is spelled out here because straight.el names local clones after the GitHub repo's basename, and both ~catppuccin/emacs~ and ~dracula/emacs~ are called ~emacs~ — without it the two packages collide on one clone and catppuccin silently fails to load.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package catppuccin-theme
+    :straight (catppuccin-theme :type git :host github :repo "catppuccin/emacs"
+                                :local-repo "catppuccin-emacs")
+    :init
+    (setq catppuccin-flavor 'mocha))
+#+END_SRC
+
 [[https://github.com/domtronn/all-the-icons.el][~all-the-icons~]] provides a comprehensive icon font package for Emacs, enabling beautiful icons throughout the interface.
 
 #+BEGIN_SRC emacs-lisp
