@@ -4504,6 +4504,7 @@ Some useful ~jujutsu~ aliases.
   abbr --add jstr jj status -r
 
   abbr --add jl jj ll
+  abbr --add jla jj log -r ::
 
   abbr --add jbs jj bookmark set
   abbr --add jbsr jj bookmark set -r
