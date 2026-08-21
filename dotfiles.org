@@ -8,6 +8,7 @@
 :PROPERTIES:
 :TOC:      :include all :depth 9 :force (depth) :ignore (nothing) :local (nothing)
 :CUSTOM_ID: what-is-this
+:ID:       66e40f38-c63c-46ec-8961-c92053b698ec
 :END:
 This is a comprehensive literate configuration for Emacs and related development tools, written in ~org-mode~. This approach allows for detailed documentation alongside configuration code, making it easier to understand, maintain, and share.
 
@@ -173,6 +174,7 @@ Other useful ideas here:
 ** Installing Emacs.app
 :PROPERTIES:
 :CUSTOM_ID: installing-emacs-app
+:ID:       8ccee446-345f-4a9e-a02a-449f985f71b6
 :END:
 Emacs is installed via [[https://github.com/d12frosted/homebrew-emacs-plus][~emacs-plus~]]:
 #+begin_src bash :tangle no
@@ -3387,6 +3389,7 @@ See helpful examples at:
 *** Regular Meetings Example
 :PROPERTIES:
 :CUSTOM_ID: regular-meetings-example
+:ID:       7bb0f8d4-b58e-4a31-8fd7-40b1318ef79f
 :END:
 This is an example of how I process regular meetings like 1 to 1s:
 1. use the capture template below to gather agenda items during the week. These are accumulated into
@@ -3833,6 +3836,7 @@ Various setup like sensitive tags and functions that deal with them are stored e
 ** Precompiling Packages
 :PROPERTIES:
 :CUSTOM_ID: precompiling-packages
+:ID:       b8430e47-50df-4eb1-83ad-af38ffc64782
 :END:
 Emacs native-compiles packages into ~~/.emacs.d/eln-cache/<emacs-version>/~. Because that cache is keyed by Emacs version, every time Emacs is upgraded (e.g. a ~brew~ upgrade of ~emacs-plus@30~) the packages have to be recompiled, which makes the first GUI start after an upgrade slow as compilation happens lazily in the background.
 
@@ -4183,6 +4187,7 @@ This script handles one-time installation of development tools. It's separated f
 *** Usage
 :PROPERTIES:
 :CUSTOM_ID: usage
+:ID:       f2f47fb8-0e23-49d7-868f-0ab12727d75d
 :END:
 
 After tangling, make the script executable and run it:
