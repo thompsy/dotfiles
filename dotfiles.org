@@ -622,8 +622,8 @@ Built-in ~mule~ (MUlti-Lingual Enhancement) handles character encoding and inter
     (setq locale-coding-system 'utf-8-unix)
     (set-selection-coding-system 'utf-8-unix)
     (setenv "LC_CTYPE" "UTF-8")
-    (setenv "LC_ALL" "en_US.UTF-8")
-    (setenv "LANG" "en_US.UTF-8"))
+    (setenv "LC_ALL" "en_GB.UTF-8")
+    (setenv "LANG" "en_GB.UTF-8"))
 #+END_SRC
 
 Built-in ~uniquify~ automatically renames buffers with the same name so that they're easier to distinguish by including parts of their directory paths.
@@ -1857,6 +1857,18 @@ and presents completion candidates.
 :ID:       05DF5D12-0C29-44DD-88A5-F25762BC4F85
 :CUSTOM_ID: spelling
 :END:
+
+Built-in ~ispell~ is the interface to the external spellchecker that ~flyspell~ drives. Pin the backend to ~aspell~ rather than relying on Emacs' search order, and set the dictionary explicitly to British English - an explicit ~ispell-dictionary~ takes precedence over the locale, so spelling stays consistent whatever the environment. ~en_GB~ resolves to ~en_GB-ise~ in aspell, i.e. /organise/ rather than /organize/. The personal word list is pointed at the existing ~~/.aspell.en.pws~ so previously saved words carry over; without this aspell would look for ~~/.aspell.en_GB.pws~ instead and they would appear to vanish.
+
+#+begin_src emacs-lisp
+  (use-package ispell
+    :straight nil
+    :ensure nil
+    :custom
+    (ispell-program-name "aspell")
+    (ispell-dictionary "en_GB")
+    (ispell-personal-dictionary "~/.aspell.en.pws"))
+#+END_SRC
 
 Moving back to ~flyspell~ for now.
 #+begin_src  emacs-lisp
@@ -4260,6 +4272,9 @@ brew "zellij"
 
 # Python language server, used globally by eglot
 brew "basedpyright"
+
+# Spellchecker used by Emacs flyspell/ispell (provides the en_GB dictionary)
+brew "aspell"
 
 # macOS specific packages
 if OS.mac?
