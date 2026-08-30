@@ -5168,3 +5168,389 @@ config.enable_kitty_graphics = true
 
 return config
 #+end_src
+
+* Zellij
+:PROPERTIES:
+:ID:       2555B73F-8FC7-43B7-A7DB-5B07C74261EC
+:CUSTOM_ID: zellij
+:END:
+
+Terminal multiplexer, used mainly so terminal sessions survive a reboot -
+Ghostty has no session restore on Linux (~window-save-state~ is macOS-only).
+
+Session resurrection is the point of the settings at the bottom of this block.
+Zellij serialises each pane's cwd *and* its running command to
+~~/.cache/zellij/~, so ~zellij attach <name>~ after a reboot brings the tabs
+back. Panes return suspended: the command is shown, and Enter runs it.
+
+The ~post_command_discovery_hook~ exists because Claude Code sessions need to be
+resumed by id. The [[#fish][Fish]] ~claude~ wrapper launches sessions as
+~claude --session-id <uuid>~; this hook rewrites that to ~claude --resume <uuid>~
+at serialisation time, so a resurrected pane reopens that exact conversation
+rather than starting a fresh one. A bare ~claude~ (a shell predating the wrapper)
+degrades to ~claude --resume~, which opens the session picker scoped to the
+pane's cwd.
+
+Note that a pane whose argv carries no uuid can never learn its own id - picking
+a session in the picker does not rewrite argv - so it will need the picker again
+on every reboot. To break that loop once: ~/status~ in the pane to read the
+Session ID, ~/exit~, then relaunch as ~claude --resume <id>~.
+
+The default layout is ~disable-status-bar~: the tab bar stays at the top, but the
+row of mode shortcuts along the bottom is gone. When a keybinding escapes me,
+~Alt /~ opens a keybinding cheatsheet (~~/bin/zellij-keys~, below) in a sized
+floating pane; ~q~ closes it. The key is unshifted deliberately: ~Alt ?~ (i.e.
+~Alt+Shift+/~) never reaches Zellij - it parses in the config and silently never
+fires. Unshifted ~Alt~ bindings work.
+
+Don't be tempted to pop up ~zellij:status-bar~ itself: as a floating pane it
+loads but paints nothing until some other event forces a redraw, so you get an
+invisible pane and a stray swap-layout indicator. ~zellij:configuration~ renders,
+but it is a keybinding *preset switcher* that can rewrite your config, not a
+passive reference. Note that ~default_layout~ only affects *new* sessions -
+an existing session has its chrome panes baked into its serialised layout.
+
+Gotcha: ~\$~ is not a valid KDL escape, so the sed end-anchor below is a bare
+~$~. Run ~zellij setup --check~ after editing - it reports parse errors that are
+otherwise silent.
+#+begin_src conf :tangle "~/.config/zellij/config.kdl" :mkdirp yes
+// If you'd like to override the default keybindings completely, be sure to change "keybinds" to "keybinds clear-defaults=true"
+keybinds clear-defaults=true {
+    // unbind C-g since I use it in Emacs a lot
+    unbind "Ctrl g"
+    normal {
+        // uncomment this and adjust key if using copy_on_select=false
+        // bind "Alt c" { Copy; }
+    }
+    // locked {
+    //     bind "Ctrl x" { SwitchToMode "Normal"; }
+    // }
+    unbind "Ctrl n"
+    unbind "Ctrl p"
+    unbind "Ctrl h"
+    tab {
+        bind "Ctrl t" { SwitchToMode "Normal"; }
+        bind "r" { SwitchToMode "RenameTab"; TabNameInput 0; }
+        bind "h" "Left" "Up" "k" { GoToPreviousTab; }
+        bind "l" "Right" "Down" "j" { GoToNextTab; }
+        bind "n" { NewTab; SwitchToMode "Normal"; }
+        bind "x" { CloseTab; SwitchToMode "Normal"; }
+        bind "s" { ToggleActiveSyncTab; SwitchToMode "Normal"; }
+        bind "1" { GoToTab 1; SwitchToMode "Normal"; }
+        bind "2" { GoToTab 2; SwitchToMode "Normal"; }
+        bind "3" { GoToTab 3; SwitchToMode "Normal"; }
+        bind "4" { GoToTab 4; SwitchToMode "Normal"; }
+        bind "5" { GoToTab 5; SwitchToMode "Normal"; }
+        bind "6" { GoToTab 6; SwitchToMode "Normal"; }
+        bind "7" { GoToTab 7; SwitchToMode "Normal"; }
+        bind "8" { GoToTab 8; SwitchToMode "Normal"; }
+        bind "9" { GoToTab 9; SwitchToMode "Normal"; }
+        bind "Tab" { ToggleTab; }
+    }
+    scroll {
+        bind "Ctrl s" { SwitchToMode "Normal"; }
+        bind "e" { EditScrollback; SwitchToMode "Normal"; }
+        bind "s" { SwitchToMode "EnterSearch"; SearchInput 0; }
+        bind "Ctrl c" { ScrollToBottom; SwitchToMode "Normal"; }
+        bind "j" "Down" { ScrollDown; }
+        bind "k" "Up" { ScrollUp; }
+        bind "Ctrl f" "PageDown" "Right" "l" { PageScrollDown; }
+        bind "Ctrl b" "PageUp" "Left" "h" { PageScrollUp; }
+        bind "d" { HalfPageScrollDown; }
+        bind "u" { HalfPageScrollUp; }
+        // uncomment this and adjust key if using copy_on_select=false
+        // bind "Alt c" { Copy; }
+    }
+    search {
+        bind "Ctrl s" { SwitchToMode "Normal"; }
+        bind "Ctrl c" { ScrollToBottom; SwitchToMode "Normal"; }
+        bind "j" "Down" { ScrollDown; }
+        bind "k" "Up" { ScrollUp; }
+        bind "Ctrl f" "PageDown" "Right" "l" { PageScrollDown; }
+        bind "Ctrl b" "PageUp" "Left" "h" { PageScrollUp; }
+        bind "d" { HalfPageScrollDown; }
+        bind "u" { HalfPageScrollUp; }
+        bind "n" { Search "down"; }
+        bind "p" { Search "up"; }
+        bind "c" { SearchToggleOption "CaseSensitivity"; }
+        bind "w" { SearchToggleOption "Wrap"; }
+        bind "o" { SearchToggleOption "WholeWord"; }
+    }
+    entersearch {
+        bind "Ctrl c" "Esc" { SwitchToMode "Scroll"; }
+        bind "Enter" { SwitchToMode "Search"; }
+    }
+    renametab {
+        bind "Ctrl c" { SwitchToMode "Normal"; }
+        bind "Esc" { UndoRenameTab; SwitchToMode "Tab"; }
+    }
+    renamepane {
+        bind "Ctrl c" { SwitchToMode "Normal"; }
+        bind "Esc" { UndoRenamePane; SwitchToMode "Pane"; }
+    }
+    session {
+        bind "Ctrl o" { SwitchToMode "Normal"; }
+        bind "Ctrl s" { SwitchToMode "Scroll"; }
+        bind "d" { Detach; }
+    }
+    tmux {
+        bind "[" { SwitchToMode "Scroll"; }
+        bind "Ctrl b" { Write 2; SwitchToMode "Normal"; }
+        bind "\"" { NewPane "Down"; SwitchToMode "Normal"; }
+        bind "%" { NewPane "Right"; SwitchToMode "Normal"; }
+        bind "z" { ToggleFocusFullscreen; SwitchToMode "Normal"; }
+        bind "c" { NewTab; SwitchToMode "Normal"; }
+        bind "," { SwitchToMode "RenameTab"; }
+        bind "p" { GoToPreviousTab; SwitchToMode "Normal"; }
+        bind "n" { GoToNextTab; SwitchToMode "Normal"; }
+        bind "Left" { MoveFocus "Left"; SwitchToMode "Normal"; }
+        bind "Right" { MoveFocus "Right"; SwitchToMode "Normal"; }
+        bind "Down" { MoveFocus "Down"; SwitchToMode "Normal"; }
+        bind "Up" { MoveFocus "Up"; SwitchToMode "Normal"; }
+        bind "h" { MoveFocus "Left"; SwitchToMode "Normal"; }
+        bind "l" { MoveFocus "Right"; SwitchToMode "Normal"; }
+        bind "j" { MoveFocus "Down"; SwitchToMode "Normal"; }
+        bind "k" { MoveFocus "Up"; SwitchToMode "Normal"; }
+        bind "o" { FocusNextPane; }
+        bind "d" { Detach; }
+        bind "Space" { NextSwapLayout; }
+        bind "x" { CloseFocus; SwitchToMode "Normal"; }
+    }
+    shared_except "locked" {
+        bind "Ctrl x" { SwitchToMode "Locked"; }
+        bind "Ctrl q" { Quit; }
+        bind "Alt n" { NewPane; }
+        bind "Alt h" "Alt Left" { MoveFocusOrTab "Left"; }
+        bind "Alt l" "Alt Right" { MoveFocusOrTab "Right"; }
+        bind "Alt j" "Alt Down" { MoveFocus "Down"; }
+        bind "Alt k" "Alt Up" { MoveFocus "Up"; }
+        bind "Alt =" "Alt +" { Resize "Increase"; }
+        bind "Alt -" { Resize "Decrease"; }
+        bind "Alt [" { PreviousSwapLayout; }
+        bind "Alt ]" { NextSwapLayout; }
+        bind "Alt /" {
+            Run "zellij-keys" {
+                floating true
+                name "keybindings"
+                close_on_exit true
+                width "70%"
+                height "80%"
+                x "15%"
+                y "10%"
+            }
+        }
+        bind "Ctrl y" {
+            LaunchOrFocusPlugin "file:~/.config/zellij/plugins/room.wasm" {
+                floating true
+                ignore_case true
+            }
+        }
+    }
+    shared_except "normal" "locked" {
+        bind "Enter" "Esc" { SwitchToMode "Normal"; }
+    }
+    shared_except "scroll" "locked" {
+        bind "Ctrl s" { SwitchToMode "Scroll"; }
+    }
+    shared_except "session" "locked" {
+        bind "Ctrl o" { SwitchToMode "Session"; }
+    }
+    shared_except "tab" "locked" {
+        bind "Ctrl t" { SwitchToMode "Tab"; }
+    }
+    shared_except "tmux" "locked" {
+        bind "Ctrl b" { SwitchToMode "Tmux"; }
+    }
+}
+
+plugins {
+    tab-bar { path "tab-bar"; }
+    status-bar { path "status-bar"; }
+    strider { path "strider"; }
+    compact-bar { path "compact-bar"; }
+}
+
+// Choose what to do when zellij receives SIGTERM, SIGINT, SIGQUIT or SIGHUP
+// eg. when terminal window with an active zellij session is closed
+// Options:
+//   - detach (Default)
+//   - quit
+//
+on_force_close "detach"
+
+//  Send a request for a simplified ui (without arrow fonts) to plugins
+//  Options:
+//    - true
+//    - false (Default)
+//
+// simplified_ui true
+
+// Choose the path to the default shell that zellij will use for opening new panes
+// Default: $SHELL
+//
+default_shell "fish"
+
+// Choose the path to override cwd that zellij will use for opening new panes
+//
+// default_cwd ""
+
+// Toggle between having pane frames around the panes
+// Options:
+//   - true (default)
+//   - false
+//
+pane_frames false
+
+default_layout "disable-status-bar"
+
+// Toggle between having Zellij lay out panes according to a predefined set of layouts whenever possible
+// Options:
+//   - true (default)
+//   - false
+//
+// auto_layout true
+
+// Define color themes for Zellij
+// For more examples, see: https://github.com/zellij-org/zellij/tree/main/example/themes
+// Once these themes are defined, one of them should to be selected in the "theme" section of this file
+
+// The name of the default layout to load on startup
+// Default: "default"
+//
+// default_layout "compact"
+
+// Choose the mode that zellij uses when starting up.
+// Default: normal
+//
+// default_mode "locked"
+
+// Toggle enabling the mouse mode.
+// On certain configurations, or terminals this could
+// potentially interfere with copying text.
+// Options:
+//   - true (default)
+//   - false
+//
+// mouse_mode false
+
+// Configure the scroll back buffer size
+// This is the number of lines zellij stores for each pane in the scroll back
+// buffer. Excess number of lines are discarded in a FIFO fashion.
+// Valid values: positive integers
+// Default value: 10000
+//
+// scroll_buffer_size 10000
+
+// Provide a command to execute when copying text. The text will be piped to
+// the stdin of the program to perform the copy. This can be used with
+// terminal emulators which do not support the OSC 52 ANSI control sequence
+// that will be used by default if this option is not set.
+// Examples:
+//
+// copy_command "xclip -selection clipboard" // x11
+// copy_command "wl-copy"                    // wayland
+// copy_command "pbcopy"                     // osx
+
+// Choose the destination for copied text
+// Allows using the primary selection buffer (on x11/wayland) instead of the system clipboard.
+// Does not apply when using copy_command.
+// Options:
+//   - system (default)
+//   - primary
+//
+// copy_clipboard "primary"
+
+// Enable or disable automatic copy (and clear) of selection when releasing mouse
+// Default: true
+//
+// copy_on_select false
+
+// Path to the default editor to use to edit pane scrollbuffer
+// Default: $EDITOR or $VISUAL
+//
+scrollback_editor "emacsclient --no-wait"
+
+// When attaching to an existing session with other users,
+// should the session be mirrored (true)
+// or should each user have their own cursor (false)
+// Default: false
+//
+// mirror_session true
+
+// The folder in which Zellij will look for layouts
+//
+// layout_dir "/path/to/my/layout_dir"
+
+// The folder in which Zellij will look for themes
+//
+// theme_dir "/path/to/my/theme_dir"
+
+// --- session resurrection -------------------------------------------------
+// Serialize tabs/panes/cwds/running-commands so a session survives a reboot.
+session_serialization true
+serialization_interval 30
+
+// Rewrite a serialised Claude Code command so a resurrected pane reopens the
+// conversation instead of starting a fresh one. The fish `claude` wrapper
+// launches sessions as `claude --session-id <uuid>`, which becomes
+// `claude --resume <uuid>`. A bare `claude` (a shell predating the wrapper)
+// degrades to `claude --resume`, which opens the session picker scoped to the
+// pane's cwd -- one keypress per pane, and it handles several sessions per dir.
+post_command_discovery_hook "echo \"$RESURRECT_COMMAND\" | sed -E \"s/^claude --session-id ([0-9a-fA-F-]+).*/claude --resume \\1/; s/^claude *$/claude --resume/\""
+#+end_src
+
+The cheatsheet ~Alt /~ opens. It parses the ~keybinds~ block above and prints it
+as a table, dropping the ~SwitchToMode "Normal"~ boilerplate that ends nearly
+every bind. Because it reads the live config, it cannot drift out of date.
+#+begin_src python :tangle "~/bin/zellij-keys" :mkdirp yes :tangle-mode (identity #o755) :shebang "#!/usr/bin/env python3"
+"""Show this config's Zellij keybindings in a readable table. Bound to Alt / ."""
+import os, re, subprocess
+
+cfg = os.environ.get("ZELLIJ_CONFIG_FILE",
+                     os.path.expanduser("~/.config/zellij/config.kdl"))
+src = open(cfg).read()
+kb = src[src.index("keybinds"):]
+
+def tidy(action):
+    action = re.sub(r'\s*;\s*', ", ", action).strip().rstrip(",")
+    action = re.sub(r',?\s*SwitchToMode "Normal"\s*$', "", action).strip()
+    action = re.sub(r'SwitchToMode "(\w+)"', r"-> \1", action)
+    action = re.sub(r'"[^"]*/([^"/]+)"', r"\1", action)      # paths -> basename
+    return action.replace('"', "").strip() or "-> Normal"
+
+mode, out, pending, depth = None, [], None, 0
+for raw in kb.splitlines():
+    s = raw.strip()
+    if s.startswith("//") or not s:
+        continue
+    if pending is not None:                       # inside a multi-line bind
+        depth += s.count("{") - s.count("}")
+        if depth <= 0:
+            out.append((pending[0], tidy(pending[1]) if pending[1] else "…"))
+            pending, depth = None, 0
+        elif not pending[1] and s not in ("{", "}"):
+            pending[1] = re.sub(r'\s*\{$', "", s)
+        continue
+    m = re.match(r'^(\w[\w\s"]*)\{$', s)
+    if m and "bind" not in s and "keybinds" not in s:
+        mode = m.group(1).strip().replace('"', "")
+        out.append((None, f"\n\033[1;35m{mode}\033[0m"))
+        continue
+    b = re.match(r'^bind\s+((?:"[^"]+"\s*)+)\{(.*)$', s)
+    if b:
+        keys = " / ".join(re.findall(r'"([^"]+)"', b.group(1)))
+        rest = b.group(2).strip()
+        if rest.endswith("}") and rest.count("{") == rest.count("}") - 1:
+            out.append((keys, tidy(rest[:-1])))
+        else:
+            pending, depth = [keys, ""], 1 + rest.count("{") - rest.count("}")
+
+w = min(max((len(k) for k, _ in out if k), default=12), 20)
+pruned = [(k, a) for i, (k, a) in enumerate(out)
+          if not (k is None and (i + 1 >= len(out) or out[i + 1][0] is None))]
+body = [a if k is None else f"  \033[1;36m{k:<{w}}\033[0m  {a}" for k, a in pruned]
+text = "\n".join(body) + "\n\n\033[2m(q to close)\033[0m\n"
+
+pager = subprocess.Popen(["less", "-R", "-X"], stdin=subprocess.PIPE)
+pager.communicate(text.encode())
+#+end_src
