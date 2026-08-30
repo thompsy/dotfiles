@@ -4707,6 +4707,24 @@ Emacs ~ghostel~ setup. Directory tracking and the ~ghostel_cmd~ helper are auto-
   end
 #+end_src
 
+Wrap ~claude~ so every new session gets an explicit ~--session-id~. Claude Code
+otherwise picks its own id, which only exists inside the process; putting the
+uuid in ~argv~ is what lets Zellij's command discovery see it and serialise the
+pane as ~claude --resume <uuid>~ (see the [[#zellij][Zellij]] section). Flags that already pin or
+pick a conversation are passed straight through.
+#+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
+  function claude --wraps=claude --description 'claude with an explicit session id so zellij can resurrect the exact conversation'
+      for a in $argv
+          switch $a
+              case -r --resume -c --continue --session-id --fork-session --from-pr --cloud -p --print
+                  command claude $argv
+                  return $status
+          end
+      end
+      command claude --session-id (uuidgen) $argv
+  end
+#+end_src
+
 Source any local config
 #+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
   if test -e ~/notebook/local-dotfiles/fishrc
