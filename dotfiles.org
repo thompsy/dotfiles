@@ -3930,7 +3930,7 @@ Useful key built-in bindings:
 
 Pinned versions of externally-installed CLI tools live in a plain ~KEY=VALUE~ file at the repo root, ~tool-versions~. It is read at runtime by the [[#brewfile][Brewfile]] and the [[#development-tools-setup][dev-tools setup script]], so a version can be bumped by editing that one file. Re-run ~make setup-tools~ (Go/Rust tools) or ~brew bundle~ (Homebrew runtimes) to apply. Emacs packages are pinned separately in [[#package-versions][~straight-versions.el~]].
 
-The file covers the Go tools (~gopls~, ~golangci-lint~, ~gup~), the Rust crates (~cargo-update~, ~starship-jj~), and the Homebrew language runtimes (~node~, ~go~, ~python~, each pinned to a major series). ~golangci-lint~ stays on the last v1 — v2 uses a ~/v2~ module path and a different config format, so upgrading is a deliberate migration.
+The file covers the Go tools (~gopls~, ~golangci-lint~, ~gup~), the Rust crates (~cargo-update~, ~starship-jj~), the JS ~typescript~ package that backs [[#lsp-servers][TypeScript's language server]], and the Homebrew language runtimes (~node~, ~go~, ~python~, each pinned to a major series). ~golangci-lint~ stays on the last v1 — v2 uses a ~/v2~ module path and a different config format, so upgrading is a deliberate migration.
 
 ** Development Tools Setup
 :PROPERTIES:
@@ -4087,6 +4087,39 @@ This script handles one-time installation of development tools. It's separated f
       end
   end
 
+  function install_node_tools
+      echo "📘 Installing Node tools..."
+
+      if ! type -q npm
+          echo "❌ npm not found on PATH. Install node first (see the Brewfile)."
+          return 1
+      end
+
+      # A plain JS TypeScript for typescript-language-server to fall back on when
+      # a file isn't inside a project with its own typescript. It goes in a
+      # private prefix rather than `npm install -g' because Homebrew's typescript
+      # formula already owns the `tsc' symlink in the brew prefix - and that
+      # formula is the native TS 7 build, which ships no tsserver.js.
+      set -l ts_version (tool_version typescript)
+      or return 1
+      set -l ts_prefix "$HOME/.local/share/typescript"
+      set -l ts_manifest "$ts_prefix/node_modules/typescript/package.json"
+
+      set -l ts_installed ""
+      if test -f $ts_manifest
+          set ts_installed (jq -r '.version' $ts_manifest 2>/dev/null)
+      end
+
+      if test "$ts_installed" = "$ts_version"
+          log_step "SKIP" "typescript $ts_version already installed"
+      else
+          log_step "INSTALL" "Installing typescript $ts_version..."
+          if not install_with_retry "npm install --silent --no-audit --no-fund --prefix $ts_prefix typescript@$ts_version"
+              echo "❌ Failed to install typescript"
+          end
+      end
+  end
+
   function install_nerd_fonts
       echo "🔤 Installing Nerd Fonts..."
 
@@ -4184,6 +4217,7 @@ This script handles one-time installation of development tools. It's separated f
 
       # Install other tools
       install_go_tools
+      install_node_tools
       install_nerd_fonts
 
       # Update installed tools only when explicitly requested with --update
@@ -4273,6 +4307,10 @@ brew "zellij"
 
 # Python language server, used globally by eglot
 brew "basedpyright"
+
+# TypeScript language server (wraps tsserver), used globally by eglot. Depends on
+# the same node formula pinned above.
+brew "typescript-language-server"
 
 # Spellchecker used by Emacs flyspell/ispell (provides the en_GB dictionary)
 brew "aspell"

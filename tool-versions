@@ -14,6 +14,13 @@ gup=v0.27.8
 cargo-update=17.0.0
 starship-jj=0.7.0
 
+# JS/TS tooling, installed with npm into its own prefix (~/.local/share/typescript)
+# by setup-dev-tools.fish. This is the tsserver that typescript-language-server
+# falls back on for files outside a project that has its own typescript; Homebrew's
+# typescript formula can't serve as one, being the native TS 7 build with no
+# tsserver.js.
+typescript=5.9.3
+
 # Homebrew language runtimes, pinned to a major series (formula name@SERIES)
 node=26
 go=1.26
