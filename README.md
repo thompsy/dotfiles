@@ -99,3 +99,10 @@ You can also tangle from within Emacs by opening `dotfiles.org` and running
 - **Python LSP:** `basedpyright` is installed globally via Homebrew and used by
   eglot for all Python projects; the `pet` package supplies each project's
   virtualenv so imports resolve without manual activation.
+- **TypeScript LSP:** `typescript-language-server` comes from Homebrew, but it
+  only wraps whichever `tsserver` belongs to the project being edited, so a
+  project needs its own `node_modules/typescript`. Homebrew's `typescript`
+  formula cannot fill in for a missing one — since TypeScript 7 it ships only
+  the native `tsc` binary and no `tsserver.js` — so `make setup-tools` installs
+  a plain JS TypeScript under `~/.local/share/typescript` and eglot passes it as
+  `tsserver.fallbackPath`, used only when a project has no copy of its own.

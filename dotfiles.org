@@ -2531,6 +2531,8 @@ Built-in ~eglot~ provides Language Server Protocol (LSP) support for Emacs. It e
     :hook
     ((go-ts-mode . eglot-ensure)
      (python-ts-mode . eglot-ensure)
+     (typescript-ts-mode . eglot-ensure)
+     (tsx-ts-mode . eglot-ensure)
      (terraform-mode . eglot-ensure)
      (java-ts-mode . eglot-ensure)
      (bash-ts-mode . eglot-ensure)
@@ -2584,7 +2586,59 @@ Built-in ~eglot~ provides Language Server Protocol (LSP) support for Emacs. It e
     ;; so imports resolve per-project without activating the venv manually.
     ;; ruff is available on-demand via `my/lint-ruff' (flycheck hydra `P').
     (add-to-list 'eglot-server-programs
-                 `(python-ts-mode . ("basedpyright-langserver" "--stdio"))))
+                 `(python-ts-mode . ("basedpyright-langserver" "--stdio")))
+    ;; Configure TypeScript/TSX. Eglot already knows typescript-language-server,
+    ;; but the entry is overridden to add inlay hints and the tsserver fallback
+    ;; built by `at/typescript-language-server-contact' below. The :language-id
+    ;; specs have to be repeated: without them eglot derives the id from the mode
+    ;; name, and tsserver wants "typescriptreact", not "tsx".
+    (add-to-list 'eglot-server-programs
+                 '(((typescript-ts-mode :language-id "typescript")
+                    (tsx-ts-mode :language-id "typescriptreact"))
+                   . at/typescript-language-server-contact)))
+
+  ;; typescript-language-server runs the tsserver belonging to the project it is
+  ;; editing (node_modules/typescript), the way VS Code does, so diagnostics match
+  ;; what the project's own compiler reports. Files outside such a project need a
+  ;; fallback, and Homebrew's `typescript' is no use for one: since TypeScript 7 it
+  ;; ships only the native `tsc' binary and no tsserver.js. The dev-tools setup
+  ;; script therefore installs a plain JS TypeScript under ~/.local/share/typescript,
+  ;; passed here as `tsserver.fallbackPath' - which the server consults only after
+  ;; failing to find the project's own copy, so per-project versions still win.
+  (defvar at/tsserver-fallback-path-cache 'unset
+    "Cached location of the global TypeScript lib directory.
+  The symbol `unset' means it has not been looked up yet; nil means no
+  global TypeScript is installed.")
+
+  (defun at/tsserver-fallback-path ()
+    "Return the lib directory of the global TypeScript install, or nil."
+    (when (eq at/tsserver-fallback-path-cache 'unset)
+      (setq at/tsserver-fallback-path-cache
+            (let ((lib (expand-file-name
+                        "~/.local/share/typescript/node_modules/typescript/lib")))
+              (and (file-exists-p (expand-file-name "tsserver.js" lib)) lib))))
+    at/tsserver-fallback-path-cache)
+
+  (defun at/typescript-language-server-contact (&optional _interactive)
+    "Return the eglot contact for typescript-language-server.
+  A function rather than a literal so the fallback lookup happens when a
+  TypeScript server is first started, not at startup.  Note `:json-false':
+  plain nil would serialise to an empty object and be ignored."
+    `("typescript-language-server" "--stdio"
+      :initializationOptions
+      (:preferences
+       (:includeInlayParameterNameHints "all"
+        ;; Skip the hints that merely restate the argument or variable
+        ;; name - they are pure noise.
+        :includeInlayParameterNameHintsWhenArgumentMatchesName :json-false
+        :includeInlayVariableTypeHintsWhenTypeMatchesName :json-false
+        :includeInlayFunctionParameterTypeHints t
+        :includeInlayVariableTypeHints t
+        :includeInlayPropertyDeclarationTypeHints t
+        :includeInlayFunctionLikeReturnTypeHints t
+        :includeInlayEnumMemberValueHints t)
+       ,@(when-let* ((fallback (at/tsserver-fallback-path)))
+           (list :tsserver (list :fallbackPath fallback))))))
 
 
   ;; Enhanced eglot integration functions
@@ -2632,6 +2686,8 @@ Built-in ~eglot~ provides Language Server Protocol (LSP) support for Emacs. It e
                 (select-window help-window)))
           (message "No symbol at point"))))))
 #+END_SRC
+
+The servers themselves are installed outside Emacs: ~gopls~ and ~basedpyright~ by the [[#development-tools-setup][dev-tools setup script]] and the [[#brewfile][Brewfile]], and ~typescript-language-server~ by the Brewfile as well. TypeScript needs one extra piece, because ~typescript-language-server~ is only a wrapper - it drives whichever ~tsserver~ belongs to the project being edited, and Homebrew's ~typescript~ formula cannot stand in for a missing one, since TypeScript 7 dropped the JS ~tsserver.js~ in favour of a native binary. The setup script installs a plain JS TypeScript into its own prefix for exactly that fallback; a project with its own ~node_modules/typescript~ still uses that instead. TypeScript files also need the ~typescript~ and ~tsx~ grammars from [[#treesitter-setup][Treesitter Setup]] installed.
 
 [[https://github.com/mohkale/consult-eglot][~consult-eglot~]] integrates eglot with consult, providing enhanced interfaces for LSP features like symbol search and workspace navigation.
 
@@ -2719,6 +2775,17 @@ Simple linter functions using compile-mode for built-in error navigation.
 
 #+BEGIN_SRC emacs-lisp
   (use-package json-mode)
+#+END_SRC
+
+Built-in ~typescript-ts-mode~ provides TypeScript support using tree-sitter. Emacs only claims the ~.ts~ and ~.tsx~ extensions from inside the library itself, which nothing loads on its own, so the file associations are declared here - otherwise TypeScript files open in ~fundamental-mode~. JSX-flavoured code (~.tsx~) is a different major mode, ~tsx-ts-mode~, built on its own grammar. Both grammars are listed in [[#treesitter-setup][Treesitter Setup]]; run ~M-x treesit-install-language-grammar~ once per machine for ~typescript~ and ~tsx~.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package typescript-ts-mode
+    :straight nil
+    :mode (("\\.ts\\'" . typescript-ts-mode)
+           ("\\.mts\\'" . typescript-ts-mode)
+           ("\\.cts\\'" . typescript-ts-mode)
+           ("\\.tsx\\'" . tsx-ts-mode)))
 #+END_SRC
 
 Helper functions for eglot integration with error handling.
