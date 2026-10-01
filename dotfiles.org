@@ -2150,7 +2150,7 @@ Now we've got a hydra to make the various window management functions easily acc
            (interactive)
            (ace-window 16)
            (add-hook 'ace-window-end-once-hook
-                     'hydra-window/body)))
+                     'hydra-window-delux/body)))
     ("O" delete-other-windows)
 
     ;; Switch
@@ -2160,12 +2160,12 @@ Now we've got a hydra to make the various window management functions easily acc
            (interactive)
            (ace-window 1)
            (add-hook 'ace-window-end-once-hook
-                     'hydra-window/body)))
+                     'hydra-window-delux/body)))
     ("s" (lambda ()
            (interactive)
            (ace-window 4)
            (add-hook 'ace-window-end-once-hook
-                     'hydra-window/body)))
+                     'hydra-window-delux/body)))
     ("c" delete-window)
 
     ("q" nil))
