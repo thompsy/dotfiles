@@ -66,7 +66,7 @@
  ("free-keys" . "bed8e9c356c889cd98dd7a4a63c69d6c4960cf82")
  ("gcmh" . "0089f9c3a6d4e9a310d0791cf6fa8f35642ecfd9")
  ("general.el" . "a48768f85a655fe77b5f45c2880b420da1b1b9c3")
- ("ghostel" . "7aa53db6ce82612b868c70e44087ac55f4354d56")
+ ("ghostel" . "d239a3c3b8cd9a7210169bb7dd50c94fccfb95c6")
  ("git-timemachine" . "d1346a76122595aeeb7ebb292765841c6cfd417b")
  ("gnu-elpa-mirror" . "1a75d552f3501e228e4390e71dc709d1b391dfdc")
  ("gotest-ts" . "fc291328059ad615409b2377c93281e7354782b6")
