@@ -4494,8 +4494,10 @@ The ~fzf.fish~ plugin. This gives a number of useful keybindings:
 - ~Ctrl Alt P~ :: show fuzzy process list. On selection, print the ~pid~ of the selected process.
 
 #+begin_src fish :tangle "~/.config/fish/config.fish" :mkdirp yes
-  # Install fisher if it's not found
-  if ! functions -q fisher
+  # Install fisher if it's not found. Only in interactive shells: fisher
+  # spawns `fish --command` subprocesses, which would otherwise re-run this
+  # bootstrap and recurse.
+  if status is-interactive && ! functions -q fisher
       echo "Installing Fisher..."
       curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fisher
       # Install all plugins
